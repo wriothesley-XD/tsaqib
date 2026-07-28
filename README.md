@@ -1,100 +1,59 @@
-# API Pendaftaran Tsaqib Island — Kontrak Framer ↔ Laravel
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-Ini buat Galang (backend) supaya bisa langsung kerja tanpa nunggu Framer
-selesai duluan. Kontraknya sudah fix di bawah ini — kalau Framer ganti
-struktur data nanti, koordinasikan dulu sebelum ubah.
+<p align="center">
+<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+</p>
 
-## Endpoint
+## About Laravel
 
-```
-POST /api/submit
-Content-Type: application/json
-```
+Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-### Request body yang dikirim dari Framer
+- [Simple, fast routing engine](https://laravel.com/docs/routing).
+- [Powerful dependency injection container](https://laravel.com/docs/container).
+- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+- [Robust background job processing](https://laravel.com/docs/queues).
+- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-```json
-{
-  "komunitas": "tahfidz",
-  "role": "hafidz",
-  "nama_lengkap": "Nama Lengkap",
-  "nama_panggilan": "Panggilan",
-  "instagram": "@username",
-  "alasan": "Alasan mendaftar..."
-}
-```
+Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-- `komunitas` dan `role` itu **slug**, harus sama persis dengan key yang
-  ada di `config/komunitas.php` (contoh: `tahfidz`, bukan `Tahfidz`).
+## Learning Laravel
 
-### Response sukses (200)
-```json
-{ "success": true, "message": "Pendaftaran berhasil diterima." }
-```
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
 
-### Response gagal validasi (422)
-```json
-{ "success": false, "message": "..." }
-```
-atau kalau gagal dari Laravel FormRequest bawaan:
-```json
-{ "message": "...", "errors": { "nama_lengkap": ["Nama lengkap wajib diisi."] } }
-```
+If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-## Cara pasang ke repo Laravel
+## Laravel Sponsors
 
-1. Copy semua file ke lokasi yang sama:
-   - `routes/api.php` → **gabungkan** isinya ke `routes/api.php` yang
-     sudah ada (jangan timpa, tinggal tambahkan baris Route::post-nya)
-   - `app/Http/Requests/StorePendaftaranRequest.php`
-   - `app/Http/Controllers/Api/PendaftaranController.php`
-   - `app/Mail/PendaftaranMasuk.php`
-   - `resources/views/emails/pendaftaran-masuk.blade.php`
-   - `config/cors.php` — **cek dulu** apakah file ini sudah ada di project,
-     kalau sudah ada tinggal sesuaikan bagian `allowed_origins` saja
+We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
 
-2. Pastikan `config/komunitas.php` (yang sudah dibuat sebelumnya untuk
-   bagian map) ada di project yang sama, karena controller ini
-   membacanya untuk validasi slug komunitas/role.
+### Premium Partners
 
-3. Set alamat email tujuan di `.env`:
-   ```
-   MAIL_ADMIN_ADDRESS=fsi@sekolah.sch.id
-   ```
-   lalu di `config/mail.php` tambahkan:
-   ```php
-   'admin_address' => env('MAIL_ADMIN_ADDRESS', 'fsi@example.com'),
-   ```
+- **[Vehikl](https://vehikl.com)**
+- **[Tighten Co.](https://tighten.co)**
+- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+- **[64 Robots](https://64robots.com)**
+- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
+- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+- **[Redberry](https://redberry.international/laravel-development)**
+- **[Active Logic](https://activelogic.com)**
 
-4. Testing tanpa SMTP dulu (biar nggak keblok jaringan sekolah):
-   set `.env`:
-   ```
-   MAIL_MAILER=log
-   ```
-   Nanti isi email muncul di `storage/logs/laravel.log`, bukan
-   benar-benar terkirim — cukup buat mastiin data & format email-nya
-   benar dulu.
+## Contributing
 
-## Alamat API tergantung situasi (untuk kode fetch di Framer)
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-| Situasi | URL |
-|---|---|
-| Testing di laptop sendiri | `http://127.0.0.1:8000/api/submit` |
-| Testing online sementara | URL ngrok yang lagi aktif |
-| Sudah live (production) | domain asli, misal `https://api.tsaqibisland.com/api/submit` |
+## Code of Conduct
 
-Contoh kode fetch lengkap ada di `framer-submit-example.js` — tinggal
-sesuaikan `apiUrl`-nya dan cara ambil data dari form Framer kalian
-(`formData.komunitasSlug` dst itu placeholder, sesuaikan dengan cara
-kalian simpan state di Framer).
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
-## Yang perlu dicek bareng-bareng sebelum dianggap "selesai"
-- [ ] CORS sudah di-set benar (`allowed_origins` di `config/cors.php`)
-- [ ] Test kirim dari Framer beneran (bukan cuma Postman) — dulu sempat
-      berhasil pakai ngrok, pastikan masih jalan setelah kode di atas
-      dipasang
-- [ ] Format email yang diterima admin sudah sesuai kebutuhan (isi,
-      subject, dst)
-- [ ] Apa yang terjadi di sisi Framer kalau response-nya gagal
-      (422/500) — pastikan ada pesan error yang muncul ke user, jangan
-      diam saja
+## Security Vulnerabilities
+
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+
+## License
+
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

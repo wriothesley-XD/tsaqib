@@ -2,35 +2,33 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StorePendaftaranRequest extends FormRequest
 {
+    /**
+     * Determine if the user is authorized to make this request.
+     */
     public function authorize(): bool
     {
-        // Endpoint publik, tidak perlu auth/login
         return true;
     }
 
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, ValidationRule|array<mixed>|string>
+     */
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'nickname' => ['required', 'string', 'max:100'],
-            'class' => ['required', 'string', 'max:100'],
-            'ig_user' => ['required', 'string', 'max:100'],
-            'reason' => ['required', 'string', 'max:2000'],
-        ];
-    }
-
-    public function messages(): array
-    {
-        return [
-            'name.required' => 'Nama lengkap wajib diisi.',
-            'nickname.required' => 'Nama panggilan wajib diisi.',
-            'class.required' => 'Kelas wajib diisi.',
-            'ig_user.required' => 'Username Instagram wajib diisi.',
-            'reason.required' => 'Alasan wajib diisi.',
+            'komunitas'      => ['required', 'string'],
+            'role'           => ['required', 'string'],
+            'nama_lengkap'   => ['required', 'string', 'max:255'],
+            'nama_panggilan' => ['required', 'string', 'max:100'],
+            'instagram'      => ['required', 'string', 'max:100'],
+            'alasan'         => ['required', 'string', 'max:2000'],
         ];
     }
 }

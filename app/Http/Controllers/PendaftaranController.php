@@ -6,15 +6,15 @@ use Illuminate\Http\Request;
 
 class PendaftaranController extends Controller
 {
-    public function store(Request $request)
+    public function store(\Illuminate\Http\Request $request)
     {
         $validated = $request->validate([
-            'nama_lengkap' => 'required|string|max:255',
-            'nama_panggilan' => 'required|string|max:100',
-            'username_ig' => 'required|string|max:100',
-            'komunitas' => 'required|string|max:100',
-            'role' => 'required|string|max:100',
-            'alasan' => 'required|string',
+            'name' => 'required|string|max:255',
+            'nickname' => 'required|string|max:100',
+            'class' => 'required|string|max:100',
+            'ig_user' => 'required|string|max:100',
+            'reason' => ['required', 'string', 'max:2000']
+           
         ]);
 
         return response()->json([

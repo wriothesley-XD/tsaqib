@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\Registration;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -12,7 +13,7 @@ class PendaftaranMasuk extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public function __construct(public array $data)
+    public function __construct(public Registration $registration)
     {
         //
     }
@@ -20,7 +21,7 @@ class PendaftaranMasuk extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Pendaftaran Baru: ' . $this->data['komunitas_nama'] . ' — ' . $this->data['nama_lengkap'],
+            subject: 'Pendaftaran Open Recruitment FSI: ' . $this->registration->full_name,
         );
     }
 
@@ -28,7 +29,7 @@ class PendaftaranMasuk extends Mailable
     {
         return new Content(
             view: 'emails.pendaftaran-masuk',
-            with: ['data' => $this->data],
+            with: ['registration' => $this->registration],
         );
     }
 }

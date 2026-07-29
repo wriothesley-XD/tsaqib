@@ -10,6 +10,11 @@ use App\Http\Controllers\TsaqibController;
 
 // Publik — tanpa login (Peta & Pustaka FSI)
 Route::get('/', [PageController::class, 'home'])->name('home');
+<<<<<<< HEAD
+Route::get('/community', [PageController::class, 'community'])->name('community');
+Route::get('/dashboard', [PageController::class, 'dashboard'])->name('dashboard');
+=======
+>>>>>>> 25129578b719ececc4ec024efeac171d589095bf
 Route::get('/perpustakaan', [PageController::class, 'perpustakaan'])->name('perpustakaan');
 
 <<<<<<< HEAD

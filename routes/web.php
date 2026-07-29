@@ -1,13 +1,23 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PageController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/community', [PageController::class, 'community'])->name('community');
 Route::get('/labor', [PageController::class, 'labor'])->name('labor');
 Route::get('/perpustakaan', [PageController::class, 'perpustakaan'])->name('perpustakaan');
 
+Route::prefix('admin-panel')->name('admin.')->group(function () {
+    Route::get('/', [AdminController::class, 'index'])->name('index');           // Daftar Buku
+    Route::get('/add', [AdminController::class, 'create'])->name('create');   // Form Tambah
+    Route::post('/add', [AdminController::class, 'store'])->name('store');    // Simpan Data Baru
+    Route::get('/{id}/edit', [AdminController::class, 'edit'])->name('edit');    // Form Edit
+    Route::put('/{id}', [AdminController::class, 'update'])->name('update');     // Simpan Perubahan
+    Route::delete('/{id}', [AdminController::class, 'destroy'])->name('destroy');// Hapus Data
+});
+
 Route::get('/', function () {
-    return view('welcome');
+    return view('home');
 });

@@ -19,12 +19,13 @@
                     <form method="POST" action="{{ route('daftar.store') }}" class="space-y-6">
                         @csrf
 
-                        {{-- Nama Lengkap: otomatis dari akun, read-only, tidak dikirim sebagai input --}}
+                        {{-- Nama Lengkap: sekarang input beneran (bisa diisi guest tanpa akun).
+                             Kalau lagi login, otomatis ke-prefill dari nama akun tapi tetap bisa diedit. --}}
                         <div>
                             <x-input-label for="full_name" value="Nama Lengkap" />
-                            <x-text-input id="full_name" type="text" class="mt-1 block w-full bg-gray-100"
-                                value="{{ auth()->user()->name }}" disabled />
-                            <p class="text-sm text-gray-500 mt-1">Diambil otomatis dari akunmu.</p>
+                            <x-text-input id="full_name" name="full_name" type="text" class="mt-1 block w-full"
+                                value="{{ old('full_name', auth()->user()->name ?? '') }}" required />
+                            <x-input-error :messages="$errors->get('full_name')" class="mt-2" />
                         </div>
 
                         {{-- Nama Panggilan --}}

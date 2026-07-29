@@ -115,4 +115,16 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Notification Address
+    |--------------------------------------------------------------------------
+    |
+    | Dipakai PendaftaranController buat ngirim notifikasi tiap ada
+    | pendaftaran Open Recruitment baru. Isi MAIL_ADMIN_ADDRESS di .env.
+    |
+    */
+
+    'admin_address' => env('MAIL_ADMIN_ADDRESS', 'admin@example.com'),
+
 ];

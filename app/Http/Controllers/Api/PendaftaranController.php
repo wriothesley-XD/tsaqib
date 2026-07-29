@@ -5,47 +5,42 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePendaftaranRequest;
 use App\Mail\PendaftaranMasuk;
+use App\Models\Registration;
 use Illuminate\Support\Facades\Mail;
 
 class PendaftaranController extends Controller
 {
+    /**
+     * Tampilkan form Open Recruitment.
+     */
+    public function create()
+    {
+        return view('pendaftaran.create');
+    }
+
+    /**
+     * Simpan pendaftaran baru dan kirim notifikasi ke email resmi FSI.
+     */
     public function store(StorePendaftaranRequest $request)
     {
         $validated = $request->validated();
+        $user = $request->user();
 
-        // 1. Ambil data komunitas dari config
-        $komunitasConfig = config("komunitas.{$validated['komunitas']}");
+        $registration = Registration::create([
+            'user_id' => $user->id,
+            'full_name' => $user->name, // otomatis dari akun, bukan input manual
+            'nickname' => $validated['nickname'],
+            'class' => $validated['class'],
+            'username_ig' => $validated['username_ig'],
+            'reason' => $validated['reason'],
+            'status' => 'pending',
+        ]);
 
-        // Validasi A: Cek apakah slug komunitas ada & statusnya aktif
-        if (!$komunitasConfig || !($komunitasConfig['aktif'] ?? false)) {
-            return response()->json([
-                'message' => 'Komunitas tidak ditemukan atau sedang tidak aktif.',
-            ], 422);
-        }
+        Mail::to(config('mail.admin_address'))->send(new PendaftaranMasuk($registration));
+        $registration->update(['email_sent_at' => now()]);
 
-        // Validasi B: Cek apakah role valid (jika komunitas memiliki daftar roles)
-        $daftarRoles = $komunitasConfig['roles'] ?? [];
-        if (!empty($daftarRoles) && !array_key_exists($validated['role'], $daftarRoles)) {
-            return response()->json([
-                'message' => 'Role yang dipilih tidak valid untuk komunitas ini.',
-            ], 422);
-        }
-
-        // 2. Tambahkan nama tampilan komunitas & role ke dalam data
-        $validated['komunitas_nama'] = $komunitasConfig['nama'];
-        $validated['role_nama'] = $daftarRoles[$validated['role']]['nama'] ?? $validated['role'];
-
-        // 3. Kirim Email Notifikasi ke Admin
-        $adminEmail = config('mail.admin_address') ?? env('MAIL_ADMIN_ADDRESS');
-
-        if ($adminEmail) {
-            Mail::to($adminEmail)->send(new PendaftaranMasuk($validated));
-        }
-
-        // 3. Kembalikan Respon Sukses
-        return response()->json([
-            'success' => true,
-            'message' => 'Pendaftaran berhasil diterima.',
-        ], 200);
+        return redirect()
+            ->route('daftar.create')
+            ->with('success', 'Pendaftaran berhasil dikirim. Terima kasih!');
     }
 }

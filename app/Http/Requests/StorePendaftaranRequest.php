@@ -12,7 +12,8 @@ class StorePendaftaranRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        // Harus login untuk mendaftar (route ini sudah di dalam middleware('auth')).
+        return $this->user() !== null;
     }
 
     /**
@@ -23,12 +24,10 @@ class StorePendaftaranRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'komunitas'      => ['required', 'string'],
-            'role'           => ['required', 'string'],
-            'nama_lengkap'   => ['required', 'string', 'max:255'],
-            'nama_panggilan' => ['required', 'string', 'max:100'],
-            'instagram'      => ['required', 'string', 'max:100'],
-            'alasan'         => ['required', 'string', 'max:2000'],
+            'nickname' => ['required', 'string', 'max:100'],
+            'class' => ['required', 'string', 'max:100'],
+            'username_ig' => ['required', 'string', 'max:100'],
+            'reason' => ['required', 'string', 'max:2000'],
         ];
     }
 }

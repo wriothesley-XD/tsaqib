@@ -29,7 +29,6 @@
                 <div class="flex justify-center gap-4 flex-wrap">
                     <!-- Tombol Home (Aktif - Warna Hijau) -->
                     <a href="{{ route('home') }}" class="px-6 py-3 bg-emerald-600 text-white font-semibold rounded-xl shadow-md hover:bg-emerald-700 transition duration-200">
-                        Home
                     </a>
 
                     <!-- Tombol Community -->

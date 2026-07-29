@@ -16,11 +16,6 @@ class PageController extends Controller
         return view('community');
     }
 
-    public function labor()
-    {
-        return view('labor');
-    }
-
     public function perpustakaan()
     {
         return view('perpustakaan');

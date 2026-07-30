@@ -20,9 +20,4 @@ Route::prefix('admin-panel')->name('admin.')->group(function () {
     Route::put('/{id}', [AdminController::class, 'update'])->name('update');     // Simpan Perubahan
     Route::delete('/{id}', [AdminController::class, 'destroy'])->name('destroy');// Hapus Data
 });
-
-Route::get('/', function () {
-    return view('home');
-});
-
 require __DIR__.'/auth.php';

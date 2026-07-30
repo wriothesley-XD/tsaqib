@@ -5,4 +5,4 @@
     <a href="{{ route('kegiatan') }}">Informasi Kegiatan</a> |
     <a href="{{ route('perpustakaan') }}">Perpustakaan</a>
 </nav>
-<hr>ppp
+<hr>

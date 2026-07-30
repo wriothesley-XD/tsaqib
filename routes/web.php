@@ -4,7 +4,9 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
 
-// Publik — tanpa login (Peta & Pustaka FSI)
+// ==========================================================
+// PUBLIK — tanpa login
+// ==========================================================
 Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/community', [PageController::class, 'community'])->name('community');
 Route::get('/dashboard', [PageController::class, 'dashboard'])->name('dashboard');

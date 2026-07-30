@@ -12,8 +12,9 @@ class StorePendaftaranRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // Harus login untuk mendaftar (route ini sudah di dalam middleware('auth')).
-        return $this->user() !== null;
+        // Open Recruitment sekarang publik (guest boleh daftar tanpa akun) —
+        // sesuai keputusan rapat granular access. Dulu wajib login, sekarang tidak.
+        return true;
     }
 
     /**
@@ -24,6 +25,7 @@ class StorePendaftaranRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'full_name' => ['required', 'string', 'max:255'],
             'nickname' => ['required', 'string', 'max:100'],
             'class' => ['required', 'string', 'max:100'],
             'username_ig' => ['required', 'string', 'max:100'],

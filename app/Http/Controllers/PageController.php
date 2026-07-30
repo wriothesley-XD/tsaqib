@@ -20,6 +20,11 @@ class PageController extends Controller
         return view('dashboard');
     }
 
+    public function labor()
+    {
+    return view('labor');
+    }
+
     public function perpustakaan()
     {
         return view('perpustakaan');

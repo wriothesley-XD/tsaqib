@@ -10,7 +10,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/community', [PageController::class, 'community'])->name('community');
 Route::get('/dashboard', [PageController::class, 'dashboard'])->name('dashboard');
+Route::get('/labor', [PageController::class, 'labor'])->name('labor');
 Route::get('/perpustakaan', [PageController::class, 'perpustakaan'])->name('perpustakaan');
+
 
 Route::prefix('admin-panel')->name('admin.')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('index');           // Daftar Buku

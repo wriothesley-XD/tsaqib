@@ -33,9 +33,3 @@ class PageController extends Controller
      * yang tiba-tiba 404 buat orang lain yang lagi kerja paralel.
      */
 
-    
-    public function community()
-    {
-        return view('community');
-    }
-

@@ -21,7 +21,7 @@ class Registration extends Model
         'full_name',
         'nickname',
         'class',
-        'instagram_username',
+        'username_ig',
         'reason',
         'status',
         'email_sent_at',

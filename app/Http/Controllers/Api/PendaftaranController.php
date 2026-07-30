@@ -24,11 +24,11 @@ class PendaftaranController extends Controller
     public function store(StorePendaftaranRequest $request)
     {
         $validated = $request->validated();
-        $user = $request->user();
+        $user = $request->user(); // null kalau guest — sekarang itu valid, bukan bug
 
         $registration = Registration::create([
-            'user_id' => $user->id,
-            'full_name' => $user->name, // otomatis dari akun, bukan input manual
+            'user_id' => $user?->id, // null kalau guest, sesuai migration nullable
+            'full_name' => $validated['full_name'], // dari input form, bukan lagi dari akun
             'nickname' => $validated['nickname'],
             'class' => $validated['class'],
             'username_ig' => $validated['username_ig'],

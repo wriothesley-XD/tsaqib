@@ -57,7 +57,10 @@ Route::middleware('auth')->group(function () {
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
-
-    Route::get('daftar', [PendaftaranController::class, 'create'])->name('daftar.create');
-    Route::post('/daftar', [PendaftaranController::class, 'store'])->name('daftar.store');
 });
+
+// Open Recruitment (daftar member) — publik, sesuai keputusan rapat granular access.
+// Dipindah keluar dari group 'auth' di atas — sebelumnya wajib login, sekarang guest
+// juga boleh daftar tanpa akun (lihat migration nullable user_id di registrations).
+Route::get('daftar', [PendaftaranController::class, 'create'])->name('daftar.create');
+Route::post('/daftar', [PendaftaranController::class, 'store'])->name('daftar.store');

@@ -13,14 +13,20 @@
 
                     {{-- Menu TSAQIB — tambah item baru di sini pakai pola yang sama --}}
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <a href="{{ route('labor-pai') }}"
+                        <a href="{{ route('labor') }}"
                            class="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition">
                             <span class="font-medium text-gray-900">Labor PAI</span>
                             <p class="text-sm text-gray-500 mt-1">Visi-misi &amp; struktur organisasi FSI</p>
                         </a>
 
+                        <a href="{{ route('role') }}"
+                           class="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition">
+                            <span class="font-medium text-gray-900">Informasi Role</span>
+                            <p class="text-sm text-gray-500 mt-1">Detail jabatan &amp; wewenang internal FSI</p>
+                        </a>
+
                         {{-- Placeholder, tinggal isi begitu route-nya jadi:
-                        <a href="{{ route('open-recruitment') }}" class="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition">
+                        <a href="{{ route('daftar.create') }}" class="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition">
                             <span class="font-medium text-gray-900">Open Recruitment</span>
                             <p class="text-sm text-gray-500 mt-1">Daftar jadi pengurus FSI</p>
                         </a>

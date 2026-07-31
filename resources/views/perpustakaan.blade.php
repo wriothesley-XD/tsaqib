@@ -1,171 +1,192 @@
+<!-- resources/views/perpustakaan.blade.php -->
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maktabah Digital - Pustaka Islami</title>
+    <title>Perpustakaan Digital FSI - TSAQIB SMAN 1 Bukittinggi</title>
     @vite('resources/css/app.css')
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    @php
+        $books = \App\Models\Book::latest()->get();
+    @endphp
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        'islamic-dark': '#064e3b',   // Emerald 900
-                        'islamic-main': '#047857',   // Emerald 600
-                        'islamic-light': '#ecfdf5',  // Emerald 50
-                        'islamic-gold': '#f59e0b',   // Amber 500
-                        'bg-outer': '#f3f4f6'        // Abu-abu terang untuk luar container (seperti di screenshot)
-                    }
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
                 }
             }
         }
     </script>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-900 font-sans antialiased min-h-screen flex flex-col">
 
+    <!-- Unified TSAQIB Navbar (6 Items) -->
     @include('partials.navbar')
-    
 
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-8 w-full">
 
-                <!-- Search Bar (Tengah) -->
-                <div class="flex-1 max-w-2xl mx-8 hidden md:block">
+        <!-- Top Header & Search Bar -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
+            <div class="max-w-3xl mx-auto text-center space-y-3">
+                <span class="inline-block px-3 py-1 rounded-full bg-[#01795F]/10 text-[#01795F] text-xs font-semibold uppercase tracking-wider">
+                    Maktabah Digital Publik FSI
+                </span>
+                <h1 class="text-3xl font-bold text-slate-900 tracking-tight">
+                    Perpustakaan Digital <span class="text-[#01795F]">TSAQIB</span>
+                </h1>
+                <p class="text-xs sm:text-sm text-slate-600">
+                    Akses publik buku digital, modul PAI, materi Aqidah, Fiqih, SKI, dan Hadits SMAN 1 Bukittinggi tanpa perlu login.
+                </p>
+
+                <!-- SEARCH BAR -->
+                <div class="pt-2 max-w-xl mx-auto">
                     <div class="relative">
-                        <input type="text" class="w-full bg-white text-gray-900 rounded-md pl-4 pr-10 py-2 focus:outline-none focus:ring-2 focus:ring-islamic-gold" placeholder="Cari Kitab, Penulis, Tafsir, atau Topik...">
-                        <button class="absolute right-0 top-0 mt-2 mr-3 text-gray-500 hover:text-islamic-main">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </button>
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400 text-sm"></i>
+                        <input type="text" id="library-search" onkeyup="filterBooks()" placeholder="Cari judul buku, penulis, atau kata kunci..."
+                               class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-xs text-slate-900 focus:outline-none focus:border-[#01795F] focus:ring-1 focus:ring-[#01795F] shadow-inner">
                     </div>
                 </div>
+            </div>
 
-                <!-- Auth Buttons -->
-                <div class="flex items-center space-x-4">
-                    <a href="#" class="hidden md:block text-gray-200 hover:text-white text-sm font-medium">Masuk</a>
-                    <a href="#" class="bg-islamic-gold hover:bg-yellow-500 text-islamic-dark px-4 py-2 rounded-md text-sm font-bold transition duration-150">Daftar</a>
-                    <button class="md:hidden text-white"><i class="fa-solid fa-bars text-xl"></i></button>
-                </div>
+            <!-- CATEGORY FILTER TABS -->
+            <div class="mt-8 pt-4 border-t border-slate-100 flex items-center justify-center space-x-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-200">
+                <button onclick="filterCategory('semua')" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold bg-[#01795F] text-white transition whitespace-nowrap">Semua Buku</button>
+                <button onclick="filterCategory('fiqih')" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition whitespace-nowrap">Fiqih</button>
+                <button onclick="filterCategory('aqidah')" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition whitespace-nowrap">Aqidah</button>
+                <button onclick="filterCategory('ski')" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition whitespace-nowrap">SKI</button>
+                <button onclick="filterCategory('hadits')" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition whitespace-nowrap">Hadits & Tafsir</button>
+                <button onclick="filterCategory('modul')" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition whitespace-nowrap">Modul PAI</button>
             </div>
         </div>
-    </nav>
 
-    <!-- MAIN CONTAINER (Mendatar putih di tengah seperti Screenshot (808).jpg) -->
-    <main class="max-w-7xl mx-auto bg-white min-h-screen shadow-sm border-x border-gray-200">
-        
-        <!-- WELCOME SECTION & FEATURES CARD -->
-        <div class="px-8 py-10 border-b border-gray-100">
-            <h1 class="text-2xl text-islamic-main font-semibold mb-6">Selamat Datang di Maktabah Digital</h1>
+        <!-- DIGITAL BOOKS GRID -->
+        <div id="books-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             
-            <!-- Cards Container (Horizontal Scroll/Flex) -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Card 1 -->
-                <div class="border border-gray-200 rounded-lg p-5 flex items-center space-x-4 hover:shadow-md transition duration-200 hover:border-islamic-main group cursor-pointer">
-                    <div class="text-4xl text-gray-400 group-hover:text-islamic-main transition">
-                        <i class="fa-solid fa-book-open-reader"></i>
-                    </div>
+            @forelse($books as $book)
+                <div class="book-card bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition duration-200 flex flex-col justify-between group"
+                     data-title="{{ strtolower($book->title) }}"
+                     data-author="{{ strtolower($book->author) }}"
+                     data-category="{{ strtolower($book->category ?? 'modul') }}">
+                    
                     <div>
-                        <h3 class="font-bold text-gray-800 text-lg">Baca Kitab Gratis</h3>
-                        <p class="text-sm text-gray-500 mt-1">Ribuan literatur Islam dan kitab kuning digital.</p>
+                        <!-- Cover PDF / Placeholder -->
+                        <div class="w-full h-48 rounded-xl bg-slate-100 border border-slate-200 flex flex-col items-center justify-center p-4 relative overflow-hidden mb-3 group-hover:border-[#01795F] transition">
+                            @if($book->cover_path)
+                                <img src="{{ asset('storage/' . $book->cover_path) }}" alt="{{ $book->title }}" class="w-full h-full object-cover rounded-lg">
+                            @else
+                                <div class="w-12 h-12 rounded-xl bg-[#01795F]/10 text-[#01795F] flex items-center justify-center font-bold text-xl mb-2">
+                                    <i class="fa-solid fa-file-pdf"></i>
+                                </div>
+                                <span class="text-[10px] font-bold text-[#01795F] uppercase tracking-wider">Modul Digital</span>
+                            @endif
+                        </div>
+
+                        <!-- Book Title & Author -->
+                        <span class="text-[9px] font-bold text-[#01795F] uppercase tracking-wider block mb-1">
+                            {{ $book->category ?? 'Modul PAI' }}
+                        </span>
+                        <h3 class="font-bold text-sm text-slate-900 group-hover:text-[#01795F] transition line-clamp-2 leading-snug">
+                            {{ $book->title }}
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-1">Penulis: {{ $book->author ?? 'Tim PAI SMAN 1 Bukittinggi' }}</p>
                     </div>
+
+                    <!-- Read & Download Action Buttons -->
+                    <div class="mt-4 pt-3 border-t border-slate-100 flex items-center space-x-2">
+                        <a href="{{ asset('storage/' . $book->pdf_path) }}" target="_blank"
+                           class="flex-1 py-2 rounded-xl bg-[#01795F] hover:bg-[#3F704D] text-white text-center font-semibold text-xs transition shadow-sm flex items-center justify-center space-x-1">
+                            <i class="fa-solid fa-eye text-[11px]"></i>
+                            <span>Baca PDF</span>
+                        </a>
+
+                        <a href="{{ asset('storage/' . $book->pdf_path) }}" download
+                           class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition border border-slate-200" title="Unduh File">
+                            <i class="fa-solid fa-download"></i>
+                        </a>
+                    </div>
+
                 </div>
-                <!-- Card 2 -->
-                <div class="border border-gray-200 rounded-lg p-5 flex items-center space-x-4 hover:shadow-md transition duration-200 hover:border-islamic-main group cursor-pointer">
-                    <div class="text-4xl text-gray-400 group-hover:text-islamic-main transition">
-                        <i class="fa-solid fa-calendar-check"></i>
+            @empty
+                <!-- SAMPLE BOOKS FOR DEMO IF DB EMPTY -->
+                @php
+                    $sampleBooks = [
+                        ['title' => 'Buku Panduan Fiqih Shalat Lanjutan', 'author' => 'Tim PAI SMAN 1 Bukittinggi', 'cat' => 'fiqih'],
+                        ['title' => 'Ringkasan Aqidah & Akhlak Rabbani', 'author' => 'Ust. Pembina TSAQIB', 'cat' => 'aqidah'],
+                        ['title' => 'Sejarah Kebudayaan Islam Masa Khulafaur Rasyidin', 'author' => 'Majelis SKI FSI', 'cat' => 'ski'],
+                        ['title' => 'Modul Praktikum Ibadah Kelas X', 'author' => 'Laboratorium PAI', 'cat' => 'modul'],
+                    ];
+                @endphp
+                @foreach($sampleBooks as $sb)
+                    <div class="book-card bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition duration-200 flex flex-col justify-between group"
+                         data-title="{{ strtolower($sb['title']) }}"
+                         data-author="{{ strtolower($sb['author']) }}"
+                         data-category="{{ strtolower($sb['cat']) }}">
+                        <div>
+                            <div class="w-full h-48 rounded-xl bg-slate-100 border border-slate-200 flex flex-col items-center justify-center p-4 relative overflow-hidden mb-3">
+                                <i class="fa-solid fa-book-bookmark text-4xl text-[#01795F] mb-2"></i>
+                                <span class="text-[10px] font-bold text-[#01795F] uppercase">{{ $sb['cat'] }}</span>
+                            </div>
+                            <span class="text-[9px] font-bold text-[#01795F] uppercase block mb-1">{{ $sb['cat'] }}</span>
+                            <h3 class="font-bold text-sm text-slate-900 group-hover:text-[#01795F] transition line-clamp-2 leading-snug">{{ $sb['title'] }}</h3>
+                            <p class="text-xs text-slate-500 mt-1">Penulis: {{ $sb['author'] }}</p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center space-x-2">
+                            <a href="#" onclick="alert('Silakan upload file PDF resmi di Admin Panel!'); return false;" class="flex-1 py-2 rounded-xl bg-[#01795F] text-white text-center font-semibold text-xs">
+                                <i class="fa-solid fa-eye text-[11px] mr-1"></i>Baca PDF
+                            </a>
+                        </div>
                     </div>
-                    <div>
-                        <h3 class="font-bold text-gray-800 text-lg">Target Khatam</h3>
-                        <p class="text-sm text-gray-500 mt-1">Atur jadwal membaca Al-Qur'an harian Anda.</p>
-                    </div>
-                </div>
-                <!-- Card 3 -->
-                <div class="border border-gray-200 rounded-lg p-5 flex items-center space-x-4 hover:shadow-md transition duration-200 hover:border-islamic-main group cursor-pointer">
-                    <div class="text-4xl text-gray-400 group-hover:text-islamic-main transition">
-                        <i class="fa-solid fa-bookmark"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-gray-800 text-lg">Simpan Favorit</h3>
-                        <p class="text-sm text-gray-500 mt-1">Buat daftar bacaan buku sejarah & sirah nabawiyah.</p>
-                    </div>
-                </div>
-            </div>
+                @endforeach
+            @endforelse
+
         </div>
 
-        <!-- TRENDING BOOKS SECTION -->
-        <div class="px-8 py-10 bg-gray-50/50">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl text-islamic-main font-semibold underline decoration-2 decoration-islamic-gold underline-offset-8">Kitab & Buku Populer</h2>
-                <div class="flex space-x-2">
-                    <button class="bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-full w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-chevron-left"></i></button>
-                    <button class="bg-islamic-main hover:bg-islamic-dark text-white rounded-full w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-chevron-right"></i></button>
-                </div>
-            </div>
-
-            <!-- Book Carousel (Flex overflow) -->
-            <div class="flex space-x-6 overflow-x-auto pb-4 snap-x scrollbar-hide">
-                <!-- Book Item 1 -->
-                <div class="min-w-[160px] snap-start group">
-                    <div class="w-full h-64 bg-emerald-800 rounded-md shadow-md flex items-center justify-center text-center p-4 border-2 border-transparent group-hover:border-islamic-gold transition relative overflow-hidden">
-                        <!-- Placeholder gambar cover kitab -->
-                        <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')]"></div>
-                        <h3 class="text-islamic-gold font-serif font-bold z-10">Riyadhus<br>Shalihin</h3>
-                    </div>
-                    <div class="mt-3">
-                        <p class="font-bold text-gray-800 text-sm truncate">Riyadhus Shalihin</p>
-                        <p class="text-xs text-gray-500">Imam Nawawi</p>
-                    </div>
-                </div>
-                
-                <!-- Book Item 2 -->
-                <div class="min-w-[160px] snap-start group">
-                    <div class="w-full h-64 bg-slate-800 rounded-md shadow-md flex items-center justify-center text-center p-4 border-2 border-transparent group-hover:border-islamic-gold transition relative overflow-hidden">
-                         <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')]"></div>
-                        <h3 class="text-white font-serif font-bold z-10">Sirah<br>Nabawiyah</h3>
-                    </div>
-                    <div class="mt-3">
-                        <p class="font-bold text-gray-800 text-sm truncate">Sirah Nabawiyah</p>
-                        <p class="text-xs text-gray-500">Shafiyurrahman</p>
-                    </div>
-                </div>
-
-                <!-- Book Item 3 -->
-                <div class="min-w-[160px] snap-start group">
-                    <div class="w-full h-64 bg-amber-700 rounded-md shadow-md flex items-center justify-center text-center p-4 border-2 border-transparent group-hover:border-islamic-gold transition relative overflow-hidden">
-                         <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')]"></div>
-                        <h3 class="text-white font-serif font-bold z-10">Al-Hikam</h3>
-                    </div>
-                    <div class="mt-3">
-                        <p class="font-bold text-gray-800 text-sm truncate">Al-Hikam</p>
-                        <p class="text-xs text-gray-500">Ibn Atha'illah</p>
-                    </div>
-                </div>
-                
-                <!-- Book Item 4 -->
-                <div class="min-w-[160px] snap-start group">
-                    <div class="w-full h-64 bg-teal-900 rounded-md shadow-md flex items-center justify-center text-center p-4 border-2 border-transparent group-hover:border-islamic-gold transition relative overflow-hidden">
-                         <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')]"></div>
-                        <h3 class="text-islamic-gold font-serif font-bold z-10">Fiqh<br>Sunnah</h3>
-                    </div>
-                    <div class="mt-3">
-                        <p class="font-bold text-gray-800 text-sm truncate">Fiqh Sunnah</p>
-                        <p class="text-xs text-gray-500">Sayyid Sabiq</p>
-                    </div>
-                </div>
-                
-                <!-- Book Item 5 -->
-                <div class="min-w-[160px] snap-start group">
-                    <div class="w-full h-64 bg-amber-100 rounded-md shadow-md flex items-center justify-center text-center p-4 border-2 border-transparent group-hover:border-islamic-gold transition relative overflow-hidden">
-                        <h3 class="text-gray-800 font-serif font-bold z-10 text-xl border-2 border-gray-800 p-2">القرآن</h3>
-                    </div>
-                    <div class="mt-3">
-                        <p class="font-bold text-gray-800 text-sm truncate">Mushaf Al-Qur'an</p>
-                        <p class="text-xs text-gray-500">Kemenag RI</p>
-                    </div>
-                </div>
-
-            </div>
-        </div>
     </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-200 bg-white py-8 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>&copy; {{ date('Y') }} TSAQIB • Forum Studi Islam SMAN 1 Bukittinggi. Hak Cipta Dilindungi.</p>
+        </div>
+    </footer>
+
+    <script>
+        function filterBooks() {
+            const query = document.getElementById('library-search').value.toLowerCase();
+            const cards = document.querySelectorAll('.book-card');
+            cards.forEach(card => {
+                const title = card.getAttribute('data-title');
+                const author = card.getAttribute('data-author');
+                if (title.includes(query) || author.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function filterCategory(cat) {
+            const cards = document.querySelectorAll('.book-card');
+            cards.forEach(card => {
+                const category = card.getAttribute('data-category');
+                if (cat === 'semua' || category === cat) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
 
 </body>
 </html>

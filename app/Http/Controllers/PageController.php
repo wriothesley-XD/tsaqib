@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
-use Symfony\Component\HttpFoundation\Response;
 
 class PageController extends Controller
 {
     /**
-     * Landing page — pulau TSAQIB.
+     * Landing page — Peta Sekolah Floating Island (Modular Layer, Tanpa Navbar).
      * Route: GET /
      */
     public function landing()
@@ -18,22 +20,80 @@ class PageController extends Controller
     }
 
     /**
-     * Halaman komunitas (dinamis, 1 template untuk 13 komunitas).
-     * Route: GET /komunitas/{slug}
+     * Halaman Pemilihan Role Carousel Slider (Hanya untuk user yang belum memiliki selected_community).
+     * Route: GET /select-role
      */
-    public function komunitasShow(string $slug)
+    public function selectRole()
     {
         $daftarKomunitas = Config::get('komunitas.daftar', []);
+        return view('select-role', compact('daftarKomunitas'));
+    }
 
-        $komunitas = collect($daftarKomunitas)
-            ->firstWhere('slug', $slug);
+    /**
+     * Simpan pilihan komunitas (selected_community) ke database user secara permanen.
+     * Route: POST /select-role
+     */
+    public function storeRole(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'community_slug' => ['required', 'string', 'max:100'],
+        ]);
 
-        if (! $komunitas) {
-            abort(Response::HTTP_NOT_FOUND, 'Komunitas tidak ditemukan.');
+        $user = Auth::user();
+        if ($user) {
+            $user->update([
+                'selected_community' => $validated['community_slug'],
+            ]);
         }
 
-        return view('komunitas.show', [
-            'komunitas' => $komunitas,
+        // Setelah simpan role -> LANGSUNG MASUK KE HALAMAN KOMUNITAS
+        return redirect()->route('komunitas');
+    }
+
+    /**
+     * Beranda Utama / Direct ke Halaman Komunitas Feed
+     * Route: GET /beranda
+     */
+    public function beranda()
+    {
+        return redirect()->route('komunitas');
+    }
+
+    /**
+     * Halaman Utama Komunitas (Feed Timeline + FAB + Filter Komunitas).
+     * Route: GET /komunitas/{slug?}
+     */
+    public function komunitasIndex(?string $slug = null)
+    {
+        $daftarKomunitas = Config::get('komunitas.daftar', []);
+        $user = Auth::user();
+
+        // Jika slug tidak diberikan dan user punya selected_community di DB, gunakan itu
+        if (!$slug && $user && $user->selected_community) {
+            $currentSlug = $user->selected_community;
+        } else {
+            $currentSlug = $slug ?? 'semua';
+        }
+
+        $query = Post::with('user')->latest();
+
+        if ($currentSlug && $currentSlug !== 'semua') {
+            $query->where('community_slug', $currentSlug);
+        }
+
+        $posts = $query->get();
+        $komunitasAktif = $currentSlug !== 'semua' ? collect($daftarKomunitas)->firstWhere('slug', $currentSlug) : null;
+
+        return view('komunitas.index', [
+            'daftarKomunitas' => $daftarKomunitas,
+            'komunitasAktif'  => $komunitasAktif,
+            'currentSlug'     => $currentSlug,
+            'posts'           => $posts,
         ]);
+    }
+
+    public function komunitasShow(string $slug)
+    {
+        return $this->komunitasIndex($slug);
     }
 }

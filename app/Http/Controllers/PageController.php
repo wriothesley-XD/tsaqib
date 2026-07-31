@@ -3,21 +3,37 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
+use Symfony\Component\HttpFoundation\Response;
 
 class PageController extends Controller
 {
-    public function dashboard()
+    /**
+     * Landing page — pulau TSAQIB.
+     * Route: GET /
+     */
+    public function landing()
     {
-        return view('dashboard');
+        return view('landing');
     }
 
-    public function community()
+    /**
+     * Halaman komunitas (dinamis, 1 template untuk 13 komunitas).
+     * Route: GET /komunitas/{slug}
+     */
+    public function komunitasShow(string $slug)
     {
-        return view('community');
-    }
+        $daftarKomunitas = Config::get('komunitas.daftar', []);
 
-    public function perpustakaan()
-    {
-        return view('perpustakaan');
+        $komunitas = collect($daftarKomunitas)
+            ->firstWhere('slug', $slug);
+
+        if (! $komunitas) {
+            abort(Response::HTTP_NOT_FOUND, 'Komunitas tidak ditemukan.');
+        }
+
+        return view('komunitas.show', [
+            'komunitas' => $komunitas,
+        ]);
     }
 }

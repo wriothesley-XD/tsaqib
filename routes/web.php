@@ -5,6 +5,7 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TsaqibController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\OpenRecruitmentController;
 
 // ==========================================================
 // PUBLIK — tanpa login
@@ -12,6 +13,22 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/community', [PageController::class, 'community'])->name('community');
 Route::get('/perpustakaan', [PageController::class, 'perpustakaan'])->name('perpustakaan');
+
+
+Route::get('/', [PageController::class, 'landing'])
+    ->name('landing');
+Route::get('/komunitas/{slug}', [PageController::class, 'komunitasShow'])
+    ->name('komunitas.show');
+Route::get('/open-recruitment', [PageController::class, 'openRecruitmentForm'])
+    ->name('open.recruitment');
+Route::get('/laboratorium-pai', function () {
+    return view('laboratorium-pai'); // TODO: buat view ini
+})->name('laboratorium.pai');
+
+Route::get('/informasi-kegiatan', function () {
+    return view('informasi-kegiatan'); // TODO: buat view ini
+})->name('informasi.kegiatan');
+
 
 // Labor PAI & Informasi Kegiatan FSI — sebelumnya PageController::labor()
 // cuma nunjuk ke view placeholder yatim (resources/views/labor.blade.php).

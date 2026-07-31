@@ -17,15 +17,13 @@ class Registration extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'user_id',
-        'full_name',
-        'nickname',
-        'class',
-        'username_ig',
-        'reason',
-        'status',
-        'email_sent_at',
-    ];
+    'user_id',
+    'nama_lengkap',
+    'nama_panggilan',
+    'kelas',
+    'instagram_username',
+    'alasan_bergabung',
+];
 
     /**
      * Get the attributes that should be cast.

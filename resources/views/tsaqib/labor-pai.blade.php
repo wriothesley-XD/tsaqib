@@ -99,6 +99,7 @@
                     <i class="fa-solid fa-sitemap"></i>
                 </div>
                 <div>
+                    
                     <h2 class="text-xl font-bold text-slate-900">Infografis Struktur Organisasi</h2>
                     <p class="text-slate-500 text-xs">Struktur Pembina Guru & Pengurus Siswa Laboratorium PAI & TSAQIB</p>
                 </div>
@@ -106,59 +107,11 @@
 
             <!-- INFOGRAPHIC TREE NODES -->
             <div class="space-y-6">
+                <img src="{{ asset('images/struktur.png') }}" alt="FSI">
+                <img src="{{ asset('images/kepengurusan.png') }}" alt="FSI">
+                
 
-                <!-- Node 1: Pembina -->
-                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-center max-w-sm mx-auto shadow-sm">
-                    <span class="text-[10px] font-bold text-[#01795F] uppercase tracking-widest block mb-1">Pengarah Utama</span>
-                    <h4 class="font-bold text-sm text-slate-900">Guru Pembina PAI SMAN 1 Bukittinggi</h4>
-                    <p class="text-xs text-slate-500 mt-0.5">Pembimbing Kepengurusan & Keilmuan</p>
-                </div>
-
-                <!-- Connector Line -->
-                <div class="w-0.5 h-6 bg-slate-300 mx-auto"></div>
-
-                <!-- Node 2: Ketua & Wakil -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto">
-                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-center">
-                        <span class="text-[10px] font-bold text-[#01795F] uppercase block mb-1">Ketua Umum</span>
-                        <h4 class="font-bold text-sm text-slate-900">Ketua FSI TSAQIB</h4>
-                        <p class="text-[10px] text-slate-500 mt-0.5">Koordinator Utama Siswa</p>
-                    </div>
-                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-center">
-                        <span class="text-[10px] font-bold text-[#01795F] uppercase block mb-1">Wakil Ketua</span>
-                        <h4 class="font-bold text-sm text-slate-900">Wakil Ketua FSI</h4>
-                        <p class="text-[10px] text-slate-500 mt-0.5">Pendamping Operasional</p>
-                    </div>
-                </div>
-
-                <!-- Connector Line -->
-                <div class="w-0.5 h-6 bg-slate-300 mx-auto"></div>
-
-                <!-- Node 3: Sekretaris & Bendahara -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto">
-                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-center">
-                        <span class="text-[10px] font-bold text-[#3F704D] uppercase block mb-1">Sekretaris</span>
-                        <h4 class="font-bold text-sm text-slate-900">Sekretaris Utama</h4>
-                        <p class="text-[10px] text-slate-500 mt-0.5">Administrasi & Surat Keputusan</p>
-                    </div>
-                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-center">
-                        <span class="text-[10px] font-bold text-[#3F704D] uppercase block mb-1">Bendahara</span>
-                        <h4 class="font-bold text-sm text-slate-900">Bendahara Utama</h4>
-                        <p class="text-[10px] text-slate-500 mt-0.5">Pengelolaan Keuangan & Kas</p>
-                    </div>
-                </div>
-
-                <!-- Connector Line -->
-                <div class="w-0.5 h-6 bg-slate-300 mx-auto"></div>
-
-                <!-- Node 4: Koordinator Divisi (13 Komunitas) -->
-                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-center max-w-2xl mx-auto">
-                    <span class="text-[10px] font-bold text-[#01795F] uppercase tracking-widest block mb-1">Pelaksana Operasional</span>
-                    <h4 class="font-bold text-sm text-slate-900">Koordinator Divisi 13 Komunitas</h4>
-                    <p class="text-xs text-slate-500 mt-0.5">(Tahfidz, Syiar, Nasyid, Kaligrafi, Panahan, Kemuslimahan, Media, Lughah, Hadrah, Literasi, Baksos, Entrepreneur, Science)</p>
-                </div>
-
-            </div>
+                
         </div>
 
     </main>

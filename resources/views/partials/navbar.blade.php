@@ -8,7 +8,7 @@
         <div class="flex items-center justify-between h-16 sm:h-20">
 
             <!-- Brand Logo & Title -->
-            <a href="{{ route('landing') }}" class="flex items-center space-x-3 group" title="Kembali ke Floating Island Home">
+            <a href="{{ route('landing') }}" class="flex items-center space-x-3 group" title="Kembali ke Home Floating Island">
                 <div class="w-10 h-10 rounded-xl bg-[#01795F] text-white flex items-center justify-center font-bold text-lg shadow-sm group-hover:bg-[#3F704D] transition duration-200">
                     TS
                 </div>
@@ -20,17 +20,17 @@
                 </div>
             </a>
 
-            <!-- Desktop 6 Navigation Items -->
+            <!-- Desktop 6 Navigation Items (+ Admin Panel if Role = Admin) -->
             <nav class="hidden md:flex items-center space-x-1 lg:space-x-2">
 
-                <!-- 1. Beranda (Kembali ke Home Floating Island /) -->
+                <!-- 1. Beranda (Home Floating Island /) -->
                 <a href="{{ route('landing') }}"
                    class="px-3.5 py-2 rounded-lg text-xs font-semibold transition duration-150 flex items-center space-x-1.5 {{ $currentRoute == 'landing' ? 'bg-[#01795F] text-white' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' }}">
                     <i class="fa-solid fa-house text-[11px]"></i>
                     <span>Beranda</span>
                 </a>
 
-                <!-- 2. Komunitas (Feed Utama TSAQIB) -->
+                <!-- 2. Komunitas (Feed Timeline Utama) -->
                 <a href="{{ route('komunitas') }}"
                    class="px-3.5 py-2 rounded-lg text-xs font-semibold transition duration-150 flex items-center space-x-1.5 {{ str_contains($currentRoute, 'komunitas') ? 'bg-[#01795F] text-white' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' }}">
                     <i class="fa-solid fa-users text-[11px]"></i>
@@ -44,22 +44,30 @@
                     <span>Laboratorium PAI</span>
                 </a>
 
-                <!-- 4. Open Recruitment -->
-                <a href="{{ route('open.recruitment') }}"
-                   class="px-3.5 py-2 rounded-lg text-xs font-semibold transition duration-150 flex items-center space-x-1.5 {{ str_contains($currentRoute, 'open.recruitment') ? 'bg-[#01795F] text-white' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' }}">
-                    <i class="fa-solid fa-user-plus text-[11px]"></i>
-                    <span>Open Recruitment</span>
-                </a>
-
-                <!-- 5. Perpustakaan -->
+                <!-- 4. Perpustakaan -->
                 <a href="{{ route('perpustakaan') }}"
                    class="px-3.5 py-2 rounded-lg text-xs font-semibold transition duration-150 flex items-center space-x-1.5 {{ $currentRoute == 'perpustakaan' ? 'bg-[#01795F] text-white' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' }}">
                     <i class="fa-solid fa-book text-[11px]"></i>
                     <span>Perpustakaan</span>
                 </a>
 
-                <!-- 6. Profil User / Auth Link -->
+                <!-- 5. Open Recruitment -->
+                <a href="{{ route('open.recruitment') }}"
+                   class="px-3.5 py-2 rounded-lg text-xs font-semibold transition duration-150 flex items-center space-x-1.5 {{ str_contains($currentRoute, 'open.recruitment') ? 'bg-[#01795F] text-white' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' }}">
+                    <i class="fa-solid fa-user-plus text-[11px]"></i>
+                    <span>Open Recruitment</span>
+                </a>
+
+                <!-- 6. ADMIN PANEL LINK (KHUSUS ROLE ADMIN) -->
                 @auth
+                    @if(Auth::user()->role === 'admin')
+                        <a href="{{ route('admin.index') }}"
+                           class="px-3.5 py-2 rounded-lg text-xs font-bold text-amber-800 bg-amber-100 hover:bg-amber-200 transition duration-150 flex items-center space-x-1.5 border border-amber-300">
+                            <i class="fa-solid fa-shield-halved text-amber-700"></i>
+                            <span>Admin Panel</span>
+                        </a>
+                    @endif
+
                     <a href="{{ route('profile.edit') }}"
                        class="ml-2 px-3.5 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-800 hover:bg-[#3F704D] hover:text-white transition duration-150 flex items-center space-x-1.5 border border-slate-200">
                         <i class="fa-solid fa-circle-user text-sm"></i>
@@ -96,13 +104,18 @@
         <a href="{{ route('laboratorium.pai') }}" class="block px-3 py-2 rounded-lg text-xs font-semibold text-slate-800 hover:bg-slate-100">
             <i class="fa-solid fa-flask text-[#01795F] mr-2"></i>Laboratorium PAI
         </a>
-        <a href="{{ route('open.recruitment') }}" class="block px-3 py-2 rounded-lg text-xs font-semibold text-slate-800 hover:bg-slate-100">
-            <i class="fa-solid fa-user-plus text-[#01795F] mr-2"></i>Open Recruitment
-        </a>
         <a href="{{ route('perpustakaan') }}" class="block px-3 py-2 rounded-lg text-xs font-semibold text-slate-800 hover:bg-slate-100">
             <i class="fa-solid fa-book text-[#01795F] mr-2"></i>Perpustakaan
         </a>
+        <a href="{{ route('open.recruitment') }}" class="block px-3 py-2 rounded-lg text-xs font-semibold text-slate-800 hover:bg-slate-100">
+            <i class="fa-solid fa-user-plus text-[#01795F] mr-2"></i>Open Recruitment
+        </a>
         @auth
+            @if(Auth::user()->role === 'admin')
+                <a href="{{ route('admin.index') }}" class="block px-3 py-2 rounded-lg text-xs font-bold text-amber-800 bg-amber-50">
+                    <i class="fa-solid fa-shield-halved text-amber-700 mr-2"></i>Admin Panel
+                </a>
+            @endif
             <a href="{{ route('profile.edit') }}" class="block px-3 py-2 rounded-lg text-xs font-semibold text-slate-800 hover:bg-slate-100">
                 <i class="fa-solid fa-circle-user text-[#01795F] mr-2"></i>Profil Saya
             </a>

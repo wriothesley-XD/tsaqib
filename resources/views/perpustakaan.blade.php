@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     @php
-        $books = \App\Models\Book::latest()->get();
+        $books = \App\Models\Book::where('is_visible', true)->latest()->get();
     @endphp
 
     <script>
@@ -69,7 +69,7 @@
             </div>
         </div>
 
-        <!-- DIGITAL BOOKS GRID -->
+        <!-- DIGITAL BOOKS GRID (DATABASE DRIVEN) -->
         <div id="books-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             
             @forelse($books as $book)
@@ -81,8 +81,8 @@
                     <div>
                         <!-- Cover PDF / Placeholder -->
                         <div class="w-full h-48 rounded-xl bg-slate-100 border border-slate-200 flex flex-col items-center justify-center p-4 relative overflow-hidden mb-3 group-hover:border-[#01795F] transition">
-                            @if($book->cover_path)
-                                <img src="{{ asset('storage/' . $book->cover_path) }}" alt="{{ $book->title }}" class="w-full h-full object-cover rounded-lg">
+                            @if($book->cover_image)
+                                <img src="{{ asset('storage/' . $book->cover_image) }}" alt="{{ $book->title }}" class="w-full h-full object-cover rounded-lg">
                             @else
                                 <div class="w-12 h-12 rounded-xl bg-[#01795F]/10 text-[#01795F] flex items-center justify-center font-bold text-xl mb-2">
                                     <i class="fa-solid fa-file-pdf"></i>
@@ -103,16 +103,22 @@
 
                     <!-- Read & Download Action Buttons -->
                     <div class="mt-4 pt-3 border-t border-slate-100 flex items-center space-x-2">
-                        <a href="{{ asset('storage/' . $book->pdf_path) }}" target="_blank"
-                           class="flex-1 py-2 rounded-xl bg-[#01795F] hover:bg-[#3F704D] text-white text-center font-semibold text-xs transition shadow-sm flex items-center justify-center space-x-1">
-                            <i class="fa-solid fa-eye text-[11px]"></i>
-                            <span>Baca PDF</span>
-                        </a>
+                        @if($book->pdf_path)
+                            <a href="{{ asset('storage/' . $book->pdf_path) }}" target="_blank"
+                               class="flex-1 py-2 rounded-xl bg-[#01795F] hover:bg-[#3F704D] text-white text-center font-semibold text-xs transition shadow-sm flex items-center justify-center space-x-1">
+                                <i class="fa-solid fa-eye text-[11px]"></i>
+                                <span>Baca PDF</span>
+                            </a>
 
-                        <a href="{{ asset('storage/' . $book->pdf_path) }}" download
-                           class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition border border-slate-200" title="Unduh File">
-                            <i class="fa-solid fa-download"></i>
-                        </a>
+                            <a href="{{ asset('storage/' . $book->pdf_path) }}" download
+                               class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition border border-slate-200" title="Unduh File">
+                                <i class="fa-solid fa-download"></i>
+                            </a>
+                        @else
+                            <button onclick="alert('File PDF belum diunggah oleh admin.')" class="w-full py-2 rounded-xl bg-slate-100 text-slate-400 text-xs font-semibold">
+                                PDF Belum Tersedia
+                            </button>
+                        @endif
                     </div>
 
                 </div>
@@ -141,8 +147,9 @@
                             <p class="text-xs text-slate-500 mt-1">Penulis: {{ $sb['author'] }}</p>
                         </div>
                         <div class="mt-4 pt-3 border-t border-slate-100 flex items-center space-x-2">
-                            <a href="#" onclick="alert('Silakan upload file PDF resmi di Admin Panel!'); return false;" class="flex-1 py-2 rounded-xl bg-[#01795F] text-white text-center font-semibold text-xs">
-                                <i class="fa-solid fa-eye text-[11px] mr-1"></i>Baca PDF
+                            <a href="#" onclick="alert('Silakan unggah file PDF resmi di Admin Panel!'); return false;" class="flex-1 py-2 rounded-xl bg-[#01795F] text-white text-center font-semibold text-xs flex items-center justify-center space-x-1">
+                                <i class="fa-solid fa-eye text-[11px]"></i>
+                                <span>Baca PDF</span>
                             </a>
                         </div>
                     </div>

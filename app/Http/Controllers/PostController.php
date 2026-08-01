@@ -6,11 +6,12 @@ use App\Models\Post;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
     /**
-     * Simpan postingan baru dari anggota komunitas.
+     * Simpan postingan baru dari anggota komunitas dengan lampiran foto.
      */
     public function store(Request $request): RedirectResponse
     {
@@ -18,11 +19,12 @@ class PostController extends Controller
             'community_slug' => ['required', 'string', 'max:100'],
             'title'          => ['required', 'string', 'max:255'],
             'content'        => ['required', 'string', 'max:5000'],
-            'image'          => ['nullable', 'image', 'max:2048'],
+            'image'          => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg,webp', 'max:4096'],
         ]);
 
         $imagePath = null;
         if ($request->hasFile('image')) {
+            // Simpan file ke disk 'public' dalam folder 'posts'
             $imagePath = $request->file('image')->store('posts', 'public');
         }
 
@@ -38,11 +40,10 @@ class PostController extends Controller
     }
 
     /**
-     * Update postingan milik anggota sendiri.
+     * Update postingan milik anggota sendiri atau admin.
      */
     public function update(Request $request, Post $post): RedirectResponse
     {
-        // Pastikan hanya pemilik postingan atau admin yang bisa edit
         if ($post->user_id !== Auth::id() && Auth::user()->role !== 'admin') {
             abort(403, 'Anda tidak memiliki hak untuk mengedit postingan ini.');
         }
@@ -50,24 +51,38 @@ class PostController extends Controller
         $validated = $request->validate([
             'title'   => ['required', 'string', 'max:255'],
             'content' => ['required', 'string', 'max:5000'],
+            'image'   => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg,webp', 'max:4096'],
         ]);
 
+        $imagePath = $post->image_path;
+        if ($request->hasFile('image')) {
+            // Hapus gambar lama jika ada
+            if ($post->image_path && Storage::disk('public')->exists($post->image_path)) {
+                Storage::disk('public')->delete($post->image_path);
+            }
+            $imagePath = $request->file('image')->store('posts', 'public');
+        }
+
         $post->update([
-            'title'   => $validated['title'],
-            'content' => $validated['content'],
+            'title'      => $validated['title'],
+            'content'    => $validated['content'],
+            'image_path' => $imagePath,
         ]);
 
         return redirect()->back()->with('success', 'Postingan berhasil diperbarui!');
     }
 
     /**
-     * Hapus postingan milik anggota sendiri.
+     * Hapus postingan milik anggota sendiri atau admin.
      */
     public function destroy(Post $post): RedirectResponse
     {
-        // Pastikan hanya pemilik postingan atau admin yang bisa hapus
         if ($post->user_id !== Auth::id() && Auth::user()->role !== 'admin') {
             abort(403, 'Anda tidak memiliki hak untuk menghapus postingan ini.');
+        }
+
+        if ($post->image_path && Storage::disk('public')->exists($post->image_path)) {
+            Storage::disk('public')->delete($post->image_path);
         }
 
         $post->delete();

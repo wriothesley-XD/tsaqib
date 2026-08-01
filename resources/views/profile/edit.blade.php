@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profil Akun Saya - TSAQIB SMAN 1 Bukittinggi</title>
+    <title>Profil Saya - TSAQIB SMAN 1 Bukittinggi</title>
     @vite('resources/css/app.css')
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -64,7 +64,7 @@
                     </div>
                 </div>
 
-                <div class="pt-2 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Role Sistem</span>
                         @if(Auth::user()->role === 'admin')
@@ -85,7 +85,7 @@
                                 <i class="fa-solid fa-layer-group mr-1"></i>{{ Auth::user()->selected_community ?? 'Belum Memilih' }}
                             </span>
                             <a href="{{ route('select-role') }}" class="text-[10px] text-[#01795F] font-bold hover:underline">
-                                [Ganti]
+                                [Ganti Minat]
                             </a>
                         </div>
                     </div>

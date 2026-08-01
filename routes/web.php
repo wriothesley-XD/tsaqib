@@ -23,7 +23,7 @@ Route::get('/perpustakaan', function () {
 // ==========================================================
 Route::middleware('auth')->group(function () {
 
-    // Halaman Pemilihan Role (Slider Carousel & Store ke DB)
+    // Halaman Pemilihan Role Karakter Komunitas (Slider Carousel & Store ke DB)
     Route::get('/select-role', [PageController::class, 'selectRole'])->name('select-role');
     Route::post('/select-role', [PageController::class, 'storeRole'])->name('select-role.store');
 
@@ -31,7 +31,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/beranda', [PageController::class, 'beranda'])->name('beranda');
     Route::get('/dashboard', [PageController::class, 'beranda'])->name('dashboard');
 
-    // Feed Komunitas Utama
+    // Feed Komunitas Utama (Social Timeline)
     Route::get('/komunitas/{slug?}', [PageController::class, 'komunitasIndex'])->name('komunitas');
     Route::get('/komunitas-show/{slug}', [PageController::class, 'komunitasShow'])->name('komunitas.show');
 
@@ -55,9 +55,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/role', [TsaqibController::class, 'role'])->name('role');
 
-    // Admin Panel Sederhana
+    // Admin Panel (Proteksi Admin Role test1@gmail.com)
     Route::prefix('admin-panel')->name('admin.')->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('index');
+        Route::post('/users/{user}/role', [AdminController::class, 'updateUserRole'])->name('users.role');
+        Route::post('/books', [AdminController::class, 'storeBook'])->name('books.store');
+        Route::delete('/books/{book}', [AdminController::class, 'destroyBook'])->name('books.destroy');
         Route::post('/toggle-recruitment', [AdminController::class, 'toggleRecruitment'])->name('toggle-recruitment');
     });
 

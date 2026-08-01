@@ -9,10 +9,17 @@ class Book extends Model
 {
     use HasFactory;
 
-     protected $fillable = [
+    protected $fillable = [
         'title',
         'author',
-        'cover_path',
+        'category',
+        'cover_image',
         'pdf_path',
-     ];
+        'description',
+        'is_visible',
+    ];
+
+    protected $casts = [
+        'is_visible' => 'boolean',
+    ];
 }

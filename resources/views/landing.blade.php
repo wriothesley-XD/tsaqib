@@ -45,16 +45,20 @@
             height:100%;
             object-fit:contain;
         }
-        .l-sky              { left:0%;      top:0%;      width:100%;    height:100%; }
-        .l-clouds-far       { left:22.852%; top:0%;      width:77.148%; height:100%; }
-        .l-clouds-near      { left:3.828%;  top:41.458%; width:43.477%; height:50.972%; }
-        .l-clouds-mist      { left:0%;      top:65.486%; width:100%;    height:34.514%; }
-        .l-building-a       { left:0%;      top:36.667%; width:23.086%; height:63.333%; }
-        .l-buildings-b      { left:0%;      top:0%;      width:98.984%; height:90.486%; }
-        .l-building-c       { left:26.641%; top:7.431%;  width:30.391%; height:79.792%; }
-        .l-main-island      { left:10.625%; top:0%;      width:87.578%; height:100%; }
-        .l-mosque-decor     { left:0%;      top:0%;      width:83.594%; height:84.653%; }
-        .l-foreground-decor { left:18.242%; top:32.222%; width:50.078%; height:46.597%; }
+        /* z-index eksplisit — urutan render dijamin BELAKANG -> DEPAN,
+           nggak lagi cuma andalkan urutan DOM (soalnya animasi transform
+           di .enter / .island-float bisa bikin browser tertentu salah stacking
+           kalau cuma DOM order yang jadi acuan). */
+        .l-sky              { left:0%;      top:0%;      width:100%;    height:100%;   z-index:1; }
+        .l-clouds-mist      { left:0%;      top:65.486%; width:100%;    height:34.514%; z-index:2; }
+        .l-clouds-near      { left:3.828%;  top:41.458%; width:43.477%; height:50.972%; z-index:3; }
+        .l-buildings-b      { left:0%;      top:0%;      width:98.984%; height:90.486%; z-index:4; }
+        .l-building-c       { left:26.641%; top:7.431%;  width:30.391%; height:79.792%; z-index:5; }
+        .l-clouds-far       { left:22.852%; top:0%;      width:77.148%; height:100%;   z-index:6; }
+        .l-main-island      { left:10.625%; top:0%;      width:87.578%; height:100%;   z-index:8; }
+        .l-foreground-decor { left:18.242%; top:32.222%; width:50.078%; height:46.597%; z-index:9; }
+        .l-mosque-decor     { left:0%;      top:0%;      width:83.594%; height:84.653%; z-index:10; }
+        .l-building-a       { left:0%;      top:36.667%; width:23.086%; height:63.333%; z-index:12; }
 
         .enter{
             opacity:0;
@@ -78,6 +82,7 @@
         .island-float{
             position:absolute;
             inset:0;
+            z-index:7;
             animation: floatIsland 6.5s ease-in-out 2s infinite;
         }
         @keyframes floatIsland{
@@ -89,7 +94,11 @@
         .l-mosque-decor     { animation-delay: .85s; }
         .l-foreground-decor { animation-delay: 1s; }
 
-        /* ===== hitbox masjid — posisi diambil dari bounding box kubah aslinya ===== */
+        /* ===== hitbox masjid — posisi diambil dari bounding box kubah aslinya =====
+           z-index eksplisit WAJIB di sini, kalau nggak hitbox ini "ketiban"
+           gambar mosque-decor/foreground-decor yang juga punya z-index eksplisit
+           (elemen tanpa z-index selalu kalah tumpuk dari elemen ber-z-index,
+           nggak peduli urutan DOM-nya) — makanya kemarin masjid & buku nggak bisa diklik. */
         .mosque-hotspot{
             position:absolute;
             left:37.11%;
@@ -97,6 +106,7 @@
             width:18.75%;
             height:59.03%;
             cursor:pointer;
+            z-index:15;
             opacity:0;
             animation: fadeInHotspot .6s ease 1.6s forwards;
         }
@@ -121,7 +131,7 @@
             opacity:0;
             pointer-events:none;
             transition:opacity .25s ease, transform .25s ease;
-            z-index:5;
+            z-index:16;
         }
 
         /* ===== hitbox buku — sementara jadi pintu masuk Perpustakaan,
@@ -133,6 +143,7 @@
             width:17.58%;
             height:15.28%;
             cursor:pointer;
+            z-index:15;
             opacity:0;
             animation: fadeInHotspot .6s ease 1.75s forwards;
         }
@@ -156,7 +167,7 @@
             opacity:0;
             pointer-events:none;
             transition:opacity .25s ease, transform .25s ease;
-            z-index:5;
+            z-index:16;
         }
 
         .brand-title{
@@ -165,7 +176,7 @@
             left:50%;
             transform:translateX(-50%);
             text-align:center;
-            z-index:10;
+            z-index:20;
             opacity:0;
             animation: fadeInHotspot .8s ease 1.9s forwards;
         }
@@ -194,7 +205,7 @@
             bottom:2%;
             left:50%;
             transform:translateX(-50%);
-            z-index:10;
+            z-index:20;
             font-family:var(--font-label);
             font-size:clamp(8px, .9vw, 10px);
             color:#64748b;
@@ -216,13 +227,16 @@
     <div class="scene">
 
         <img class="layer l-sky enter" src="{{ asset('assets/landing/sky.png') }}" alt="">
-        <img class="layer l-clouds-far enter" src="{{ asset('assets/landing/clouds-far.png') }}" alt="">
-        <img class="layer l-clouds-near enter" src="{{ asset('assets/landing/clouds-near.png') }}" alt="">
-        <img class="layer l-clouds-mist enter" src="{{ asset('assets/landing/clouds-mist.png') }}" alt="">
 
-        <img class="layer l-building-a enter" src="{{ asset('assets/landing/building-a.png') }}" alt="">
+        <!-- clouds jauh & kabut dasar dulu, tetap di belakang gedung -->
+        <img class="layer l-clouds-mist enter" src="{{ asset('assets/landing/clouds-mist.png') }}" alt="">
+        <img class="layer l-clouds-near enter" src="{{ asset('assets/landing/clouds-near.png') }}" alt="">
+
         <img class="layer l-buildings-b enter" src="{{ asset('assets/landing/buildings-b.png') }}" alt="">
         <img class="layer l-building-c enter" src="{{ asset('assets/landing/building-c.png') }}" alt="">
+
+        <!-- clouds-far ditaruh SETELAH gedung: awan pojok kanan-bawah harus overlap DI DEPAN gedung -->
+        <img class="layer l-clouds-far enter" src="{{ asset('assets/landing/clouds-far.png') }}" alt="">
 
         <div class="brand-title">
             <span class="brand-eyebrow">Eksplorasi Dunia TSAQIB SMAN 1 Bukittinggi</span>
@@ -233,8 +247,8 @@
         <div class="island-float">
             <div class="island-group">
                 <img class="layer l-main-island enter" src="{{ asset('assets/landing/main-island.png') }}" alt="Pulau utama TSAQIB">
-                <img class="layer l-mosque-decor enter" src="{{ asset('assets/landing/mosque-decor.png') }}" alt="Masjid dan perpustakaan mini">
                 <img class="layer l-foreground-decor enter" src="{{ asset('assets/landing/foreground-decor.png') }}" alt="">
+                <img class="layer l-mosque-decor enter" src="{{ asset('assets/landing/mosque-decor.png') }}" alt="Masjid dan perpustakaan mini">
 
                 <!-- MASJID: logic auth dipertahankan persis dari versi sebelumnya -->
                 <div class="mosque-hotspot" onclick="handleMasjidClick()" title="Masuk ke TSAQIB"></div>
@@ -245,6 +259,10 @@
                 <div class="book-tooltip">Perpustakaan</div>
             </div>
         </div>
+
+        <!-- building-a: PALING DEPAN, di luar island-float supaya nggak ikut idle-float pulau,
+             tapi tetap render di ATAS pulau (overlap ke island) sesuai reference art -->
+        <img class="layer l-building-a enter" src="{{ asset('assets/landing/building-a.png') }}" alt="">
 
         <div class="footer-note">&copy; {{ date('Y') }} TSAQIB • Forum Studi Islam SMAN 1 Bukittinggi</div>
 

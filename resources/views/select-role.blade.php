@@ -7,7 +7,7 @@
             'deskripsi_singkat' => "Program menghafal dan menjaga hafalan al-Qur'an.",
             'peran' => 'Commander, Support',
             'icon' => 'fa-solid fa-book-quran',
-            'image' => 'https://placehold.co/300x450/01795F/FFFFFF/png?text=Tahfidz',
+            'image' => asset('images/icon/tahfidz.jpg')
         ],
         [
             'slug' => 'young-stars',
@@ -15,7 +15,7 @@
             'deskripsi_singkat' => 'Wadah pengembangan bakat dan prestasi siswa (Forum Olimpiade).',
             'peran' => 'Commander, Supporter',
             'icon' => 'fa-solid fa-award',
-            'image' => 'https://placehold.co/300x450/0f172a/FFFFFF/png?text=Young+Stars',
+            'image' => asset('images/icon/young-stars.jpg'),
         ],
         [
             'slug' => 'grow-up',
@@ -23,7 +23,7 @@
             'deskripsi_singkat' => 'Berfokus pada pembentukan karakter remaja ke arah yang lebih positif.',
             'peran' => 'Commander, Support',
             'icon' => 'fa-solid fa-seedling',
-            'image' => 'https://placehold.co/300x450/0284c7/FFFFFF/png?text=Grow+Up',
+            'image' => asset('images/icon/grow-up.jpg'),
         ],
         [
             'slug' => 'blitzsport',
@@ -31,7 +31,7 @@
             'deskripsi_singkat' => 'Wadah aktivitas olahraga Gen Z untuk mencetak fisik sehat dan kuat.',
             'peran' => 'Commander, Support',
             'icon' => 'fa-solid fa-dumbbell',
-            'image' => 'https://placehold.co/300x450/b91c1c/FFFFFF/png?text=Blitzsport',
+            'image' => asset('images/icon/blitzsport.jpg'),
         ],
         [
             'slug' => 'gofam',
@@ -39,7 +39,7 @@
             'deskripsi_singkat' => 'Gathering of Ambitious, tempat pemuda saling belajar dan berbagi wawasan.',
             'peran' => 'Commander, Supporter',
             'icon' => 'fa-solid fa-users',
-            'image' => 'https://placehold.co/300x450/d97706/FFFFFF/png?text=Gofam',
+            'image' => asset('images/icon/gofam.jpg'),
         ],
         [
             'slug' => 'leora',
@@ -47,7 +47,7 @@
             'deskripsi_singkat' => 'Komunitas gamers untuk menjadikan game sebagai media positif.',
             'peran' => 'Leora Commander, Subcomunity, Support',
             'icon' => 'fa-solid fa-gamepad',
-            'image' => 'https://placehold.co/300x450/6d28d9/FFFFFF/png?text=Leora',
+            'image' => asset('images/icon/leora.jpg'),
         ],
         [
             'slug' => 'mushou',
@@ -55,7 +55,7 @@
             'deskripsi_singkat' => 'Muslim Shounen, wadah peminat budaya Jejepangan & media dakwah.',
             'peran' => 'Commander, Support',
             'icon' => 'fa-solid fa-yin-yang',
-            'image' => 'https://placehold.co/300x450/be185d/FFFFFF/png?text=MuShou',
+            'image' => asset('images/icon/mushou.jpg'),
         ],
     ];
 @endphp

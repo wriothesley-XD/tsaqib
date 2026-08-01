@@ -1,6 +1,6 @@
-{{-- resources/views/partials/navbar.blade.php --}}
 @php
     $currentRoute = Route::currentRouteName();
+    $daftarKomunitasNav = \Illuminate\Support\Facades\Config::get('komunitas.daftar', []);
 @endphp
 
 <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 text-slate-900 shadow-sm transition-all duration-300">
@@ -30,12 +30,48 @@
                     <span>Beranda</span>
                 </a>
 
-                <!-- 2. Komunitas (Feed Timeline Utama) -->
-                <a href="{{ route('komunitas') }}"
-                   class="px-3.5 py-2 rounded-lg text-xs font-semibold transition duration-150 flex items-center space-x-1.5 {{ str_contains($currentRoute, 'komunitas') ? 'bg-[#01795F] text-white' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' }}">
-                    <i class="fa-solid fa-users text-[11px]"></i>
-                    <span>Komunitas</span>
-                </a>
+                <!-- 2. Komunitas — DROPDOWN MENU (Sesuai Screenshot 901) -->
+                <div class="relative" id="komunitasDropdownWrapper">
+                    <button type="button" id="komunitasDropdownBtn"
+                            class="px-3.5 py-2 rounded-lg text-xs font-semibold transition duration-150 flex items-center space-x-1.5 {{ str_contains($currentRoute, 'komunitas') ? 'bg-[#01795F] text-white' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' }}">
+                        <i class="fa-solid fa-users text-[11px]"></i>
+                        <span>Komunitas</span>
+                        <i class="fa-solid fa-chevron-down text-[9px] transition-transform duration-200" id="komunitasChevron"></i>
+                    </button>
+
+                    <!-- Dropdown Panel Komunitas -->
+                    <div id="komunitasMegaMenu"
+                         class="hidden absolute left-0 top-full mt-2 w-[600px] bg-white border border-slate-100 rounded-2xl shadow-xl z-50 p-6 overflow-hidden origin-top-left transform transition-all">
+                        
+                        <!-- Header Dropdown: "Lihat Semua ->" -->
+                        <div class="flex justify-end mb-5">
+                            <a href="{{ route('komunitas', 'semua') }}" class="text-[#01795F] hover:text-[#015e4a] text-xs font-bold flex items-center transition-colors">
+                                Lihat Semua &rarr;
+                            </a>
+                        </div>
+
+                        <!-- Grid Item Komunitas (2 Kolom) -->
+                        <div class="grid grid-cols-2 gap-x-6 gap-y-5">
+                            @foreach($daftarKomunitasNav as $navK)
+                                <a href="{{ route('komunitas', $navK['slug']) }}" class="flex items-start space-x-3 group p-2 -m-2 rounded-xl hover:bg-slate-50 transition-colors">
+                                    <!-- Icon Box -->
+                                    <div class="shrink-0 w-10 h-10 rounded-lg bg-[#01795F]/10 flex items-center justify-center text-[#01795F] group-hover:bg-[#01795F] group-hover:text-white transition-colors">
+                                        <i class="fa-solid fa-layer-group"></i>
+                                    </div>
+                                    <!-- Deskripsi -->
+                                    <div>
+                                        <h4 class="text-sm font-bold text-slate-800 mb-0.5 group-hover:text-[#01795F] transition-colors">
+                                            {{ $navK['nama'] }}
+                                        </h4>
+                                        <p class="text-[10px] text-slate-500 leading-snug">
+                                            {{ $navK['deskripsi_singkat'] ?? '' }}
+                                        </p>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
 
                 <!-- 3. Laboratorium PAI -->
                 <a href="{{ route('laboratorium.pai') }}"
@@ -134,6 +170,37 @@
         if (btn && menu) {
             btn.addEventListener('click', function() {
                 menu.classList.toggle('hidden');
+            });
+        }
+
+        // Dropdown menu untuk "Komunitas"
+        const komunitasBtn = document.getElementById('komunitasDropdownBtn');
+        const komunitasMenu = document.getElementById('komunitasMegaMenu');
+        const komunitasChevron = document.getElementById('komunitasChevron');
+        const komunitasWrapper = document.getElementById('komunitasDropdownWrapper');
+
+        if (komunitasBtn && komunitasMenu) {
+            komunitasBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isHidden = komunitasMenu.classList.contains('hidden');
+                komunitasMenu.classList.toggle('hidden');
+                komunitasChevron.classList.toggle('rotate-180', isHidden);
+            });
+
+            // Tutup dropdown saat klik di luar area
+            document.addEventListener('click', function(e) {
+                if (komunitasWrapper && !komunitasWrapper.contains(e.target)) {
+                    komunitasMenu.classList.add('hidden');
+                    komunitasChevron.classList.remove('rotate-180');
+                }
+            });
+
+            // Tutup dropdown saat tekan Escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    komunitasMenu.classList.add('hidden');
+                    komunitasChevron.classList.remove('rotate-180');
+                }
             });
         }
     });

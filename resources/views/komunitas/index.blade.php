@@ -23,18 +23,25 @@
         }
     </script>
 </head>
-<body class="bg-slate-50 text-slate-900 font-sans antialiased min-h-screen flex flex-col relative">
+<body class="bg-slate-50 text-slate-900 font-sans antialiased min-h-screen flex flex-col relative overflow-x-hidden">
 
-    <!-- Unified TSAQIB Navbar (6 Items) -->
+    <!-- Unified TSAQIB Navbar -->
     @include('partials.navbar')
 
     <main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10 space-y-6 w-full">
 
-        <!-- Title Banner & Filter Pills -->
+        <!-- Title Banner -->
         <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 pb-4 border-b border-slate-100">
+            <!-- Menghapus border-b dan padding bawah karena filter sudah tidak ada -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-slate-900">Timeline Feed Komunitas</h1>
+                    <h1 class="text-2xl font-bold text-slate-900">
+                        Timeline Feed Komunitas
+                        <!-- Tambahan Dinamis: Menampilkan nama komunitas di judul jika bukan 'semua' -->
+                        @if($currentSlug !== 'semua')
+                            <span class="text-[#01795F]">- {{ collect($daftarKomunitas)->firstWhere('slug', $currentSlug)['nama'] ?? '' }}</span>
+                        @endif
+                    </h1>
                     <p class="text-slate-500 text-xs mt-0.5">Kumpulan postingan kegiatan, pengumuman, dan karya 13 komunitas FSI</p>
                 </div>
                 @auth
@@ -44,20 +51,6 @@
                     </button>
                 @endauth
             </div>
-
-            <!-- 13 Community Filter Horizontal Pills -->
-            <div class="flex items-center space-x-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-200">
-                <a href="{{ route('komunitas', 'semua') }}"
-                   class="px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition {{ $currentSlug == 'semua' ? 'bg-[#01795F] text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
-                    Semua Komunitas
-                </a>
-                @foreach($daftarKomunitas as $k)
-                    <a href="{{ route('komunitas', $k['slug']) }}"
-                       class="px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition {{ $currentSlug == $k['slug'] ? 'bg-[#01795F] text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
-                        {{ $k['nama'] }}
-                    </a>
-                @endforeach
-            </div>
         </div>
 
         @if(session('success'))
@@ -66,7 +59,7 @@
             </div>
         @endif
 
-        <!-- POSTS TIMELINE FEED (DIRECTLY VISIBLE FIRST) -->
+        <!-- POSTS TIMELINE FEED -->
         <div class="space-y-4">
             @forelse($posts as $post)
                 <article class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:border-slate-300 transition duration-150">
@@ -108,7 +101,7 @@
                     <h3 class="font-bold text-base text-slate-900 mb-2 leading-snug">{{ $post->title }}</h3>
                     <p class="text-xs text-slate-700 leading-relaxed whitespace-pre-line mb-4">{{ $post->content }}</p>
 
-                    <!-- ATTACHED IMAGE DISPLAY (FIXED STORAGE LINK & ASSET URL) -->
+                    <!-- ATTACHED IMAGE DISPLAY -->
                     @if($post->image_path)
                         <div class="rounded-xl overflow-hidden border border-slate-200 bg-slate-100 max-h-96 w-full flex items-center justify-center my-3">
                             <img src="{{ asset('storage/' . $post->image_path) }}" alt="{{ $post->title }}" class="w-full h-full object-cover max-h-96">
@@ -151,7 +144,7 @@
 
     </main>
 
-    <!-- FLOATING ACTION BUTTON (+) FOR CREATING POST (BOTTOM-RIGHT) -->
+    <!-- FLOATING ACTION BUTTON (+) -->
     @auth
         <div class="fixed bottom-6 right-6 z-40">
             <button onclick="openCreateModal()"
@@ -176,7 +169,6 @@
 
                 <form action="{{ route('posts.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                     @csrf
-
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Judul Postingan</label>
                         <input type="text" name="title" required placeholder="Contoh: Dokumen Kegiatan Tahfidz..."
@@ -219,13 +211,15 @@
     @endauth
 
     <!-- Footer -->
-    <footer class="border-t border-slate-200 bg-white py-8 text-center text-xs text-slate-500">
+    <footer class="border-t border-slate-200 bg-white py-8 text-center text-xs text-slate-500 mt-auto">
         <div class="max-w-7xl mx-auto px-4">
             <p>&copy; {{ date('Y') }} TSAQIB • Forum Studi Islam SMAN 1 Bukittinggi. Hak Cipta Dilindungi.</p>
         </div>
     </footer>
 
+    <!-- SCRIPT UNTUK MODAL SAJA (Filter JS sudah dihapus) -->
     <script>
+        // Logika Modal Create & Edit Post
         function openCreateModal() {
             document.getElementById('create-post-modal').classList.remove('hidden');
         }

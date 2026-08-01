@@ -2,67 +2,65 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TsaqibController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OpenRecruitmentController;
+use Illuminate\Support\Facades\Route;
 
 // ==========================================================
-// PUBLIK — tanpa login
+// 1. LANDING PAGE FLOATING ISLAND (Publik — Tanpa Navbar TSAQIB)
 // ==========================================================
-Route::get('/', [PageController::class, 'home'])->name('home');
-Route::get('/community', [PageController::class, 'community'])->name('community');
-Route::get('/perpustakaan', [PageController::class, 'perpustakaan'])->name('perpustakaan');
+Route::get('/', [PageController::class, 'landing'])->name('landing');
 
-
-Route::get('/', [PageController::class, 'landing'])
-    ->name('landing');
-Route::get('/komunitas/{slug}', [PageController::class, 'komunitasShow'])
-    ->name('komunitas.show');
-Route::get('/open-recruitment', [PageController::class, 'openRecruitmentForm'])
-    ->name('open.recruitment');
-Route::get('/laboratorium-pai', function () {
-    return view('laboratorium-pai'); // TODO: buat view ini
-})->name('laboratorium.pai');
-
-Route::get('/informasi-kegiatan', function () {
-    return view('informasi-kegiatan'); // TODO: buat view ini
-})->name('informasi.kegiatan');
-
-
-// Labor PAI & Informasi Kegiatan FSI — sebelumnya PageController::labor()
-// cuma nunjuk ke view placeholder yatim (resources/views/labor.blade.php).
-// Implementasi aslinya sudah jadi di TsaqibController tapi tidak pernah
-// di-route. Nama route 'labor' dipertahankan karena sudah dipakai di
-// beberapa blade lain (navbar, community, perpustakaan).
-Route::get('/labor', [TsaqibController::class, 'laborPai'])->name('labor');
-Route::get('/kegiatan', [TsaqibController::class, 'kegiatan'])->name('kegiatan');
+// 2. PERPUSTAKAAN DIGITAL (Publik — Bebas Akses Tanpa Login)
+Route::get('/perpustakaan', function () {
+    return view('perpustakaan');
+})->name('perpustakaan');
 
 // ==========================================================
-// WAJIB LOGIN — Dashboard TSAQIB, Profile, Informasi Role
-// (Bug #1 fix: profile.edit/update/destroy sebelumnya tidak ada sama
-// sekali padahal dipanggil di navigation.blade.php — RouteNotFoundException
-// di hampir semua halaman ber-x-app-layout untuk user yang login.
-// Sekaligus benerin: /dashboard sebelumnya publik, padahal keputusan
-// arsitektur bilang Dashboard TSAQIB wajib login.)
+// 3. TSAQIB MAIN EXPERIENCE (Wajib Login / Check Auth)
 // ==========================================================
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', [PageController::class, 'dashboard'])->name('dashboard');
 
+    // Halaman Pemilihan Role (Slider Carousel & Store ke DB)
+    Route::get('/select-role', [PageController::class, 'selectRole'])->name('select-role');
+    Route::post('/select-role', [PageController::class, 'storeRole'])->name('select-role.store');
+
+    // Beranda TSAQIB (Redirect ke Komunitas)
+    Route::get('/beranda', [PageController::class, 'beranda'])->name('beranda');
+    Route::get('/dashboard', [PageController::class, 'beranda'])->name('dashboard');
+
+    // Feed Komunitas Utama
+    Route::get('/komunitas/{slug?}', [PageController::class, 'komunitasIndex'])->name('komunitas');
+    Route::get('/komunitas-show/{slug}', [PageController::class, 'komunitasShow'])->name('komunitas.show');
+
+    // Post CRUD Actions
+    Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+    Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
+    Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+
+    // Laboratorium PAI
+    Route::get('/laboratorium-pai', [TsaqibController::class, 'laborPai'])->name('laboratorium.pai');
+    Route::get('/labor', [TsaqibController::class, 'laborPai'])->name('labor');
+
+    // Open Recruitment
+    Route::get('/open-recruitment', [OpenRecruitmentController::class, 'showForm'])->name('open.recruitment');
+    Route::post('/open-recruitment', [OpenRecruitmentController::class, 'submit'])->name('open.recruitment.submit');
+    Route::get('/open-recruitment/terima-kasih', [OpenRecruitmentController::class, 'thankYou'])->name('open.recruitment.thank-you');
+
+    // Profil User
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
     Route::get('/role', [TsaqibController::class, 'role'])->name('role');
+
+    // Admin Panel Sederhana
+    Route::prefix('admin-panel')->name('admin.')->group(function () {
+        Route::get('/', [AdminController::class, 'index'])->name('index');
+        Route::post('/toggle-recruitment', [AdminController::class, 'toggleRecruitment'])->name('toggle-recruitment');
+    });
+
 });
 
-
-Route::prefix('admin-panel')->name('admin.')->group(function () {
-    Route::get('/', [AdminController::class, 'index'])->name('index');           // Daftar Buku
-    Route::get('/add', [AdminController::class, 'create'])->name('create');   // Form Tambah
-    Route::post('/add', [AdminController::class, 'store'])->name('store');    // Simpan Data Baru
-    Route::get('/{id}/edit', [AdminController::class, 'edit'])->name('edit');    // Form Edit
-    Route::put('/{id}', [AdminController::class, 'update'])->name('update');     // Simpan Perubahan
-    Route::delete('/{id}', [AdminController::class, 'destroy'])->name('destroy');// Hapus Data
-});
 require __DIR__.'/auth.php';

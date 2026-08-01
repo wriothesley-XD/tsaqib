@@ -34,8 +34,8 @@
         <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 pb-4 border-b border-slate-100">
                 <div>
-                    <h1 class="text-2xl font-bold text-slate-900">Timeline & Activity Feed</h1>
-                    <p class="text-slate-500 text-xs mt-0.5">Postingan kegiatan, pengumuman, dan diskusi terkini anggota TSAQIB</p>
+                    <h1 class="text-2xl font-bold text-slate-900">Timeline Feed Komunitas</h1>
+                    <p class="text-slate-500 text-xs mt-0.5">Kumpulan postingan kegiatan, pengumuman, dan karya 13 komunitas FSI</p>
                 </div>
                 @auth
                     <button onclick="openCreateModal()" class="hidden sm:inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-[#01795F] hover:bg-[#3F704D] text-white font-semibold text-xs shadow-sm transition">
@@ -45,15 +45,15 @@
                 @endauth
             </div>
 
-            <!-- Community Filter Horizontal Pills -->
+            <!-- 13 Community Filter Horizontal Pills -->
             <div class="flex items-center space-x-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-200">
                 <a href="{{ route('komunitas', 'semua') }}"
-                   class="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition {{ $currentSlug == 'semua' ? 'bg-[#01795F] text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
+                   class="px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition {{ $currentSlug == 'semua' ? 'bg-[#01795F] text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
                     Semua Komunitas
                 </a>
                 @foreach($daftarKomunitas as $k)
                     <a href="{{ route('komunitas', $k['slug']) }}"
-                       class="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition {{ $currentSlug == $k['slug'] ? 'bg-[#01795F] text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
+                       class="px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition {{ $currentSlug == $k['slug'] ? 'bg-[#01795F] text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
                         {{ $k['nama'] }}
                     </a>
                 @endforeach
@@ -69,7 +69,7 @@
         <!-- POSTS TIMELINE FEED (DIRECTLY VISIBLE FIRST) -->
         <div class="space-y-4">
             @forelse($posts as $post)
-                <article class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                <article class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:border-slate-300 transition duration-150">
                     
                     <!-- Post Header -->
                     <div class="flex items-center justify-between mb-3">
@@ -89,14 +89,14 @@
                         <!-- EDIT & DELETE BUTTONS FOR OWNER OR ADMIN -->
                         @if(Auth::check() && (Auth::id() === $post->user_id || Auth::user()->role === 'admin'))
                             <div class="flex items-center space-x-2">
-                                <button onclick="toggleEditModal('{{ $post->id }}')" class="text-xs text-slate-500 hover:text-[#01795F] font-semibold px-2 py-1 rounded bg-slate-100">
+                                <button onclick="toggleEditModal('{{ $post->id }}')" class="text-xs text-slate-500 hover:text-[#01795F] font-semibold px-2.5 py-1 rounded-lg bg-slate-100">
                                     <i class="fa-solid fa-pen mr-1"></i>Edit
                                 </button>
 
                                 <form action="{{ route('posts.destroy', $post->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus postingan ini?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-xs text-red-500 hover:text-red-700 font-semibold px-2 py-1 rounded bg-red-50">
+                                    <button type="submit" class="text-xs text-red-500 hover:text-red-700 font-semibold px-2.5 py-1 rounded-lg bg-red-50">
                                         <i class="fa-solid fa-trash mr-1"></i>Hapus
                                     </button>
                                 </form>
@@ -108,23 +108,34 @@
                     <h3 class="font-bold text-base text-slate-900 mb-2 leading-snug">{{ $post->title }}</h3>
                     <p class="text-xs text-slate-700 leading-relaxed whitespace-pre-line mb-4">{{ $post->content }}</p>
 
+                    <!-- ATTACHED IMAGE DISPLAY (FIXED STORAGE LINK & ASSET URL) -->
                     @if($post->image_path)
-                        <div class="rounded-xl overflow-hidden border border-slate-200 max-h-96">
-                            <img src="{{ asset('storage/' . $post->image_path) }}" alt="{{ $post->title }}" class="w-full h-full object-cover">
+                        <div class="rounded-xl overflow-hidden border border-slate-200 bg-slate-100 max-h-96 w-full flex items-center justify-center my-3">
+                            <img src="{{ asset('storage/' . $post->image_path) }}" alt="{{ $post->title }}" class="w-full h-full object-cover max-h-96">
                         </div>
                     @endif
 
                     <!-- EDIT MODAL FORM -->
                     @if(Auth::check() && (Auth::id() === $post->user_id || Auth::user()->role === 'admin'))
                         <div id="edit-modal-{{ $post->id }}" class="hidden mt-4 pt-4 border-t border-slate-200">
-                            <form action="{{ route('posts.update', $post->id) }}" method="POST" class="space-y-3">
+                            <form action="{{ route('posts.update', $post->id) }}" method="POST" enctype="multipart/form-data" class="space-y-3">
                                 @csrf
                                 @method('PUT')
-                                <input type="text" name="title" value="{{ $post->title }}" required class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold">
-                                <textarea name="content" rows="3" required class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs">{{ $post->content }}</textarea>
-                                <div class="flex justify-end space-x-2">
-                                    <button type="button" onclick="toggleEditModal('{{ $post->id }}')" class="px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600">Batal</button>
-                                    <button type="submit" class="px-3 py-1 rounded-lg text-xs font-semibold bg-[#01795F] text-white">Simpan Perubahan</button>
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Judul Postingan</label>
+                                    <input type="text" name="title" value="{{ $post->title }}" required class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Isi Postingan</label>
+                                    <textarea name="content" rows="3" required class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900">{{ $post->content }}</textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Ganti Foto (Opsional)</label>
+                                    <input type="file" name="image" accept="image/*" class="w-full text-xs text-slate-500">
+                                </div>
+                                <div class="flex justify-end space-x-2 pt-2">
+                                    <button type="button" onclick="toggleEditModal('{{ $post->id }}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600">Batal</button>
+                                    <button type="submit" class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-[#01795F] text-white">Simpan Perubahan</button>
                                 </div>
                             </form>
                         </div>
@@ -133,7 +144,7 @@
                 </article>
             @empty
                 <div class="bg-white border border-slate-200 rounded-2xl p-8 text-center text-slate-400 text-xs">
-                    Belum ada postingan di kategori ini. Tekan tombol (+) untuk membuat postingan pertama!
+                    Belum ada postingan di kategori ini. Tekan tombol (+) untuk menerbitkan postingan pertama!
                 </div>
             @endforelse
         </div>
@@ -168,7 +179,7 @@
 
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Judul Postingan</label>
-                        <input type="text" name="title" required placeholder="Contoh: Kajian Rutin FSI..."
+                        <input type="text" name="title" required placeholder="Contoh: Dokumen Kegiatan Tahfidz..."
                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#01795F]">
                     </div>
 
@@ -185,13 +196,13 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Isi Postingan / Dokumentasi</label>
-                        <textarea name="content" rows="4" required placeholder="Tuliskan cerita, materi kajian, atau pengumuman..."
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Isi Postingan / Deskripsi</label>
+                        <textarea name="content" rows="4" required placeholder="Tuliskan materi, pengumuman, atau rincian kegiatan..."
                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#01795F]"></textarea>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Lampiran Foto (Opsional)</label>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Lampirkan Foto (Opsional)</label>
                         <input type="file" name="image" accept="image/*"
                                class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#01795F]/10 file:text-[#01795F]">
                     </div>

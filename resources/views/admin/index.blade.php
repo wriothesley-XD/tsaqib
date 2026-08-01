@@ -1,68 +1,43 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Kelola Buku — Pustaka FSI') }}
-        </h2>
-    </x-slot>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Library</title>
+    <!-- Adding simple Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-10">
 
-    <div class="py-12">
-        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
+    <h1 class="text-3xl font-bold mb-8 text-center">Our Digital Library</h1>
 
-                    @if (session('success'))
-                        <div class="mb-4 p-4 rounded-md bg-green-50 text-green-700 text-sm">
-                            {{ session('success') }}
-                        </div>
-                    @endif
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <!-- Loop through each book -->
+        @foreach($books as $book)
+            <div class="bg-white p-5 rounded-lg shadow-md">
+                
+                <!-- Display Cover Image -->
+                @if($book->cover_image)
+                    <img src="{{ asset('storage/' . $book->cover_image) }}" alt="Cover" class="w-full h-64 object-cover rounded mb-4">
+                @else
+                    <div class="w-full h-64 bg-gray-200 flex items-center justify-center rounded mb-4">No Cover</div>
+                @endif
 
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-medium">Daftar Buku</h3>
-                        <a href="{{ route('admin.create') }}"
-                           class="inline-flex items-center px-4 py-2 bg-gray-800 text-white text-sm font-medium rounded-md hover:bg-gray-700">
-                            {{ __('Tambah Buku') }}
-                        </a>
-                    </div>
+                <!-- Display Details -->
+                <h2 class="text-xl font-bold">{{ $book->title }}</h2>
+                <p class="text-gray-600 mb-2">By: {{ $book->author }}</p>
+                <p class="text-sm text-gray-500 mb-4">{{ $book->description }}</p>
 
-                    @if ($books->isEmpty())
-                        <p class="text-gray-500">Belum ada buku. Klik "Tambah Buku" untuk mulai.</p>
-                    @else
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="border-b border-gray-200">
-                                    <th class="py-2 pr-4">Judul</th>
-                                    <th class="py-2 pr-4">Penulis</th>
-                                    <th class="py-2 pr-4 text-right">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($books as $book)
-                                    <tr class="border-b border-gray-100">
-                                        <td class="py-3 pr-4">{{ $book->title }}</td>
-                                        <td class="py-3 pr-4">{{ $book->author }}</td>
-                                        <td class="py-3 pr-4 text-right space-x-3">
-                                            <a href="{{ route('admin.edit', $book->id) }}"
-                                               class="text-indigo-600 hover:text-indigo-900 text-sm">
-                                                {{ __('Edit') }}
-                                            </a>
-                                            <form method="POST" action="{{ route('admin.destroy', $book->id) }}"
-                                                  class="inline"
-                                                  onsubmit="return confirm('Yakin hapus buku ini?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-900 text-sm">
-                                                    {{ __('Hapus') }}
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    @endif
+                <!-- Download/View Button -->
+                @if($book->pdf_path)
+                    <a href="{{ asset('storage/' . $book->pdf_path) }}" target="_blank" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 block text-center">
+                        Read PDF
+                    </a>
+                @endif
 
-                </div>
             </div>
-        </div>
+        @endforeach
     </div>
-</x-app-layout>
+
+</body>
+</html>

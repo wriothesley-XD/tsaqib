@@ -28,11 +28,20 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $user = Auth::user();
+
+        // Auto redirect: Jika belum pernah memilih komunitas, arahkan ke /select-role
+        if ($user && !$user->selected_community) {
+            return redirect()->route('select-role');
+        }
+
+        // Jika sudah memilih komunitas, langsung masuk ke /komunitas
+        return redirect()->route('komunitas');
     }
 
     /**
      * Destroy an authenticated session.
+     * Setelah logout -> REDIRECT KEMBALI KE LANDING FLOATING ISLAND (/)
      */
     public function destroy(Request $request): RedirectResponse
     {

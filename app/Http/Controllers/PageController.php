@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Config;
 class PageController extends Controller
 {
     /**
-     * Landing page — Peta Sekolah Floating Island (Modular Layer, Tanpa Navbar).
+     * Landing page — Peta Sekolah Floating Island (Publik — Tanpa Navbar).
      * Route: GET /
      */
     public function landing()
@@ -20,7 +20,7 @@ class PageController extends Controller
     }
 
     /**
-     * Halaman Pemilihan Role Carousel Slider (Hanya untuk user yang belum memiliki selected_community).
+     * Halaman Pemilihan Role Karakter Komunitas (Slider Carousel).
      * Route: GET /select-role
      */
     public function selectRole()
@@ -30,7 +30,7 @@ class PageController extends Controller
     }
 
     /**
-     * Simpan pilihan komunitas (selected_community) ke database user secara permanen.
+     * Simpan minat komunitas (selected_community) ke database user secara permanen.
      * Route: POST /select-role
      */
     public function storeRole(Request $request): RedirectResponse
@@ -51,7 +51,7 @@ class PageController extends Controller
     }
 
     /**
-     * Beranda Utama / Direct ke Halaman Komunitas Feed
+     * Direct Beranda ke Halaman Komunitas Feed
      * Route: GET /beranda
      */
     public function beranda()
@@ -60,7 +60,7 @@ class PageController extends Controller
     }
 
     /**
-     * Halaman Utama Komunitas (Feed Timeline + FAB + Filter Komunitas).
+     * Halaman Utama Komunitas (Social Media Feed Timeline + FAB + Filter Komunitas).
      * Route: GET /komunitas/{slug?}
      */
     public function komunitasIndex(?string $slug = null)

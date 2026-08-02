@@ -206,6 +206,46 @@
             z-index:16;
         }
 
+        /* ===== hitbox pohon — membuka prototype Figma pada tab baru ===== */
+        .tree-hotspot{
+            position:absolute;
+            left:28.5%;
+            top:35.5%;
+            width:12.5%;
+            height:22%;
+            cursor:pointer;
+            z-index:15;
+            opacity:0;
+            border-radius:50%;
+            transition:transform .3s ease, filter .3s ease;
+            animation: fadeInHotspot .6s ease 1.8s forwards;
+        }
+        .tree-hotspot:hover{
+            transform:scale(1.05);
+            filter:drop-shadow(0 0 20px rgba(1,121,95,.75));
+        }
+        .tree-hotspot:hover ~ .tree-tooltip{ opacity:1; transform:translate(-50%, -4px); }
+
+        .tree-tooltip{
+            position:absolute;
+            left:34.75%;
+            top:30%;
+            transform:translate(-50%, 4px);
+            background:var(--ink);
+            color:var(--cream);
+            font-family:var(--font-label);
+            font-size:clamp(9px, 1.1vw, 13px);
+            letter-spacing:.06em;
+            text-transform:uppercase;
+            padding:6px 12px;
+            border-radius:7px;
+            white-space:nowrap;
+            opacity:0;
+            pointer-events:none;
+            transition:opacity .25s ease, transform .25s ease;
+            z-index:16;
+        }
+
         .brand-title{
             position:absolute;
             top:4%;
@@ -297,6 +337,10 @@
                 <!-- BUKU: publik, langsung ke perpustakaan tanpa auth -->
                 <a class="book-hotspot" href="{{ route('perpustakaan') }}" title="Perpustakaan" style="display:block;"></a>
                 <div class="book-tooltip">Perpustakaan</div>
+
+                <!-- POHON: Membuka Prototype Figma pada tab baru -->
+                <a class="tree-hotspot" href="https://www.figma.com/proto/1Azmk9c0fapjsTICrk7hU6/Tsaqib-Adv?node-id=5-4&t=O3fg7rE3EBm3cqZ7-0&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=1%3A2" target="_blank" rel="noopener noreferrer" title="Lihat Prototype TSAQIB" style="display:block;"></a>
+                <div class="tree-tooltip">Lihat Prototype TSAQIB</div>
             </div>
         </div>
 

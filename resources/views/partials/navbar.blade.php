@@ -117,8 +117,8 @@
                     @endif
 
                     <a href="{{ route('profile.edit') }}"
-                       class="ml-2 px-3.5 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-800 hover:bg-[#3F704D] hover:text-white transition duration-150 flex items-center space-x-1.5 border border-slate-200">
-                        <i class="fa-solid fa-circle-user text-sm"></i>
+                       class="ml-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-800 hover:bg-[#3F704D] hover:text-white transition duration-150 flex items-center space-x-2 border border-slate-200">
+                        <x-community-avatar :user="Auth::user()" size="xs" />
                         <span>Profil</span>
                     </a>
                 @else

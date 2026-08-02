@@ -237,7 +237,10 @@
                         @forelse($users as $index => $u)
                             <tr class="hover:bg-slate-50">
                                 <td class="p-3 font-bold">{{ $index + 1 }}</td>
-                                <td class="p-3 font-semibold text-slate-900">{{ $u->name }}</td>
+                                <td class="p-3 font-semibold text-slate-900 flex items-center space-x-2">
+                                    <x-community-avatar :user="$u" size="sm" />
+                                    <span>{{ $u->name }}</span>
+                                </td>
                                 <td class="p-3 text-slate-600">{{ $u->email }}</td>
                                 <td class="p-3 uppercase font-bold text-[#01795F]">{{ $u->selected_community ?? '-' }}</td>
                                 <td class="p-3 font-bold">

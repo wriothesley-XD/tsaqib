@@ -50,6 +50,20 @@ class User extends Authenticatable
     }
 
     /**
+     * Get default community avatar URL or custom profile photo URL.
+     */
+    public function getAvatarUrlAttribute(): string
+    {
+        if (isset($this->profile_photo_path) && $this->profile_photo_path) {
+            return asset('storage/'.$this->profile_photo_path);
+        }
+
+        $community = $this->selected_community ?? 'default';
+
+        return asset('images/community-avatar/'.$community.'.png');
+    }
+
+    /**
      * Model booted hook untuk secara otomatis menetapkan role 'admin'
      * untuk email test1@gmail.com dan admin@fsi.sch.id
      */

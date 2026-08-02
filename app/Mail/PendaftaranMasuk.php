@@ -21,7 +21,7 @@ class PendaftaranMasuk extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Pendaftaran Open Recruitment FSI: ' . $this->registration->full_name,
+            subject: 'Pendaftaran Open Recruitment FSI: '.$this->registration->full_name,
         );
     }
 

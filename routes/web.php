@@ -1,25 +1,38 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\OpenRecruitmentController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TsaqibController;
-use App\Http\Controllers\OpenRecruitmentController;
 use Illuminate\Support\Facades\Route;
 
 // ==========================================================
-// 1. LANDING PAGE FLOATING ISLAND (Publik — Tanpa Navbar TSAQIB)
+// 1. PUBLIC ROUTES (Dapat diakses publik tanpa login)
 // ==========================================================
 Route::get('/', [PageController::class, 'landing'])->name('landing');
 
-// 2. PERPUSTAKAAN DIGITAL (Publik — Bebas Akses Tanpa Login)
+// Halaman Hub Masjid (Pintu Masuk Laboratorium PAI & Open Recruitment)
+Route::get('/hub', [PageController::class, 'hub'])->name('hub');
+Route::get('/hub-masjid', [PageController::class, 'hub'])->name('hub.masjid');
+
+// Perpustakaan Digital Publik
 Route::get('/perpustakaan', function () {
     return view('perpustakaan');
 })->name('perpustakaan');
 
+// Laboratorium PAI Publik
+Route::get('/laboratorium-pai', [TsaqibController::class, 'laborPai'])->name('laboratorium.pai');
+Route::get('/labor', [TsaqibController::class, 'laborPai'])->name('labor');
+
+// Open Recruitment Publik (Calon Anggota Kelas X)
+Route::get('/open-recruitment', [OpenRecruitmentController::class, 'showForm'])->name('open.recruitment');
+Route::post('/open-recruitment', [OpenRecruitmentController::class, 'submit'])->name('open.recruitment.submit');
+Route::get('/open-recruitment/terima-kasih', [OpenRecruitmentController::class, 'thankYou'])->name('open.recruitment.thank-you');
+
 // ==========================================================
-// 3. TSAQIB MAIN EXPERIENCE (Wajib Login / Check Auth)
+// 2. TSAQIB MAIN EXPERIENCE (Wajib Login / Check Auth)
 // ==========================================================
 Route::middleware('auth')->group(function () {
 
@@ -40,22 +53,13 @@ Route::middleware('auth')->group(function () {
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
 
-    // Laboratorium PAI
-    Route::get('/laboratorium-pai', [TsaqibController::class, 'laborPai'])->name('laboratorium.pai');
-    Route::get('/labor', [TsaqibController::class, 'laborPai'])->name('labor');
-
-    // Open Recruitment
-    Route::get('/open-recruitment', [OpenRecruitmentController::class, 'showForm'])->name('open.recruitment');
-    Route::post('/open-recruitment', [OpenRecruitmentController::class, 'submit'])->name('open.recruitment.submit');
-    Route::get('/open-recruitment/terima-kasih', [OpenRecruitmentController::class, 'thankYou'])->name('open.recruitment.thank-you');
-
     // Profil User
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/role', [TsaqibController::class, 'role'])->name('role');
 
-    // Admin Panel (Proteksi Admin Role test1@gmail.com)
+    // Admin Panel (Proteksi Admin Role)
     Route::prefix('admin-panel')->name('admin.')->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('index');
         Route::post('/users/{user}/role', [AdminController::class, 'updateUserRole'])->name('users.role');

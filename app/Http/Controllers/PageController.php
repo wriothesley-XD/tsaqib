@@ -20,12 +20,22 @@ class PageController extends Controller
     }
 
     /**
+     * Halaman Hub Masjid (Laboratorium PAI & Open Recruitment — Publik).
+     * Route: GET /hub
+     */
+    public function hub()
+    {
+        return view('landing.hub');
+    }
+
+    /**
      * Halaman Pemilihan Role Karakter Komunitas (Slider Carousel).
      * Route: GET /select-role
      */
     public function selectRole()
     {
         $daftarKomunitas = Config::get('komunitas.daftar', []);
+
         return view('select-role', compact('daftarKomunitas'));
     }
 
@@ -69,7 +79,7 @@ class PageController extends Controller
         $user = Auth::user();
 
         // Jika slug tidak diberikan dan user punya selected_community di DB, gunakan itu
-        if (!$slug && $user && $user->selected_community) {
+        if (! $slug && $user && $user->selected_community) {
             $currentSlug = $user->selected_community;
         } else {
             $currentSlug = $slug ?? 'semua';
@@ -86,9 +96,9 @@ class PageController extends Controller
 
         return view('komunitas.index', [
             'daftarKomunitas' => $daftarKomunitas,
-            'komunitasAktif'  => $komunitasAktif,
-            'currentSlug'     => $currentSlug,
-            'posts'           => $posts,
+            'komunitasAktif' => $komunitasAktif,
+            'currentSlug' => $currentSlug,
+            'posts' => $posts,
         ]);
     }
 

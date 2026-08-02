@@ -17,9 +17,9 @@ class PostController extends Controller
     {
         $validated = $request->validate([
             'community_slug' => ['required', 'string', 'max:100'],
-            'title'          => ['required', 'string', 'max:255'],
-            'content'        => ['required', 'string', 'max:5000'],
-            'image'          => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg,webp', 'max:4096'],
+            'title' => ['required', 'string', 'max:255'],
+            'content' => ['required', 'string', 'max:5000'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg,webp', 'max:4096'],
         ]);
 
         $imagePath = null;
@@ -29,11 +29,11 @@ class PostController extends Controller
         }
 
         Post::create([
-            'user_id'        => Auth::id(),
+            'user_id' => Auth::id(),
             'community_slug' => $validated['community_slug'],
-            'title'          => $validated['title'],
-            'content'        => $validated['content'],
-            'image_path'     => $imagePath,
+            'title' => $validated['title'],
+            'content' => $validated['content'],
+            'image_path' => $imagePath,
         ]);
 
         return redirect()->back()->with('success', 'Postingan berhasil diterbitkan!');
@@ -49,9 +49,9 @@ class PostController extends Controller
         }
 
         $validated = $request->validate([
-            'title'   => ['required', 'string', 'max:255'],
+            'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string', 'max:5000'],
-            'image'   => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg,webp', 'max:4096'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg,webp', 'max:4096'],
         ]);
 
         $imagePath = $post->image_path;
@@ -64,8 +64,8 @@ class PostController extends Controller
         }
 
         $post->update([
-            'title'      => $validated['title'],
-            'content'    => $validated['content'],
+            'title' => $validated['title'],
+            'content' => $validated['content'],
             'image_path' => $imagePath,
         ]);
 

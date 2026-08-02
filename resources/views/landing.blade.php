@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Peta Sekolah Floating Island - TSAQIB SMAN 1 Bukittinggi</title>
+    <title>Peta Dunia TSAQIB - SMAN 1 Bukittinggi</title>
     @vite('resources/css/app.css')
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -117,7 +117,43 @@
         .mosque-tooltip{
             position:absolute;
             left:46.49%;
-            top:7%;
+            top:18%;
+            transform:translate(-50%, 4px);
+            background:var(--ink);
+            color:var(--cream);
+            font-family:var(--font-label);
+            font-size:clamp(9px, 1.1vw, 13px);
+            letter-spacing:.06em;
+            text-transform:uppercase;
+            padding:6px 12px;
+            border-radius:7px;
+            white-space:nowrap;
+            opacity:0;
+            pointer-events:none;
+            transition:opacity .25s ease, transform .25s ease;
+            z-index:16;
+        }
+
+        /* ===== hitbox lambang komunitas / bola merah kacamata — gerbang auth ===== */
+        .emblem-hotspot{
+            position:absolute;
+            left:64.45%;
+            top:55.97%;
+            width:5.08%;
+            height:5.56%;
+            cursor:pointer;
+            z-index:15;
+            opacity:0;
+            border-radius:50%;
+            animation: fadeInHotspot .6s ease 1.7s forwards;
+        }
+        .emblem-hotspot:hover{ filter:drop-shadow(0 0 20px rgba(225,29,72,.7)); }
+        .emblem-hotspot:hover ~ .emblem-tooltip{ opacity:1; transform:translate(-50%, -4px); }
+
+        .emblem-tooltip{
+            position:absolute;
+            left:66.99%;
+            top:51%;
             transform:translate(-50%, 4px);
             background:var(--ink);
             color:var(--cream);
@@ -240,7 +276,7 @@
 
         <div class="brand-title">
             <span class="brand-eyebrow">Eksplorasi Dunia TSAQIB SMAN 1 Bukittinggi</span>
-            <h1 class="brand-h1">Peta Sekolah Floating Island</h1>
+            <h1 class="brand-h1">Peta Dunia TSAQIB</h1>
         </div>
 
         <!-- pulau + masjid + buku + dekorasi: satu grup, naik-turun bareng -->
@@ -250,9 +286,13 @@
                 <img class="layer l-foreground-decor enter" src="{{ asset('assets/landing/foreground-decor.png') }}" alt="">
                 <img class="layer l-mosque-decor enter" src="{{ asset('assets/landing/mosque-decor.png') }}" alt="Masjid dan perpustakaan mini">
 
-                <!-- MASJID: logic auth dipertahankan persis dari versi sebelumnya -->
-                <div class="mosque-hotspot" onclick="handleMasjidClick()" title="Masuk ke TSAQIB"></div>
-                <div class="mosque-tooltip">Masuk ke TSAQIB</div>
+                <!-- MASJID: Publik, langsung mengarahkan ke Halaman Hub Masjid (Laboratorium PAI & Open Recruitment) -->
+                <a class="mosque-hotspot" href="{{ route('hub') }}" title="Laboratorium PAI & Pendaftaran" style="display:block;"></a>
+                <div class="mosque-tooltip">Laboratorium PAI & Pendaftaran</div>
+
+                <!-- EMBLEM MASCOT / BOLA MERAH KACAMATA: Gerbang Auth Utama Komunitas -->
+                <div class="emblem-hotspot" onclick="handleEmblemClick()" title="Masuk Komunitas TSAQIB"></div>
+                <div class="emblem-tooltip">Masuk Komunitas TSAQIB</div>
 
                 <!-- BUKU: publik, langsung ke perpustakaan tanpa auth -->
                 <a class="book-hotspot" href="{{ route('perpustakaan') }}" title="Perpustakaan" style="display:block;"></a>
@@ -269,7 +309,8 @@
     </div>
 
     <script>
-        function handleMasjidClick() {
+        // Logic Auth Pindah ke Hitbox Emblem Komunitas (Bola Merah Kacamata)
+        function handleEmblemClick() {
             @auth
                 @if(Auth::user()->selected_community)
                     window.location.href = "{{ route('komunitas') }}";

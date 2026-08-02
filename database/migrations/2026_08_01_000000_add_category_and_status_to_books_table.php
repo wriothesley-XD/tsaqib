@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('books', function (Blueprint $table) {
-            if (!Schema::hasColumn('books', 'category')) {
+            if (! Schema::hasColumn('books', 'category')) {
                 $table->string('category')->default('modul')->after('author');
             }
-            if (!Schema::hasColumn('books', 'is_visible')) {
+            if (! Schema::hasColumn('books', 'is_visible')) {
                 $table->boolean('is_visible')->default(true)->after('description');
             }
         });

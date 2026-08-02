@@ -20,7 +20,7 @@ class PendaftaranFsiDiterima extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Pendaftaran Baru FSI - ' . $this->registration->nama_lengkap,
+            subject: 'Pendaftaran Baru FSI - '.$this->registration->nama_lengkap,
         );
     }
 

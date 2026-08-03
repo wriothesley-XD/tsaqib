@@ -325,15 +325,10 @@
 
     <div class="scene">
 
-        {{-- <img class="layer l-sky enter" src="{{ asset('assets/landing/sky.png') }}" alt=""> --}}
         <video class="layer l-sky enter" src="{{ asset('assets/landing/video.webm') }}" autoplay loop muted playsinline></video>
         
         <!-- clouds jauh & kabut dasar dulu, tetap di belakang gedung -->
         <img class="layer l-clouds-mist enter" src="{{ asset('assets/landing/clouds-mist.png') }}" alt="">
-        {{-- <img class="layer l-clouds-near enter" src="{{ asset('assets/landing/clouds-near.png') }}" alt=""> --}}
-
-        {{-- <img class="layer l-buildings-b enter" src="{{ asset('assets/landing/buildings-b.png') }}" alt="">
-        <img class="layer l-building-c enter" src="{{ asset('assets/landing/building-c.png') }}" alt=""> --}}
 
         <!-- clouds-far ditaruh SETELAH gedung: awan pojok kanan-bawah harus overlap DI DEPAN gedung -->
         <img class="layer l-clouds-far enter" src="{{ asset('assets/landing/clouds-far.png') }}" alt="">
@@ -376,7 +371,7 @@
 
         <!-- building-a: PALING DEPAN, di luar island-float supaya nggak ikut idle-float pulau,
              tapi tetap render di ATAS pulau (overlap ke island) sesuai reference art -->
-        {{-- <img class="layer l-building-a enter" src="{{ asset('assets/landing/building-a.png') }}" alt=""> --}}
+
 
         <div class="footer-note">&copy; {{ date('Y') }} TSAQIB • Forum Studi Islam SMAN 1 Bukittinggi</div>
 

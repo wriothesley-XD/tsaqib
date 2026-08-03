@@ -31,7 +31,7 @@ class AuthenticatedSessionController extends Controller
         $user = Auth::user();
 
         // Auto redirect: Jika belum pernah memilih komunitas, arahkan ke /select-role
-        if ($user && !$user->selected_community) {
+        if ($user && ! $user->selected_community) {
             return redirect()->route('select-role');
         }
 

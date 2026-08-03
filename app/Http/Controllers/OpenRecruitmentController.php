@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Mail\PendaftaranFsiDiterima;
 use App\Models\Registration;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class OpenRecruitmentController extends Controller
@@ -28,20 +28,20 @@ class OpenRecruitmentController extends Controller
     public function submit(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'nama_lengkap'        => ['required', 'string', 'max:255'],
-            'nama_panggilan'      => ['required', 'string', 'max:100'],
-            'kelas'               => ['required', 'string', 'max:50'],
-            'instagram_username'  => ['required', 'string', 'max:100'],
-            'alasan_bergabung'    => ['required', 'string', 'max:2000'],
+            'nama_lengkap' => ['required', 'string', 'max:255'],
+            'nama_panggilan' => ['required', 'string', 'max:100'],
+            'kelas' => ['required', 'string', 'max:50'],
+            'instagram_username' => ['required', 'string', 'max:100'],
+            'alasan_bergabung' => ['required', 'string', 'max:2000'],
         ]);
 
         $registration = Registration::create([
-            'user_id'             => null, // guest submission, tidak butuh login
-            'nama_lengkap'        => $validated['nama_lengkap'],
-            'nama_panggilan'      => $validated['nama_panggilan'],
-            'kelas'               => $validated['kelas'],
-            'instagram_username'  => $validated['instagram_username'],
-            'alasan_bergabung'    => $validated['alasan_bergabung'],
+            'user_id' => null, // guest submission, tidak butuh login
+            'full_name' => $validated['nama_lengkap'],
+            'nickname' => $validated['nama_panggilan'],
+            'class' => $validated['kelas'],
+            'username_ig' => $validated['instagram_username'],
+            'reason' => $validated['alasan_bergabung'],
         ]);
 
         // Kirim notifikasi ke email resmi FSI.

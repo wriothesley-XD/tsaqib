@@ -52,6 +52,18 @@
             <!-- Informasional User (2 cols) -->
             <div class="md:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
                 
+                <!-- Avatar Header Row -->
+                <div class="flex items-center space-x-4 pb-4 border-b border-slate-100">
+                    <x-community-avatar :user="Auth::user()" size="xl" />
+                    <div>
+                        <span class="inline-block px-2.5 py-0.5 rounded-full bg-[#01795F]/10 text-[#01795F] text-[10px] font-bold uppercase tracking-wider mb-1">
+                            Default Community Avatar
+                        </span>
+                        <h2 class="text-xl font-extrabold text-slate-900 leading-tight">{{ Auth::user()->name ?? 'Anggota TSAQIB' }}</h2>
+                        <p class="text-xs text-slate-500">{{ Auth::user()->email ?? '-' }}</p>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Nama Anggota</span>

@@ -22,12 +22,12 @@ class AdminController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             abort(401, 'Anda harus login terlebih dahulu.');
         }
 
-        // Auto-assign role admin untuk email khusus test1@gmail.com & admin@fsi.sch.id
-        if (in_array($user->email, ['test1@gmail.com', 'admin@fsi.sch.id']) || str_contains($user->email, 'admin')) {
+        // Auto-assign role admin untuk email khusus terdaftar
+        if (in_array($user->email, ['test1@gmail.com', 'admin@fsi.sch.id'])) {
             if ($user->role !== 'admin') {
                 $user->update(['role' => 'admin']);
             }
@@ -53,9 +53,9 @@ class AdminController extends Controller
         $isRecruitmentOpen = Setting::getByKey('recruitment_open', '1') === '1';
 
         $stats = [
-            'total_users'         => $users->count(),
-            'total_posts'         => $posts->count(),
-            'total_books'         => $books->count(),
+            'total_users' => $users->count(),
+            'total_posts' => $posts->count(),
+            'total_books' => $books->count(),
             'total_registrations' => $registrations->count(),
         ];
 
@@ -76,7 +76,7 @@ class AdminController extends Controller
 
         $user->update(['role' => $validated['role']]);
 
-        return redirect()->back()->with('success', 'Role pengguna ' . $user->name . ' berhasil diperbarui!');
+        return redirect()->back()->with('success', 'Role pengguna '.$user->name.' berhasil diperbarui!');
     }
 
     /**
@@ -88,13 +88,13 @@ class AdminController extends Controller
         $this->checkAdmin();
 
         $validated = $request->validate([
-            'title'       => ['required', 'string', 'max:255'],
-            'author'      => ['required', 'string', 'max:255'],
-            'category'    => ['required', 'string', 'max:100'],
+            'title' => ['required', 'string', 'max:255'],
+            'author' => ['required', 'string', 'max:255'],
+            'category' => ['required', 'string', 'max:100'],
             'description' => ['nullable', 'string', 'max:2000'],
-            'cover'       => ['nullable', 'image', 'max:2048'],
-            'pdf'         => ['required', 'file', 'mimes:pdf', 'max:20480'],
-            'is_visible'  => ['nullable', 'boolean'],
+            'cover' => ['nullable', 'image', 'max:2048'],
+            'pdf' => ['required', 'file', 'mimes:pdf', 'max:20480'],
+            'is_visible' => ['nullable', 'boolean'],
         ]);
 
         $coverPath = null;
@@ -105,13 +105,13 @@ class AdminController extends Controller
         $pdfPath = $request->file('pdf')->store('books', 'public');
 
         Book::create([
-            'title'       => $validated['title'],
-            'author'      => $validated['author'],
-            'category'    => $validated['category'],
+            'title' => $validated['title'],
+            'author' => $validated['author'],
+            'category' => $validated['category'],
             'description' => $validated['description'] ?? null,
             'cover_image' => $coverPath,
-            'pdf_path'    => $pdfPath,
-            'is_visible'  => $request->has('is_visible'),
+            'pdf_path' => $pdfPath,
+            'is_visible' => $request->has('is_visible'),
         ]);
 
         return redirect()->back()->with('success', 'Buku PDF baru berhasil ditambahkan ke Perpustakaan!');
@@ -149,6 +149,7 @@ class AdminController extends Controller
         Setting::setByKey('recruitment_open', $status);
 
         $msg = $status === '1' ? 'Pendaftaran Open Recruitment BERHASIL DIBUKA!' : 'Pendaftaran Open Recruitment DITUTUP.';
+
         return redirect()->back()->with('success', $msg);
     }
 }

@@ -7,7 +7,7 @@ return [
             'nama' => 'Tahfidz',
             'deskripsi_singkat' => "Program menghafal dan menjaga hafalan al-Qur'an.",
             'peran' => 'Commander, Support',
-            'image' => 'images/icon/tahfidz.jpg'
+            'image' => 'images/icon/tahfidz.jpg',
         ],
         [
             'slug' => 'young-stars',
@@ -51,5 +51,5 @@ return [
             'peran' => 'Commander, Support',
             'image' => 'images/icon/mushou.jpg',
         ],
-    ]
+    ],
 ];

@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'role')) {
+            if (! Schema::hasColumn('users', 'role')) {
                 $table->string('role')->default('member')->after('email');
             }
-            if (!Schema::hasColumn('users', 'selected_community')) {
+            if (! Schema::hasColumn('users', 'selected_community')) {
                 $table->string('selected_community')->nullable()->after('role');
             }
         });

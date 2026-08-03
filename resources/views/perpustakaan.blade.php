@@ -81,7 +81,7 @@
                     
                     <div>
                         <!-- Cover PDF / Placeholder -->
-                        <div class="w-full h-48 rounded-xl bg-slate-100 border border-slate-200 flex flex-col items-center justify-center p-4 relative overflow-hidden mb-3 group-hover:border-[#01795F] transition">
+                        <div class="w-full h-36 rounded-xl bg-slate-100 border border-slate-200 flex flex-col items-center justify-center p-3 relative overflow-hidden mb-3 group-hover:border-[#01795F] transition">
                             @if($book->cover_image)
                                 <img src="{{ asset('storage/' . $book->cover_image) }}" alt="{{ $book->title }}" class="w-full h-full object-cover rounded-lg">
                             @else
@@ -139,7 +139,7 @@
                          data-author="{{ strtolower($sb['author']) }}"
                          data-category="{{ strtolower($sb['cat']) }}">
                         <div>
-                            <div class="w-full h-48 rounded-xl bg-slate-100 border border-slate-200 flex flex-col items-center justify-center p-4 relative overflow-hidden mb-3">
+                            <div class="w-full h-36 rounded-xl bg-slate-100 border border-slate-200 flex flex-col items-center justify-center p-3 relative overflow-hidden mb-3">
                                 <i class="fa-solid fa-book-bookmark text-4xl text-[#01795F] mb-2"></i>
                                 <span class="text-[10px] font-bold text-[#01795F] uppercase">{{ $sb['cat'] }}</span>
                             </div>

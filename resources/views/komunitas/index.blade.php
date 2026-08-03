@@ -67,9 +67,7 @@
                     <!-- Post Header -->
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center space-x-3">
-                            <div class="w-9 h-9 rounded-full bg-[#01795F]/10 text-[#01795F] flex items-center justify-center font-bold text-sm">
-                                <i class="fa-solid fa-user"></i>
-                            </div>
+                            <x-community-avatar :user="$post->user" :slug="$post->community_slug" size="md" />
                             <div>
                                 <h4 class="font-bold text-xs text-slate-900">{{ $post->user->name ?? 'Anggota TSAQIB' }}</h4>
                                 <span class="text-[10px] text-slate-400">

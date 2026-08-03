@@ -24,6 +24,7 @@ class User extends Authenticatable
         'password',
         'role',
         'selected_community',
+        'bio',
     ];
 
     /**
@@ -61,18 +62,5 @@ class User extends Authenticatable
         $community = $this->selected_community ?? 'default';
 
         return asset('images/community-avatar/'.$community.'.png');
-    }
-
-    /**
-     * Model booted hook untuk secara otomatis menetapkan role 'admin'
-     * untuk email test1@gmail.com dan admin@fsi.sch.id
-     */
-    protected static function booted(): void
-    {
-        static::saving(function (User $user) {
-            if ($user->email === 'test1@gmail.com' || $user->email === 'admin@fsi.sch.id') {
-                $user->role = 'admin';
-            }
-        });
     }
 }

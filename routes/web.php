@@ -1,13 +1,11 @@
 <?php
 
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\LibraryController;
 use App\Http\Controllers\OpenRecruitmentController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TsaqibController;
-use App\Http\Controllers\TugasController;
 use Illuminate\Support\Facades\Route;
 
 // ==========================================================
@@ -20,7 +18,9 @@ Route::get('/hub', [PageController::class, 'hub'])->name('hub');
 Route::get('/hub-masjid', [PageController::class, 'hub'])->name('hub.masjid');
 
 // Perpustakaan Digital Publik
-Route::get('/perpustakaan', [LibraryController::class, 'index'])->name('perpustakaan');
+Route::get('/perpustakaan', function () {
+    return view('perpustakaan');
+})->name('perpustakaan');
 
 // Laboratorium PAI Publik
 Route::get('/laboratorium-pai', [TsaqibController::class, 'laborPai'])->name('laboratorium.pai');
@@ -67,9 +67,6 @@ Route::middleware('auth')->group(function () {
         Route::delete('/books/{book}', [AdminController::class, 'destroyBook'])->name('books.destroy');
         Route::post('/toggle-recruitment', [AdminController::class, 'toggleRecruitment'])->name('toggle-recruitment');
     });
-
-    // Tugas Upload Route
-    Route::post('/tugas', [TugasController::class, 'store'])->name('tugas.store');
 
 });
 

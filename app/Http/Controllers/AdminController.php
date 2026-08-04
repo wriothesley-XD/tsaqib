@@ -26,6 +26,13 @@ class AdminController extends Controller
             abort(401, 'Anda harus login terlebih dahulu.');
         }
 
+        // Auto-assign role admin untuk email khusus terdaftar
+        if (in_array($user->email, ['test1@gmail.com', 'admin@fsi.sch.id'])) {
+            if ($user->role !== 'admin') {
+                $user->update(['role' => 'admin']);
+            }
+        }
+
         if ($user->role !== 'admin') {
             abort(403, 'Akses Ditolak. Halaman ini hanya dapat diakses oleh Admin.');
         }

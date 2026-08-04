@@ -31,6 +31,10 @@ Route::get('/open-recruitment', [OpenRecruitmentController::class, 'showForm'])-
 Route::post('/open-recruitment', [OpenRecruitmentController::class, 'submit'])->name('open.recruitment.submit');
 Route::get('/open-recruitment/terima-kasih', [OpenRecruitmentController::class, 'thankYou'])->name('open.recruitment.thank-you');
 
+// Feed Komunitas — bisa dilihat oleh GUEST (tanpa login)
+Route::get('/komunitas/{slug?}', [PageController::class, 'komunitasIndex'])->name('komunitas');
+Route::get('/komunitas-show/{slug}', [PageController::class, 'komunitasShow'])->name('komunitas.show');
+
 // ==========================================================
 // 2. TSAQIB MAIN EXPERIENCE (Wajib Login / Check Auth)
 // ==========================================================
@@ -44,11 +48,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/beranda', [PageController::class, 'beranda'])->name('beranda');
     Route::get('/dashboard', [PageController::class, 'beranda'])->name('dashboard');
 
-    // Feed Komunitas Utama (Social Timeline)
-    Route::get('/komunitas/{slug?}', [PageController::class, 'komunitasIndex'])->name('komunitas');
-    Route::get('/komunitas-show/{slug}', [PageController::class, 'komunitasShow'])->name('komunitas.show');
-
-    // Post CRUD Actions
+    // Post CRUD Actions — wajib login
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');

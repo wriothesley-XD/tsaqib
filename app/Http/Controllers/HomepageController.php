@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-class LibraryController extends Controller
+class HomepageController extends Controller
 {
     //
 }

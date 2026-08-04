@@ -52,7 +52,7 @@
                 Gerbang Utama Masjid Floating Island
             </span>
             <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-                Pusat Layanan & Aktivitas <span class="text-[#01795F]">FSI TSAQIB</span>
+                Pusat Layanan & Aktivitas <span class="text-[#01795F]">LABOR PAI DIGITAL</span>
             </h1>
             <p class="text-slate-600 text-xs sm:text-sm max-w-lg mx-auto leading-relaxed">
                 Silakan pilih fasilitas atau jalur pendaftaran yang ingin Anda akses di bawah ini. Akses publik tanpa perlu login.

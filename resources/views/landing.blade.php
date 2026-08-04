@@ -326,7 +326,7 @@
     <div class="scene">
 
         <video class="layer l-sky enter" src="{{ asset('assets/landing/video.webm') }}" autoplay loop muted playsinline></video>
-        
+
         <!-- clouds jauh & kabut dasar dulu, tetap di belakang gedung -->
         <img class="layer l-clouds-mist enter" src="{{ asset('assets/landing/clouds-mist.png') }}" alt="">
 
@@ -355,7 +355,7 @@
                 <a class="mosque-hotspot" href="{{ route('hub') }}" title="Laboratorium PAI & Pendaftaran" style="display:block;"></a>
                 <div class="mosque-tooltip">Laboratorium PAI & Pendaftaran</div>
 
-                <!-- EMBLEM MASCOT / BOLA MERAH KACAMATA: Gerbang Auth Utama Komunitas -->
+                <!-- EMBLEM MASCOT / BOLA MERAH KACAMATA: Gerbang Utama Komunitas (Guest & Login) -->
                 <div class="emblem-hotspot" onclick="handleEmblemClick()" title="Masuk Komunitas TSAQIB"></div>
                 <div class="emblem-tooltip">Masuk Komunitas TSAQIB</div>
 
@@ -378,7 +378,9 @@
     </div>
 
     <script>
-        // Logic Auth Pindah ke Hitbox Emblem Komunitas (Bola Merah Kacamata)
+        // Logic Klik Hitbox Emblem Komunitas (Bola Merah Kacamata)
+        // Guest & user login sama-sama diarahkan ke feed komunitas.
+        // Aksi yang butuh login (buat postingan, dll) tetap dijaga oleh middleware 'auth' di route terkait.
         function handleEmblemClick() {
             @auth
                 @if(Auth::user()->selected_community)
@@ -387,7 +389,7 @@
                     window.location.href = "{{ route('select-role') }}";
                 @endif
             @else
-                window.location.href = "{{ route('login') }}";
+                window.location.href = "{{ route('komunitas') }}";
             @endauth
         }
 

@@ -102,7 +102,7 @@
                     <!-- ATTACHED IMAGE DISPLAY -->
                     @if($post->image_path)
                         <div class="rounded-xl overflow-hidden border border-slate-200 bg-slate-100 max-h-96 w-full flex items-center justify-center my-3">
-                            <img src="{{ asset('storage/' . $post->image_path) }}" alt="{{ $post->title }}" class="w-full h-full object-cover max-h-96">
+                            <img src="{{ asset('storage/' . $post->image_path) }}" alt="{{ $post->title }}" class="w-full h-full object-contain max-h-96">
                         </div>
                     @endif
 

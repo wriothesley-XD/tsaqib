@@ -347,7 +347,7 @@
         <!-- pulau + masjid + buku + dekorasi: satu grup, naik-turun bareng -->
         <div class="island-float">
             <div class="island-group">
-                <img class="layer l-main-island enter" src="{{ asset('assets/landing/main-island.png') }}" alt="Pulau utama TSAQIB">
+                <img class="layer l-main-island enter" src="{{ asset('assets/landing/galangmewing.png') }}" alt="Pulau utama TSAQIB">
                 <img class="layer l-foreground-decor enter" src="{{ asset('assets/landing/foreground-decor.png') }}" alt="">
                 <img class="layer l-mosque-decor enter" src="{{ asset('assets/landing/mosque-decor.png') }}" alt="Masjid dan perpustakaan mini">
 

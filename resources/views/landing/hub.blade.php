@@ -29,11 +29,11 @@
     <header class="max-w-5xl mx-auto w-full flex items-center justify-between py-4">
         <a href="{{ route('landing') }}" class="flex items-center space-x-3 group">
             <div class="w-10 h-10 rounded-xl bg-[#01795F] text-white flex items-center justify-center font-bold text-lg shadow-sm group-hover:bg-[#3F704D] transition duration-200">
-                TS
+                LP
             </div>
             <div>
                 <span class="font-bold text-base sm:text-lg tracking-tight text-slate-900 block leading-none">
-                    TSAQIB
+                    LABOR PAI DIGITAL
                 </span>
                 <span class="text-[10px] text-[#01795F] font-semibold tracking-wider uppercase block mt-0.5">FSI SMAN 1 Bukittinggi</span>
             </div>
@@ -46,7 +46,7 @@
     </header>
 
     <!-- Main Hub Content -->
-    <main class="max-w-4xl mx-auto w-full my-auto py-8">
+    <main class="max-w-8xl mx-auto w-full my-auto py-8">
         <div class="text-center space-y-3 mb-10">
             <span class="inline-block px-3.5 py-1 rounded-full bg-[#01795F]/10 text-[#01795F] text-xs font-bold uppercase tracking-wider">
                 Gerbang Utama Masjid Floating Island
@@ -60,7 +60,7 @@
         </div>
 
         <!-- 2 Big Cards Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
             
             <!-- Card 1: Laboratorium PAI -->
             <a href="{{ route('laboratorium.pai') }}" 
@@ -87,6 +87,55 @@
                 </div>
             </a>
 
+            <!-- Card 1: Laboratorium PAI -->
+            <a href="{{ route('perpustakaan') }}" 
+               class="group relative bg-white border-2 border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-sm hover:shadow-2xl hover:shadow-[#01795F]/15 hover:border-[#01795F] hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between">
+                <div>
+                    <div class="w-14 h-14 rounded-2xl bg-[#01795F]/10 text-[#01795F] flex items-center justify-center text-2xl font-bold mb-5 group-hover:bg-[#01795F] group-hover:text-white transition-colors duration-300">
+                        <i class="fa-solid fa-book"></i>
+                    </div>
+
+                    <span class="inline-block text-[10px] font-extrabold text-[#01795F] uppercase tracking-widest mb-1">
+                        PUSTAKA PAI DIGITAL
+                    </span>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 group-hover:text-[#01795F] transition-colors leading-tight">
+                        Pustaka PAI Digital
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-600 mt-2.5 leading-relaxed">
+                        Akses terhadap buku digital serta penguatan literasi Agama Islam untuk mendukung peningkatan pemahaman, pembelajaran, dan pengamalan nilai-nilai keislaman secara efektif.
+                    </p>
+                </div>
+
+                <div class="mt-8 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#01795F]">
+                    <span>Buka Pusataka Digital</span>
+                    <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform duration-200"></i>
+                </div>
+            </a>
+
+            <!-- Card 2: Open Recruitment -->
+            <a href="{{ route('komunitas') }}" 
+               class="group relative bg-white border-2 border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-sm hover:shadow-2xl hover:shadow-[#01795F]/15 hover:border-[#01795F] hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between">
+                <div>
+                    <div class="w-14 h-14 rounded-2xl bg-[#01795F]/10 text-[#01795F] flex items-center justify-center text-2xl font-bold mb-5 group-hover:bg-[#01795F] group-hover:text-white transition-colors duration-300">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <span class="inline-block text-[10px] font-extrabold text-[#01795F] uppercase tracking-widest mb-1">
+                        Tsaqib FSI
+                    </span>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 group-hover:text-[#01795F] transition-colors leading-tight">
+                        Tsaqib FSI
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-600 mt-2.5 leading-relaxed">
+                        Ekstrakurikuler Keagamaan yang menjadi ruang tumbuh dalam menempa diri siswa dibidang ketakwaan, kejujuran, dan akhlakul karimah.
+                </div>
+
+                <div class="mt-8 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#01795F]">
+                    <span>Akses Tsaqib</span>
+                    <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform duration-200"></i>
+                </div>
+            </a>
+
             <!-- Card 2: Open Recruitment -->
             <a href="{{ route('open.recruitment') }}" 
                class="group relative bg-white border-2 border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-sm hover:shadow-2xl hover:shadow-[#01795F]/15 hover:border-[#01795F] hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between">
@@ -99,7 +148,7 @@
                         Pendaftaran Anggota Baru
                     </span>
                     <h2 class="text-xl sm:text-2xl font-bold text-slate-900 group-hover:text-[#01795F] transition-colors leading-tight">
-                        Open Recruitment
+                        Registrasi Pengunjung
                     </h2>
                     <p class="text-xs sm:text-sm text-slate-600 mt-2.5 leading-relaxed">
                         Pendaftaran terbuka anggota baru khusus siswa/i Kelas X SMAN 1 Bukittinggi. Bergabunglah bersama 13 bidang minat TSAQIB!
@@ -111,7 +160,6 @@
                     <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform duration-200"></i>
                 </div>
             </a>
-
         </div>
     </main>
 

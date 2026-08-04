@@ -42,7 +42,7 @@
                     Maktabah Digital Publik FSI
                 </span>
                 <h1 class="text-3xl font-bold text-slate-900 tracking-tight">
-                    Perpustakaan Digital <span class="text-[#01795F]">TSAQIB</span>
+                    Perpustakaan Digital <span class="text-[#01795F]">PAI SMAN 1 Bukittinggi</span>
                 </h1>
                 <p class="text-xs sm:text-sm text-slate-600">
                     Akses publik buku digital, modul PAI, materi Aqidah, Fiqih, SKI, dan Hadits SMAN 1 Bukittinggi tanpa perlu login.

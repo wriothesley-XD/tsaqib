@@ -14,11 +14,11 @@
             <!-- Brand Logo & Title -->
             <a href="{{ route('landing') }}" class="flex items-center space-x-3 group" title="Kembali ke Home Floating Island">
                 <div class="w-10 h-10 rounded-xl bg-[#01795F] text-white flex items-center justify-center font-bold text-lg shadow-sm group-hover:bg-[#3F704D] transition duration-200">
-                    TS
+                    LP
                 </div>
                 <div>
                     <span class="font-bold text-base sm:text-lg tracking-tight text-slate-900 block leading-none">
-                        TSAQIB
+                        LABOR PAI DIGITAL
                     </span>
                     <span class="text-[10px] text-[#01795F] font-semibold tracking-wider uppercase block mt-0.5">FSI SMAN 1 Bukittinggi</span>
                 </div>

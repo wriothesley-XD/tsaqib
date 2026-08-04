@@ -53,7 +53,7 @@
                 </div>
                 <h3 class="font-bold text-base text-slate-900 mb-2">Sejarah Singkat</h3>
                 <p class="text-xs text-slate-600 leading-relaxed">
-                    Laboratorium PAI SMAN 1 Bukittinggi dikembangkan sebagai wadah praktikum ibadah praktis (tata cara jenazah, khutbah, fiqih shalat), seni Islam, dan integrasi sains-Al-Qur'an sejak berdiri hingga dikelola bersama pengurus FSI TSAQIB.
+                    Laboratorium Pendidikan Agama Islam (PAI) tidak sekadar hadir sebagai ruang fisik untuk kegiatan pembelajaran, tetapi menjadi pusat pembinaan karakter, penguatan akhlak mulia, pengembangan spiritual, serta pembiasaan nilai-nilai keislaman dalam kehidupan sehari-hari peserta didik.
                 </p>
             </div>
 
@@ -85,34 +85,33 @@
                 <div class="w-10 h-10 rounded-xl bg-[#01795F]/10 text-[#01795F] flex items-center justify-center font-bold text-lg mb-3">
                     <i class="fa-solid fa-eye"></i>
                 </div>
-                <h3 class="font-bold text-base text-slate-900 mb-2">Media Online</h3>
+                <h3 class="font-bold text-base text-slate-900 mb-2">Legalitas dab Struktur Organisai</h3>
                 <p class="text-xs text-slate-600 leading-relaxed font-medium">
-                    Menjadi pusat praktikum keilmuan Islam dan laboratorium karakter siswa SMAN 1 Bukittinggi yang unggul, beriman, dan berakhlak mulia.
+                    Surat Keputusan (SK) beserta rincian hak dan kewajiban masing-masing personel yang memuat pembagian tugas, tanggung jawab, wewenang, hak, serta kewajiban dalam melaksanakan pekerjaan secara efektif, terukur, dan sesuai ketentuan yang berlaku.
                 </p>
             </div>
             <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                 <div class="w-10 h-10 rounded-xl bg-[#01795F]/10 text-[#01795F] flex items-center justify-center font-bold text-lg mb-3">
                     <i class="fa-solid fa-eye"></i>
                 </div>
-                <h3 class="font-bold text-base text-slate-900 mb-2">Kegiatan PBM Siswa</h3>
+                <h3 class="font-bold text-base text-slate-900 mb-2">Perencaaan dan Regulasi Operasional Labor PAI Digital</h3>
                 <p class="text-xs text-slate-600 leading-relaxed font-medium">
-                    Menjadi pusat praktikum keilmuan Islam dan laboratorium karakter siswa SMAN 1 Bukittinggi yang unggul, beriman, dan berakhlak mulia.
+                    Perencanaan dan regulasi operasional Laboratorium PAI Digital mencakup penyusunan kebijakan, standar operasional prosedur, tata kelola layanan, pemanfaatan teknologi, pembagian tugas, serta mekanisme evaluasi untuk menjamin pelaksanaan kegiatan yang efektif, aman, dan berkelanjutan.                </p>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                <div class="w-10 h-10 rounded-xl bg-[#01795F]/10 text-[#01795F] flex items-center justify-center font-bold text-lg mb-3">
+                    <i class="fa-solid fa-eye"></i>
+                </div>
+                <h3 class="font-bold text-base text-slate-900 mb-2">Pelaksanaan Pemanfaatan Labor PAI Digital</h3>
+                <p class="text-xs text-slate-600 leading-relaxed font-medium">
+                    Pelaksanaan pemanfaatan Laboratorium PAI Digital diarahkan sebagai pusat pembelajaran dan pengembangan kompetensi yang dimanfaatkan oleh siswa, guru PAI, Kelompok Kerja Guru (KKG), serta Musyawarah Guru Mata Pelajaran (MGMP) PAI melalui berbagai layanan, sumber belajar digital, pelatihan, kolaborasi, dan inovasi pembelajaran berbasis teknologi.
                 </p>
             </div>
             <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                 <div class="w-10 h-10 rounded-xl bg-[#01795F]/10 text-[#01795F] flex items-center justify-center font-bold text-lg mb-3">
                     <i class="fa-solid fa-eye"></i>
                 </div>
-                <h3 class="font-bold text-base text-slate-900 mb-2">KKGMGMP PAI</h3>
-                <p class="text-xs text-slate-600 leading-relaxed font-medium">
-                    Menjadi pusat praktikum keilmuan Islam dan laboratorium karakter siswa SMAN 1 Bukittinggi yang unggul, beriman, dan berakhlak mulia.
-                </p>
-            </div>
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                <div class="w-10 h-10 rounded-xl bg-[#01795F]/10 text-[#01795F] flex items-center justify-center font-bold text-lg mb-3">
-                    <i class="fa-solid fa-eye"></i>
-                </div>
-                <h3 class="font-bold text-base text-slate-900 mb-2">Sarana Prasarana</h3>
+                <h3 class="font-bold text-base text-slate-900 mb-2">Sarana Prasarana / Inventaris Aset</h3>
                 <p class="text-xs text-slate-600 leading-relaxed font-medium">
                     Menjadi pusat praktikum keilmuan Islam dan laboratorium karakter siswa SMAN 1 Bukittinggi yang unggul, beriman, dan berakhlak mulia.
                 </p>

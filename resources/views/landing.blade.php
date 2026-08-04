@@ -50,14 +50,12 @@
            di .enter / .island-float bisa bikin browser tertentu salah stacking
            kalau cuma DOM order yang jadi acuan). */
         .l-sky              { left:0%;      top:0%;      width:100%;    height:100%;   z-index:1; }
-        .l-clouds-mist      { left:0%;      top:65.486%; width:100%;    height:34.514%; z-index:2; }
-        .l-clouds-near      { left:3.828%;  top:41.458%; width:43.477%; height:50.972%; z-index:3; }
         .l-buildings-b      { left:0%;      top:0%;      width:98.984%; height:90.486%; z-index:4; }
         .l-building-c       { left:26.641%; top:7.431%;  width:30.391%; height:79.792%; z-index:5; }
-        .l-clouds-far       { left:22.852%; top:0%;      width:77.148%; height:100%;   z-index:6; }
-        .l-main-island      { left:10.625%; top:0%;      width:87.578%; height:100%;   z-index:8; }
+
+        .l-main-island      { left:20.625%; top:30%;      width:57.578%; height:100%;   z-index:8; }
         .l-foreground-decor { left:18.242%; top:32.222%; width:50.078%; height:46.597%; z-index:9; }
-        .l-mosque-decor     { left:0%;      top:0%;      width:83.594%; height:84.653%; z-index:10; }
+        .l-mosque-decor     { left:20%;      top:13%;      width:50.594%; height:84.653%; z-index:10; }
         .l-building-a       { left:0%;      top:36.667%; width:23.086%; height:63.333%; z-index:12; }
 
         .enter{
@@ -101,10 +99,10 @@
            nggak peduli urutan DOM-nya) — makanya kemarin masjid & buku nggak bisa diklik. */
         .mosque-hotspot{
             position:absolute;
-            left:37.11%;
-            top:32%;
-            width:18.75%;
-            height:38%;
+            left:40.11%;
+            top:40%;
+            width:10.75%;
+            height:21%;
             cursor:pointer;
             z-index:15;
             opacity:0;
@@ -116,8 +114,43 @@
 
         .mosque-tooltip{
             position:absolute;
-            left:46.49%;
-            top:26%;
+            left:49.60%;
+            top:39%;
+            transform:translate(-50%, 4px);
+            background:var(--ink);
+            color:var(--cream);
+            font-family:var(--font-label);
+            font-size:clamp(9px, 1.1vw, 13px);
+            letter-spacing:.06em;
+            text-transform:uppercase;
+            padding:6px 12px;
+            border-radius:7px;
+            white-space:nowrap;
+            opacity:0;
+            pointer-events:none;
+            transition:opacity .25s ease, transform .25s ease;
+            z-index:16;
+        }
+
+        .facebook-hotspot{
+            position:absolute;
+            left:40.11%;
+            top:60%;
+            width:10.75%;
+            height:21%;
+            cursor:pointer;
+            z-index:15;
+            opacity:0;
+            animation: fadeInHotspot .6s ease 1.6s forwards;
+        }
+        @keyframes fadeInHotspot{ to{ opacity:1; } }
+        .facebook-hotspot:hover{ filter:drop-shadow(0 0 22px rgba(201,166,107,.6)); }
+        .facebook-hotspot:hover ~ .facebook-tooltip{ opacity:1; transform:translate(-50%, -4px); }
+
+        .facebook-tooltip{
+            position:absolute;
+            left:50%;
+            top:66%;
             transform:translate(-50%, 4px);
             background:var(--ink);
             color:var(--cream);
@@ -137,8 +170,8 @@
         /* ===== hitbox lambang komunitas / bola merah kacamata — gerbang auth ===== */
         .emblem-hotspot{
             position:absolute;
-            left:64.45%;
-            top:55.97%;
+            left:53.45%;
+            top:62.97%;
             width:5.08%;
             height:5.56%;
             cursor:pointer;
@@ -152,8 +185,8 @@
 
         .emblem-tooltip{
             position:absolute;
-            left:66.99%;
-            top:51%;
+            left:57.50%;
+            top:59%;
             transform:translate(-50%, 4px);
             background:var(--ink);
             color:var(--cream);
@@ -173,10 +206,11 @@
         /* ===== hitbox buku — sementara jadi pintu masuk Perpustakaan,
            sampai Pulau Perpustakaan terpisah tersedia sebagai asset sendiri ===== */
         .book-hotspot{
+            border:#10140F;
             position:absolute;
-            left:20.31%;
-            top:40.97%;
-            width:17.58%;
+            left:37.31%;
+            top:44.97%;
+            width:10.58%;
             height:15.28%;
             cursor:pointer;
             z-index:15;
@@ -188,8 +222,8 @@
 
         .book-tooltip{
             position:absolute;
-            left:29.10%;
-            top:36%;
+            left:38.10%;
+            top:50%;
             transform:translate(-50%, 4px);
             background:var(--ink);
             color:var(--cream);
@@ -211,10 +245,10 @@
            Membuka prototype Figma pada tab baru. ===== */
         .tree-hotspot{
             position:absolute;
-            left:66%;
-            top:8%;
-            width:34%;
-            height:88%;
+            left:60%;
+            top:56%;
+            width:11%;
+            height:20%;
             cursor:pointer;
             z-index:15;
             opacity:0;
@@ -236,8 +270,42 @@
 
         .tree-tooltip{
             position:absolute;
-            left:83%;
-            top:4%;
+            left:66%;
+            top:47%;
+            transform:translate(-50%, 4px);
+            background:var(--ink);
+            color:var(--cream);
+            font-family:var(--font-label);
+            font-size:clamp(9px, 1.1vw, 13px);
+            letter-spacing:.06em;
+            text-transform:uppercase;
+            padding:6px 12px;
+            border-radius:7px;
+            white-space:nowrap;
+            opacity:0;
+            pointer-events:none;
+            transition:opacity .25s ease, transform .25s ease;
+            z-index:16;
+        },
+         .book-hotspot{
+            border:#10140F;
+            position:absolute;
+            left:37.31%;
+            top:44.97%;
+            width:10.58%;
+            height:15.28%;
+            cursor:pointer;
+            z-index:15;
+            opacity:0;
+            animation: fadeInHotspot .6s ease 1.75s forwards;
+        }
+        .book-hotspot:hover{ filter:drop-shadow(0 0 18px rgba(1,121,95,.55)); }
+        .book-hotspot:hover ~ .book-tooltip{ opacity:1; transform:translate(-50%, -4px); }
+
+        .book-tooltip{
+            position:absolute;
+            left:38.10%;
+            top:50%;
             transform:translate(-50%, 4px);
             background:var(--ink);
             color:var(--cream);
@@ -254,9 +322,56 @@
             z-index:16;
         }
 
+        .ig-hotspot{
+            position:absolute;
+            left:36%;
+            top:48%;
+            width:11%;
+            height:20%;
+            cursor:pointer;
+            z-index:15;
+            opacity:0;
+            transition:transform .3s ease, filter .3s ease;
+            animation: fadeInHotspot .6s ease 1.8s forwards;
+            clip-path: polygon(
+                38% 0%, 58% 2%, 74% 8%, 87% 18%,
+                95% 30%, 98% 43%, 94% 55%, 84% 64%,
+                68% 69%, 60% 100%, 42% 100%, 36% 69%,
+                20% 63%, 8% 52%, 3% 38%, 5% 24%,
+                14% 12%, 26% 4%
+            );
+        }
+        .ig-hotspot:hover{
+            transform:scale(1.02);
+            filter:drop-shadow(0 0 20px rgba(1,121,95,.75));
+        }
+        .ig-hotspot:hover ~ .ig-tooltip{ opacity:1; transform:translate(-50%, -4px); }
+
+        .ig-tooltip{
+            position:absolute;
+            left:41%;
+            top:59%;
+            transform:translate(-50%, 4px);
+            background:var(--ink);
+            color:var(--cream);
+            font-family:var(--font-label);
+            font-size:clamp(9px, 1.1vw, 13px);
+            letter-spacing:.06em;
+            text-transform:uppercase;
+            padding:6px 12px;
+            border-radius:7px;
+            white-space:nowrap;
+            opacity:0;
+            pointer-events:none;
+            transition:opacity .25s ease, transform .25s ease;
+            z-index:16;
+        }
+
+
         /* ===== MODE DEBUG: tambahkan ?debug=1 di URL buat lihat area hotspot ===== */
         body.debug-hotspot .mosque-hotspot,
         body.debug-hotspot .emblem-hotspot,
+        body.debug-hotspot .ig-hotspot,
         body.debug-hotspot .book-hotspot{
             opacity:1 !important;
             background:rgba(255,0,0,.25);
@@ -340,6 +455,7 @@
                 <img src="{{ asset('assets/logo-instansi/kemenag.webp') }}" alt="Logo 1" class="h-14 w-14 object-contain">
                 <img src="{{ asset('assets/logo-instansi/sumbar.webp') }}" alt="Logo 3" class="h-14 w-14 object-contain">
                 <img src="{{ asset('assets/logo-instansi/smansa.webp') }}" alt="Logo 4" class="h-14 w-14 object-contain">
+                <img src="{{ asset('assets/logo-instansi/fsi.png') }}" alt="Logo 5" class="h-14 w-14 object-contain">
             </div>
         </div>
         </div>
@@ -348,12 +464,18 @@
         <div class="island-float">
             <div class="island-group">
                 <img class="layer l-main-island enter" src="{{ asset('assets/landing/galangmewing3.png') }}" alt="Pulau utama TSAQIB">
-                <img class="layer l-foreground-decor enter" src="{{ asset('assets/landing/foreground-decor.png') }}" alt="">
+                {{-- <img class="layer l-foreground-decor enter" src="{{ asset('assets/landing/foreground-decor.png') }}" alt=""> --}}
                 <img class="layer l-mosque-decor enter" src="{{ asset('assets/landing/mosque-decor.png') }}" alt="Masjid dan perpustakaan mini">
 
                 <!-- MASJID: Publik, langsung mengarahkan ke Halaman Hub Masjid (Laboratorium PAI & Open Recruitment) -->
                 <a class="mosque-hotspot" href="{{ route('hub') }}" title="Laboratorium PAI & Pendaftaran" style="display:block;"></a>
                 <div class="mosque-tooltip">Laboratorium PAI & Pendaftaran</div>
+
+                <a class="facebook-hotspot" href="https://www.facebook.com/share/1BJMFJvK5k/" title="Laboratorium PAI & Pendaftaran" style="display:block;"></a>
+                <div class="facebook-tooltip">Facebook FSI</div>
+
+                <a class="ig-hotspot" href="https://www.instagram.com/fsi.smansa_landbouw?igsh=MXVzMzd5Nms0eDZpNQ==" title="Instagram FSI" style="display:block;"></a>
+                <div class="ig-tooltip">Instagram FSI</div>
 
                 <!-- EMBLEM MASCOT / BOLA MERAH KACAMATA: Gerbang Utama Komunitas (Guest & Login) -->
                 <div class="emblem-hotspot" onclick="handleEmblemClick()" title="Masuk Komunitas TSAQIB"></div>

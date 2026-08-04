@@ -116,9 +116,16 @@
                         </a>
                     @endif
 
+                    @php
+                        $profilePics = glob(public_path('images/profile-pic/*.{jpg,jpeg,png,webp}'), GLOB_BRACE);
+                        $randomAvatar = $profilePics
+                            ? asset('images/profile-pic/' . basename($profilePics[array_rand($profilePics)]))
+                            : asset('images/default-avatar.png');
+                    @endphp
+
                     <a href="{{ route('profile.edit') }}"
-                       class="ml-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-800 hover:bg-[#3F704D] hover:text-white transition duration-150 flex items-center space-x-2 border border-slate-200">
-                        <x-community-avatar :user="Auth::user()" size="xs" />
+                    class="ml-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-800 hover:bg-[#3F704D] hover:text-white transition duration-150 flex items-center space-x-2 border border-slate-200">
+                        <img src="{{ $randomAvatar }}" alt="Avatar" class="w-6 h-6 rounded-full object-cover">
                         <span>Profil</span>
                     </a>
                 @else

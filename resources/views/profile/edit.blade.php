@@ -53,8 +53,15 @@
             <div class="md:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
                 
                 <!-- Avatar Header Row -->
+                @php
+                    $profilePics = glob(public_path('images/profile-pic/*.{jpg,jpeg,png,webp}'), GLOB_BRACE);
+                    $randomAvatar = $profilePics
+                        ? asset('images/profile-pic/' . basename($profilePics[array_rand($profilePics)]))
+                        : asset('images/default-avatar.png');
+                @endphp
+
                 <div class="flex items-center space-x-4 pb-4 border-b border-slate-100">
-                    <x-community-avatar :user="Auth::user()" size="xl" />
+                    <img src="{{ $randomAvatar }}" alt="Avatar" class="w-16 h-16 rounded-full object-cover">
                     <div>
                         <span class="inline-block px-2.5 py-0.5 rounded-full bg-[#01795F]/10 text-[#01795F] text-[10px] font-bold uppercase tracking-wider mb-1">
                             Default Community Avatar

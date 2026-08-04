@@ -28,8 +28,8 @@
     <!-- Top Header Navigation -->
     <header class="max-w-5xl mx-auto w-full flex items-center justify-between py-4">
         <a href="{{ route('landing') }}" class="flex items-center space-x-3 group">
-            <div class="w-10 h-10 rounded-xl bg-[#01795F] text-white flex items-center justify-center font-bold text-lg shadow-sm group-hover:bg-[#3F704D] transition duration-200">
-                LP
+            <div class="w-10 h-10 rounded-xl bg-[#01795F] text-white flex items-centerjustify-center font-bold text-lg shadow-sm group-hover:bg-[#3F704D] transition duration-200 overflow-hidden">
+                <img src="{{  asset('images/labor.png') }}" alt="Logo" class="w-full h-full object-cover">
             </div>
             <div>
                 <span class="font-bold text-base sm:text-lg tracking-tight text-slate-900 block leading-none">

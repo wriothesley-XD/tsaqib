@@ -336,8 +336,8 @@
         <div class="brand-title">
             <span class="brand-eyebrow">Labor PAI Digital SMAN 1 Bukittinggi</span>
             <div class="flex justify-center items-center gap-6 md:gap-10">
-                <img src="{{ asset('assets/logo-instansi/kemenag.webp') }}" alt="Logo 1" class="h-14 w-14 object-contain">
                 <img src="{{ asset('assets/logo-instansi/pendidikan.webp') }}" alt="Logo 2" class="h-14 w-14 object-contain">
+                <img src="{{ asset('assets/logo-instansi/kemenag.webp') }}" alt="Logo 1" class="h-14 w-14 object-contain">
                 <img src="{{ asset('assets/logo-instansi/sumbar.webp') }}" alt="Logo 3" class="h-14 w-14 object-contain">
                 <img src="{{ asset('assets/logo-instansi/smansa.webp') }}" alt="Logo 4" class="h-14 w-14 object-contain">
             </div>
@@ -347,7 +347,7 @@
         <!-- pulau + masjid + buku + dekorasi: satu grup, naik-turun bareng -->
         <div class="island-float">
             <div class="island-group">
-                <img class="layer l-main-island enter" src="{{ asset('assets/landing/galangmewing.png') }}" alt="Pulau utama TSAQIB">
+                <img class="layer l-main-island enter" src="{{ asset('assets/landing/galangmewing3.png') }}" alt="Pulau utama TSAQIB">
                 <img class="layer l-foreground-decor enter" src="{{ asset('assets/landing/foreground-decor.png') }}" alt="">
                 <img class="layer l-mosque-decor enter" src="{{ asset('assets/landing/mosque-decor.png') }}" alt="Masjid dan perpustakaan mini">
 

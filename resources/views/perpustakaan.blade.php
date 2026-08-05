@@ -127,10 +127,7 @@
                 <!-- SAMPLE BOOKS FOR DEMO IF DB EMPTY -->
                 @php
                     $sampleBooks = [
-                        ['title' => 'Buku Panduan Fiqih Shalat Lanjutan', 'author' => 'Tim PAI SMAN 1 Bukittinggi', 'cat' => 'fiqih'],
-                        ['title' => 'Ringkasan Aqidah & Akhlak Rabbani', 'author' => 'Ust. Pembina TSAQIB', 'cat' => 'aqidah'],
-                        ['title' => 'Sejarah Kebudayaan Islam Masa Khulafaur Rasyidin', 'author' => 'Majelis SKI FSI', 'cat' => 'ski'],
-                        ['title' => 'Modul Praktikum Ibadah Kelas X', 'author' => 'Laboratorium PAI', 'cat' => 'modul'],
+                    
                     ];
                 @endphp
                 @foreach($sampleBooks as $sb)

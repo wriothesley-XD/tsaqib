@@ -162,6 +162,25 @@
             </a>
         </div>
     </main>
+    <!-- SECTION KOTAK SARAN DI BAGIAN BAWAH -->
+<div class="mt-12 bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
+    <div class="max-w-2xl mx-auto text-center">
+        <h3 class="text-2xl font-bold text-slate-900 mb-2">Kotak Saran & Masukan</h3>
+        <p class="text-slate-600 mb-6">Punya kritik, saran, atau masukan untuk pengembangan Labor PAI Digital? Silakan sampaikan melalui formulir di bawah ini.</p>
+        
+        <!-- Opsi 1: Tombol langsung buka Google Form di tab baru -->
+        <a href="LINK_GOOGLE_FORM_KAMU_DISINI" target="_blank" class="inline-flex items-center justify-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl transition shadow-md">
+            <i class="fa-solid fa-pen-to-square mr-2"></i> Isi Kotak Saran (Google Form)
+        </a>
+
+        <!-- Opsi 2 (Alternatif): Kalau mau Google Form-nya langsung muncul di web (Embed iframe) -->
+        <!-- 
+        <div class="w-full mt-4">
+            <iframe src="LINK_EMBED_GOOGLE_FORM_KAMU" width="100%" height="500" frameborder="0" marginheight="0" marginwidth="0">Memuat…</iframe>
+        </div> 
+        -->
+    </div>
+</div>
 
     <!-- Footer -->
     <footer class="max-w-5xl mx-auto w-full text-center text-xs text-slate-500 py-4">

@@ -169,7 +169,7 @@
         <p class="text-slate-600 mb-6">Punya kritik, saran, atau masukan untuk pengembangan Labor PAI Digital? Silakan sampaikan melalui formulir di bawah ini.</p>
         
         <!-- Opsi 1: Tombol langsung buka Google Form di tab baru -->
-        <a href="LINK_GOOGLE_FORM_KAMU_DISINI" target="_blank" class="inline-flex items-center justify-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl transition shadow-md">
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLScLDeCvGI17R7Z-NkckFV-N9Sm1Jfl8-eOEl20ZFVfFDeebgQ/viewform?usp=publish-editor" target="_blank" class="inline-flex items-center justify-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl transition shadow-md">
             <i class="fa-solid fa-pen-to-square mr-2"></i> Isi Kotak Saran (Google Form)
         </a>
 

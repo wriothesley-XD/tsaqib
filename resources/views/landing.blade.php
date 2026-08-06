@@ -367,11 +367,57 @@
             z-index:16;
         }
 
+        .yt-hotspot{
+            position:absolute;
+            left:50.5;
+            top:45.5%;
+            width:11%;
+            height:20%;
+            cursor:pointer;
+            z-index:15;
+            opacity:0;
+            transition:transform .3s ease, filter .3s ease;
+            animation: fadeInHotspot .6s ease 1.8s forwards;
+            clip-path: polygon(
+                38% 0%, 58% 2%, 74% 8%, 87% 18%,
+                95% 30%, 98% 43%, 94% 55%, 84% 64%,
+                68% 69%, 60% 100%, 42% 100%, 36% 69%,
+                20% 63%, 8% 52%, 3% 38%, 5% 24%,
+                14% 12%, 26% 4%
+            );
+        }
+        .yt-hotspot:hover{
+            transform:scale(1.02);
+            filter:drop-shadow(0 0 20px rgba(1,121,95,.75));
+        }
+        .yt-hotspot:hover ~ .yt-tooltip{ opacity:1; transform:translate(-50%, -4px); }
+
+        .yt-tooltip{
+            position:absolute;
+            left:58.7%;
+            top:45.5%;
+            transform:translate(-50%, 4px);
+            background:var(--ink);
+            color:var(--cream);
+            font-family:var(--font-label);
+            font-size:clamp(9px, 1.1vw, 13px);
+            letter-spacing:.06em;
+            text-transform:uppercase;
+            padding:6px 12px;
+            border-radius:7px;
+            white-space:nowrap;
+            opacity:0;
+            pointer-events:none;
+            transition:opacity .25s ease, transform .25s ease;
+            z-index:16;
+        }
+
 
         /* ===== MODE DEBUG: tambahkan ?debug=1 di URL buat lihat area hotspot ===== */
         body.debug-hotspot .mosque-hotspot,
         body.debug-hotspot .emblem-hotspot,
         body.debug-hotspot .ig-hotspot,
+        body.debug-hotspot .yt-hotspot,
         body.debug-hotspot .book-hotspot{
             opacity:1 !important;
             background:rgba(255,0,0,.25);
@@ -468,14 +514,17 @@
                 <img class="layer l-mosque-decor enter" src="{{ asset('assets/landing/mosque-decor.png') }}" alt="Masjid dan perpustakaan mini">
 
                 <!-- MASJID: Publik, langsung mengarahkan ke Halaman Hub Masjid (Laboratorium PAI & Open Recruitment) -->
-                <a class="mosque-hotspot" href="{{ route('hub') }}" title="Laboratorium PAI & Pendaftaran" style="display:block;"></a>
-                <div class="mosque-tooltip">Laboratorium PAI & Pendaftaran</div>
+                <a class="mosque-hotspot" href="{{ route('hub') }}" title="Selamat Datang di Labor PAI" style="display:block;"></a>
+                <div class="mosque-tooltip">Selamat Datang di Labor PAI</div>
 
                 <a class="facebook-hotspot" href="https://www.facebook.com/share/1BJMFJvK5k/" title="Laboratorium PAI & Pendaftaran" style="display:block;"></a>
                 <div class="facebook-tooltip">Facebook FSI</div>
 
                 <a class="ig-hotspot" href="https://www.instagram.com/fsi.smansa_landbouw?igsh=MXVzMzd5Nms0eDZpNQ==" title="Instagram FSI" style="display:block;"></a>
                 <div class="ig-tooltip">Instagram FSI</div>
+
+                <a class="yt-hotspot" href="https://ytfsi.carrd.co/" title="YouTube FSI" style="display:block;"></a>
+                <div class="yt-tooltip">YouTube FSI</div>
 
                 <!-- EMBLEM MASCOT / BOLA MERAH KACAMATA: Gerbang Utama Komunitas (Guest & Login) -->
                 <div class="emblem-hotspot" onclick="handleEmblemClick()" title="Masuk Komunitas TSAQIB"></div>

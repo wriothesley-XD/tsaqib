@@ -137,27 +137,7 @@
                 <img src="{{ asset('images/struktur.png') }}" alt="FSI">
                 <img src="{{ asset('images/kepengurusan.png') }}" alt="FSI">
             </div>
-        </div>
-
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
-            <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-slate-100">
-                <div class="w-10 h-10 rounded-xl bg-[#01795F] text-white flex items-center justify-center text-lg shadow-sm">
-                    <i class="fa-solid fa-sitemap"></i>
-                </div>
-                <div>
-                    
-                    <h2 class="text-xl font-bold text-slate-900">Dokumentasi Labor PAI</h2>
-                    <p class="text-slate-500 text-xs">Dokumentasi Foto Laboratorium PAI & TSAQIB</p>
-                </div>
-            </div>
-
-            <!-- INFOGRAPHIC TREE NODES -->
-            <div class="space-y-6">
-                <img src="{{ asset('images/struktur.png') }}" alt="FSI">
-                <img src="{{ asset('images/kepengurusan.png') }}" alt="FSI">
-            </div>
-        </div>
-        
+        </div>        
 
     </main>
 

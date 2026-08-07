@@ -1,574 +1,386 @@
 <!-- resources/views/landing.blade.php -->
 <!DOCTYPE html>
-<html lang="id" class="overflow-hidden">
+<html lang="id" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Peta Dunia TSAQIB - SMAN 1 Bukittinggi</title>
+    <title>TSAQIB - Forum Studi Islam SMAN 1 Bukittinggi</title>
     @vite('resources/css/app.css')
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600&family=Manrope:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&family=Manrope:wght@600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif'],
+                        label: ['Manrope', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+
     <style>
         :root{
             --cream:#F7F5EF;
             --ink:#10140F;
+            --green:#01795F;
+            --green-dark:#3F704D;
             --gold:#C9A66B;
-            --font-display:'Plus Jakarta Sans', sans-serif;
-            --font-body:'Inter', sans-serif;
-            --font-label:'Manrope', sans-serif;
-        }
-        *{margin:0;padding:0;box-sizing:border-box;}
-        html,body{height:100%;background:#DCEBF2;}
-        body{
-            font-family:var(--font-body);
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            min-height:100vh;
-            overflow:hidden;
         }
 
-        .scene{
-            position:relative;
-            width:100%;
-            max-width:2560px;
-            aspect-ratio: 2560 / 1440;
-            margin:auto;
-            overflow:hidden;
+        /* ===== Background hero: TIDAK pakai foto asli (belum ada aset foto di project),
+           jadi pakai gradient hijau-emas on-brand + pola bintang 8 khas Islami (SVG, ringan).
+           Kalau nanti ada foto asli (misal foto masjid sekolah / kegiatan FSI), tinggal ganti
+           baris `background-image` di .hero-bg dengan url('{{ asset('images/hero-foto.jpg') }}')
+           ditaruh SEBELUM gradient overlay-nya, biar teks tetap kebaca. ===== */
+        .hero-bg{
+            background-color:var(--ink);
+            background-image:
+                radial-gradient(circle at 15% 20%, rgba(1,121,95,.55), transparent 45%),
+                radial-gradient(circle at 85% 75%, rgba(201,166,107,.35), transparent 50%),
+                linear-gradient(160deg, #0d3327 0%, #10140F 55%, #10140F 100%);
         }
-
-        .layer{
-            position:absolute;
-            display:block;
-            width:100%;
-            height:100%;
-            object-fit:contain;
-        }
-        /* z-index eksplisit — urutan render dijamin BELAKANG -> DEPAN,
-           nggak lagi cuma andalkan urutan DOM (soalnya animasi transform
-           di .enter / .island-float bisa bikin browser tertentu salah stacking
-           kalau cuma DOM order yang jadi acuan). */
-        .l-sky              { left:0%;      top:0%;      width:100%;    height:100%;   z-index:1; }
-        .l-buildings-b      { left:0%;      top:0%;      width:98.984%; height:90.486%; z-index:4; }
-        .l-building-c       { left:26.641%; top:7.431%;  width:30.391%; height:79.792%; z-index:5; }
-
-        .l-main-island      { left:20.625%; top:30%;      width:57.578%; height:100%;   z-index:8; }
-        .l-foreground-decor { left:18.242%; top:32.222%; width:50.078%; height:46.597%; z-index:9; }
-        .l-mosque-decor     { left:20%;      top:13%;      width:50.594%; height:84.653%; z-index:10; }
-        .l-building-a       { left:0%;      top:36.667%; width:23.086%; height:63.333%; z-index:12; }
-
-        .enter{
-            opacity:0;
-            transform:translateY(14px);
-            animation:riseIn .9s cubic-bezier(.22,.8,.3,1) forwards;
-        }
-        @keyframes riseIn{
-            from{ opacity:0; transform:translateY(14px); }
-            to{ opacity:1; transform:translateY(0); }
-        }
-
-        .l-sky          { animation-delay: 0s; }
-        .l-clouds-far   { animation-delay: .15s; }
-        .l-clouds-near  { animation-delay: .25s; }
-        .l-clouds-mist  { animation-delay: .3s; }
-        /* .l-building-a   { animation-delay: .4s; }
-        .l-buildings-b  { animation-delay: .48s; } */
-        /* .l-building-c   { animation-delay: .56s; } */
-
-        /* pulau + semua yang ada di atasnya (masjid, buku, dekorasi) naik-turun BARENG */
-        .island-float{
+        .hero-pattern{
             position:absolute;
             inset:0;
-            z-index:7;
-            animation: floatIsland 6.5s ease-in-out 2s infinite;
+            opacity:.14;
+            background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='84' height='84' viewBox='0 0 84 84'%3E%3Cg fill='none' stroke='%23F7F5EF' stroke-width='1'%3E%3Cpath d='M42 4 L60 20 L78 4 M42 4 L24 20 L6 4 M42 80 L60 64 L78 80 M42 80 L24 64 L6 80 M4 42 L20 24 L4 6 M4 42 L20 60 L4 78 M80 42 L64 24 L80 6 M80 42 L64 60 L80 78' /%3E%3Ccircle cx='42' cy='42' r='16'/%3E%3C/g%3E%3C/svg%3E");
+            background-size:84px 84px;
         }
-        @keyframes floatIsland{
-            0%,100%{ transform:translateY(0); }
-            50%{ transform:translateY(-10px); }
-        }
-        .island-group{ position:absolute; inset:0; }
-        .l-main-island      { animation-delay: .7s; }
-        .l-mosque-decor     { animation-delay: .85s; }
-        .l-foreground-decor { animation-delay: 1s; }
 
-        /* ===== hitbox masjid — posisi diambil dari bounding box kubah aslinya =====
-           z-index eksplisit WAJIB di sini, kalau nggak hitbox ini "ketiban"
-           gambar mosque-decor/foreground-decor yang juga punya z-index eksplisit
-           (elemen tanpa z-index selalu kalah tumpuk dari elemen ber-z-index,
-           nggak peduli urutan DOM-nya) — makanya kemarin masjid & buku nggak bisa diklik. */
-        .mosque-hotspot{
-            position:absolute;
-            left:40.11%;
-            top:40%;
-            width:10.75%;
-            height:21%;
-            cursor:pointer;
-            z-index:15;
-            opacity:0;
-            animation: fadeInHotspot .6s ease 1.6s forwards;
+        .brand-mark{
+            width:42px;height:42px;border-radius:12px;
+            background:linear-gradient(135deg, var(--green), var(--green-dark));
+            display:flex;align-items:center;justify-content:center;
+            font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;color:var(--cream);
+            box-shadow:0 4px 14px rgba(1,121,95,.4);
         }
-        @keyframes fadeInHotspot{ to{ opacity:1; } }
-        .mosque-hotspot:hover{ filter:drop-shadow(0 0 22px rgba(201,166,107,.6)); }
-        .mosque-hotspot:hover ~ .mosque-tooltip{ opacity:1; transform:translate(-50%, -4px); }
 
-        .mosque-tooltip{
-            position:absolute;
-            left:49.60%;
-            top:39%;
-            transform:translate(-50%, 4px);
-            background:var(--ink);
+        .eyebrow-pill{
+            display:inline-flex;align-items:center;gap:6px;
+            padding:5px 14px;border-radius:999px;
+            background:rgba(247,245,239,.1);
+            border:1px solid rgba(247,245,239,.2);
             color:var(--cream);
-            font-family:var(--font-label);
-            font-size:clamp(9px, 1.1vw, 13px);
-            letter-spacing:.06em;
-            text-transform:uppercase;
-            padding:6px 12px;
-            border-radius:7px;
-            white-space:nowrap;
-            opacity:0;
-            pointer-events:none;
-            transition:opacity .25s ease, transform .25s ease;
-            z-index:16;
+            font-family:'Manrope',sans-serif;font-weight:700;
+            font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+            backdrop-filter:blur(4px);
         }
 
-        .facebook-hotspot{
-            position:absolute;
-            left:40.11%;
-            top:60%;
-            width:10.75%;
-            height:21%;
-            cursor:pointer;
-            z-index:15;
-            opacity:0;
-            animation: fadeInHotspot .6s ease 1.6s forwards;
+        .cta-primary{
+            background:var(--green);
+            transition:background .2s ease, transform .2s ease, box-shadow .2s ease;
+            box-shadow:0 10px 30px -8px rgba(1,121,95,.6);
         }
-        @keyframes fadeInHotspot{ to{ opacity:1; } }
-        .facebook-hotspot:hover{ filter:drop-shadow(0 0 22px rgba(201,166,107,.6)); }
-        .facebook-hotspot:hover ~ .facebook-tooltip{ opacity:1; transform:translate(-50%, -4px); }
+        .cta-primary:hover{ background:var(--green-dark); transform:translateY(-2px); }
 
-        .facebook-tooltip{
-            position:absolute;
-            left:50%;
-            top:66%;
-            transform:translate(-50%, 4px);
-            background:var(--ink);
+        /* ===== Carousel kartu ===== */
+        .carousel-track{
+            scroll-snap-type:x mandatory;
+            scrollbar-width:none;
+        }
+        .carousel-track::-webkit-scrollbar{ display:none; }
+        .carousel-card{
+            scroll-snap-align:start;
+            flex:0 0 auto;
+        }
+        .carousel-nav-btn{
+            width:38px;height:38px;border-radius:999px;
+            display:flex;align-items:center;justify-content:center;
+            background:rgba(247,245,239,.1);
+            border:1px solid rgba(247,245,239,.25);
             color:var(--cream);
-            font-family:var(--font-label);
-            font-size:clamp(9px, 1.1vw, 13px);
-            letter-spacing:.06em;
-            text-transform:uppercase;
-            padding:6px 12px;
-            border-radius:7px;
-            white-space:nowrap;
-            opacity:0;
-            pointer-events:none;
-            transition:opacity .25s ease, transform .25s ease;
-            z-index:16;
+            transition:background .2s ease, transform .15s ease;
         }
+        .carousel-nav-btn:hover{ background:rgba(1,121,95,.85); }
+        .carousel-nav-btn:active{ transform:scale(.94); }
 
-        /* ===== hitbox lambang komunitas / bola merah kacamata — gerbang auth ===== */
-        .emblem-hotspot{
-            position:absolute;
-            left:53.45%;
-            top:62.97%;
-            width:5.08%;
-            height:5.56%;
-            cursor:pointer;
-            z-index:15;
-            opacity:0;
-            border-radius:50%;
-            animation: fadeInHotspot .6s ease 1.7s forwards;
+        .card-face{
+            width:198px;height:280px;border-radius:22px;position:relative;overflow:hidden;
+            display:flex;flex-direction:column;justify-content:flex-end;
+            padding:18px;transition:transform .35s ease, box-shadow .35s ease;
+            border:1px solid rgba(247,245,239,.12);
         }
-        .emblem-hotspot:hover{ filter:drop-shadow(0 0 20px rgba(225,29,72,.7)); }
-        .emblem-hotspot:hover ~ .emblem-tooltip{ opacity:1; transform:translate(-50%, -4px); }
+        @media (min-width:1024px){ .card-face{ width:220px; height:320px; } }
+        .card-face:hover{ transform:translateY(-8px); box-shadow:0 20px 40px -12px rgba(0,0,0,.5); }
+        .card-face::after{
+            content:'';position:absolute;inset:0;
+            background:linear-gradient(180deg, transparent 35%, rgba(0,0,0,.75) 100%);
+        }
+        .card-face .card-icon,
+        .card-face .card-label,
+        .card-face .card-desc,
+        .card-face .card-arrow{ position:relative; z-index:2; }
 
-        .emblem-tooltip{
-            position:absolute;
-            left:57.50%;
-            top:59%;
-            transform:translate(-50%, 4px);
-            background:var(--ink);
-            color:var(--cream);
-            font-family:var(--font-label);
-            font-size:clamp(9px, 1.1vw, 13px);
-            letter-spacing:.06em;
-            text-transform:uppercase;
-            padding:6px 12px;
-            border-radius:7px;
-            white-space:nowrap;
-            opacity:0;
-            pointer-events:none;
-            transition:opacity .25s ease, transform .25s ease;
-            z-index:16;
-        }
-
-        /* ===== hitbox buku — sementara jadi pintu masuk Perpustakaan,
-           sampai Pulau Perpustakaan terpisah tersedia sebagai asset sendiri ===== */
-        .book-hotspot{
-            border:#10140F;
-            position:absolute;
-            left:37.31%;
-            top:44.97%;
-            width:10.58%;
-            height:15.28%;
-            cursor:pointer;
-            z-index:15;
-            opacity:0;
-            animation: fadeInHotspot .6s ease 1.75s forwards;
-        }
-        .book-hotspot:hover{ filter:drop-shadow(0 0 18px rgba(1,121,95,.55)); }
-        .book-hotspot:hover ~ .book-tooltip{ opacity:1; transform:translate(-50%, -4px); }
-
-        .book-tooltip{
-            position:absolute;
-            left:38.10%;
-            top:50%;
-            transform:translate(-50%, 4px);
-            background:var(--ink);
-            color:var(--cream);
-            font-family:var(--font-label);
-            font-size:clamp(9px, 1.1vw, 13px);
-            letter-spacing:.06em;
-            text-transform:uppercase;
-            padding:6px 12px;
-            border-radius:7px;
-            white-space:nowrap;
-            opacity:0;
-            pointer-events:none;
-            transition:opacity .25s ease, transform .25s ease;
-            z-index:16;
-        }
-
-        /* ===== hitbox pohon — ngikutin siluet pohon (ijo+coklat), area abu2 (bangunan/awan
-           di belakangnya) dikecualikan lewat clip-path, bukan kotak persegi lagi.
-           Membuka prototype Figma pada tab baru. ===== */
-        .tree-hotspot{
-            position:absolute;
-            left:60%;
-            top:56%;
-            width:11%;
-            height:20%;
-            cursor:pointer;
-            z-index:15;
-            opacity:0;
-            transition:transform .3s ease, filter .3s ease;
-            animation: fadeInHotspot .6s ease 1.8s forwards;
-            clip-path: polygon(
-                38% 0%, 58% 2%, 74% 8%, 87% 18%,
-                95% 30%, 98% 43%, 94% 55%, 84% 64%,
-                68% 69%, 60% 100%, 42% 100%, 36% 69%,
-                20% 63%, 8% 52%, 3% 38%, 5% 24%,
-                14% 12%, 26% 4%
-            );
-        }
-        .tree-hotspot:hover{
-            transform:scale(1.02);
-            filter:drop-shadow(0 0 20px rgba(1,121,95,.75));
-        }
-        .tree-hotspot:hover ~ .tree-tooltip{ opacity:1; transform:translate(-50%, -4px); }
-
-        .tree-tooltip{
-            position:absolute;
-            left:66%;
-            top:47%;
-            transform:translate(-50%, 4px);
-            background:var(--ink);
-            color:var(--cream);
-            font-family:var(--font-label);
-            font-size:clamp(9px, 1.1vw, 13px);
-            letter-spacing:.06em;
-            text-transform:uppercase;
-            padding:6px 12px;
-            border-radius:7px;
-            white-space:nowrap;
-            opacity:0;
-            pointer-events:none;
-            transition:opacity .25s ease, transform .25s ease;
-            z-index:16;
-        },
-         .book-hotspot{
-            border:#10140F;
-            position:absolute;
-            left:37.31%;
-            top:44.97%;
-            width:10.58%;
-            height:15.28%;
-            cursor:pointer;
-            z-index:15;
-            opacity:0;
-            animation: fadeInHotspot .6s ease 1.75s forwards;
-        }
-        .book-hotspot:hover{ filter:drop-shadow(0 0 18px rgba(1,121,95,.55)); }
-        .book-hotspot:hover ~ .book-tooltip{ opacity:1; transform:translate(-50%, -4px); }
-
-        .book-tooltip{
-            position:absolute;
-            left:38.10%;
-            top:50%;
-            transform:translate(-50%, 4px);
-            background:var(--ink);
-            color:var(--cream);
-            font-family:var(--font-label);
-            font-size:clamp(9px, 1.1vw, 13px);
-            letter-spacing:.06em;
-            text-transform:uppercase;
-            padding:6px 12px;
-            border-radius:7px;
-            white-space:nowrap;
-            opacity:0;
-            pointer-events:none;
-            transition:opacity .25s ease, transform .25s ease;
-            z-index:16;
-        }
-
-        .ig-hotspot{
-            position:absolute;
-            left:36%;
-            top:48%;
-            width:11%;
-            height:20%;
-            cursor:pointer;
-            z-index:15;
-            opacity:0;
-            transition:transform .3s ease, filter .3s ease;
-            animation: fadeInHotspot .6s ease 1.8s forwards;
-            clip-path: polygon(
-                38% 0%, 58% 2%, 74% 8%, 87% 18%,
-                95% 30%, 98% 43%, 94% 55%, 84% 64%,
-                68% 69%, 60% 100%, 42% 100%, 36% 69%,
-                20% 63%, 8% 52%, 3% 38%, 5% 24%,
-                14% 12%, 26% 4%
-            );
-        }
-        .ig-hotspot:hover{
-            transform:scale(1.02);
-            filter:drop-shadow(0 0 20px rgba(1,121,95,.75));
-        }
-        .ig-hotspot:hover ~ .ig-tooltip{ opacity:1; transform:translate(-50%, -4px); }
-
-        .ig-tooltip{
-            position:absolute;
-            left:41%;
-            top:59%;
-            transform:translate(-50%, 4px);
-            background:var(--ink);
-            color:var(--cream);
-            font-family:var(--font-label);
-            font-size:clamp(9px, 1.1vw, 13px);
-            letter-spacing:.06em;
-            text-transform:uppercase;
-            padding:6px 12px;
-            border-radius:7px;
-            white-space:nowrap;
-            opacity:0;
-            pointer-events:none;
-            transition:opacity .25s ease, transform .25s ease;
-            z-index:16;
-        }
-
-        .yt-hotspot{
-            position:absolute;
-            left:50.5;
-            top:45.5%;
-            width:11%;
-            height:20%;
-            cursor:pointer;
-            z-index:15;
-            opacity:0;
-            transition:transform .3s ease, filter .3s ease;
-            animation: fadeInHotspot .6s ease 1.8s forwards;
-            clip-path: polygon(
-                38% 0%, 58% 2%, 74% 8%, 87% 18%,
-                95% 30%, 98% 43%, 94% 55%, 84% 64%,
-                68% 69%, 60% 100%, 42% 100%, 36% 69%,
-                20% 63%, 8% 52%, 3% 38%, 5% 24%,
-                14% 12%, 26% 4%
-            );
-        }
-        .yt-hotspot:hover{
-            transform:scale(1.02);
-            filter:drop-shadow(0 0 20px rgba(1,121,95,.75));
-        }
-        .yt-hotspot:hover ~ .yt-tooltip{ opacity:1; transform:translate(-50%, -4px); }
-
-        .yt-tooltip{
-            position:absolute;
-            left:58.7%;
-            top:45.5%;
-            transform:translate(-50%, 4px);
-            background:var(--ink);
-            color:var(--cream);
-            font-family:var(--font-label);
-            font-size:clamp(9px, 1.1vw, 13px);
-            letter-spacing:.06em;
-            text-transform:uppercase;
-            padding:6px 12px;
-            border-radius:7px;
-            white-space:nowrap;
-            opacity:0;
-            pointer-events:none;
-            transition:opacity .25s ease, transform .25s ease;
-            z-index:16;
-        }
-
-
-        /* ===== MODE DEBUG: tambahkan ?debug=1 di URL buat lihat area hotspot ===== */
-        body.debug-hotspot .mosque-hotspot,
-        body.debug-hotspot .emblem-hotspot,
-        body.debug-hotspot .ig-hotspot,
-        body.debug-hotspot .yt-hotspot,
-        body.debug-hotspot .book-hotspot{
-            opacity:1 !important;
-            background:rgba(255,0,0,.25);
-            outline:2px dashed red;
-        }
-        /* tree-hotspot dipisah: sudah berbentuk polygon (bukan kotak),
-           jadi outline dilepas biar nggak bikin bingung bentuk aslinya */
-        body.debug-hotspot .tree-hotspot{
-            opacity:1 !important;
-            background:rgba(255,0,0,.35);
-        }
-
-        .brand-title{
-            position:absolute;
-            top:4%;
-            left:50%;
-            transform:translateX(-50%);
-            text-align:center;
-            z-index:20;
-            opacity:0;
-            animation: fadeInHotspot .8s ease 1.9s forwards;
-        }
-        .brand-eyebrow{
-            display:inline-block;
-            padding:4px 14px;
-            border-radius:999px;
-            background:rgba(255,255,255,.85);
-            border:1px solid rgba(0,0,0,.08);
-            color:#01795F;
-            font-family:var(--font-label);
-            font-size:clamp(9px,1vw,12px);
-            font-weight:700;
-            letter-spacing:.04em;
-            margin-bottom:6px;
-        }
-        .brand-h1{
-            font-family:var(--font-display);
-            font-weight:800;
-            font-size:clamp(14px, 2.2vw, 24px);
-            color:#1e293b;
-        }
-
-        .footer-note{
-            position:absolute;
-            bottom:2%;
-            left:50%;
-            transform:translateX(-50%);
-            z-index:20;
-            font-family:var(--font-label);
-            font-size:clamp(8px, .9vw, 10px);
-            color:#64748b;
-            background:rgba(255,255,255,.8);
-            padding:4px 12px;
-            border-radius:999px;
-            border:1px solid rgba(0,0,0,.06);
-            opacity:0;
-            animation: fadeInHotspot .8s ease 2.1s forwards;
-        }
+        .c-labor   { background:linear-gradient(155deg,#0f7a5c,#0a4a3a); }
+        .c-perpus  { background:linear-gradient(155deg,#3f704d,#1f3a26); }
+        .c-komunitas{ background:linear-gradient(155deg,#c9a66b,#8a6a3b); }
+        .c-figma   { background:linear-gradient(155deg,#10140f,#01795f); }
 
         @media (prefers-reduced-motion: reduce){
-            *{ animation-duration:.01ms !important; animation-iteration-count:1 !important; }
+            *{ transition-duration:.01ms !important; animation-duration:.01ms !important; }
         }
     </style>
 </head>
-<body class="select-none">
+<body class="antialiased bg-[#10140F]">
 
-    <div class="scene">
+<div class="relative min-h-screen hero-bg overflow-hidden flex flex-col">
+    <div class="hero-pattern pointer-events-none"></div>
 
-        <video class="layer l-sky enter" src="{{ asset('assets/landing/video.webm') }}" autoplay loop muted playsinline></video>
+    {{-- ================= NAVBAR SEDERHANA (khusus hero) ================= --}}
+    <header class="relative z-20">
+        <div class="max-w-7xl mx-auto px-5 sm:px-8 py-5 flex items-center justify-between">
 
-        <!-- clouds jauh & kabut dasar dulu, tetap di belakang gedung -->
-        <img class="layer l-clouds-mist enter" src="{{ asset('assets/landing/clouds-mist.png') }}" alt="">
+            <a href="{{ route('landing') }}" class="flex items-center gap-3 group">
+                <div class="brand-mark group-hover:scale-105 transition-transform">TS</div>
+                <div class="leading-none">
+                    <span class="block font-display font-extrabold text-base text-[var(--cream)] tracking-tight">TSAQIB</span>
+                    <span class="block font-label text-[9px] text-[var(--gold)] font-bold tracking-widest uppercase mt-0.5">FSI SMAN 1 Bukittinggi</span>
+                </div>
+            </a>
 
-        <!-- clouds-far ditaruh SETELAH gedung: awan pojok kanan-bawah harus overlap DI DEPAN gedung -->
-        <img class="layer l-clouds-far enter" src="{{ asset('assets/landing/clouds-far.png') }}" alt="">
+            {{-- Navigasi utama (desktop) --}}
+            <nav class="hidden lg:flex items-center gap-1 font-label text-xs font-semibold">
+                <a href="{{ route('laboratorium.pai') }}" class="px-3.5 py-2 rounded-full text-[var(--cream)]/80 hover:text-white hover:bg-white/10 transition">Laboratorium PAI</a>
+                <a href="{{ route('perpustakaan') }}" class="px-3.5 py-2 rounded-full text-[var(--cream)]/80 hover:text-white hover:bg-white/10 transition">Perpustakaan</a>
+                <button type="button" onclick="handleKomunitasClick()" class="px-3.5 py-2 rounded-full text-[var(--cream)]/80 hover:text-white hover:bg-white/10 transition">Komunitas</button>
+                <a href="{{ route('open.recruitment') }}" class="px-3.5 py-2 rounded-full text-[var(--cream)]/80 hover:text-white hover:bg-white/10 transition">Open Recruitment</a>
+            </nav>
 
-        <div class="brand-title">
-            <span class="brand-eyebrow">Labor PAI Digital SMAN 1 Bukittinggi</span>
-            <div class="flex justify-center items-center gap-6 md:gap-10">
-                <img src="{{ asset('assets/logo-instansi/pendidikan.webp') }}" alt="Logo 2" class="h-14 w-14 object-contain">
-                <img src="{{ asset('assets/logo-instansi/kemenag.webp') }}" alt="Logo 1" class="h-14 w-14 object-contain">
-                <img src="{{ asset('assets/logo-instansi/sumbar.webp') }}" alt="Logo 3" class="h-14 w-14 object-contain">
-                <img src="{{ asset('assets/logo-instansi/smansa.webp') }}" alt="Logo 4" class="h-14 w-14 object-contain">
-                <img src="{{ asset('assets/logo-instansi/fsi.png') }}" alt="Logo 5" class="h-14 w-14 object-contain">
-            </div>
-        </div>
-        </div>
+            {{-- Sosial media + login/profile --}}
+            <div class="flex items-center gap-2 sm:gap-3">
+                <div class="hidden sm:flex items-center gap-1.5">
+                    {{-- TODO Rara: ganti href "#" dengan link akun sosmed FSI TSAQIB yang asli --}}
+                    <a href="https://www.instagram.com/fsi.smansa_landbouw?igsh=MXVzMzd5Nms0eDZpNQ==
 
-        <!-- pulau + masjid + buku + dekorasi: satu grup, naik-turun bareng -->
-        <div class="island-float">
-            <div class="island-group">
-                <img class="layer l-main-island enter" src="{{ asset('assets/landing/galangmewing3.png') }}" alt="Pulau utama TSAQIB">
-                {{-- <img class="layer l-foreground-decor enter" src="{{ asset('assets/landing/foreground-decor.png') }}" alt=""> --}}
-                <img class="layer l-mosque-decor enter" src="{{ asset('assets/landing/mosque-decor.png') }}" alt="Masjid dan perpustakaan mini">
+" target="_blank" rel="noopener" class="w-9 h-9 rounded-full flex items-center justify-center text-[var(--cream)]/80 hover:text-white hover:bg-white/10 transition" title="Instagram">
+                        <i class="fa-brands fa-instagram text-sm"></i>
+                    </a>
+                    <a href="https://ytfsi.carrd.co" target="_blank" rel="noopener" class="w-9 h-9 rounded-full flex items-center justify-center text-[var(--cream)]/80 hover:text-white hover:bg-white/10 transition" title="Youtube">
+                        <i class="fa-brands fa-youtube text-sm"></i>
+                    </a>
+                    <a href="https://www.facebook.com/share/1BJMFJvK5k/" target="_blank" rel="noopener" class="w-9 h-9 rounded-full flex items-center justify-center text-[var(--cream)]/80 hover:text-white hover:bg-white/10 transition" title="Facebook">
+                        <i class="fa-brands fa-facebook text-sm"></i>
+                    </a>
+                </div>
 
-                <!-- MASJID: Publik, langsung mengarahkan ke Halaman Hub Masjid (Laboratorium PAI & Open Recruitment) -->
-                <a class="mosque-hotspot" href="{{ route('hub') }}" title="Selamat Datang di Labor PAI" style="display:block;"></a>
-                <div class="mosque-tooltip">Selamat Datang di Labor PAI</div>
+                <div class="w-px h-6 bg-white/15 hidden sm:block"></div>
 
-                <a class="facebook-hotspot" href="https://www.facebook.com/share/1BJMFJvK5k/" title="Laboratorium PAI & Pendaftaran" style="display:block;"></a>
-                <div class="facebook-tooltip">Facebook FSI</div>
-
-                <a class="ig-hotspot" href="https://www.instagram.com/fsi.smansa_landbouw?igsh=MXVzMzd5Nms0eDZpNQ==" title="Instagram FSI" style="display:block;"></a>
-                <div class="ig-tooltip">Instagram FSI</div>
-
-                <a class="yt-hotspot" href="https://ytfsi.carrd.co/" title="YouTube FSI" style="display:block;"></a>
-                <div class="yt-tooltip">YouTube FSI</div>
-
-                <!-- EMBLEM MASCOT / BOLA MERAH KACAMATA: Gerbang Utama Komunitas (Guest & Login) -->
-                <div class="emblem-hotspot" onclick="handleEmblemClick()" title="Masuk Komunitas TSAQIB"></div>
-                <div class="emblem-tooltip">Masuk Komunitas TSAQIB</div>
-
-                <!-- BUKU: publik, langsung ke perpustakaan tanpa auth -->
-                <a class="book-hotspot" href="{{ route('perpustakaan') }}" title="Perpustakaan" style="display:block;"></a>
-                <div class="book-tooltip">Perpustakaan</div>
-
-                <!-- POHON (ngikutin siluet ijo+coklat, area abu2 dikecualikan): Membuka Prototype Figma pada tab baru -->
-                <a class="tree-hotspot" href="https://www.figma.com/proto/1Azmk9c0fapjsTICrk7hU6/Tsaqib-Adv?node-id=5-4&t=O3fg7rE3EBm3cqZ7-0&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=1%3A2" target="_blank" rel="noopener noreferrer" title="Lihat Prototype TSAQIB" style="display:block;"></a>
-                <div class="tree-tooltip">Lihat Prototype TSAQIB</div>
-            </div>
-        </div>
-
-        <!-- building-a: PALING DEPAN, di luar island-float supaya nggak ikut idle-float pulau,
-             tapi tetap render di ATAS pulau (overlap ke island) sesuai reference art -->
-
-
-        <div class="footer-note">&copy; {{ date('Y') }} TSAQIB • Forum Studi Islam SMAN 1 Bukittinggi</div>
-
-    </div>
-
-    <script>
-        // Logic Klik Hitbox Emblem Komunitas (Bola Merah Kacamata)
-        // Guest & user login sama-sama diarahkan ke feed komunitas.
-        // Aksi yang butuh login (buat postingan, dll) tetap dijaga oleh middleware 'auth' di route terkait.
-        function handleEmblemClick() {
-            @auth
-                @if(Auth::user()->selected_community)
-                    window.location.href = "{{ route('komunitas') }}";
+                @auth
+                    <a href="{{ route('profile.edit') }}" class="flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 transition">
+                        <x-community-avatar :user="Auth::user()" size="xs" />
+                        <span class="text-xs font-label font-semibold text-[var(--cream)] hidden sm:inline">Profil</span>
+                    </a>
                 @else
-                    window.location.href = "{{ route('select-role') }}";
-                @endif
-            @else
+                    <a href="{{ route('login') }}" class="px-4 py-2 rounded-full bg-[var(--green)] hover:bg-[var(--green-dark)] text-white text-xs font-label font-bold transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-right-to-bracket text-[11px]"></i>
+                        <span>Masuk</span>
+                    </a>
+                @endauth
+
+                {{-- Toggle menu mobile --}}
+                <button type="button" id="mobile-nav-btn" class="lg:hidden w-9 h-9 rounded-full flex items-center justify-center text-[var(--cream)] bg-white/10 hover:bg-white/20 transition">
+                    <i class="fa-solid fa-bars text-sm" id="mobile-nav-icon"></i>
+                </button>
+            </div>
+        </div>
+
+        {{-- Drawer mobile --}}
+        <div id="mobile-nav-menu" class="hidden lg:hidden max-w-7xl mx-auto px-5 pb-5 flex flex-col gap-1 font-label text-sm font-semibold">
+            <a href="{{ route('laboratorium.pai') }}" class="px-4 py-2.5 rounded-xl text-[var(--cream)]/90 hover:bg-white/10 transition">Laboratorium PAI</a>
+            <a href="{{ route('perpustakaan') }}" class="px-4 py-2.5 rounded-xl text-[var(--cream)]/90 hover:bg-white/10 transition">Perpustakaan</a>
+            <button type="button" onclick="handleKomunitasClick()" class="text-left px-4 py-2.5 rounded-xl text-[var(--cream)]/90 hover:bg-white/10 transition">Komunitas</button>
+            <a href="{{ route('open.recruitment') }}" class="px-4 py-2.5 rounded-xl text-[var(--cream)]/90 hover:bg-white/10 transition">Open Recruitment</a>
+            <div class="flex items-center gap-1.5 px-4 pt-2">
+                <a href="#" target="_blank" rel="noopener" class="w-9 h-9 rounded-full flex items-center justify-center text-[var(--cream)]/80 hover:text-white hover:bg-white/10 transition"><i class="fa-brands fa-instagram text-sm"></i></a>
+                <a href="#" target="_blank" rel="noopener" class="w-9 h-9 rounded-full flex items-center justify-center text-[var(--cream)]/80 hover:text-white hover:bg-white/10 transition"><i class="fa-brands fa-tiktok text-sm"></i></a>
+                <a href="#" target="_blank" rel="noopener" class="w-9 h-9 rounded-full flex items-center justify-center text-[var(--cream)]/80 hover:text-white hover:bg-white/10 transition"><i class="fa-brands fa-whatsapp text-sm"></i></a>
+            </div>
+        </div>
+    </header>
+
+    {{-- ================= HERO CONTENT ================= --}}
+    <main class="relative z-10 flex-1 max-w-7xl w-full mx-auto px-5 sm:px-8 flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-6 py-8 lg:py-0">
+
+        {{-- Kiri: branding + deskripsi + CTA utama --}}
+        <div class="lg:w-[46%] pt-4 lg:pt-0">
+            <span class="eyebrow-pill">
+                <i class="fa-solid fa-mosque text-[10px]"></i>
+                Forum Studi Islam &middot; SMAN 1 Bukittinggi
+            </span>
+
+            <h1 class="font-display font-extrabold text-[var(--cream)] leading-[1.05] mt-5 text-5xl sm:text-6xl lg:text-7xl tracking-tight">
+                TSAQIB
+            </h1>
+            <p class="font-display font-bold text-[var(--gold)] text-lg sm:text-xl mt-1 tracking-tight">
+                Cerdas Iman, Unggul Prestasi
+            </p>
+
+            <p class="text-[var(--cream)]/70 text-sm sm:text-[15px] leading-relaxed mt-5 max-w-md">
+                Wadah kaderisasi dan pengembangan diri siswa/i SMAN 1 Bukittinggi berbasis nilai-nilai
+                keislaman &mdash; menghubungkan Laboratorium PAI, Perpustakaan Digital, dan komunitas
+                minat &amp; bakat dalam satu ekosistem.
+            </p>
+
+            <div class="flex flex-wrap items-center gap-4 mt-8">
+                <a href="{{ route('open.recruitment') }}" class="cta-primary inline-flex items-center gap-2.5 text-white font-label font-bold text-xs sm:text-sm px-6 py-3.5 rounded-full">
+                    <i class="fa-solid fa-user-plus text-xs"></i>
+                    <span>Daftar Jadi Anggota</span>
+                </a>
+                <a href="#program" class="inline-flex items-center gap-2 text-[var(--cream)]/80 hover:text-white font-label font-semibold text-xs sm:text-sm transition">
+                    <span>Lihat Semua Program</span>
+                    <i class="fa-solid fa-arrow-down text-[10px]"></i>
+                </a>
+            </div>
+        </div>
+
+        {{-- Kanan: carousel horizontal --}}
+        <div id="program" class="lg:w-[54%] lg:pl-4">
+            <div class="flex items-center justify-between mb-4 lg:mb-5">
+                <h2 class="font-label text-[var(--cream)]/60 text-[11px] font-bold uppercase tracking-widest">
+                    Jelajahi Program TSAQIB
+                </h2>
+                <div class="hidden sm:flex items-center gap-2">
+                    <button type="button" id="carousel-prev" class="carousel-nav-btn" aria-label="Sebelumnya">
+                        <i class="fa-solid fa-chevron-left text-xs"></i>
+                    </button>
+                    <button type="button" id="carousel-next" class="carousel-nav-btn" aria-label="Berikutnya">
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="relative">
+                <div id="carousel-track" class="carousel-track flex gap-4 overflow-x-auto pb-3 -mx-1 px-1">
+
+                    <a href="{{ route('laboratorium.pai') }}" class="carousel-card card-face c-labor">
+                        <i class="card-icon fa-solid fa-flask text-2xl text-white/90 mb-3"></i>
+                        <span class="card-label block font-display font-bold text-white text-lg leading-tight">Laboratorium<br>PAI</span>
+                        <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">Materi, riset, dan simulasi ibadah</span>
+                        <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
+                            Buka <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </span>
+                    </a>
+
+                    <a href="{{ route('perpustakaan') }}" class="carousel-card card-face c-perpus">
+                        <i class="card-icon fa-solid fa-book-open text-2xl text-white/90 mb-3"></i>
+                        <span class="card-label block font-display font-bold text-white text-lg leading-tight">Perpustakaan<br>Digital</span>
+                        <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">Koleksi buku &amp; referensi FSI</span>
+                        <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
+                            Buka <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </span>
+                    </a>
+
+                    <button type="button" onclick="handleKomunitasClick()" class="carousel-card card-face c-komunitas text-left">
+                        <i class="card-icon fa-solid fa-users text-2xl text-white/90 mb-3"></i>
+                        <span class="card-label block font-display font-bold text-white text-lg leading-tight">Komunitas<br>TSAQIB</span>
+                        <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">7 komunitas minat &amp; bakat</span>
+                        <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
+                            Buka <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </span>
+                    </button>
+
+                    <a href="https://www.figma.com/proto/1Azmk9c0fapjsTICrk7hU6/Tsaqib-Adv?node-id=5-4&t=O3fg7rE3EBm3cqZ7-0&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=1%3A2"
+                       target="_blank" rel="noopener noreferrer" class="carousel-card card-face c-figma">
+                        <i class="card-icon fa-solid fa-diagram-project text-2xl text-white/90 mb-3"></i>
+                        <span class="card-label block font-display font-bold text-white text-lg leading-tight">Prototype<br>TSAQIB</span>
+                        <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">Desain awal di Figma</span>
+                        <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
+                            Lihat <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                        </span>
+                    </a>
+
+                </div>
+
+                {{-- Page indicator --}}
+                <div class="flex items-center justify-between mt-1">
+                    <div class="flex sm:hidden items-center gap-2">
+                        <button type="button" id="carousel-prev-mobile" class="carousel-nav-btn" aria-label="Sebelumnya">
+                            <i class="fa-solid fa-chevron-left text-xs"></i>
+                        </button>
+                        <button type="button" id="carousel-next-mobile" class="carousel-nav-btn" aria-label="Berikutnya">
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
+                    <span class="ml-auto font-label text-[var(--cream)]/50 text-xs font-bold tracking-wider">
+                        <span id="carousel-index">01</span> / 04
+                    </span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="relative z-10 max-w-7xl w-full mx-auto px-5 sm:px-8 py-5 text-center lg:text-left">
+        <p class="text-[var(--cream)]/40 text-[11px] font-label">
+            &copy; {{ date('Y') }} TSAQIB &middot; Forum Studi Islam SMAN 1 Bukittinggi
+        </p>
+    </footer>
+</div>
+
+<script>
+    // ===== Gerbang auth Komunitas (logic sama kayak emblem-hotspot di Floating Island lama) =====
+    function handleKomunitasClick() {
+        @auth
+            @if(Auth::user()->selected_community)
                 window.location.href = "{{ route('komunitas') }}";
-            @endauth
+            @else
+                window.location.href = "{{ route('select-role') }}";
+            @endif
+        @else
+            window.location.href = "{{ route('login') }}";
+        @endauth
+    }
+
+    // ===== Mobile nav drawer =====
+    document.addEventListener('DOMContentLoaded', function () {
+        const btn = document.getElementById('mobile-nav-btn');
+        const menu = document.getElementById('mobile-nav-menu');
+        const icon = document.getElementById('mobile-nav-icon');
+        if (btn && menu) {
+            btn.addEventListener('click', function () {
+                menu.classList.toggle('hidden');
+                icon.classList.toggle('fa-bars');
+                icon.classList.toggle('fa-xmark');
+            });
         }
 
-        // Mode debug: buka ?debug=1 di URL untuk lihat area hotspot (merah)
-        if (new URLSearchParams(window.location.search).get('debug') === '1') {
-            document.body.classList.add('debug-hotspot');
+        // ===== Carousel: prev/next + page indicator =====
+        const track = document.getElementById('carousel-track');
+        const indexLabel = document.getElementById('carousel-index');
+        const cards = track ? Array.from(track.children) : [];
+        const totalCards = cards.length;
+
+        function scrollByCard(direction) {
+            if (!track || !cards.length) return;
+            const cardWidth = cards[0].getBoundingClientRect().width + 16; // + gap-4
+            track.scrollBy({ left: direction * cardWidth, behavior: 'smooth' });
         }
-    </script>
+
+        ['carousel-prev', 'carousel-prev-mobile'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('click', () => scrollByCard(-1));
+        });
+        ['carousel-next', 'carousel-next-mobile'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('click', () => scrollByCard(1));
+        });
+
+        if (track && indexLabel && totalCards) {
+            track.addEventListener('scroll', function () {
+                const cardWidth = cards[0].getBoundingClientRect().width + 16;
+                const current = Math.min(totalCards, Math.max(1, Math.round(track.scrollLeft / cardWidth) + 1));
+                indexLabel.textContent = String(current).padStart(2, '0');
+            }, { passive: true });
+        }
+    });
+</script>
 
 </body>
 </html>

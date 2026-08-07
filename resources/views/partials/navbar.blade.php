@@ -12,13 +12,13 @@
         <div class="flex items-center justify-between h-16 sm:h-20">
 
             <!-- Brand Logo & Title -->
-            <a href="{{ route('landing') }}" class="flex items-center space-x-3 group" title="Kembali ke Home Floating Island">
+            <a href="{{ route('landing') }}" class="flex items-center space-x-3 group" title="Kembali ke Beranda">
                 <div class="w-10 h-10 rounded-xl bg-[#01795F] text-white flex items-center justify-center font-bold text-lg shadow-sm group-hover:bg-[#3F704D] transition duration-200">
-                    LP
+                    TS
                 </div>
                 <div>
                     <span class="font-bold text-base sm:text-lg tracking-tight text-slate-900 block leading-none">
-                        LABOR PAI DIGITAL
+                        TSAQIB
                     </span>
                     <span class="text-[10px] text-[#01795F] font-semibold tracking-wider uppercase block mt-0.5">FSI SMAN 1 Bukittinggi</span>
                 </div>
@@ -27,7 +27,7 @@
             <!-- Desktop Navigation Items -->
             <nav class="hidden md:flex items-center space-x-1 lg:space-x-2">
 
-                <!-- 1. Beranda (Home Floating Island /) -->
+                <!-- 1. Beranda (Hero Landing /) -->
                 <a href="{{ route('landing') }}"
                    class="px-3.5 py-2 rounded-lg text-xs font-semibold transition duration-150 flex items-center space-x-1.5 {{ $currentRoute == 'landing' ? 'bg-[#01795F] text-white' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' }}">
                     <i class="fa-solid fa-house text-[11px]"></i>
@@ -116,16 +116,9 @@
                         </a>
                     @endif
 
-                    @php
-                        $profilePics = glob(public_path('images/profile-pic/*.{jpg,jpeg,png,webp}'), GLOB_BRACE);
-                        $randomAvatar = $profilePics
-                            ? asset('images/profile-pic/' . basename($profilePics[array_rand($profilePics)]))
-                            : asset('images/default-avatar.png');
-                    @endphp
-
                     <a href="{{ route('profile.edit') }}"
-                    class="ml-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-800 hover:bg-[#3F704D] hover:text-white transition duration-150 flex items-center space-x-2 border border-slate-200">
-                        <img src="{{ $randomAvatar }}" alt="Avatar" class="w-6 h-6 rounded-full object-cover">
+                       class="ml-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-800 hover:bg-[#3F704D] hover:text-white transition duration-150 flex items-center space-x-2 border border-slate-200">
+                        <x-community-avatar :user="Auth::user()" size="xs" />
                         <span>Profil</span>
                     </a>
                 @else

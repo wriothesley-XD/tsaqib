@@ -28,12 +28,12 @@
     <!-- Top Header Navigation -->
     <header class="max-w-5xl mx-auto w-full flex items-center justify-between py-4">
         <a href="{{ route('landing') }}" class="flex items-center space-x-3 group">
-            <div class="w-10 h-10 rounded-xl bg-[#01795F] text-white flex items-centerjustify-center font-bold text-lg shadow-sm group-hover:bg-[#3F704D] transition duration-200 overflow-hidden">
-                <img src="{{  asset('images/labor.png') }}" alt="Logo" class="w-full h-full object-cover">
+            <div class="w-10 h-10 rounded-xl bg-[#01795F] text-white flex items-center justify-center font-bold text-lg shadow-sm group-hover:bg-[#3F704D] transition duration-200">
+                TS
             </div>
             <div>
                 <span class="font-bold text-base sm:text-lg tracking-tight text-slate-900 block leading-none">
-                    LABOR PAI DIGITAL
+                    TSAQIB
                 </span>
                 <span class="text-[10px] text-[#01795F] font-semibold tracking-wider uppercase block mt-0.5">FSI SMAN 1 Bukittinggi</span>
             </div>
@@ -41,18 +41,18 @@
 
         <a href="{{ route('landing') }}" class="inline-flex items-center space-x-2 text-xs font-bold text-slate-700 hover:text-[#01795F] bg-white/80 backdrop-blur border border-slate-200/80 px-4 py-2 rounded-full shadow-sm hover:shadow transition">
             <i class="fa-solid fa-arrow-left text-[11px]"></i>
-            <span>Kembali ke Floating Island</span>
+            <span>Kembali ke Beranda</span>
         </a>
     </header>
 
     <!-- Main Hub Content -->
-    <main class="max-w-8xl mx-auto w-full my-auto py-8">
+    <main class="max-w-4xl mx-auto w-full my-auto py-8">
         <div class="text-center space-y-3 mb-10">
             <span class="inline-block px-3.5 py-1 rounded-full bg-[#01795F]/10 text-[#01795F] text-xs font-bold uppercase tracking-wider">
-                Gerbang Utama Masjid Floating Island
+                Gerbang Utama Masjid TSAQIB
             </span>
             <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-                Pusat Layanan & Aktivitas <span class="text-[#01795F]">LABOR PAI DIGITAL</span>
+                Pusat Layanan & Aktivitas <span class="text-[#01795F]">FSI TSAQIB</span>
             </h1>
             <p class="text-slate-600 text-xs sm:text-sm max-w-lg mx-auto leading-relaxed">
                 Silakan pilih fasilitas atau jalur pendaftaran yang ingin Anda akses di bawah ini. Akses publik tanpa perlu login.
@@ -60,7 +60,7 @@
         </div>
 
         <!-- 2 Big Cards Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
             
             <!-- Card 1: Laboratorium PAI -->
             <a href="{{ route('laboratorium.pai') }}" 
@@ -87,55 +87,6 @@
                 </div>
             </a>
 
-            <!-- Card 1: Laboratorium PAI -->
-            <a href="{{ route('perpustakaan') }}" 
-               class="group relative bg-white border-2 border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-sm hover:shadow-2xl hover:shadow-[#01795F]/15 hover:border-[#01795F] hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between">
-                <div>
-                    <div class="w-14 h-14 rounded-2xl bg-[#01795F]/10 text-[#01795F] flex items-center justify-center text-2xl font-bold mb-5 group-hover:bg-[#01795F] group-hover:text-white transition-colors duration-300">
-                        <i class="fa-solid fa-book"></i>
-                    </div>
-
-                    <span class="inline-block text-[10px] font-extrabold text-[#01795F] uppercase tracking-widest mb-1">
-                        PUSTAKA PAI DIGITAL
-                    </span>
-                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 group-hover:text-[#01795F] transition-colors leading-tight">
-                        Pustaka PAI Digital
-                    </h2>
-                    <p class="text-xs sm:text-sm text-slate-600 mt-2.5 leading-relaxed">
-                        Akses terhadap buku digital serta penguatan literasi Agama Islam untuk mendukung peningkatan pemahaman, pembelajaran, dan pengamalan nilai-nilai keislaman secara efektif.
-                    </p>
-                </div>
-
-                <div class="mt-8 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#01795F]">
-                    <span>Buka Pusataka Digital</span>
-                    <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform duration-200"></i>
-                </div>
-            </a>
-
-            <!-- Card 2: Open Recruitment -->
-            <a href="{{ route('komunitas') }}" 
-               class="group relative bg-white border-2 border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-sm hover:shadow-2xl hover:shadow-[#01795F]/15 hover:border-[#01795F] hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between">
-                <div>
-                    <div class="w-14 h-14 rounded-2xl bg-[#01795F]/10 text-[#01795F] flex items-center justify-center text-2xl font-bold mb-5 group-hover:bg-[#01795F] group-hover:text-white transition-colors duration-300">
-                        <i class="fa-solid fa-user"></i>
-                    </div>
-
-                    <span class="inline-block text-[10px] font-extrabold text-[#01795F] uppercase tracking-widest mb-1">
-                        Tsaqib FSI
-                    </span>
-                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 group-hover:text-[#01795F] transition-colors leading-tight">
-                        Tsaqib FSI
-                    </h2>
-                    <p class="text-xs sm:text-sm text-slate-600 mt-2.5 leading-relaxed">
-                        Ekstrakurikuler Keagamaan yang menjadi ruang tumbuh dalam menempa diri siswa dibidang ketakwaan, kejujuran, dan akhlakul karimah.
-                </div>
-
-                <div class="mt-8 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#01795F]">
-                    <span>Akses Tsaqib</span>
-                    <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform duration-200"></i>
-                </div>
-            </a>
-
             <!-- Card 2: Open Recruitment -->
             <a href="{{ route('open.recruitment') }}" 
                class="group relative bg-white border-2 border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-sm hover:shadow-2xl hover:shadow-[#01795F]/15 hover:border-[#01795F] hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between">
@@ -148,7 +99,7 @@
                         Pendaftaran Anggota Baru
                     </span>
                     <h2 class="text-xl sm:text-2xl font-bold text-slate-900 group-hover:text-[#01795F] transition-colors leading-tight">
-                        Registrasi Pengunjung
+                        Open Recruitment
                     </h2>
                     <p class="text-xs sm:text-sm text-slate-600 mt-2.5 leading-relaxed">
                         Pendaftaran terbuka anggota baru khusus siswa/i Kelas X SMAN 1 Bukittinggi. Bergabunglah bersama 13 bidang minat TSAQIB!
@@ -160,27 +111,9 @@
                     <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform duration-200"></i>
                 </div>
             </a>
+
         </div>
     </main>
-    <!-- SECTION KOTAK SARAN DI BAGIAN BAWAH -->
-<div class="mt-12 bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
-    <div class="max-w-2xl mx-auto text-center">
-        <h3 class="text-2xl font-bold text-slate-900 mb-2">Kotak Saran & Masukan</h3>
-        <p class="text-slate-600 mb-6">Punya kritik, saran, atau masukan untuk pengembangan Labor PAI Digital? Silakan sampaikan melalui formulir di bawah ini.</p>
-        
-        <!-- Opsi 1: Tombol langsung buka Google Form di tab baru -->
-        <a href="https://docs.google.com/forms/d/e/1FAIpQLScLDeCvGI17R7Z-NkckFV-N9Sm1Jfl8-eOEl20ZFVfFDeebgQ/viewform?usp=publish-editor" target="_blank" class="inline-flex items-center justify-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl transition shadow-md">
-            <i class="fa-solid fa-pen-to-square mr-2"></i> Isi Kotak Saran (Google Form)
-        </a>
-
-        <!-- Opsi 2 (Alternatif): Kalau mau Google Form-nya langsung muncul di web (Embed iframe) -->
-        <!-- 
-        <div class="w-full mt-4">
-            <iframe src="LINK_EMBED_GOOGLE_FORM_KAMU" width="100%" height="500" frameborder="0" marginheight="0" marginwidth="0">Memuat…</iframe>
-        </div> 
-        -->
-    </div>
-</div>
 
     <!-- Footer -->
     <footer class="max-w-5xl mx-auto w-full text-center text-xs text-slate-500 py-4">

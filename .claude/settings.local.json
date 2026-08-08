@@ -3,7 +3,8 @@
     "allow": [
       "Bash(grep -n '\\\\$books' resources/views/perpustakaan.blade.php)",
       "Bash(php artisan *)",
-      "Bash(git stash *)"
+      "Bash(git stash *)",
+      "Bash(NODE_PATH=\"$\\(pwd\\)/node_modules\" node /tmp/tsaqib-profile-img.js)"
     ]
   }
 }

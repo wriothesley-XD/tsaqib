@@ -94,7 +94,9 @@ class PageController extends Controller
             $query->where('community_slug', $currentSlug);
         }
 
-        $posts = $query->get();
+        // paginate(10) -> feed timeline single-column; ?page=N shareable.
+        // Slug komunitas ada di path (bukan query) jadi tetap terjaga antar-halaman.
+        $posts = $query->paginate(10);
         $komunitasAktif = $currentSlug !== 'semua' ? collect($daftarKomunitas)->firstWhere('slug', $currentSlug) : null;
 
         return view('komunitas.index', [

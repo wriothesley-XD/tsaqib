@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\LibraryController;
 use App\Http\Controllers\OpenRecruitmentController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PostController;
@@ -17,10 +18,8 @@ Route::get('/', [PageController::class, 'landing'])->name('landing');
 Route::get('/hub', [PageController::class, 'hub'])->name('hub');
 Route::get('/hub-masjid', [PageController::class, 'hub'])->name('hub.masjid');
 
-// Perpustakaan Digital Publik
-Route::get('/perpustakaan', function () {
-    return view('perpustakaan');
-})->name('perpustakaan');
+// Perpustakaan Digital Publik (filter ?category= & ?q= + pagination server-side)
+Route::get('/perpustakaan', [LibraryController::class, 'index'])->name('perpustakaan');
 
 // Laboratorium PAI Publik
 Route::get('/laboratorium-pai', [TsaqibController::class, 'laborPai'])->name('laboratorium.pai');

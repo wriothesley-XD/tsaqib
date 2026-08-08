@@ -136,11 +136,20 @@
             </div>
         </div>
     </div>
+</header>
 
-    {{-- ===== MOBILE DRAWER (< xl) ===== --}}
-    <div id="mobile-menu-backdrop" class="hidden fixed top-20 xl:top-24 inset-x-0 bottom-0 z-40 bg-black/50 backdrop-blur-sm xl:hidden"></div>
+{{--
+    ===== MOBILE DRAWER (< xl) =====
+    Sengaja ditarik KELUAR dari <header>. Header memakai backdrop-blur-md
+    (backdrop-filter), dan ancestor ber-backdrop-filter memaksa seluruh
+    subtree ter-rasterize pada layer terpisah sekaligus menonaktifkan
+    subpixel font rendering -> teks link menu tampak blur/lembek.
+    Di luar header, container teks bukan lagi descendant backdrop-filter,
+    posisi memakai fixed relatif viewport, dan teks kembali tajam.
+--}}
+<div id="mobile-menu-backdrop" class="hidden fixed top-20 xl:top-24 inset-x-0 bottom-0 z-40 bg-black/50 backdrop-blur-sm xl:hidden"></div>
 
-    <div id="mobile-menu" class="hidden xl:hidden border-t border-white/5 bg-[#10140F] px-5 py-3 space-y-0.5 shadow-2xl max-h-[calc(100vh-5rem)] overflow-y-auto">
+<div id="mobile-menu" class="hidden fixed top-20 xl:top-24 inset-x-0 z-50 xl:hidden border-t border-white/5 bg-[#10140F] px-5 py-3 space-y-0.5 shadow-2xl max-h-[calc(100vh-5rem)] overflow-y-auto antialiased">
 
         @foreach($navBefore as $item)
             <a href="{{ $item['href'] }}"
@@ -197,7 +206,6 @@
             @endauth
         </div>
     </div>
-</header>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {

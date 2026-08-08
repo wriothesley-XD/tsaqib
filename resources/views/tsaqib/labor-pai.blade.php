@@ -5,12 +5,18 @@
 <head>
     @include('partials.theme-head')
 </head>
-<body class="bg-[#10140F] text-[var(--cream)] font-sans antialiased min-h-screen flex flex-col">
+<body class="bg-[#10140F] text-[var(--cream)] font-sans antialiased">
+
+    {{-- Wrapper halaman: gradient full-tinggi + host silhouette di tepi bawah (scroll bersama konten) --}}
+    <div class="skyline-page flex flex-col">
+
+    {{-- Background skyline siluet (muncul sekali di tepi bawah halaman) --}}
+    <x-islamic-skyline-background />
 
     <!-- Unified TSAQIB Navbar -->
     @include('partials.navbar')
 
-    <main class="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-10 w-full">
+    <main class="relative z-10 flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-10 w-full">
 
         <!-- Title Banner -->
         <x-page-header
@@ -109,8 +115,8 @@
 
             <!-- INFOGRAPHIC TREE NODES -->
             <div class="space-y-6">
-                <img src="{{ asset('images/struktur.png') }}" alt="Struktur FSI TSAQIB" class="w-full rounded-xl border border-white/10 bg-white p-2" onerror="this.remove()">
-                <img src="{{ asset('images/kepengurusan.png') }}" alt="Kepengurusan FSI TSAQIB" class="w-full rounded-xl border border-white/10 bg-white p-2" onerror="this.remove()">
+                <img src="{{ asset('images/struktur.webp') }}" alt="Struktur FSI TSAQIB" class="w-full rounded-xl border border-white/10 bg-white p-2" loading="lazy" onerror="this.remove()">
+                <img src="{{ asset('images/kepengurusan.webp') }}" alt="Kepengurusan FSI TSAQIB" class="w-full rounded-xl border border-white/10 bg-white p-2" loading="lazy" onerror="this.remove()">
             </div>
         </div>
 
@@ -118,6 +124,8 @@
 
     <!-- Footer -->
     @include('partials.site-footer')
+
+    </div>{{-- end .skyline-page --}}
 
 </body>
 </html>

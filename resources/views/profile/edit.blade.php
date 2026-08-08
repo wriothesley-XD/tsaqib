@@ -8,7 +8,7 @@
         $userPosts = \App\Models\Post::where('user_id', Auth::id())->latest()->get();
     @endphp
 </head>
-<body class="bg-[#10140F] text-[var(--cream)] font-sans antialiased min-h-screen flex flex-col">
+<body class="text-[var(--cream)] font-sans antialiased min-h-screen flex flex-col">
 
     <!-- Unified TSAQIB Navbar -->
     @include('partials.navbar')

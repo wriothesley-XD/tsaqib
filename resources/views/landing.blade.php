@@ -175,7 +175,7 @@
         }
     </style>
 </head>
-<body class="antialiased bg-[#10140F]">
+<body class="antialiased">
 
 <div class="relative min-h-screen hero-bg overflow-hidden flex flex-col">
     {{-- Foto asli hero (opsional). Upload ke public/assets/landing/hero-photo.jpg dengan

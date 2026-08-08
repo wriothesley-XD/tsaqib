@@ -4,7 +4,18 @@
       "Bash(grep -n '\\\\$books' resources/views/perpustakaan.blade.php)",
       "Bash(php artisan *)",
       "Bash(git stash *)",
-      "Bash(NODE_PATH=\"$\\(pwd\\)/node_modules\" node /tmp/tsaqib-profile-img.js)"
+      "Bash(NODE_PATH=\"$\\(pwd\\)/node_modules\" node /tmp/tsaqib-profile-img.js)",
+      "Bash(python3 *)",
+      "Bash(npm run *)",
+      "Bash(npx playwright *)",
+      "Bash(node /tmp/tsaqib-preview/shoot.mjs)",
+      "Bash(node -e \"console.log\\(require.resolve\\('playwright'\\)\\)\")",
+      "Read(//home/kai/.npm/_npx/**)",
+      "Bash(sudo -n true)",
+      "Read(//usr/lib/**)",
+      "Bash(ldd /home/kai/.cache/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-linux64/chrome-headless-shell)",
+      "Read(//tmp/**)",
+      "Bash(apt-get download *)"
     ]
   }
 }

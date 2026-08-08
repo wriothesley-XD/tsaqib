@@ -80,7 +80,7 @@
         }
     </style>
 </head>
-<body class="bg-[#10140F] text-[var(--cream)] font-sans antialiased h-[100dvh] flex flex-col justify-between p-4 sm:p-6 overflow-hidden">
+<body class="text-[var(--cream)] font-sans antialiased h-[100dvh] flex flex-col justify-between p-4 sm:p-6 overflow-hidden">
 
     <div class="max-w-4xl mx-auto w-full flex flex-col items-center justify-center h-full text-center">
 

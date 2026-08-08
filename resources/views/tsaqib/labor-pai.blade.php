@@ -5,18 +5,12 @@
 <head>
     @include('partials.theme-head')
 </head>
-<body class="bg-[#10140F] text-[var(--cream)] font-sans antialiased">
-
-    {{-- Wrapper halaman: gradient full-tinggi + host silhouette di tepi bawah (scroll bersama konten) --}}
-    <div class="skyline-page flex flex-col">
-
-    {{-- Background skyline siluet (muncul sekali di tepi bawah halaman) --}}
-    <x-islamic-skyline-background />
+<body class="text-[var(--cream)] font-sans antialiased min-h-screen flex flex-col">
 
     <!-- Unified TSAQIB Navbar -->
     @include('partials.navbar')
 
-    <main class="relative z-10 flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-10 w-full">
+    <main class="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-10 w-full">
 
         <!-- Title Banner -->
         <x-page-header
@@ -124,8 +118,6 @@
 
     <!-- Footer -->
     @include('partials.site-footer')
-
-    </div>{{-- end .skyline-page --}}
 
 </body>
 </html>

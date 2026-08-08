@@ -2,7 +2,17 @@
 
 @php
     $pageTitle = 'Perpustakaan Digital FSI - TSAQIB SMAN 1 Bukittinggi';
-    $books = \App\Models\Book::where('is_visible', true)->latest()->get();
+
+    // Kategori filter (server-side). 'semua' = tanpa filter kategori.
+    $bookCategories = [
+        'semua'  => 'Semua Buku',
+        'fiqih'  => 'Fiqih',
+        'aqidah' => 'Aqidah',
+        'ski'    => 'SKI',
+        'hadits' => 'Hadits & Tafsir',
+        'modul'  => 'Modul PAI',
+    ];
+    $activeCat = in_array($category, array_keys($bookCategories), true) ? $category : 'semua';
 @endphp
 
 @section('content')
@@ -16,36 +26,41 @@
                 title="Perpustakaan Digital <span class='text-[var(--gold)]'>PAI SMAN 1 Bukittinggi</span>"
                 subtitle="Akses publik buku digital, modul PAI, materi Aqidah, Fiqih, SKI, dan Hadits SMAN 1 Bukittinggi tanpa perlu login.">
                 <x-slot:extra>
-                    <!-- SEARCH BAR -->
-                    <div class="max-w-xl mx-auto">
+                    <!-- SEARCH BAR (server-side GET). Hidden category agar pencarian
+                         tidak lupa kategori yang sedang aktif. Submit -> reset ke page 1. -->
+                    <form method="GET" action="{{ route('perpustakaan') }}" class="max-w-xl mx-auto" role="search">
+                        <input type="hidden" name="category" value="{{ $activeCat }}">
                         <div class="relative">
-                            <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-white/40 text-sm"></i>
-                            <input type="text" id="library-search" onkeyup="filterBooks()" placeholder="Cari judul buku, penulis, atau kata kunci..."
-                                   class="tsaqib-input w-full pl-11 pr-4 py-3 text-xs">
+                            <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-white/40 text-sm pointer-events-none"></i>
+                            <input type="text" name="q" value="{{ $q }}" placeholder="Cari judul buku, penulis, atau kata kunci..."
+                                   class="tsaqib-input w-full pl-11 pr-4 py-3 text-xs" aria-label="Cari buku">
                         </div>
-                    </div>
+                    </form>
                 </x-slot:extra>
             </x-page-header>
 
-            <!-- CATEGORY FILTER TABS -->
+            <!-- CATEGORY FILTER TABS (server-side via ?category=, pertahankan ?q=) -->
             <div class="mt-8 pt-6 border-t border-white/10 flex items-center justify-center space-x-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-white/10">
-                <button onclick="filterCategory('semua', this)" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold bg-[#01795F] text-white transition whitespace-nowrap">Semua Buku</button>
-                <button onclick="filterCategory('fiqih', this)" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white/5 text-white/70 hover:bg-white/10 transition whitespace-nowrap">Fiqih</button>
-                <button onclick="filterCategory('aqidah', this)" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white/5 text-white/70 hover:bg-white/10 transition whitespace-nowrap">Aqidah</button>
-                <button onclick="filterCategory('ski', this)" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white/5 text-white/70 hover:bg-white/10 transition whitespace-nowrap">SKI</button>
-                <button onclick="filterCategory('hadits', this)" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white/5 text-white/70 hover:bg-white/10 transition whitespace-nowrap">Hadits & Tafsir</button>
-                <button onclick="filterCategory('modul', this)" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white/5 text-white/70 hover:bg-white/10 transition whitespace-nowrap">Modul PAI</button>
+                @foreach($bookCategories as $key => $label)
+                    @php
+                        $catQuery = ['category' => $key];
+                        if ($q !== '') {
+                            $catQuery['q'] = $q;
+                        }
+                    @endphp
+                    <a href="{{ route('perpustakaan', $catQuery) }}"
+                       class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition {{ $activeCat === $key ? 'bg-[#01795F] text-white' : 'bg-white/5 text-white/70 hover:bg-white/10' }}">
+                        {{ $label }}
+                    </a>
+                @endforeach
             </div>
         </div>
 
-        <!-- DIGITAL BOOKS GRID (DATABASE DRIVEN) -->
+        <!-- DIGITAL BOOKS GRID (DATABASE DRIVEN, paginated) -->
         <div id="books-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
 
             @forelse($books as $book)
-                <div class="book-card tsaqib-card p-4 flex flex-col justify-between group"
-                     data-title="{{ strtolower($book->title) }}"
-                     data-author="{{ strtolower($book->author) }}"
-                     data-category="{{ strtolower($book->category ?? 'modul') }}">
+                <div class="tsaqib-card p-4 flex flex-col justify-between group">
 
                     <div>
                         <!-- Cover PDF / Placeholder -->
@@ -92,83 +107,22 @@
 
                 </div>
             @empty
-                <!-- SAMPLE BOOKS FOR DEMO IF DB EMPTY -->
-                @php
-                    $sampleBooks = [
-
-                    ];
-                @endphp
-                @foreach($sampleBooks as $sb)
-                    <div class="book-card tsaqib-card p-4 flex flex-col justify-between group"
-                         data-title="{{ strtolower($sb['title']) }}"
-                         data-author="{{ strtolower($sb['author']) }}"
-                         data-category="{{ strtolower($sb['cat']) }}">
-                        <div>
-                            <div class="w-full h-36 rounded-xl bg-white/5 border border-white/10 flex flex-col items-center justify-center p-3 relative overflow-hidden mb-3">
-                                <i class="fa-solid fa-book-bookmark text-4xl text-[#3fd6b0] mb-2"></i>
-                                <span class="text-[10px] font-bold text-[#3fd6b0] uppercase">{{ $sb['cat'] }}</span>
-                            </div>
-                            <span class="text-[9px] font-bold text-[var(--gold)] uppercase block mb-1">{{ $sb['cat'] }}</span>
-                            <h3 class="font-bold text-sm text-[var(--cream)] group-hover:text-[var(--gold)] transition line-clamp-2 leading-snug">{{ $sb['title'] }}</h3>
-                            <p class="text-xs text-white/50 mt-1">Penulis: {{ $sb['author'] }}</p>
-                        </div>
-                        <div class="mt-4 pt-3 border-t border-white/10 flex items-center space-x-2">
-                            <a href="#" onclick="alert('Silakan unggah file PDF resmi di Admin Panel!'); return false;" class="flex-1 py-2 rounded-xl bg-[#01795F] text-white text-center font-semibold text-xs flex items-center justify-center space-x-1">
-                                <i class="fa-solid fa-eye text-[11px]"></i>
-                                <span>Baca PDF</span>
-                            </a>
-                        </div>
-                    </div>
-                @endforeach
+                <div class="col-span-full tsaqib-card-flat p-10 text-center">
+                    <i class="fa-solid fa-book-bookmark text-3xl text-white/15 block mb-3"></i>
+                    <p class="text-white/45 text-xs">
+                        Tidak ada buku yang cocok dengan pencarian atau kategori ini.
+                    </p>
+                </div>
             @endforelse
 
         </div>
 
+        {{-- Pagination controls (themed) --}}
+        @if ($books->hasPages())
+            <div class="pt-2">
+                {{ $books->links('partials.pagination') }}
+            </div>
+        @endif
+
     </main>
 @endsection
-
-@push('scripts')
-    <script>
-        function filterBooks() {
-            const query = document.getElementById('library-search').value.toLowerCase();
-            const cards = document.querySelectorAll('.book-card');
-            cards.forEach(card => {
-                const title = card.getAttribute('data-title');
-                const author = card.getAttribute('data-author');
-                if (title.includes(query) || author.includes(query)) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
-
-        // Filter Category + ubah warna tombol (palet gelap)
-        function filterCategory(cat, clickedBtn) {
-
-            // 1. Logika ubah warna/tampilan tombol
-            if (clickedBtn) {
-                const buttons = document.querySelectorAll('.cat-btn');
-
-                buttons.forEach(btn => {
-                    btn.classList.remove('bg-[#01795F]', 'text-white');
-                    btn.classList.add('bg-white/5', 'text-white/70', 'hover:bg-white/10');
-                });
-
-                clickedBtn.classList.remove('bg-white/5', 'text-white/70', 'hover:bg-white/10');
-                clickedBtn.classList.add('bg-[#01795F]', 'text-white');
-            }
-
-            // 2. Logika memunculkan/menyembunyikan buku
-            const cards = document.querySelectorAll('.book-card');
-            cards.forEach(card => {
-                const category = card.getAttribute('data-category');
-                if (cat === 'semua' || category === cat) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
-    </script>
-@endpush

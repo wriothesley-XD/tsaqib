@@ -120,6 +120,14 @@
             @endforelse
         </div>
 
+        {{-- Pagination controls (themed) — slug komunitas ada di path, jadi
+             pindah halaman tidak mengubah kategori. ?page=N shareable. --}}
+        @if ($posts->hasPages())
+            <div class="pt-2">
+                {{ $posts->links('partials.pagination') }}
+            </div>
+        @endif
+
     </main>
 
     <!-- FLOATING ACTION BUTTON (+) -->

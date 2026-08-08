@@ -16,7 +16,13 @@
       "Bash(ldd /home/kai/.cache/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-linux64/chrome-headless-shell)",
       "Read(//tmp/**)",
       "Bash(apt-get download *)",
-      "Bash(grep -n \"hero-bg\\\\|</div>\\\\s*$\\\\|=====\\\\|<section\\\\|</section\\\\|@include\\('partials.site-footer'\\)\\\\|<footer\" resources/views/landing.blade.php)"
+      "Bash(grep -n \"hero-bg\\\\|</div>\\\\s*$\\\\|=====\\\\|<section\\\\|</section\\\\|@include\\('partials.site-footer'\\)\\\\|<footer\" resources/views/landing.blade.php)",
+      "Bash(git check-ignore *)",
+      "Bash(git *)",
+      "Bash(php -v)",
+      "Bash(command -v php php8 php8.1 php8.2 php8.3)",
+      "Read(//usr/bin/**)",
+      "Bash(base64 -w0 public/images/icon/tsaqib-media.svg.png)"
     ]
   }
 }

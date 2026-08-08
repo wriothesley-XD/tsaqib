@@ -1,7 +1,7 @@
 <x-guest-layout>
     <div class="mb-6 text-center">
-        <h2 class="text-xl font-bold text-slate-900">Daftar Akun TSAQIB Baru</h2>
-        <p class="text-xs text-slate-500 mt-1">Buat akun untuk bergabung dengan ekosistem FSI SMAN 1 Bukittinggi</p>
+        <h2 class="text-xl font-bold text-white">Daftar Akun TSAQIB Baru</h2>
+        <p class="text-xs text-[#8A9B7A] mt-1">Buat akun untuk bergabung dengan ekosistem FSI SMAN 1 Bukittinggi</p>
     </div>
 
     <form method="POST" action="{{ route('register') }}">
@@ -45,14 +45,14 @@
         </div>
 
         <div class="flex flex-col sm:flex-row sm:items-center justify-between mt-6 gap-3">
-            <div class="text-xs text-slate-600">
+            <div class="text-xs text-[#8A9B7A]">
                 Sudah punya akun?
-                <a href="{{ route('login') }}" class="font-bold text-[#01795F] hover:underline">
+                <a href="{{ route('login') }}" class="font-bold text-[#D9A441] hover:underline">
                     Login disini &rarr;
                 </a>
             </div>
 
-            <x-primary-button class="bg-[#01795F] hover:bg-[#3F704D]">
+            <x-primary-button class="w-full sm:w-auto justify-center">
                 {{ __('Daftar Akun') }}
             </x-primary-button>
         </div>

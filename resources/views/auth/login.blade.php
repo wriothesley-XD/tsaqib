@@ -3,8 +3,8 @@
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
     <div class="mb-6 text-center">
-        <h2 class="text-xl font-bold text-slate-900">Masuk Akun TSAQIB</h2>
-        <p class="text-xs text-slate-500 mt-1">Silakan masuk menggunakan akun Forum Studi Islam Anda</p>
+        <h2 class="text-xl font-bold text-white">Masuk Akun TSAQIB</h2>
+        <p class="text-xs text-[#8A9B7A] mt-1">Silakan masuk menggunakan akun Forum Studi Islam Anda</p>
     </div>
 
     <form method="POST" action="{{ route('login') }}">
@@ -33,19 +33,19 @@
         <div class="block mt-4">
             <label for="remember_me" class="inline-flex items-center">
                 <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-[#01795F] shadow-sm focus:ring-[#01795F]" name="remember">
-                <span class="ms-2 text-xs text-gray-600">{{ __('Remember me') }}</span>
+                <span class="ms-2 text-xs text-[#8A9B7A]">{{ __('Remember me') }}</span>
             </label>
         </div>
 
         <div class="flex flex-col sm:flex-row sm:items-center justify-between mt-6 gap-3">
-            <div class="text-xs text-slate-600">
+            <div class="text-xs text-[#8A9B7A]">
                 Belum punya akun?
-                <a href="{{ route('register') }}" class="font-bold text-[#01795F] hover:underline">
+                <a href="{{ route('register') }}" class="font-bold text-[#D9A441] hover:underline">
                     Daftar disini &rarr;
                 </a>
             </div>
 
-            <x-primary-button class="bg-[#01795F] hover:bg-[#3F704D]">
+            <x-primary-button class="w-full sm:w-auto justify-center">
                 {{ __('Log in') }}
             </x-primary-button>
         </div>

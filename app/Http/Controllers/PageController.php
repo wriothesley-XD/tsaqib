@@ -94,9 +94,20 @@ class PageController extends Controller
             $query->where('community_slug', $currentSlug);
         }
 
+        // Pencarian opsional (?q=...) — cari di judul + isi postingan. Tanpa ?q,
+        // feed berperilaku seperti sedia kala. withQueryString agar ?q= terbawa
+        // antar-halaman pagination.
+        $q = trim((string) request('q'));
+        if ($q !== '') {
+            $query->where(function ($qq) use ($q) {
+                $qq->where('title', 'like', "%{$q}%")
+                   ->orWhere('content', 'like', "%{$q}%");
+            });
+        }
+
         // paginate(10) -> feed timeline single-column; ?page=N shareable.
         // Slug komunitas ada di path (bukan query) jadi tetap terjaga antar-halaman.
-        $posts = $query->paginate(10);
+        $posts = $query->paginate(10)->withQueryString();
         $komunitasAktif = $currentSlug !== 'semua' ? collect($daftarKomunitas)->firstWhere('slug', $currentSlug) : null;
 
         return view('komunitas.index', [

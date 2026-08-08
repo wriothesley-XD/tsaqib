@@ -33,6 +33,24 @@
             </div>
         </div>
 
+        <!-- Search bar — cari postingan di feed (parameter ?q=, diproses di PageController::komunitasIndex) -->
+        <div class="tsaqib-card p-3 sm:p-4">
+            <form action="{{ request()->url() }}" method="GET" role="search" class="flex items-center gap-2">
+                <div class="relative flex-1">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-xs pointer-events-none"></i>
+                    <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari postingan..."
+                           class="tsaqib-input w-full pl-9 pr-3 py-2.5 text-xs">
+                </div>
+                @if(request('q'))
+                    <a href="{{ request()->url() }}" class="px-3 py-2.5 rounded-xl text-xs font-semibold bg-white/10 text-white/70 hover:text-white whitespace-nowrap">Reset</a>
+                @endif
+                <button type="submit" class="px-4 py-2.5 rounded-xl bg-[#01795F] hover:bg-[#3F704D] text-white text-xs font-semibold whitespace-nowrap">
+                    <i class="fa-solid fa-magnifying-glass sm:hidden"></i>
+                    <span class="hidden sm:inline">Cari</span>
+                </button>
+            </form>
+        </div>
+
         @if(session('success'))
             <div class="p-4 rounded-xl bg-[#01795F]/15 text-[#3fd6b0] border border-[#01795F]/30 text-xs font-semibold">
                 {{ session('success') }}

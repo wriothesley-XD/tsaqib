@@ -194,7 +194,7 @@
     @include('partials.navbar')
 
     {{-- ================= HERO CONTENT ================= --}}
-    <main class="relative z-10 flex-1 max-w-7xl w-full mx-auto px-5 sm:px-8 flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-6 py-8 lg:py-0">
+    <main class="relative z-10 flex-1 max-w-7xl w-full mx-auto px-5 sm:px-8 flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-6 pt-14 pb-8 lg:pb-0">
 
         {{-- Kiri: branding + deskripsi + CTA utama --}}
         <div class="lg:w-[46%] pt-4 lg:pt-0">

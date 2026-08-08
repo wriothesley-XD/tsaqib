@@ -27,7 +27,7 @@
 
 <header class="sticky top-0 z-50 bg-[#10140F]/80 backdrop-blur-md border-b border-white/10 text-[var(--cream)]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-20 xl:h-24 gap-4">
+        <div class="flex items-center justify-between h-16 xl:h-20 gap-4">
 
             {{-- ===== BRAND (kiri) ===== --}}
             <a href="{{ route('landing') }}" class="flex items-center gap-3 group shrink-0" title="Kembali ke Beranda">
@@ -49,38 +49,12 @@
                     </a>
                 @endforeach
 
-                {{-- Komunitas (dropdown) — link ke-4 --}}
-                <div class="relative" id="komunitasDropdownWrapper">
-                    <button type="button" id="komunitasDropdownBtn"
-                            aria-haspopup="true" aria-expanded="false" aria-controls="komunitasMegaMenu"
-                            class="group relative pb-1 text-xs uppercase tracking-[0.16em] font-semibold transition-colors duration-200 flex items-center gap-1.5 {{ $link($isKomunitasZone) }}">
-                        <span>Komunitas</span>
-                        <i class="fa-solid fa-chevron-down text-[8px] transition-transform duration-200" id="komunitasChevron"></i>
-                        <span class="{{ $underline($isKomunitasZone) }}"></span>
-                    </button>
-
-                    <div id="komunitasMegaMenu"
-                         class="hidden absolute left-1/2 -translate-x-1/2 top-full mt-5 w-[440px] max-w-[92vw] bg-[#141812] border border-white/10 rounded-2xl shadow-[0_24px_60px_-12px_rgba(0,0,0,0.6)] overflow-hidden">
-                        <div class="px-5 py-4 border-b border-white/10">
-                            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--gold)]">Komunitas FSI</p>
-                            <p class="text-[11px] text-white/45 mt-0.5">13 komunitas minat &amp; bakat</p>
-                        </div>
-                        <div class="grid grid-cols-2 gap-0.5 p-2 max-h-[58vh] overflow-y-auto">
-                            @foreach($daftarKomunitasNav as $navK)
-                                <a href="{{ route('komunitas', $navK['slug']) }}"
-                                   class="group flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors duration-150">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-white/25 group-hover:bg-[var(--gold)] transition-colors duration-150 shrink-0"></span>
-                                    <span class="text-[13px] font-medium text-white/75 group-hover:text-white transition-colors duration-150 truncate">{{ $navK['nama'] }}</span>
-                                </a>
-                            @endforeach
-                        </div>
-                        <a href="{{ route('komunitas', 'semua') }}"
-                           class="flex items-center justify-center gap-2 px-5 py-3.5 bg-white/[.03] hover:bg-[#01795F] text-white/75 hover:text-white text-[13px] font-bold border-t border-white/10 transition-colors duration-200">
-                            <span>Lihat semua komunitas</span>
-                            <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                        </a>
-                    </div>
-                </div>
+                {{-- Komunitas — link langsung ke feed gabungan semua komunitas (bukan dropdown) --}}
+                <a href="{{ route('komunitas', 'semua') }}"
+                   class="group relative pb-1 text-xs uppercase tracking-[0.16em] font-semibold transition-colors duration-200 {{ $link($isKomunitasZone) }}">
+                    Komunitas
+                    <span class="{{ $underline($isKomunitasZone) }}"></span>
+                </a>
 
                 @foreach($navAfter as $item)
                     <a href="{{ $item['href'] }}"
@@ -147,9 +121,9 @@
     Di luar header, container teks bukan lagi descendant backdrop-filter,
     posisi memakai fixed relatif viewport, dan teks kembali tajam.
 --}}
-<div id="mobile-menu-backdrop" class="hidden fixed top-20 xl:top-24 inset-x-0 bottom-0 z-40 bg-black/50 backdrop-blur-sm xl:hidden"></div>
+<div id="mobile-menu-backdrop" class="hidden fixed top-16 xl:top-20 inset-x-0 bottom-0 z-40 bg-black/50 backdrop-blur-sm xl:hidden"></div>
 
-<div id="mobile-menu" class="hidden fixed top-20 xl:top-24 inset-x-0 z-50 xl:hidden border-t border-white/5 bg-[#10140F] px-5 py-3 space-y-0.5 shadow-2xl max-h-[calc(100vh-5rem)] overflow-y-auto antialiased">
+<div id="mobile-menu" class="hidden fixed top-16 xl:top-20 inset-x-0 z-50 xl:hidden border-t border-white/5 bg-[#10140F] px-5 py-3 space-y-0.5 shadow-2xl max-h-[calc(100vh-4rem)] overflow-y-auto antialiased">
 
         @foreach($navBefore as $item)
             <a href="{{ $item['href'] }}"
@@ -158,27 +132,11 @@
             </a>
         @endforeach
 
-        {{-- Sub-menu Komunitas (collapsible) --}}
-        <div>
-            <button type="button" id="mobile-komunitas-btn"
-                    aria-haspopup="true" aria-expanded="{{ $isKomunitasZone ? 'true' : 'false' }}" aria-controls="mobile-komunitas-submenu"
-                    class="w-full flex items-center justify-between py-3 text-sm font-medium tracking-wide transition-colors duration-200 {{ $isKomunitasZone ? 'text-[var(--gold)]' : 'text-white/80 hover:text-white' }}">
-                <span>Komunitas</span>
-                <i class="fa-solid fa-chevron-down text-xs transition-transform duration-200 {{ $isKomunitasZone ? 'rotate-180' : '' }}" id="mobile-komunitas-chevron"></i>
-            </button>
-            <div id="mobile-komunitas-submenu" class="mt-1 ml-3 pl-4 border-l border-white/10 space-y-0.5 {{ $isKomunitasZone ? '' : 'hidden' }}">
-                <a href="{{ route('komunitas', 'semua') }}"
-                   class="block py-2.5 text-[13px] font-medium transition-colors duration-200 {{ (request()->segment(2) === 'semua' || is_null(request()->segment(2))) && $isKomunitasZone ? 'text-[var(--gold)]' : 'text-white/55 hover:text-white' }}">
-                    Lihat semua komunitas
-                </a>
-                @foreach($daftarKomunitasNav as $navK)
-                    <a href="{{ route('komunitas', $navK['slug']) }}"
-                       class="block py-2.5 text-[13px] font-medium transition-colors duration-200 {{ request()->segment(2) === $navK['slug'] ? 'text-[var(--gold)]' : 'text-white/55 hover:text-white' }}">
-                        {{ $navK['nama'] }}
-                    </a>
-                @endforeach
-            </div>
-        </div>
+        {{-- Komunitas — link langsung ke feed gabungan semua komunitas --}}
+        <a href="{{ route('komunitas', 'semua') }}"
+           class="block py-3 text-sm font-medium tracking-wide transition-colors duration-200 {{ $isKomunitasZone ? 'text-[var(--gold)]' : 'text-white/80 hover:text-white' }}">
+            Komunitas
+        </a>
 
         @foreach($navAfter as $item)
             <a href="{{ $item['href'] }}"
@@ -241,44 +199,5 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && menu && !menu.classList.contains('hidden')) closeMenu();
         });
-
-        /* ============ MOBILE KOMUNITAS SUBMENU ============ */
-        const mBtn     = document.getElementById('mobile-komunitas-btn');
-        const mSubmenu = document.getElementById('mobile-komunitas-submenu');
-        const mChevron = document.getElementById('mobile-komunitas-chevron');
-        if (mBtn && mSubmenu) {
-            mBtn.addEventListener('click', () => {
-                const hidden = mSubmenu.classList.toggle('hidden'); // true = sekarang tertutup
-                mChevron.classList.toggle('rotate-180', !hidden);
-                mBtn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
-            });
-        }
-
-        /* ============ DESKTOP KOMUNITAS DROPDOWN ============ */
-        const kBtn     = document.getElementById('komunitasDropdownBtn');
-        const kMenu    = document.getElementById('komunitasMegaMenu');
-        const kChevron = document.getElementById('komunitasChevron');
-        const kWrap    = document.getElementById('komunitasDropdownWrapper');
-
-        function closeDesktop() {
-            if (!kMenu) return;
-            kMenu.classList.add('hidden');
-            kChevron.classList.remove('rotate-180');
-            kBtn.setAttribute('aria-expanded', 'false');
-        }
-        if (kBtn && kMenu) {
-            kBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const hidden = kMenu.classList.toggle('hidden');
-                kChevron.classList.toggle('rotate-180', !hidden);
-                kBtn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
-            });
-            document.addEventListener('click', (e) => {
-                if (kWrap && !kWrap.contains(e.target)) closeDesktop();
-            });
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') closeDesktop();
-            });
-        }
     });
 </script>

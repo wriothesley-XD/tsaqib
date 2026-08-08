@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -n '\\\\$books' resources/views/perpustakaan.blade.php)",
+      "Bash(php artisan *)",
+      "Bash(git stash *)"
+    ]
+  }
+}

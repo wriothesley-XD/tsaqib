@@ -1,5 +1,6 @@
 <!-- resources/views/select-role.blade.php -->
 @php
+    $pageTitle = 'Pilih Minat Komunitas - TSAQIB SMAN 1 Bukittinggi';
     $daftarKomunitas = [
         [
             'slug' => 'tahfidz',
@@ -62,26 +63,7 @@
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pilih Minat Komunitas Anda - TSAQIB SMAN 1 Bukittinggi</title>
-    @vite('resources/css/app.css')
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
+    @include('partials.theme-head')
     <style>
         .role-slide-viewport {
             overflow: hidden;
@@ -98,18 +80,18 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 font-sans antialiased h-[100dvh] flex flex-col justify-between p-4 sm:p-6 overflow-hidden">
+<body class="bg-[#10140F] text-[var(--cream)] font-sans antialiased h-[100dvh] flex flex-col justify-between p-4 sm:p-6 overflow-hidden">
 
     <div class="max-w-4xl mx-auto w-full flex flex-col items-center justify-center h-full text-center">
 
         <!-- Top Header -->
-        <span class="inline-block px-3 py-1 rounded-full bg-[#01795F]/10 text-[#01795F] text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-2">
+        <span class="inline-block px-3 py-1 rounded-full bg-[#01795F]/15 text-[#3fd6b0] text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-2">
             Langkah Utama • Pemilihan Komunitas
         </span>
-        <h1 class="text-xl sm:text-3xl font-bold text-slate-900 tracking-tight leading-tight">
+        <h1 class="text-xl sm:text-3xl font-bold text-[var(--cream)] tracking-tight leading-tight">
             Pilih Minat Komunitas Utama Anda
         </h1>
-        <p class="text-slate-500 text-[11px] sm:text-xs mt-1.5 max-w-lg mx-auto">
+        <p class="text-white/50 text-[11px] sm:text-xs mt-1.5 max-w-lg mx-auto">
             Pilihan Anda akan disimpan dan langsung mengarahkan Anda ke linimasa komunitas tersebut.
         </p>
 
@@ -128,46 +110,45 @@
             <!-- Pagination Controls -->
             <div id="roleNav" class="flex items-center justify-center gap-3 mt-1">
                 <button type="button" id="prevPageBtn"
-                        class="w-8 h-8 rounded-full border border-slate-300 flex items-center justify-center text-slate-500 
+                        class="w-8 h-8 rounded-full border border-white/15 flex items-center justify-center text-white/60
                                hover:border-[#01795F] hover:bg-[#01795F] hover:text-white transition duration-200
-                               disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-slate-500 disabled:hover:border-slate-300">
+                               disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-white/60 disabled:hover:border-white/15">
                     <i class="fa-solid fa-chevron-left text-[10px]"></i>
                 </button>
 
                 <div id="roleDots" class="flex items-center gap-1.5"></div>
 
                 <button type="button" id="nextPageBtn"
-                        class="w-8 h-8 rounded-full border border-slate-300 flex items-center justify-center text-slate-500 
+                        class="w-8 h-8 rounded-full border border-white/15 flex items-center justify-center text-white/60
                                hover:border-[#01795F] hover:bg-[#01795F] hover:text-white transition duration-200
-                               disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-slate-500 disabled:hover:border-slate-300">
+                               disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-white/60 disabled:hover:border-white/15">
                     <i class="fa-solid fa-chevron-right text-[10px]"></i>
                 </button>
             </div>
 
-            <!-- Continue Button (DIPERKECIL) -->
-            <!-- Ukuran width disesuaikan ke w-44 (176px), padding py-2, agar lebih rapi & manis -->
+            <!-- Continue Button -->
             <button type="submit" id="continueBtn" disabled
-                    class="mt-4 w-44 block py-2 rounded-full bg-slate-900 text-white text-xs font-semibold shadow-md shadow-slate-900/20
-                           disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed 
-                           enabled:hover:bg-[#01795F] enabled:hover:shadow-[#01795F]/30 enabled:-translate-y-0.5 transition-all duration-200">
+                    class="mt-4 w-44 block py-2 rounded-full bg-[#01795F] text-white text-xs font-semibold shadow-md shadow-[#01795F]/30
+                           disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed
+                           enabled:hover:bg-[#3F704D] enabled:-translate-y-0.5 transition-all duration-200">
                 Lanjutkan ke Komunitas
             </button>
         </form>
     </div>
 
     <!-- Footer compact -->
-    <div class="text-center text-[10px] text-slate-400 shrink-0 mt-2 pb-1">
+    <div class="text-center text-[10px] text-white/40 shrink-0 mt-2 pb-1">
         &copy; {{ date('Y') }} TSAQIB • FSI SMAN 1 Bukittinggi
     </div>
 
     <!-- LOGIKA JAVASCRIPT SLIDER RESPONSIVE -->
     <script>
         const daftarKomunitas = @json($daftarKomunitas);
-        
+
         function getItemsPerPage() {
             if (window.innerWidth < 640) return 1;
             if (window.innerWidth < 1024) return 2;
-            return 3; 
+            return 3;
         }
 
         let PER_PAGE = getItemsPerPage();
@@ -198,29 +179,28 @@
         function buildCard(k) {
             const card = document.createElement('div');
             card.dataset.slug = k.slug;
-            
-            card.className = `role-card relative cursor-pointer bg-white border-2 rounded-[16px] p-2 text-left transition-all duration-300 group border-slate-200 shrink-0 w-[180px] sm:w-[200px] flex flex-col aspect-[2.5/3.4] hover:-translate-y-1.5 hover:shadow-xl hover:shadow-[#01795F]/10 mx-auto sm:mx-0`;
 
-            // HTML di dalam card TANPA tanda centang
+            card.className = `role-card relative cursor-pointer bg-white/[.04] border-2 rounded-[16px] p-2 text-left transition-all duration-300 group border-white/10 shrink-0 w-[180px] sm:w-[200px] flex flex-col aspect-[2.5/3.4] hover:-translate-y-1.5 hover:shadow-xl hover:shadow-[#01795F]/10 mx-auto sm:mx-0`;
+
             card.innerHTML = `
-                <div class="w-full h-[50%] rounded-xl overflow-hidden relative border border-slate-100 bg-slate-100 mb-2 shrink-0">
+                <div class="w-full h-[50%] rounded-xl overflow-hidden relative border border-white/10 bg-white/5 mb-2 shrink-0">
                     <img src="${k.image}" alt="${k.nama}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
-                    
+
                     <div class="absolute bottom-1.5 right-1.5 bg-white w-6 h-6 rounded-full flex items-center justify-center text-[#01795F] shadow-sm text-[10px] z-10 transition-colors">
                         ${iconFor(k)}
                     </div>
                 </div>
 
                 <div class="flex flex-col flex-grow px-1 pb-1">
-                    <h3 class="role-title font-bold text-slate-900 text-sm leading-tight mb-1 transition">${k.nama}</h3>
-                    
-                    <p class="text-[9px] text-slate-500 flex-grow line-clamp-3 leading-snug">
+                    <h3 class="role-title font-bold text-[var(--cream)] text-sm leading-tight mb-1 transition">${k.nama}</h3>
+
+                    <p class="text-[9px] text-white/50 flex-grow line-clamp-3 leading-snug">
                         ${k.deskripsi_singkat || ''}
                     </p>
 
                     <div class="pt-1.5 mt-1 shrink-0">
-                        <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">Peran:</span>
-                        <span class="text-[9px] font-bold text-[#01795F] line-clamp-2 leading-tight">${k.peran || '-'}</span>
+                        <span class="text-[8px] font-bold text-white/40 uppercase tracking-widest block mb-0.5">Peran:</span>
+                        <span class="text-[9px] font-bold text-[#3fd6b0] line-clamp-2 leading-tight">${k.peran || '-'}</span>
                     </div>
                 </div>
             `;
@@ -239,7 +219,7 @@
             track.innerHTML = '';
             pages.forEach(items => {
                 const pageEl = document.createElement('div');
-                pageEl.className = 'role-slide-page'; 
+                pageEl.className = 'role-slide-page';
 
                 const wrapEl = document.createElement('div');
                 wrapEl.className = 'flex justify-center items-center gap-4 sm:gap-6 w-full max-w-4xl mx-auto px-4 py-3';
@@ -248,7 +228,7 @@
                 pageEl.appendChild(wrapEl);
                 track.appendChild(pageEl);
             });
-            updateSelectedStyles(); 
+            updateSelectedStyles();
         }
 
         function updateSelectedStyles() {
@@ -256,16 +236,15 @@
                 const isSelected = card.dataset.slug === selectedSlug;
                 const title = card.querySelector('.role-title');
 
-                // Styling aktif pada kartu saat dipilih
                 card.classList.toggle('border-[#01795F]', isSelected);
                 card.classList.toggle('ring-[3px]', isSelected);
                 card.classList.toggle('ring-[#01795F]/20', isSelected);
-                card.classList.toggle('border-slate-200', !isSelected);
+                card.classList.toggle('border-white/10', !isSelected);
                 card.classList.toggle('shadow-2xl', isSelected);
                 card.classList.toggle('shadow-[#01795F]/20', isSelected);
                 card.classList.toggle('-translate-y-1.5', isSelected);
 
-                title.classList.toggle('text-[#01795F]', isSelected);
+                title.classList.toggle('text-[#3fd6b0]', isSelected);
             });
         }
 
@@ -275,7 +254,7 @@
                 const dot = document.createElement('button');
                 dot.type = 'button';
                 dot.className = `h-1.5 rounded-full transition-all duration-300 ${
-                    i === currentPage ? 'w-5 bg-[#01795F]' : 'w-1.5 bg-slate-200 hover:bg-slate-300'
+                    i === currentPage ? 'w-5 bg-[#01795F]' : 'w-1.5 bg-white/15 hover:bg-white/25'
                 }`;
                 dot.addEventListener('click', () => goToPage(i));
                 dotsWrap.appendChild(dot);
@@ -293,7 +272,7 @@
         function initSlider() {
             PER_PAGE = getItemsPerPage();
             pages = buildPages(daftarKomunitas, PER_PAGE);
-            
+
             if(currentPage >= pages.length) {
                 currentPage = Math.max(0, pages.length - 1);
             }

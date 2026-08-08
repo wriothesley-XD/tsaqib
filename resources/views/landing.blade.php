@@ -186,81 +186,8 @@
     <div class="hero-overlay pointer-events-none"></div>
     <div class="hero-pattern pointer-events-none"></div>
 
-    {{-- ================= NAVBAR (3-ZONE: Kiri brand | Tengah menu | Kanan sosmed+profil) =================
-         Strip logo instansi SUDAH DIPINDAH ke footer (lihat bagian footer di bawah), biar header
-         tetap bersih dan fokus ke identitas TSAQIB saja. --}}
-    <header class="relative z-20">
-
-        <div class="max-w-7xl mx-auto px-5 sm:px-8 py-5 flex items-center justify-between">
-
-            <a href="{{ route('landing') }}" class="flex items-center gap-3 group">
-                <div class="brand-mark group-hover:scale-105 transition-transform">TS</div>
-                <div class="leading-none">
-                    <span class="block font-display font-extrabold text-base text-[var(--cream)] tracking-tight">TSAQIB</span>
-                    <span class="block font-label text-[9px] text-[var(--gold)] font-bold tracking-widest uppercase mt-0.5">FSI SMAN 1 Bukittinggi</span>
-                </div>
-            </a>
-
-            {{-- Navigasi utama (desktop) --}}
-            <nav class="hidden lg:flex items-center gap-1 font-label text-xs font-semibold">
-                <nav class="hidden lg:flex items-center gap-1 font-label text-xs font-semibold">
-    <a href="{{ route('laboratorium.pai') }}" class="px-3.5 py-2 rounded-full text-white hover:text-white hover:bg-white/10 transition">Laboratorium PAI</a>
-    <a href="{{ route('perpustakaan') }}" class="px-3.5 py-2 rounded-full text-white hover:text-white hover:bg-white/10 transition">Perpustakaan</a>
-    <button type="button" onclick="handleKomunitasClick()" class="px-3.5 py-2 rounded-full text-white hover:text-white hover:bg-white/10 transition">Komunitas</button>
-    <a href="{{ route('open.recruitment') }}" class="px-3.5 py-2 rounded-full text-white hover:text-white hover:bg-white/10 transition">Open Recruitment</a>
-</nav>
-            </nav>
-
-            {{-- Sosial media + login/profile --}}
-            <div class="flex items-center gap-2 sm:gap-3">
-                <div class="hidden sm:flex items-center gap-1.5">
-                    {{-- TODO Rara: ganti href "#" dengan link akun sosmed FSI TSAQIB yang asli --}}
-                    <a href="https://www.instagram.com/fsi.smansa_landbouw?igsh=MXVzMzd5Nms0eDZpNQ==
-" target="_blank" rel="noopener" class="w-9 h-9 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition" title="Instagram">
-                        <i class="fa-brands fa-instagram text-sm"></i>
-                    </a>
-                    <a href="https://www.facebook.com/share/1BJMFJvK5k/" target="_blank" rel="noopener" class="w-9 h-9 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition" title="Facebook">
-                        <i class="fa-brands fa-facebook text-sm"></i>
-                    </a>
-                    <a href="https://ytfsi.carrd.co" target="_blank" rel="noopener" class="w-9 h-9 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition" title="Youtube">
-                        <i class="fa-brands fa-youtube text-sm"></i>
-                    </a>
-                </div>
-
-                <div class="w-px h-6 bg-white/15 hidden sm:block"></div>
-
-                @auth
-                    <a href="{{ route('profile.edit') }}" class="flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 transition">
-                        <x-community-avatar :user="Auth::user()" size="xs" />
-                        <span class="text-xs font-label font-semibold text-[var(--cream)] hidden sm:inline">Profil</span>
-                    </a>
-                @else
-                    <a href="{{ route('login') }}" class="px-4 py-2 rounded-full bg-[var(--green)] hover:bg-[var(--green-dark)] text-white text-xs font-label font-bold transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-right-to-bracket text-[11px]"></i>
-                        <span>Masuk</span>
-                    </a>
-                @endauth
-
-                {{-- Toggle menu mobile --}}
-                <button type="button" id="mobile-nav-btn" class="lg:hidden w-9 h-9 rounded-full flex items-center justify-center text-[var(--cream)] bg-white/10 hover:bg-white/20 transition">
-                    <i class="fa-solid fa-bars text-sm" id="mobile-nav-icon"></i>
-                </button>
-            </div>
-        </div>
-
-        {{-- Drawer mobile --}}
-        <div id="mobile-nav-menu" class="hidden lg:hidden max-w-7xl mx-auto px-5 pb-5 flex flex-col gap-1 font-label text-sm font-semibold">
-            <a href="{{ route('laboratorium.pai') }}" class="px-4 py-2.5 rounded-xl text-[var(--cream)]/90 hover:bg-white/10 transition">Laboratorium PAI</a>
-            <a href="{{ route('perpustakaan') }}" class="px-4 py-2.5 rounded-xl text-[var(--cream)]/90 hover:bg-white/10 transition">Perpustakaan</a>
-            <button type="button" onclick="handleKomunitasClick()" class="text-left px-4 py-2.5 rounded-xl text-[var(--cream)]/90 hover:bg-white/10 transition">Komunitas</button>
-            <a href="{{ route('open.recruitment') }}" class="px-4 py-2.5 rounded-xl text-[var(--cream)]/90 hover:bg-white/10 transition">Open Recruitment</a>
-            <div class="flex items-center gap-1.5 px-4 pt-2">
-                <a href="#" target="_blank" rel="noopener" class="w-9 h-9 rounded-full flex items-center justify-center text-[var(--cream)]/80 hover:text-white hover:bg-white/10 transition"><i class="fa-brands fa-instagram text-sm"></i></a>
-                <a href="#" target="_blank" rel="noopener" class="w-9 h-9 rounded-full flex items-center justify-center text-[var(--cream)]/80 hover:text-white hover:bg-white/10 transition"><i class="fa-brands fa-tiktok text-sm"></i></a>
-                <a href="#" target="_blank" rel="noopener" class="w-9 h-9 rounded-full flex items-center justify-center text-[var(--cream)]/80 hover:text-white hover:bg-white/10 transition"><i class="fa-brands fa-whatsapp text-sm"></i></a>
-            </div>
-        </div>
-    </header>
+    {{-- ================= NAVBAR (shared partial — sama di semua halaman) ================= --}}
+    @include('partials.navbar')
 
     {{-- ================= HERO CONTENT ================= --}}
     <main class="relative z-10 flex-1 max-w-7xl w-full mx-auto px-5 sm:px-8 flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-6 py-8 lg:py-0">
@@ -370,6 +297,51 @@
         </div>
     </main>
 
+    {{-- ================= KOMUNITAS PREVIEW (publik — tamu bisa lihat tanpa login) ================= --}}
+    @if(!empty($daftarKomunitas))
+    <section id="komunitas-preview" class="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 py-14 sm:py-20">
+        <div class="text-center mb-10">
+            <span class="eyebrow-pill">
+                <i class="fa-solid fa-users text-[10px]"></i>
+                {{ count($daftarKomunitas) }} Komunitas Minat &amp; Bakat
+            </span>
+            <h2 class="font-display font-extrabold text-[var(--cream)] text-3xl sm:text-4xl mt-4 tracking-tight">
+                Jelajahi Komunitas TSAQIB
+            </h2>
+            <p class="text-white/60 text-sm mt-3 max-w-xl mx-auto">
+                Tiap komunitas punya karakter sendiri. Intip dari dekat, lalu pilih yang paling cocok dengan minatmu.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            @foreach($daftarKomunitas as $k)
+                <a href="{{ route('komunitas', $k['slug']) }}"
+                   class="group flex items-center gap-4 p-4 rounded-2xl bg-white/[.04] border border-white/10 hover:bg-white/[.08] hover:border-white/20 transition">
+                    <img src="{{ asset($k['image']) }}" alt="{{ $k['nama'] }}"
+                         class="w-16 h-16 rounded-xl object-cover shrink-0 bg-white/5"
+                         onerror="this.remove()">
+                    <div class="min-w-0">
+                        <h3 class="font-display font-bold text-[var(--cream)] truncate group-hover:text-[var(--gold)] transition-colors">
+                            {{ $k['nama'] }}
+                        </h3>
+                        <p class="text-white/55 text-xs mt-1 line-clamp-2 leading-snug">
+                            {{ $k['deskripsi_singkat'] }}
+                        </p>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-white/30 group-hover:text-[var(--gold)] transition-colors ml-auto shrink-0"></i>
+                </a>
+            @endforeach
+        </div>
+
+        <div class="text-center mt-10">
+            <a href="{{ route('komunitas', 'semua') }}" class="cta-primary inline-flex items-center gap-2 text-white font-label font-bold text-xs sm:text-sm px-6 py-3.5 rounded-full">
+                <i class="fa-solid fa-grip text-xs"></i>
+                <span>Lihat Semua Komunitas</span>
+            </a>
+        </div>
+    </section>
+    @endif
+
     {{-- ================= FOOTER: "Rumah Baru" untuk logo instansi =================
          Kiri (atau atas di mobile): teks hak cipta.
          Kanan (atau bawah di mobile): barisan logo instansi pendukung, rapi & horizontal.
@@ -404,23 +376,12 @@
                 window.location.href = "{{ route('select-role') }}";
             @endif
         @else
-            window.location.href = "{{ route('login') }}";
+            // Guest boleh membaca feed komunitas (read-only) — tanpa paksa login.
+            window.location.href = "{{ route('komunitas') }}";
         @endauth
     }
 
-    // ===== Mobile nav drawer =====
     document.addEventListener('DOMContentLoaded', function () {
-        const btn = document.getElementById('mobile-nav-btn');
-        const menu = document.getElementById('mobile-nav-menu');
-        const icon = document.getElementById('mobile-nav-icon');
-        if (btn && menu) {
-            btn.addEventListener('click', function () {
-                menu.classList.toggle('hidden');
-                icon.classList.toggle('fa-bars');
-                icon.classList.toggle('fa-xmark');
-            });
-        }
-
         // ===== Carousel: prev/next + page indicator =====
         const track = document.getElementById('carousel-track');
         const indexLabel = document.getElementById('carousel-index');

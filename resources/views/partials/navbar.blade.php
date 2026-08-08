@@ -3,230 +3,196 @@
     $daftarKomunitasNav = \Illuminate\Support\Facades\Config::get('komunitas.daftar', []);
 
     $isKomunitasZone = str_contains($currentRoute, 'komunitas');
-    $isLaborOprecZone = in_array($currentRoute, ['laboratorium.pai', 'labor', 'open.recruitment', 'open.recruitment.thank-you', 'open.recruitment.submit']);
-    $isPerpustakaanZone = ($currentRoute === 'perpustakaan');
+
+    // 5 link terpusat, tampil selalu (tanpa zone-hiding biar count & centering stabil).
+    // Komunitas (dropdown) disisipkan di antara $navBefore & $navAfter -> posisi ke-4.
+    $navBefore = [
+        ['label' => 'Beranda',          'href' => route('landing'),          'active' => $currentRoute === 'landing'],
+        ['label' => 'Laboratorium PAI', 'href' => route('laboratorium.pai'), 'active' => in_array($currentRoute, ['laboratorium.pai', 'labor'])],
+        ['label' => 'Perpustakaan',     'href' => route('perpustakaan'),     'active' => $currentRoute === 'perpustakaan'],
+    ];
+    $navAfter = [
+        ['label' => 'Open Recruitment', 'href' => route('open.recruitment'), 'active' => str_contains($currentRoute, 'open.recruitment')],
+    ];
+
+    // Palet minimalis: tenang saat non-aktif, emas saat aktif. Indikator aktif = garis bawah emas.
+    $link      = fn ($active) => $active ? 'text-[var(--gold)]' : 'text-white/55 hover:text-white';
+    $underline = fn ($active) => 'absolute left-0 bottom-0 h-[2px] bg-[var(--gold)] transition-all duration-300 '
+        . ($active ? 'w-full' : 'w-0 group-hover:w-full');
 @endphp
 
-<header class="sticky top-0 z-50 bg-white/95 border-b border-slate-200 text-slate-900 shadow-sm transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16 sm:h-20">
+{{-- Token tema gelap (.brand-mark, .cta-primary, CSS vars, font-display/label) di-supply
+    tiap halaman via @include('partials.theme-head'). Navbar ini sticky (memesan tempat
+    sendiri) -> konten di bawahnya nggak ketimpa, nggak butuh padding-top. --}}
 
-            <!-- Brand Logo & Title -->
-            <a href="{{ route('landing') }}" class="flex items-center space-x-3 group" title="Kembali ke Beranda">
-                <div class="w-10 h-10 rounded-xl bg-[#01795F] text-white flex items-center justify-center font-bold text-lg shadow-sm group-hover:bg-[#3F704D] transition duration-200">
-                    TS
-                </div>
-                <div>
-                    <span class="font-bold text-base sm:text-lg tracking-tight text-slate-900 block leading-none">
-                        TSAQIB
-                    </span>
-                    <span class="text-[10px] text-[#01795F] font-semibold tracking-wider uppercase block mt-0.5">FSI SMAN 1 Bukittinggi</span>
-                </div>
+<header class="sticky top-0 z-50 bg-[#10140F]/80 backdrop-blur-md border-b border-white/10 text-[var(--cream)]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-20 xl:h-24 gap-4">
+
+            {{-- ===== BRAND (kiri) ===== --}}
+            <a href="{{ route('landing') }}" class="flex items-center gap-3 group shrink-0" title="Kembali ke Beranda">
+                <div class="brand-mark brand-mark-sm group-hover:scale-105 transition-transform">TS</div>
+                <span class="leading-none hidden sm:block">
+                    <span class="font-display font-extrabold text-base tracking-tight text-[var(--cream)] block">TSAQIB</span>
+                    <span class="text-[9px] text-[var(--gold)] font-bold tracking-[0.14em] uppercase block mt-1">FSI SMAN 1 Bukittinggi</span>
+                </span>
             </a>
 
-            <!-- Desktop Navigation Items -->
-            <nav class="hidden md:flex items-center space-x-1 lg:space-x-2">
+            {{-- ===== NAV TENGAH (≥ xl) — terpusat via flex-1 justify-center, BUKAN absolute ===== --}}
+            <nav class="hidden xl:flex flex-1 justify-center items-center gap-8 font-label whitespace-nowrap">
 
-                <!-- 1. Beranda (Hero Landing /) -->
-                <a href="{{ route('landing') }}"
-                   class="px-3.5 py-2 rounded-lg text-xs font-semibold transition duration-150 flex items-center space-x-1.5 {{ $currentRoute == 'landing' ? 'bg-[#01795F] text-white' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' }}">
-                    <i class="fa-solid fa-house text-[11px]"></i>
-                    <span>Beranda</span>
-                </a>
+                @foreach($navBefore as $item)
+                    <a href="{{ $item['href'] }}"
+                       class="group relative pb-1 text-xs uppercase tracking-[0.16em] font-semibold transition-colors duration-200 {{ $link($item['active']) }}">
+                        {{ $item['label'] }}
+                        <span class="{{ $underline($item['active']) }}"></span>
+                    </a>
+                @endforeach
 
-                <!-- 2. Komunitas (sembunyikan di Labor/Oprec & Perpustakaan) -->
-                @unless($isLaborOprecZone || $isPerpustakaanZone)
+                {{-- Komunitas (dropdown) — link ke-4 --}}
                 <div class="relative" id="komunitasDropdownWrapper">
                     <button type="button" id="komunitasDropdownBtn"
                             aria-haspopup="true" aria-expanded="false" aria-controls="komunitasMegaMenu"
-                            class="px-3.5 py-2 rounded-lg text-xs font-semibold transition duration-150 flex items-center space-x-1.5 {{ $isKomunitasZone ? 'bg-[#01795F] text-white' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' }}">
-                        <i class="fa-solid fa-users text-[11px]"></i>
+                            class="group relative pb-1 text-xs uppercase tracking-[0.16em] font-semibold transition-colors duration-200 flex items-center gap-1.5 {{ $link($isKomunitasZone) }}">
                         <span>Komunitas</span>
-                        <i class="fa-solid fa-chevron-down text-[9px] transition-transform duration-200" id="komunitasChevron"></i>
+                        <i class="fa-solid fa-chevron-down text-[8px] transition-transform duration-200" id="komunitasChevron"></i>
+                        <span class="{{ $underline($isKomunitasZone) }}"></span>
                     </button>
 
-                    <!-- Dropdown Panel Komunitas -->
                     <div id="komunitasMegaMenu"
-                         class="hidden absolute right-0 left-auto top-full mt-2 w-[92vw] sm:w-[600px] max-w-[600px] bg-white border border-slate-100 rounded-2xl shadow-xl z-50 overflow-hidden origin-top-right transform transition-all">
-
-                        <!-- Grid Item Komunitas (2 Kolom) -->
-                        <div class="grid grid-cols-2 gap-x-6 gap-y-5 p-6">
+                         class="hidden absolute left-1/2 -translate-x-1/2 top-full mt-5 w-[440px] max-w-[92vw] bg-[#141812] border border-white/10 rounded-2xl shadow-[0_24px_60px_-12px_rgba(0,0,0,0.6)] overflow-hidden">
+                        <div class="px-5 py-4 border-b border-white/10">
+                            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--gold)]">Komunitas FSI</p>
+                            <p class="text-[11px] text-white/45 mt-0.5">13 komunitas minat &amp; bakat</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-0.5 p-2 max-h-[58vh] overflow-y-auto">
                             @foreach($daftarKomunitasNav as $navK)
-                                <a href="{{ route('komunitas', $navK['slug']) }}" class="flex items-start space-x-3 group p-2 -m-2 rounded-xl hover:bg-slate-50 transition-colors">
-                                    <!-- Icon Box -->
-                                    <div class="shrink-0 w-10 h-10 rounded-lg bg-[#01795F]/10 flex items-center justify-center text-[#01795F] group-hover:bg-[#01795F] group-hover:text-white transition-colors">
-                                        <i class="fa-solid fa-layer-group"></i>
-                                    </div>
-                                    <!-- Deskripsi -->
-                                    <div>
-                                        <h4 class="text-sm font-bold text-slate-800 mb-0.5 group-hover:text-[#01795F] transition-colors">
-                                            {{ $navK['nama'] }}
-                                        </h4>
-                                        <p class="text-[10px] text-slate-500 leading-snug">
-                                            {{ $navK['deskripsi_singkat'] ?? '' }}
-                                        </p>
-                                    </div>
+                                <a href="{{ route('komunitas', $navK['slug']) }}"
+                                   class="group flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors duration-150">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-white/25 group-hover:bg-[var(--gold)] transition-colors duration-150 shrink-0"></span>
+                                    <span class="text-[13px] font-medium text-white/75 group-hover:text-white transition-colors duration-150 truncate">{{ $navK['nama'] }}</span>
                                 </a>
                             @endforeach
                         </div>
-
-                        <!-- Footer: "Lihat Semua" jadi tombol yang jelas -->
                         <a href="{{ route('komunitas', 'semua') }}"
-                           class="flex items-center justify-center gap-2 w-full py-3.5 bg-[#01795F]/5 hover:bg-[#01795F] text-[#01795F] hover:text-white text-xs font-bold border-t border-slate-100 transition-colors">
-                            <span>Lihat Semua Komunitas</span>
+                           class="flex items-center justify-center gap-2 px-5 py-3.5 bg-white/[.03] hover:bg-[#01795F] text-white/75 hover:text-white text-[13px] font-bold border-t border-white/10 transition-colors duration-200">
+                            <span>Lihat semua komunitas</span>
                             <i class="fa-solid fa-arrow-right text-[10px]"></i>
                         </a>
                     </div>
                 </div>
-                @endunless
 
-                <!-- 3. Laboratorium PAI (sembunyikan di Komunitas & Perpustakaan) -->
-                @unless($isKomunitasZone || $isPerpustakaanZone)
-                <a href="{{ route('laboratorium.pai') }}"
-                   class="px-3.5 py-2 rounded-lg text-xs font-semibold transition duration-150 flex items-center space-x-1.5 {{ $currentRoute == 'laboratorium.pai' || $currentRoute == 'labor' ? 'bg-[#01795F] text-white' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' }}">
-                    <i class="fa-solid fa-flask text-[11px]"></i>
-                    <span>Laboratorium PAI</span>
-                </a>
-                @endunless
-
-                <!-- 4. Perpustakaan (sembunyikan di Labor/Oprec & Komunitas) -->
-                @unless($isLaborOprecZone || $isKomunitasZone)
-                <a href="{{ route('perpustakaan') }}"
-                   class="px-3.5 py-2 rounded-lg text-xs font-semibold transition duration-150 flex items-center space-x-1.5 {{ $isPerpustakaanZone ? 'bg-[#01795F] text-white' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' }}">
-                    <i class="fa-solid fa-book text-[11px]"></i>
-                    <span>Perpustakaan</span>
-                </a>
-                @endunless
-
-                <!-- 5. Open Recruitment (sembunyikan di Komunitas & Perpustakaan) -->
-                @unless($isKomunitasZone || $isPerpustakaanZone)
-                <a href="{{ route('open.recruitment') }}"
-                   class="px-3.5 py-2 rounded-lg text-xs font-semibold transition duration-150 flex items-center space-x-1.5 {{ str_contains($currentRoute, 'open.recruitment') ? 'bg-[#01795F] text-white' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' }}">
-                    <i class="fa-solid fa-user-plus text-[11px]"></i>
-                    <span>Open Recruitment</span>
-                </a>
-                @endunless
-
-                <!-- 6. ADMIN PANEL LINK (KHUSUS ROLE ADMIN) -->
-                @auth
-                    @if(Auth::user()->role === 'admin')
-                        <a href="{{ route('admin.index') }}"
-                           class="px-3.5 py-2 rounded-lg text-xs font-bold text-amber-800 bg-amber-100 hover:bg-amber-200 transition duration-150 flex items-center space-x-1.5 border border-amber-300">
-                            <i class="fa-solid fa-shield-halved text-amber-700"></i>
-                            <span>Admin Panel</span>
-                        </a>
-                    @endif
-
-                    <a href="{{ route('profile.edit') }}"
-                       class="ml-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-800 hover:bg-[#3F704D] hover:text-white transition duration-150 flex items-center space-x-2 border border-slate-200">
-                        <x-community-avatar :user="Auth::user()" size="xs" />
-                        <span>Profil</span>
+                @foreach($navAfter as $item)
+                    <a href="{{ $item['href'] }}"
+                       class="group relative pb-1 text-xs uppercase tracking-[0.16em] font-semibold transition-colors duration-200 {{ $link($item['active']) }}">
+                        {{ $item['label'] }}
+                        <span class="{{ $underline($item['active']) }}"></span>
                     </a>
-                @else
-                    <a href="{{ route('login') }}"
-                       class="ml-2 px-4 py-2 rounded-lg text-xs font-semibold bg-[#01795F] text-white hover:bg-[#3F704D] transition duration-150 shadow-sm flex items-center space-x-1.5">
-                        <i class="fa-solid fa-right-to-bracket text-xs"></i>
-                        <span>Masuk</span>
-                    </a>
-                @endauth
-
+                @endforeach
             </nav>
 
-            <!-- Mobile Menu Toggle Button -->
-            <div class="flex items-center md:hidden">
+            {{-- ===== KANAN: Auth (≥ xl) + Hamburger (< xl) ===== --}}
+            <div class="flex items-center gap-4 shrink-0">
+
+                <div class="hidden xl:flex items-center gap-5">
+                    {{-- Social media (selalu tampil; tema minimalis — brighten on hover) --}}
+                    <div class="flex items-center gap-3">
+                        <a href="https://www.instagram.com/fsi.smansa_landbouw?igsh=MXVzMzd5Nms0eDZpNQ==" target="_blank" rel="noopener" aria-label="TSAQIB di Instagram" class="text-white/55 hover:text-white transition-colors duration-200">
+                            <i class="fa-brands fa-instagram text-base"></i>
+                        </a>
+                        <a href="https://www.facebook.com/share/1BJMFJvK5k/" target="_blank" rel="noopener" aria-label="TSAQIB di Facebook" class="text-white/55 hover:text-white transition-colors duration-200">
+                            <i class="fa-brands fa-facebook text-base"></i>
+                        </a>
+                        <a href="https://ytfsi.carrd.co" target="_blank" rel="noopener" aria-label="TSAQIB di YouTube" class="text-white/55 hover:text-white transition-colors duration-200">
+                            <i class="fa-brands fa-youtube text-base"></i>
+                        </a>
+                    </div>
+
+                    @auth
+                        @if(Auth::user()->role === 'admin')
+                            <a href="{{ route('admin.index') }}"
+                               class="text-xs uppercase tracking-[0.16em] font-semibold text-amber-300/85 hover:text-amber-200 transition-colors duration-200">
+                                Admin
+                            </a>
+                        @endif
+                        <a href="{{ route('profile.edit') }}" title="Profil"
+                           class="rounded-full p-0.5 ring-1 ring-white/15 hover:ring-[var(--gold)] transition duration-200">
+                            <x-community-avatar :user="Auth::user()" size="xs" />
+                        </a>
+                    @else
+                        {{-- CTA utama: satu-satunya elemen solid green di navbar --}}
+                        <a href="{{ route('login') }}"
+                           class="cta-primary inline-flex items-center px-5 py-2.5 rounded-full text-xs font-bold tracking-wide text-white">
+                            Masuk
+                        </a>
+                    @endauth
+                </div>
+
                 <button id="mobile-menu-btn" type="button"
                         aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="mobile-menu"
-                        class="p-2.5 rounded-lg text-slate-600 hover:text-[#01795F] hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#01795F] focus-visible:ring-offset-2 transition">
+                        class="xl:hidden p-2 -mr-2 text-[var(--cream)] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#01795F] rounded-full transition">
                     <i class="fa-solid fa-bars text-xl" id="menu-icon"></i>
                 </button>
             </div>
-
         </div>
     </div>
 
-    <!-- Mobile Drawer + Backdrop Overlay -->
-    <div id="mobile-menu-backdrop" class="hidden fixed top-16 sm:top-20 inset-x-0 bottom-0 z-40 bg-slate-900/50 backdrop-blur-sm md:hidden transition-opacity duration-300" aria-hidden="true"></div>
+    {{-- ===== MOBILE DRAWER (< xl) ===== --}}
+    <div id="mobile-menu-backdrop" class="hidden fixed top-20 xl:top-24 inset-x-0 bottom-0 z-40 bg-black/50 backdrop-blur-sm xl:hidden"></div>
 
-    <div id="mobile-menu" class="hidden md:hidden relative z-50 border-t border-slate-200 bg-white px-4 pt-3 pb-6 space-y-1 shadow-lg transition-all duration-300">
-        <!-- Beranda -->
-        <a href="{{ route('landing') }}"
-           class="flex items-center px-3 py-3 rounded-lg text-sm font-semibold {{ $currentRoute == 'landing' ? 'bg-[#01795F] text-white' : 'text-slate-800 hover:bg-slate-100' }}">
-            <i class="fa-solid fa-house w-5 text-center {{ $currentRoute == 'landing' ? 'text-white' : 'text-[#01795F]' }}"></i>
-            <span class="ml-2">Beranda</span>
-        </a>
+    <div id="mobile-menu" class="hidden xl:hidden border-t border-white/5 bg-[#10140F] px-5 py-3 space-y-0.5 shadow-2xl max-h-[calc(100vh-5rem)] overflow-y-auto">
 
-        @unless($isLaborOprecZone || $isPerpustakaanZone)
-        <!-- Komunitas (expandable submenu) -->
+        @foreach($navBefore as $item)
+            <a href="{{ $item['href'] }}"
+               class="block py-3 text-sm font-medium tracking-wide transition-colors duration-200 {{ $item['active'] ? 'text-[var(--gold)]' : 'text-white/80 hover:text-white' }}">
+                {{ $item['label'] }}
+            </a>
+        @endforeach
+
+        {{-- Sub-menu Komunitas (collapsible) --}}
         <div>
             <button type="button" id="mobile-komunitas-btn"
                     aria-haspopup="true" aria-expanded="{{ $isKomunitasZone ? 'true' : 'false' }}" aria-controls="mobile-komunitas-submenu"
-                    class="w-full flex items-center justify-between px-3 py-3 rounded-lg text-sm font-semibold {{ $isKomunitasZone ? 'bg-[#01795F] text-white' : 'text-slate-800 hover:bg-slate-100' }}">
-                <span class="flex items-center">
-                    <i class="fa-solid fa-users w-5 text-center {{ $isKomunitasZone ? 'text-white' : 'text-[#01795F]' }}"></i>
-                    <span class="ml-2">Komunitas</span>
-                </span>
+                    class="w-full flex items-center justify-between py-3 text-sm font-medium tracking-wide transition-colors duration-200 {{ $isKomunitasZone ? 'text-[var(--gold)]' : 'text-white/80 hover:text-white' }}">
+                <span>Komunitas</span>
                 <i class="fa-solid fa-chevron-down text-xs transition-transform duration-200 {{ $isKomunitasZone ? 'rotate-180' : '' }}" id="mobile-komunitas-chevron"></i>
             </button>
-            <div id="mobile-komunitas-submenu" class="mt-1 ml-5 pl-3 border-l-2 border-slate-100 space-y-0.5 {{ $isKomunitasZone ? '' : 'hidden' }}">
+            <div id="mobile-komunitas-submenu" class="mt-1 ml-3 pl-4 border-l border-white/10 space-y-0.5 {{ $isKomunitasZone ? '' : 'hidden' }}">
                 <a href="{{ route('komunitas', 'semua') }}"
-                   class="flex items-center px-3 py-2.5 rounded-lg text-[13px] font-semibold {{ (request()->segment(2) === 'semua' || is_null(request()->segment(2))) && $isKomunitasZone ? 'bg-[#01795F]/10 text-[#01795F]' : 'text-slate-700 hover:bg-slate-50 hover:text-[#01795F]' }}">
-                    <i class="fa-solid fa-grip w-4 text-center text-[#01795F]"></i>
-                    <span class="ml-2">Lihat Semua Komunitas</span>
+                   class="block py-2.5 text-[13px] font-medium transition-colors duration-200 {{ (request()->segment(2) === 'semua' || is_null(request()->segment(2))) && $isKomunitasZone ? 'text-[var(--gold)]' : 'text-white/55 hover:text-white' }}">
+                    Lihat semua komunitas
                 </a>
                 @foreach($daftarKomunitasNav as $navK)
                     <a href="{{ route('komunitas', $navK['slug']) }}"
-                       class="flex items-center px-3 py-2.5 rounded-lg text-[13px] font-semibold {{ (request()->segment(2) === $navK['slug']) ? 'bg-[#01795F]/10 text-[#01795F]' : 'text-slate-700 hover:bg-slate-50 hover:text-[#01795F]' }}">
-                        <i class="fa-solid fa-layer-group w-4 text-center text-[#01795F]"></i>
-                        <span class="ml-2">{{ $navK['nama'] }}</span>
+                       class="block py-2.5 text-[13px] font-medium transition-colors duration-200 {{ request()->segment(2) === $navK['slug'] ? 'text-[var(--gold)]' : 'text-white/55 hover:text-white' }}">
+                        {{ $navK['nama'] }}
                     </a>
                 @endforeach
             </div>
         </div>
-        @endunless
 
-        @unless($isKomunitasZone || $isPerpustakaanZone)
-        <!-- Laboratorium PAI -->
-        <a href="{{ route('laboratorium.pai') }}"
-           class="flex items-center px-3 py-3 rounded-lg text-sm font-semibold {{ ($currentRoute == 'laboratorium.pai' || $currentRoute == 'labor') ? 'bg-[#01795F] text-white' : 'text-slate-800 hover:bg-slate-100' }}">
-            <i class="fa-solid fa-flask w-5 text-center {{ ($currentRoute == 'laboratorium.pai' || $currentRoute == 'labor') ? 'text-white' : 'text-[#01795F]' }}"></i>
-            <span class="ml-2">Laboratorium PAI</span>
-        </a>
-        @endunless
+        @foreach($navAfter as $item)
+            <a href="{{ $item['href'] }}"
+               class="block py-3 text-sm font-medium tracking-wide transition-colors duration-200 {{ $item['active'] ? 'text-[var(--gold)]' : 'text-white/80 hover:text-white' }}">
+                {{ $item['label'] }}
+            </a>
+        @endforeach
 
-        @unless($isLaborOprecZone || $isKomunitasZone)
-        <!-- Perpustakaan -->
-        <a href="{{ route('perpustakaan') }}"
-           class="flex items-center px-3 py-3 rounded-lg text-sm font-semibold {{ $isPerpustakaanZone ? 'bg-[#01795F] text-white' : 'text-slate-800 hover:bg-slate-100' }}">
-            <i class="fa-solid fa-book w-5 text-center {{ $isPerpustakaanZone ? 'text-white' : 'text-[#01795F]' }}"></i>
-            <span class="ml-2">Perpustakaan</span>
-        </a>
-        @endunless
-
-        @unless($isKomunitasZone || $isPerpustakaanZone)
-        <!-- Open Recruitment -->
-        <a href="{{ route('open.recruitment') }}"
-           class="flex items-center px-3 py-3 rounded-lg text-sm font-semibold {{ str_contains($currentRoute, 'open.recruitment') ? 'bg-[#01795F] text-white' : 'text-slate-800 hover:bg-slate-100' }}">
-            <i class="fa-solid fa-user-plus w-5 text-center {{ str_contains($currentRoute, 'open.recruitment') ? 'text-white' : 'text-[#01795F]' }}"></i>
-            <span class="ml-2">Open Recruitment</span>
-        </a>
-        @endunless
-
-        <div class="pt-2 mt-2 border-t border-slate-100 space-y-1">
+        {{-- Area Auth (mobile) --}}
+        <div class="pt-3 mt-2 border-t border-white/5 space-y-1">
             @auth
                 @if(Auth::user()->role === 'admin')
-                    <a href="{{ route('admin.index') }}" class="flex items-center px-3 py-3 rounded-lg text-sm font-bold text-amber-800 bg-amber-50 border border-amber-200">
-                        <i class="fa-solid fa-shield-halved w-5 text-center text-amber-700"></i>
-                        <span class="ml-2">Admin Panel</span>
+                    <a href="{{ route('admin.index') }}" class="block py-3 text-sm font-semibold text-amber-300/90 hover:text-amber-200 transition-colors duration-200">
+                        Admin Panel
                     </a>
                 @endif
-                <a href="{{ route('profile.edit') }}" class="flex items-center px-3 py-3 rounded-lg text-sm font-semibold text-slate-800 hover:bg-slate-100">
+                <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 py-3 text-sm font-medium text-white/85 hover:text-white transition-colors duration-200">
                     <x-community-avatar :user="Auth::user()" size="xs" />
-                    <span class="ml-2">Profil Saya</span>
+                    <span>Profil Saya</span>
                 </a>
             @else
-                <a href="{{ route('login') }}" class="flex justify-center items-center px-4 py-3 mt-1 rounded-lg text-sm font-semibold bg-[#01795F] text-white hover:bg-[#3F704D] transition">
-                    <i class="fa-solid fa-right-to-bracket"></i>
-                    <span class="ml-2">Masuk Akun</span>
+                <a href="{{ route('login') }}" class="cta-primary flex justify-center items-center w-full px-4 py-3 rounded-full text-sm font-bold text-white">
+                    Masuk
                 </a>
             @endauth
         </div>
@@ -234,91 +200,76 @@
 </header>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        /* ============ MOBILE DRAWER ============ */
-        const btn = document.getElementById('mobile-menu-btn');
-        const menu = document.getElementById('mobile-menu');
+    document.addEventListener('DOMContentLoaded', function () {
+        /* ============ MOBILE DRAWER TOGGLE ============ */
+        const btn      = document.getElementById('mobile-menu-btn');
+        const menu     = document.getElementById('mobile-menu');
         const backdrop = document.getElementById('mobile-menu-backdrop');
         const menuIcon = document.getElementById('menu-icon');
 
-        function openMobileMenu() {
+        function openMenu() {
             menu.classList.remove('hidden');
             backdrop.classList.remove('hidden');
             document.body.classList.add('overflow-hidden');
             btn.setAttribute('aria-expanded', 'true');
             btn.setAttribute('aria-label', 'Tutup menu navigasi');
-            menuIcon.classList.remove('fa-bars');
-            menuIcon.classList.add('fa-xmark');
+            menuIcon.classList.replace('fa-bars', 'fa-xmark');
         }
-        function closeMobileMenu() {
+        function closeMenu() {
             menu.classList.add('hidden');
             backdrop.classList.add('hidden');
             document.body.classList.remove('overflow-hidden');
             btn.setAttribute('aria-expanded', 'false');
             btn.setAttribute('aria-label', 'Buka menu navigasi');
-            menuIcon.classList.remove('fa-xmark');
-            menuIcon.classList.add('fa-bars');
+            menuIcon.classList.replace('fa-xmark', 'fa-bars');
         }
 
         if (btn && menu) {
-            btn.addEventListener('click', function() {
-                menu.classList.contains('hidden') ? openMobileMenu() : closeMobileMenu();
-            });
+            btn.addEventListener('click', () => menu.classList.contains('hidden') ? openMenu() : closeMenu());
         }
         if (backdrop) {
-            backdrop.addEventListener('click', closeMobileMenu);
+            backdrop.addEventListener('click', closeMenu);
         }
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && menu && !menu.classList.contains('hidden')) {
-                closeMobileMenu();
-            }
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && menu && !menu.classList.contains('hidden')) closeMenu();
         });
 
         /* ============ MOBILE KOMUNITAS SUBMENU ============ */
-        const mKomunitasBtn = document.getElementById('mobile-komunitas-btn');
-        const mKomunitasSubmenu = document.getElementById('mobile-komunitas-submenu');
-        const mKomunitasChevron = document.getElementById('mobile-komunitas-chevron');
-        if (mKomunitasBtn && mKomunitasSubmenu) {
-            mKomunitasBtn.addEventListener('click', function() {
-                const isHidden = mKomunitasSubmenu.classList.contains('hidden');
-                mKomunitasSubmenu.classList.toggle('hidden');
-                mKomunitasChevron.classList.toggle('rotate-180', isHidden);
-                mKomunitasBtn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+        const mBtn     = document.getElementById('mobile-komunitas-btn');
+        const mSubmenu = document.getElementById('mobile-komunitas-submenu');
+        const mChevron = document.getElementById('mobile-komunitas-chevron');
+        if (mBtn && mSubmenu) {
+            mBtn.addEventListener('click', () => {
+                const hidden = mSubmenu.classList.toggle('hidden'); // true = sekarang tertutup
+                mChevron.classList.toggle('rotate-180', !hidden);
+                mBtn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
             });
         }
 
         /* ============ DESKTOP KOMUNITAS DROPDOWN ============ */
-        const komunitasBtn = document.getElementById('komunitasDropdownBtn');
-        const komunitasMenu = document.getElementById('komunitasMegaMenu');
-        const komunitasChevron = document.getElementById('komunitasChevron');
-        const komunitasWrapper = document.getElementById('komunitasDropdownWrapper');
+        const kBtn     = document.getElementById('komunitasDropdownBtn');
+        const kMenu    = document.getElementById('komunitasMegaMenu');
+        const kChevron = document.getElementById('komunitasChevron');
+        const kWrap    = document.getElementById('komunitasDropdownWrapper');
 
-        function closeDesktopDropdown() {
-            if (!komunitasMenu) return;
-            komunitasMenu.classList.add('hidden');
-            komunitasChevron.classList.remove('rotate-180');
-            komunitasBtn.setAttribute('aria-expanded', 'false');
+        function closeDesktop() {
+            if (!kMenu) return;
+            kMenu.classList.add('hidden');
+            kChevron.classList.remove('rotate-180');
+            kBtn.setAttribute('aria-expanded', 'false');
         }
-
-        if (komunitasBtn && komunitasMenu) {
-            komunitasBtn.addEventListener('click', function(e) {
+        if (kBtn && kMenu) {
+            kBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const isHidden = komunitasMenu.classList.contains('hidden');
-                komunitasMenu.classList.toggle('hidden');
-                komunitasChevron.classList.toggle('rotate-180', isHidden);
-                komunitasBtn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+                const hidden = kMenu.classList.toggle('hidden');
+                kChevron.classList.toggle('rotate-180', !hidden);
+                kBtn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
             });
-
-            document.addEventListener('click', function(e) {
-                if (komunitasWrapper && !komunitasWrapper.contains(e.target)) {
-                    closeDesktopDropdown();
-                }
+            document.addEventListener('click', (e) => {
+                if (kWrap && !kWrap.contains(e.target)) closeDesktop();
             });
-
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    closeDesktopDropdown();
-                }
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeDesktop();
             });
         }
     });

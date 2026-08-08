@@ -11,12 +11,15 @@ use Illuminate\Support\Facades\Config;
 class PageController extends Controller
 {
     /**
-     * Landing page — Peta Sekolah Floating Island (Publik — Tanpa Navbar).
+     * Landing page (Publik — tamu & anggota). Menyediakan preview komunitas.
      * Route: GET /
      */
     public function landing()
     {
-        return view('landing');
+        // Data komunitas untuk preview publik di landing (tamu bisa lihat, tanpa auth).
+        $daftarKomunitas = Config::get('komunitas.daftar', []);
+
+        return view('landing', compact('daftarKomunitas'));
     }
 
     /**

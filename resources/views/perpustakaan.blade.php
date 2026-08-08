@@ -1,109 +1,77 @@
-<!-- resources/views/perpustakaan.blade.php -->
-<!DOCTYPE html>
-<html lang="id" class="scroll-smooth">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perpustakaan Digital FSI - TSAQIB SMAN 1 Bukittinggi</title>
-    @vite('resources/css/app.css')
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    @php
-        $books = \App\Models\Book::where('is_visible', true)->latest()->get();
-    @endphp
+@extends('layouts.master')
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
-</head>
-<body class="bg-slate-50 text-slate-900 font-sans antialiased min-h-screen flex flex-col">
+@php
+    $pageTitle = 'Perpustakaan Digital FSI - TSAQIB SMAN 1 Bukittinggi';
+    $books = \App\Models\Book::where('is_visible', true)->latest()->get();
+@endphp
 
-    <!-- Unified TSAQIB Navbar (6 Items) -->
-    @include('partials.navbar')
-
+@section('content')
     <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-8 w-full">
 
         <!-- Top Header & Search Bar -->
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
-            <div class="max-w-3xl mx-auto text-center space-y-3">
-                <span class="inline-block px-3 py-1 rounded-full bg-[#01795F]/10 text-[#01795F] text-xs font-semibold uppercase tracking-wider">
-                    Maktabah Digital Publik FSI
-                </span>
-                <h1 class="text-3xl font-bold text-slate-900 tracking-tight">
-                    Perpustakaan Digital <span class="text-[#01795F]">PAI SMAN 1 Bukittinggi</span>
-                </h1>
-                <p class="text-xs sm:text-sm text-slate-600">
-                    Akses publik buku digital, modul PAI, materi Aqidah, Fiqih, SKI, dan Hadits SMAN 1 Bukittinggi tanpa perlu login.
-                </p>
-
-                <!-- SEARCH BAR -->
-                <div class="pt-2 max-w-xl mx-auto">
-                    <div class="relative">
-                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400 text-sm"></i>
-                        <input type="text" id="library-search" onkeyup="filterBooks()" placeholder="Cari judul buku, penulis, atau kata kunci..."
-                               class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-xs text-slate-900 focus:outline-none focus:border-[#01795F] focus:ring-1 focus:ring-[#01795F] shadow-inner">
+        <div class="tsaqib-card p-6 sm:p-8">
+            <x-page-header
+                eyebrow="Maktabah Digital Publik FSI"
+                eyebrow-icon="fa-solid fa-book-open"
+                title="Perpustakaan Digital <span class='text-[var(--gold)]'>PAI SMAN 1 Bukittinggi</span>"
+                subtitle="Akses publik buku digital, modul PAI, materi Aqidah, Fiqih, SKI, dan Hadits SMAN 1 Bukittinggi tanpa perlu login.">
+                <x-slot:extra>
+                    <!-- SEARCH BAR -->
+                    <div class="max-w-xl mx-auto">
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-white/40 text-sm"></i>
+                            <input type="text" id="library-search" onkeyup="filterBooks()" placeholder="Cari judul buku, penulis, atau kata kunci..."
+                                   class="tsaqib-input w-full pl-11 pr-4 py-3 text-xs">
+                        </div>
                     </div>
-                </div>
-            </div>
+                </x-slot:extra>
+            </x-page-header>
 
             <!-- CATEGORY FILTER TABS -->
-            <div class="mt-8 pt-4 border-t border-slate-100 flex items-center justify-center space-x-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-200">
-                <!-- Tambahkan parameter "this" pada setiap fungsi onclick agar JS tahu tombol mana yang diklik -->
+            <div class="mt-8 pt-6 border-t border-white/10 flex items-center justify-center space-x-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-white/10">
                 <button onclick="filterCategory('semua', this)" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold bg-[#01795F] text-white transition whitespace-nowrap">Semua Buku</button>
-                <button onclick="filterCategory('fiqih', this)" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition whitespace-nowrap">Fiqih</button>
-                <button onclick="filterCategory('aqidah', this)" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition whitespace-nowrap">Aqidah</button>
-                <button onclick="filterCategory('ski', this)" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition whitespace-nowrap">SKI</button>
-                <button onclick="filterCategory('hadits', this)" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition whitespace-nowrap">Hadits & Tafsir</button>
-                <button onclick="filterCategory('modul', this)" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition whitespace-nowrap">Modul PAI</button>
+                <button onclick="filterCategory('fiqih', this)" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white/5 text-white/70 hover:bg-white/10 transition whitespace-nowrap">Fiqih</button>
+                <button onclick="filterCategory('aqidah', this)" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white/5 text-white/70 hover:bg-white/10 transition whitespace-nowrap">Aqidah</button>
+                <button onclick="filterCategory('ski', this)" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white/5 text-white/70 hover:bg-white/10 transition whitespace-nowrap">SKI</button>
+                <button onclick="filterCategory('hadits', this)" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white/5 text-white/70 hover:bg-white/10 transition whitespace-nowrap">Hadits & Tafsir</button>
+                <button onclick="filterCategory('modul', this)" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white/5 text-white/70 hover:bg-white/10 transition whitespace-nowrap">Modul PAI</button>
             </div>
         </div>
 
         <!-- DIGITAL BOOKS GRID (DATABASE DRIVEN) -->
         <div id="books-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            
+
             @forelse($books as $book)
-                <div class="book-card bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition duration-200 flex flex-col justify-between group"
+                <div class="book-card tsaqib-card p-4 flex flex-col justify-between group"
                      data-title="{{ strtolower($book->title) }}"
                      data-author="{{ strtolower($book->author) }}"
                      data-category="{{ strtolower($book->category ?? 'modul') }}">
-                    
+
                     <div>
                         <!-- Cover PDF / Placeholder -->
-                        <div class="w-full h-36 rounded-xl bg-slate-100 border border-slate-200 flex flex-col items-center justify-center p-3 relative overflow-hidden mb-3 group-hover:border-[#01795F] transition">
+                        <div class="w-full h-36 rounded-xl bg-white/5 border border-white/10 flex flex-col items-center justify-center p-3 relative overflow-hidden mb-3 group-hover:border-[#01795F] transition">
                             @if($book->cover_image)
                                 <img src="{{ asset('storage/' . $book->cover_image) }}" alt="{{ $book->title }}" class="w-full h-full object-cover rounded-lg">
                             @else
-                                <div class="w-12 h-12 rounded-xl bg-[#01795F]/10 text-[#01795F] flex items-center justify-center font-bold text-xl mb-2">
+                                <div class="w-12 h-12 rounded-xl bg-[#01795F]/15 text-[#3fd6b0] flex items-center justify-center font-bold text-xl mb-2">
                                     <i class="fa-solid fa-file-pdf"></i>
                                 </div>
-                                <span class="text-[10px] font-bold text-[#01795F] uppercase tracking-wider">Modul Digital</span>
+                                <span class="text-[10px] font-bold text-[#3fd6b0] uppercase tracking-wider">Modul Digital</span>
                             @endif
                         </div>
 
                         <!-- Book Title & Author -->
-                        <span class="text-[9px] font-bold text-[#01795F] uppercase tracking-wider block mb-1">
+                        <span class="text-[9px] font-bold text-[var(--gold)] uppercase tracking-wider block mb-1">
                             {{ $book->category ?? 'Modul PAI' }}
                         </span>
-                        <h3 class="font-bold text-sm text-slate-900 group-hover:text-[#01795F] transition line-clamp-2 leading-snug">
+                        <h3 class="font-bold text-sm text-[var(--cream)] group-hover:text-[var(--gold)] transition line-clamp-2 leading-snug">
                             {{ $book->title }}
                         </h3>
-                        <p class="text-xs text-slate-500 mt-1">Penulis: {{ $book->author ?? 'Tim PAI SMAN 1 Bukittinggi' }}</p>
+                        <p class="text-xs text-white/50 mt-1">Penulis: {{ $book->author ?? 'Tim PAI SMAN 1 Bukittinggi' }}</p>
                     </div>
 
                     <!-- Read & Download Action Buttons -->
-                    <div class="mt-4 pt-3 border-t border-slate-100 flex items-center space-x-2">
+                    <div class="mt-4 pt-3 border-t border-white/10 flex items-center space-x-2">
                         @if($book->pdf_path)
                             <a href="{{ asset('storage/' . $book->pdf_path) }}" target="_blank"
                                class="flex-1 py-2 rounded-xl bg-[#01795F] hover:bg-[#3F704D] text-white text-center font-semibold text-xs transition shadow-sm flex items-center justify-center space-x-1">
@@ -112,11 +80,11 @@
                             </a>
 
                             <a href="{{ asset('storage/' . $book->pdf_path) }}" download
-                               class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition border border-slate-200" title="Unduh File">
+                               class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/80 text-xs font-semibold transition border border-white/15" title="Unduh File">
                                 <i class="fa-solid fa-download"></i>
                             </a>
                         @else
-                            <button onclick="alert('File PDF belum diunggah oleh admin.')" class="w-full py-2 rounded-xl bg-slate-100 text-slate-400 text-xs font-semibold">
+                            <button onclick="alert('File PDF belum diunggah oleh admin.')" class="w-full py-2 rounded-xl bg-white/5 text-white/40 text-xs font-semibold">
                                 PDF Belum Tersedia
                             </button>
                         @endif
@@ -127,24 +95,24 @@
                 <!-- SAMPLE BOOKS FOR DEMO IF DB EMPTY -->
                 @php
                     $sampleBooks = [
-                    
+
                     ];
                 @endphp
                 @foreach($sampleBooks as $sb)
-                    <div class="book-card bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition duration-200 flex flex-col justify-between group"
+                    <div class="book-card tsaqib-card p-4 flex flex-col justify-between group"
                          data-title="{{ strtolower($sb['title']) }}"
                          data-author="{{ strtolower($sb['author']) }}"
                          data-category="{{ strtolower($sb['cat']) }}">
                         <div>
-                            <div class="w-full h-36 rounded-xl bg-slate-100 border border-slate-200 flex flex-col items-center justify-center p-3 relative overflow-hidden mb-3">
-                                <i class="fa-solid fa-book-bookmark text-4xl text-[#01795F] mb-2"></i>
-                                <span class="text-[10px] font-bold text-[#01795F] uppercase">{{ $sb['cat'] }}</span>
+                            <div class="w-full h-36 rounded-xl bg-white/5 border border-white/10 flex flex-col items-center justify-center p-3 relative overflow-hidden mb-3">
+                                <i class="fa-solid fa-book-bookmark text-4xl text-[#3fd6b0] mb-2"></i>
+                                <span class="text-[10px] font-bold text-[#3fd6b0] uppercase">{{ $sb['cat'] }}</span>
                             </div>
-                            <span class="text-[9px] font-bold text-[#01795F] uppercase block mb-1">{{ $sb['cat'] }}</span>
-                            <h3 class="font-bold text-sm text-slate-900 group-hover:text-[#01795F] transition line-clamp-2 leading-snug">{{ $sb['title'] }}</h3>
-                            <p class="text-xs text-slate-500 mt-1">Penulis: {{ $sb['author'] }}</p>
+                            <span class="text-[9px] font-bold text-[var(--gold)] uppercase block mb-1">{{ $sb['cat'] }}</span>
+                            <h3 class="font-bold text-sm text-[var(--cream)] group-hover:text-[var(--gold)] transition line-clamp-2 leading-snug">{{ $sb['title'] }}</h3>
+                            <p class="text-xs text-white/50 mt-1">Penulis: {{ $sb['author'] }}</p>
                         </div>
-                        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center space-x-2">
+                        <div class="mt-4 pt-3 border-t border-white/10 flex items-center space-x-2">
                             <a href="#" onclick="alert('Silakan unggah file PDF resmi di Admin Panel!'); return false;" class="flex-1 py-2 rounded-xl bg-[#01795F] text-white text-center font-semibold text-xs flex items-center justify-center space-x-1">
                                 <i class="fa-solid fa-eye text-[11px]"></i>
                                 <span>Baca PDF</span>
@@ -157,14 +125,9 @@
         </div>
 
     </main>
+@endsection
 
-    <!-- Footer -->
-    <footer class="border-t border-slate-200 bg-white py-8 text-center text-xs text-slate-500">
-        <div class="max-w-7xl mx-auto px-4">
-            <p>&copy; {{ date('Y') }} TSAQIB • Forum Studi Islam SMAN 1 Bukittinggi. Hak Cipta Dilindungi.</p>
-        </div>
-    </footer>
-
+@push('scripts')
     <script>
         function filterBooks() {
             const query = document.getElementById('library-search').value.toLowerCase();
@@ -180,22 +143,19 @@
             });
         }
 
-        // Logic Baru: Filter Category + Ubah Warna Tombol
+        // Filter Category + ubah warna tombol (palet gelap)
         function filterCategory(cat, clickedBtn) {
-            
-            // 1. Logika untuk mengubah warna/tampilan tombol
+
+            // 1. Logika ubah warna/tampilan tombol
             if (clickedBtn) {
-                // Ambil semua tombol kategori
                 const buttons = document.querySelectorAll('.cat-btn');
-                
-                // Hapus style aktif (Hijau) dari SEMUA tombol, jadikan default (Abu-abu)
+
                 buttons.forEach(btn => {
                     btn.classList.remove('bg-[#01795F]', 'text-white');
-                    btn.classList.add('bg-slate-100', 'text-slate-700', 'hover:bg-slate-200');
+                    btn.classList.add('bg-white/5', 'text-white/70', 'hover:bg-white/10');
                 });
-                
-                // Berikan style aktif (Hijau) hanya pada tombol yang SEDANG DIKLIK
-                clickedBtn.classList.remove('bg-slate-100', 'text-slate-700', 'hover:bg-slate-200');
+
+                clickedBtn.classList.remove('bg-white/5', 'text-white/70', 'hover:bg-white/10');
                 clickedBtn.classList.add('bg-[#01795F]', 'text-white');
             }
 
@@ -211,6 +171,4 @@
             });
         }
     </script>
-
-</body>
-</html>
+@endpush

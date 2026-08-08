@@ -46,7 +46,11 @@
                                di atas foto apapun. Boleh diatur opacity-nya kalau fotonya gelap/terang.
            4. .hero-pattern → pola bintang 8 Islami tipis, paling atas, dekoratif doang. ===== */
         .hero-bg{
-            background-color:var(--ink);
+            /* Transparent: the global <body> background (gradient + girih pattern,
+               from resources/css/app.css) shows through so Beranda stays consistent
+               with every other page. The hero's own .hero-photo / .hero-overlay /
+               .hero-pattern still layer on top of it, so the hero look is unchanged. */
+            background-color:transparent;
         }
         .hero-photo{
             position:absolute;inset:0;z-index:0;

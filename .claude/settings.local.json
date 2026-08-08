@@ -15,7 +15,8 @@
       "Read(//usr/lib/**)",
       "Bash(ldd /home/kai/.cache/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-linux64/chrome-headless-shell)",
       "Read(//tmp/**)",
-      "Bash(apt-get download *)"
+      "Bash(apt-get download *)",
+      "Bash(grep -n \"hero-bg\\\\|</div>\\\\s*$\\\\|=====\\\\|<section\\\\|</section\\\\|@include\\('partials.site-footer'\\)\\\\|<footer\" resources/views/landing.blade.php)"
     ]
   }
 }

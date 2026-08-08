@@ -5,7 +5,7 @@
 <head>
     @include('partials.theme-head')
 </head>
-<body class="bg-[#10140F] text-[var(--cream)] font-sans antialiased min-h-screen flex flex-col">
+<body class="text-[var(--cream)] font-sans antialiased min-h-screen flex flex-col">
 
     <!-- Unified TSAQIB Navbar -->
     @include('partials.navbar')

@@ -19,3 +19,22 @@
         "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
         "Noto Color Emoji";
 }
+
+/* =========================================================================
+   GLOBAL TSAQIB BACKGROUND (applied once on <body>, site-wide)
+   --------------------------------------------------------------------
+   Layer 1 (top):  Islamic girih star pattern — inline SVG, 48x48 tile,
+                   stroke #5DCAA5 @ ~0.11 opacity (texture, not distraction).
+   Layer 2 (base): dark vertical gradient #0d2622 → #0a1f1c (60%) → #08140f.
+   Inline SVG => no external request, no PNG load/memory issues. Painted on
+   <body>, so it sits behind every page's content. Per-page bg utilities
+   (bg-[#10140F]) were removed from <body> tags so nothing competes with this.
+   ========================================================================= */
+body{
+    background-color:#0a1f1c;                 /* fallback base while images paint */
+    background-image:
+        url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2748%27%20height%3D%2748%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%235DCAA5%27%20stroke-width%3D%271%27%20opacity%3D%270.11%27%3E%3Cpath%20d%3D%27M24%2C2%20L34%2C12%20L24%2C22%20L14%2C12%20Z%27%2F%3E%3Cpath%20d%3D%27M24%2C26%20L34%2C36%20L24%2C46%20L14%2C36%20Z%27%2F%3E%3Cpath%20d%3D%27M0%2C12%20L10%2C2%20L10%2C22%20Z%27%20opacity%3D%270.6%27%2F%3E%3Cpath%20d%3D%27M48%2C12%20L38%2C2%20L38%2C22%20Z%27%20opacity%3D%270.6%27%2F%3E%3Cpath%20d%3D%27M0%2C36%20L10%2C26%20L10%2C46%20Z%27%20opacity%3D%270.6%27%2F%3E%3Cpath%20d%3D%27M48%2C36%20L38%2C26%20L38%2C46%20Z%27%20opacity%3D%270.6%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E"),
+        linear-gradient(180deg, #0d2622 0%, #0a1f1c 60%, #08140f 100%);
+    background-repeat:repeat, no-repeat;       /* tile the girih; stretch the gradient */
+    background-size:48px 48px, 100% 100%;
+}

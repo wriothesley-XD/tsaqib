@@ -19,7 +19,7 @@
     @include('partials.theme-head')
     @stack('head-scripts')
 </head>
-<body class="bg-[#10140F] text-[var(--cream)] font-sans antialiased min-h-screen flex flex-col relative overflow-x-hidden">
+<body class="text-[var(--cream)] font-sans antialiased min-h-screen flex flex-col relative overflow-x-hidden">
 
     @include('partials.navbar')
 

@@ -13,18 +13,12 @@
 <head>
     @include('partials.theme-head')
 </head>
-<body class="bg-[#10140F] text-[var(--cream)] font-sans antialiased">
-
-    {{-- Wrapper halaman: gradient full-tinggi + host silhouette di tepi bawah (scroll bersama konten) --}}
-    <div class="skyline-page flex flex-col">
-
-    {{-- Background skyline siluet — ganti prop `image` ke siluet khusus Open Recruitment saat tersedia --}}
-    <x-islamic-skyline-background />
+<body class="text-[var(--cream)] font-sans antialiased min-h-screen flex flex-col">
 
     <!-- Unified TSAQIB Navbar -->
     @include('partials.navbar')
 
-    <main class="relative z-10 flex-1 max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-14 space-y-10 w-full">
+    <main class="flex-1 max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-14 space-y-10 w-full">
 
         <!-- Header Title Banner -->
         <div class="max-w-3xl mx-auto">
@@ -187,8 +181,6 @@
 
     <!-- Footer -->
     @include('partials.site-footer')
-
-    </div>{{-- end .skyline-page --}}
 
 </body>
 </html>

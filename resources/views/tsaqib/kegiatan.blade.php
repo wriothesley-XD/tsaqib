@@ -3,6 +3,7 @@
 <html lang="id" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Feed Informasi Kegiatan - FSI SMAN 1 Bukittinggi</title>
     @vite('resources/css/app.css')

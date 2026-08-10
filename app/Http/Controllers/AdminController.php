@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\Post;
 use App\Models\Registration;
+use App\Models\Report;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -52,6 +53,10 @@ class AdminController extends Controller
         $registrations = Registration::latest()->get();
         $isRecruitmentOpen = Setting::getByKey('recruitment_open', '1') === '1';
 
+        // Laporan konten pending (untuk badge + Perlu Perhatian + tab Laporan).
+        $laporan = Report::pending()->with(['reportable.user', 'reporter'])->latest()->get();
+        $pendingReportCount = $laporan->count();
+
         $stats = [
             'total_users' => $users->count(),
             'total_posts' => $posts->count(),
@@ -59,7 +64,7 @@ class AdminController extends Controller
             'total_registrations' => $registrations->count(),
         ];
 
-        return view('admin.index', compact('users', 'books', 'posts', 'registrations', 'isRecruitmentOpen', 'stats'));
+        return view('admin.index', compact('users', 'books', 'posts', 'registrations', 'isRecruitmentOpen', 'stats', 'laporan', 'pendingReportCount'));
     }
 
     /**

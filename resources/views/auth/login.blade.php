@@ -13,19 +13,23 @@
         <!-- Email Address -->
         <div>
             <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full text-xs" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
+            <div class="relative mt-1">
+                <i class="fa-solid fa-envelope pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[#8A9B7A]" aria-hidden="true"></i>
+                <x-text-input id="email" class="block w-full text-xs pl-10" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
+            </div>
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
         <!-- Password -->
         <div class="mt-4">
             <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full text-xs"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
+            <div class="relative mt-1">
+                <i class="fa-solid fa-lock pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[#8A9B7A]" aria-hidden="true"></i>
+                <x-text-input id="password" class="block w-full text-xs pl-10 pw-field" type="password" name="password" required autocomplete="current-password" />
+                <button type="button" class="pw-toggle absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center h-7 w-7 rounded-md text-xs text-[#8A9B7A] hover:text-[#F7F5EF] hover:bg-white/5 transition-colors" data-toggle="password" aria-label="Tampilkan password" aria-pressed="false">
+                    <i class="fa-solid fa-eye"></i>
+                </button>
+            </div>
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 

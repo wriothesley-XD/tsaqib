@@ -25,7 +25,7 @@
     tiap halaman via @include('partials.theme-head'). Navbar ini sticky (memesan tempat
     sendiri) -> konten di bawahnya nggak ketimpa, nggak butuh padding-top. --}}
 
-<header class="sticky top-0 z-50 bg-[#10140F]/80 backdrop-blur-md border-b border-white/10 text-[var(--cream)]">
+<header class="sticky top-0 z-[70] bg-[#10140F] border-b border-white/10 text-[var(--cream)]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16 xl:h-20 gap-4">
 

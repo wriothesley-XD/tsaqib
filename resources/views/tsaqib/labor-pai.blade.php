@@ -1,5 +1,91 @@
 {{-- resources/views/tsaqib/labor-pai.blade.php --}}
 @php($pageTitle = 'Laboratorium PAI - FSI SMAN 1 Bukittinggi')
+
+@push('styles')
+    /* ===== Laboratorium PAI: aksen kartu + carousel horizontal (mobile) ===== */
+
+    /* 1) Aksen border kiri selang-seling hijau/emas — mobile only */
+    @media (max-width: 1023px){
+        .lp-cards > .tsaqib-card:nth-child(odd)  { border-left: 3px solid var(--green); }
+        .lp-cards > .tsaqib-card:nth-child(even) { border-left: 3px solid var(--gold); }
+    }
+
+    /* 2) Carousel infinite-loop (CSS keyframes) + drag Pointer Events — mobile only.
+          Track = 2 set kartu (original + clone via JS). translateX 0 → -50% loop
+          seamless karena set ke-2 identik. Desktop (≥1024px) → grid 3-kolom. */
+    .lp-carousel{
+        position:relative;
+        overflow:hidden;
+        padding:.5rem 0;
+        -webkit-mask-image:linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
+        mask-image:linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
+    }
+    .lp-track{
+        position:relative;
+        display:flex;
+        width:max-content;
+        --lp-duration:40s;
+        animation:lp-loop var(--lp-duration) linear infinite;
+        touch-action:pan-y;        /* horizontal → drag kita; vertikal → scroll halaman */
+        user-select:none;
+        cursor:grab;
+    }
+    .lp-track.is-dragging{ cursor:grabbing; animation-play-state:paused; }
+    .lp-track > .lp-card{
+        flex:0 0 auto;
+        width:min(80vw, 300px);
+        margin-right:1rem;         /* margin (bukan flex gap) supaya -50% = persis 1 set → seamless */
+    }
+    @keyframes lp-loop{
+        from{ transform:translateX(0); }
+        to  { transform:translateX(-50%); }
+    }
+
+    /* 4) Redesign kartu — badge solid pojok kiri, ikon deco faint pojok kanan,
+          judul tebal, body pendek dgn keyword bold. */
+    .lp-card{
+        position:relative; overflow:hidden; padding:1.75rem;
+        background:linear-gradient(160deg, rgba(247,245,239,.06), rgba(247,245,239,.02));
+    }
+    .lp-card-deco{
+        position:absolute; top:-.5rem; right:-.4rem;
+        font-size:5.5rem; line-height:1; color:var(--cream);
+        opacity:.05; pointer-events:none;
+    }
+    .lp-badge{
+        display:flex; align-items:center; justify-content:center;
+        width:2.75rem; height:2.75rem; border-radius:.85rem;
+        font-size:1.05rem; color:var(--cream); margin-bottom:1rem;
+        box-shadow:0 6px 18px -6px rgba(0,0,0,.55);
+    }
+    .lp-badge-green{ background:linear-gradient(140deg, var(--green), var(--green-dark)); }
+    .lp-badge-gold{ background:linear-gradient(140deg, var(--gold), #a9893f); color:var(--ink); }
+    .lp-card-title{
+        font-family:'Plus Jakarta Sans',sans-serif; font-weight:800;
+        font-size:1.05rem; line-height:1.3; color:var(--cream); margin-bottom:.5rem;
+    }
+    .lp-card-body{ font-size:.8rem; line-height:1.6; color:rgba(247,245,239,.62); }
+    .lp-card-body strong{ color:var(--cream); font-weight:700; }
+    .lp-checklist{ margin-top:.85rem; display:flex; flex-direction:column; gap:.5rem; }
+    .lp-checklist li{ display:flex; align-items:flex-start; gap:.5rem; font-size:.78rem; color:rgba(247,245,239,.62); }
+    .lp-checklist i{ color:#3fd6b0; font-size:.85rem; margin-top:.1rem; }
+
+    /* Desktop: grid 3-kolom; animasi & clone dimatikan */
+    @media (min-width:1024px){
+        .lp-carousel{ overflow:visible; -webkit-mask-image:none; mask-image:none; padding:0; }
+        .lp-track{
+            display:grid;
+            grid-template-columns:repeat(3,1fr);
+            width:auto;
+            animation:none;
+            transform:none !important;   /* hapus inline transform sisa drag */
+            touch-action:auto;
+            cursor:default;
+        }
+        .lp-track > .lp-card{ width:auto; margin-right:0; }
+        .lp-track > .lp-card.is-clone{ display:none; }
+    }
+@endpush
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
 <head>
@@ -20,79 +106,59 @@
             subtitle="Pusat riset, praktikum ibadah, dan pembinaan karakter Pendidikan Agama Islam SMAN 1 Bukittinggi." />
 
         <!-- 1. SEJARAH SINGKAT, VISI, & MISI -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="lp-carousel">
+            <div class="lp-track lp-cards">
 
-            <!-- Sejarah Singkat (1 col) -->
-            <div class="tsaqib-card p-6">
-                <div class="w-10 h-10 icon-chip flex items-center justify-center font-bold text-lg mb-3">
-                    <i class="fa-solid fa-clock-rotate-left"></i>
-                </div>
-                <h3 class="font-bold text-base text-[var(--cream)] mb-2">Sejarah Singkat</h3>
-                <p class="text-xs text-white/60 leading-relaxed">
-                    Laboratorium Pendidikan Agama Islam (PAI) tidak sekadar hadir sebagai ruang fisik untuk kegiatan pembelajaran, tetapi menjadi pusat pembinaan karakter, penguatan akhlak mulia, pengembangan spiritual, serta pembiasaan nilai-nilai keislaman dalam kehidupan sehari-hari peserta didik.
-                </p>
+            <!-- Sejarah Singkat -->
+            <div class="tsaqib-card lp-card">
+                <i class="fa-solid fa-clock-rotate-left lp-card-deco" aria-hidden="true"></i>
+                <div class="lp-badge lp-badge-green"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                <h3 class="lp-card-title">Sejarah Singkat</h3>
+                <p class="lp-card-body">Bukan sekadar ruang fisik, Labor PAI adalah pusat <strong>pembinaan karakter</strong>, penguatan akhlak mulia, serta pembiasaan nilai-nilai keislaman dalam kehidupan sehari-hari peserta didik.</p>
             </div>
 
-            <!-- Visi (1 col) -->
-            <div class="tsaqib-card p-6">
-                <div class="w-10 h-10 icon-chip flex items-center justify-center font-bold text-lg mb-3">
-                    <i class="fa-solid fa-eye"></i>
-                </div>
-                <h3 class="font-bold text-base text-[var(--cream)] mb-2">Visi dan Misi</h3>
-                <p class="text-xs text-white/60 leading-relaxed font-medium">
-                    Menjadi pusat praktikum keilmuan Islam dan laboratorium karakter siswa SMAN 1 Bukittinggi yang unggul, beriman, dan berakhlak mulia.
-                </p>
-                <ul class="space-y-1.5 text-xs text-white/60 mt-2">
-                    <li class="flex items-start space-x-2">
-                        <i class="fa-solid fa-check text-[#3fd6b0] mt-0.5"></i>
-                        <span>Memfasilitasi modul praktikum ibadah siswa.</span>
-                    </li>
-                    <li class="flex items-start space-x-2">
-                        <i class="fa-solid fa-check text-[#3fd6b0] mt-0.5"></i>
-                        <span>Mengembangkan media syiar & keilmuan Islam.</span>
-                    </li>
-                    <li class="flex items-start space-x-2">
-                        <i class="fa-solid fa-check text-[#3fd6b0] mt-0.5"></i>
-                        <span>Membangun ukhuwah & kepemimpinan Rabbani.</span>
-                    </li>
+            <!-- Visi dan Misi -->
+            <div class="tsaqib-card lp-card">
+                <i class="fa-solid fa-eye lp-card-deco" aria-hidden="true"></i>
+                <div class="lp-badge lp-badge-gold"><i class="fa-solid fa-eye"></i></div>
+                <h3 class="lp-card-title">Visi dan Misi</h3>
+                <p class="lp-card-body">Menjadi pusat <strong>praktikum keilmuan Islam</strong> dan laboratorium karakter siswa yang unggul, beriman, dan berakhlak mulia.</p>
+                <ul class="lp-checklist">
+                    <li><i class="fa-solid fa-square-check"></i><span>Memfasilitasi modul praktikum ibadah siswa.</span></li>
+                    <li><i class="fa-solid fa-square-check"></i><span>Mengembangkan media syiar &amp; keilmuan Islam.</span></li>
+                    <li><i class="fa-solid fa-square-check"></i><span>Membangun ukhuwah &amp; kepemimpinan Rabbani.</span></li>
                 </ul>
             </div>
-            <div class="tsaqib-card p-6">
-                <div class="w-10 h-10 icon-chip flex items-center justify-center font-bold text-lg mb-3">
-                    <i class="fa-solid fa-eye"></i>
-                </div>
-                <h3 class="font-bold text-base text-[var(--cream)] mb-2">Legalitas dan Struktur Organisai</h3>
-                <p class="text-xs text-white/60 leading-relaxed font-medium">
-                    Surat Keputusan (SK) beserta rincian hak dan kewajiban masing-masing personel yang memuat pembagian tugas, tanggung jawab, wewenang, hak, serta kewajiban dalam melaksanakan pekerjaan secara efektif, terukur, dan sesuai ketentuan yang berlaku.
-                </p>
+            <!-- Legalitas & Struktur Organisasi -->
+            <div class="tsaqib-card lp-card">
+                <i class="fa-solid fa-file-contract lp-card-deco" aria-hidden="true"></i>
+                <div class="lp-badge lp-badge-green"><i class="fa-solid fa-file-contract"></i></div>
+                <h3 class="lp-card-title">Legalitas &amp; Struktur Organisasi</h3>
+                <p class="lp-card-body">Dasar <strong>Surat Keputusan (SK)</strong> yang mengatur pembagian tugas, tanggung jawab, dan wewenang setiap personel agar bekerja secara efektif, terukur, dan sesuai ketentuan.</p>
             </div>
-            <div class="tsaqib-card p-6">
-                <div class="w-10 h-10 icon-chip flex items-center justify-center font-bold text-lg mb-3">
-                    <i class="fa-solid fa-eye"></i>
-                </div>
-                <h3 class="font-bold text-base text-[var(--cream)] mb-2">Perencaaan dan Regulasi Operasional Labor PAI Digital</h3>
-                <p class="text-xs text-white/60 leading-relaxed font-medium">
-                    Perencanaan dan regulasi operasional Laboratorium PAI Digital mencakup penyusunan kebijakan, standar operasional prosedur, tata kelola layanan, pemanfaatan teknologi, pembagian tugas, serta mekanisme evaluasi untuk menjamin pelaksanaan kegiatan yang efektif, aman, dan berkelanjutan.                </p>
+            <!-- Perencanaan & Regulasi Operasional -->
+            <div class="tsaqib-card lp-card">
+                <i class="fa-solid fa-clipboard-list lp-card-deco" aria-hidden="true"></i>
+                <div class="lp-badge lp-badge-gold"><i class="fa-solid fa-clipboard-list"></i></div>
+                <h3 class="lp-card-title">Perencanaan &amp; Regulasi Operasional</h3>
+                <p class="lp-card-body">Mencakup penyusunan <strong>kebijakan</strong>, <strong>SOP</strong>, tata kelola layanan, pemanfaatan teknologi, dan mekanisme evaluasi untuk operasional yang aman dan berkelanjutan.</p>
             </div>
-            <div class="tsaqib-card p-6">
-                <div class="w-10 h-10 icon-chip flex items-center justify-center font-bold text-lg mb-3">
-                    <i class="fa-solid fa-eye"></i>
-                </div>
-                <h3 class="font-bold text-base text-[var(--cream)] mb-2">Pelaksanaan Pemanfaatan Labor PAI Digital</h3>
-                <p class="text-xs text-white/60 leading-relaxed font-medium">
-                    Pelaksanaan pemanfaatan Laboratorium PAI Digital diarahkan sebagai pusat pembelajaran dan pengembangan kompetensi yang dimanfaatkan oleh siswa, guru PAI, Kelompok Kerja Guru (KKG), serta Musyawarah Guru Mata Pelajaran (MGMP) PAI melalui berbagai layanan, sumber belajar digital, pelatihan, kolaborasi, dan inovasi pembelajaran berbasis teknologi.
-                </p>
+            <!-- Pelaksanaan Pemanfaatan -->
+            <div class="tsaqib-card lp-card">
+                <i class="fa-solid fa-laptop lp-card-deco" aria-hidden="true"></i>
+                <div class="lp-badge lp-badge-green"><i class="fa-solid fa-laptop"></i></div>
+                <h3 class="lp-card-title">Pelaksanaan Pemanfaatan</h3>
+                <p class="lp-card-body">Pusat <strong>pembelajaran</strong> dan pengembangan kompetensi bagi siswa, guru PAI, KKG, serta MGMP PAI melalui sumber belajar digital dan kolaborasi berbasis teknologi.</p>
             </div>
-            <div class="tsaqib-card p-6">
-                <div class="w-10 h-10 icon-chip flex items-center justify-center font-bold text-lg mb-3">
-                    <i class="fa-solid fa-eye"></i>
-                </div>
-                <h3 class="font-bold text-base text-[var(--cream)] mb-2">Sarana Prasarana / Inventaris Aset</h3>
-                <p class="text-xs text-white/60 leading-relaxed font-medium">
-                    Menjadi pusat praktikum keilmuan Islam dan laboratorium karakter siswa SMAN 1 Bukittinggi yang unggul, beriman, dan berakhlak mulia.
-                </p>
+            <!-- Sarana Prasarana & Inventaris -->
+            <div class="tsaqib-card lp-card">
+                <i class="fa-solid fa-boxes-stacked lp-card-deco" aria-hidden="true"></i>
+                <div class="lp-badge lp-badge-gold"><i class="fa-solid fa-boxes-stacked"></i></div>
+                <h3 class="lp-card-title">Sarana Prasarana &amp; Inventaris</h3>
+                <p class="lp-card-body">Inventaris <strong>aset</strong>, perangkat keras, dan sarana prasarana penunjang kegiatan Laboratorium PAI Digital.</p>
             </div>
 
+            </div>
         </div>
 
         <!-- 2. INFOGRAFIS STRUKTUR ORGANISASI -->
@@ -108,9 +174,9 @@
             </div>
 
             <!-- INFOGRAPHIC TREE NODES -->
-            <div class="space-y-6">
-                <img src="{{ asset('images/struktur.webp') }}" alt="Struktur FSI TSAQIB" class="w-full rounded-xl border border-white/10 bg-white p-2" loading="lazy" onerror="this.remove()">
-                <img src="{{ asset('images/kepengurusan.webp') }}" alt="Kepengurusan FSI TSAQIB" class="w-full rounded-xl border border-white/10 bg-white p-2" loading="lazy" onerror="this.remove()">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <img src="{{ asset('images/struktur.webp') }}" alt="Struktur FSI TSAQIB" class="w-full h-full rounded-xl border border-white/10 bg-white p-2 object-contain" loading="lazy" onerror="this.remove()">
+                <img src="{{ asset('images/kepengurusan.webp') }}" alt="Kepengurusan FSI TSAQIB" class="w-full h-full rounded-xl border border-white/10 bg-white p-2 object-contain" loading="lazy" onerror="this.remove()">
             </div>
         </div>
 
@@ -118,6 +184,97 @@
 
     <!-- Footer -->
     @include('partials.site-footer')
+
+    {{-- Carousel infinite-loop + drag (Pointer Events: mouse + touch unified) --}}
+    <script>
+    (function () {
+        var track = document.querySelector('.lp-track');
+        if (!track) return;
+
+        // 1) Duplikat kartu sekali → loop seamless (translateX 0 → -50%)
+        var originals = Array.prototype.slice.call(track.children);
+        originals.forEach(function (node) {
+            var clone = node.cloneNode(true);
+            clone.classList.add('is-clone');
+            clone.setAttribute('aria-hidden', 'true');
+            track.appendChild(clone);
+        });
+
+        var cards = Array.prototype.slice.call(track.children); // 12 setelah clone
+        var step = 0, half = 0;
+        function measure() {
+            step = cards.length > 1 ? (cards[1].offsetLeft - cards[0].offsetLeft) : cards[0].offsetWidth;
+            half = cards[6] ? cards[6].offsetLeft : step * 6;   // lebar 1 set = clone pertama
+        }
+        measure();
+        window.addEventListener('resize', measure);
+
+        var D = parseFloat(getComputedStyle(track).getPropertyValue('--lp-duration') || '40s') * 1000;
+
+        function wrap(v) { v = v % half; if (v > 0) v -= half; return v; } // → (-half, 0]
+        function matrixX(el) {
+            var m = getComputedStyle(el).transform;
+            if (!m || m === 'none') return 0;
+            var a = m.match(/matrix[^(]*\(([^)]+)\)/);
+            if (!a) return 0;
+            var v = a[1].split(',');
+            return parseFloat(v.length === 6 ? v[4] : v[12]); // matrix(...) vs matrix3d(...)
+        }
+        function pauseAnim() { track.style.animation = 'none'; void track.offsetWidth; }
+        function resumeAnim(fromTx) {                                  // lanjut loop dari posisi `fromTx`
+            var p = half ? (-wrap(fromTx) / half) : 0;
+            if (p < 0) p = 0; if (p >= 1) p = 0;
+            track.style.transition = 'none';
+            track.style.transform = '';
+            track.style.animation = 'lp-loop ' + (D / 1000) + 's linear infinite';
+            track.style.animationDelay = (-p * D) + 'ms';
+            track.style.animationPlayState = 'running';
+        }
+
+        var armed = false, dragging = false, startX = 0, startY = 0, baseTx = 0, cur = 0;
+
+        function onDown(e) {
+            if (window.matchMedia('(min-width:1024px)').matches) return; // desktop = grid
+            armed = true; dragging = false;
+            startX = e.clientX; startY = e.clientY;
+            baseTx = matrixX(track); cur = baseTx;                        // kunci posisi animasi saat ini
+            pauseAnim();
+            track.style.transform = 'translateX(' + baseTx + 'px)';       // bridge tanpa lompat
+            window.addEventListener('pointermove', onMove);
+            window.addEventListener('pointerup', onUp);
+            window.addEventListener('pointercancel', onUp);
+        }
+        function onMove(e) {
+            if (!armed) return;
+            var dx = e.clientX - startX, dy = e.clientY - startY;
+            if (!dragging) {
+                if (Math.abs(dx) < 5) return;                            // tunggu gerakan jelas
+                if (Math.abs(dy) > Math.abs(dx)) { resumeAnim(baseTx); armed = false; cleanup(); return; } // vertikal → browser scroll
+                dragging = true; track.classList.add('is-dragging');
+            }
+            cur = wrap(baseTx + dx);                                     // instant reset di batas duplikat
+            track.style.transform = 'translateX(' + cur + 'px)';
+            e.preventDefault();
+        }
+        function onUp() {
+            if (!armed) return;
+            if (dragging) {
+                track.classList.remove('is-dragging');
+                resumeAnim(wrap(Math.round(cur / step) * step));         // snap ke kartu terdekat + resume
+            } else {
+                resumeAnim(baseTx);                                      // tap biasa → lanjut loop
+            }
+            armed = false; dragging = false; cleanup();
+        }
+        function cleanup() {
+            window.removeEventListener('pointermove', onMove);
+            window.removeEventListener('pointerup', onUp);
+            window.removeEventListener('pointercancel', onUp);
+        }
+
+        track.addEventListener('pointerdown', onDown);
+    })();
+    </script>
 
 </body>
 </html>

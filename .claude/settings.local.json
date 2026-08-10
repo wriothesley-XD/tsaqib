@@ -22,7 +22,22 @@
       "Bash(php -v)",
       "Bash(command -v php php8 php8.1 php8.2 php8.3)",
       "Read(//usr/bin/**)",
-      "Bash(base64 -w0 public/images/icon/tsaqib-media.svg.png)"
+      "Bash(base64 -w0 public/images/icon/tsaqib-media.svg.png)",
+      "Read(//usr/local/bin/**)",
+      "Bash(command -v composer)",
+      "Bash(command -v docker)",
+      "Bash(grep -nA2 \"function edit\" app/Http/Controllers/ProfileController.php)",
+      "Bash(grep -nE 'src=|avatarUrl|\\\\$user->avatar_url|onerror' resources/views/components/community-avatar.blade.php)",
+      "Bash(command -v sqlite3 mysql)",
+      "Bash(command -v python3)",
+      "Bash(file public/images/community-avatar/*)",
+      "Bash(awk '/document.addEventListener\\\\\\(.DOMContentLoaded./{f=1} f{print} /^    \\\\}\\\\\\);/{if\\(f\\)exit}' resources/views/landing.blade.php)",
+      "Bash(grep -vE \"^[+-]\\\\s*\\(//|const |let |function |if |return |track\\\\.|requestAnimationFrame|c\\\\.|}|\\\\\\)|\\\\{|\\\\s*$|updateIndex|scrollByCard|cloneOf|repositionIfClone|jumpTo|realIndex|realCards|step|indexLabel|N |document\\\\.addEventListener|carousel-|@keyframes|\\\\s*//\\)\")",
+      "Bash(grep -n 'media-grid\\\\|media-tile\\\\|@foreach.*media\\\\|@forelse.*media\\\\|$post->media\\\\|->media' resources/views/komunitas/post.blade.php)",
+      "Bash(command -v node)",
+      "Bash(awk '/<script>/{f=1;next} /<\\\\/script>/{f=0} f' resources/views/komunitas/index.blade.php)",
+      "Bash(node --check /tmp/idx_strip.js)",
+      "Bash(identify struktur.webp kepengurusan.webp)"
     ]
   }
 }

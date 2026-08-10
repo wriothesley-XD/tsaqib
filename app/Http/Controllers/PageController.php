@@ -88,7 +88,24 @@ class PageController extends Controller
             $currentSlug = $slug ?? 'semua';
         }
 
-        $query = Post::with('user')->latest();
+        // Tab sort: Terbaru (default, latest-first) atau Terpopuler (net votes).
+        $sort = request('sort') === 'popular' ? 'popular' : 'recent';
+
+        // Eager-load suara + repost user saat ini (0/1 baris) agar tombol bisa
+        // ditandai aktif sesuai pilihan user. Tamu (guest) tidak dimuat.
+        $with = ['user', 'media'];
+        if ($user) {
+            $with['votes'] = fn ($q) => $q->where('user_id', $user->id)->select(['post_id', 'type']);
+            $with['reposts'] = fn ($q) => $q->where('user_id', $user->id)->select(['post_id']);
+        }
+
+        $query = Post::with($with)->withCount(['comments', 'reposts']);
+        if ($sort === 'popular') {
+            // Terpopuler: selisih upvote-downvote, tiebreak terbaru.
+            $query->orderByRaw('(upvotes - downvotes) desc, created_at desc');
+        } else {
+            $query->latest();
+        }
 
         if ($currentSlug && $currentSlug !== 'semua') {
             $query->where('community_slug', $currentSlug);
@@ -114,6 +131,7 @@ class PageController extends Controller
             'daftarKomunitas' => $daftarKomunitas,
             'komunitasAktif' => $komunitasAktif,
             'currentSlug' => $currentSlug,
+            'sort' => $sort,
             'posts' => $posts,
         ]);
     }

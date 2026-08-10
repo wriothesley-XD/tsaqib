@@ -50,17 +50,36 @@ class User extends Authenticatable
     }
 
     /**
-     * Get default community avatar URL or custom profile photo URL.
+     * Centralized avatar URL. A real uploaded photo takes precedence;
+     * otherwise deterministically pick from the preset set in
+     * images/avatars/ (stable per user via id % count, so the navbar
+     * and profile always match and the image never changes between renders).
+     * Falls back to the default community avatar only if no presets exist.
      */
-    public function getAvatarUrlAttribute(): string
+    public function getAvatar(): string
     {
-        if (isset($this->profile_photo_path) && $this->profile_photo_path) {
+        if ($this->profile_photo_path) {
             return asset('storage/'.$this->profile_photo_path);
         }
 
-        $community = $this->selected_community ?? 'default';
+        // Memoized + sorted so the id-based pick is deterministic across renders.
+        static $presets = null;
+        if ($presets === null) {
+            $dir = public_path('images/avatars');
+            $presets = array_merge(
+                glob($dir.'/*.jpg') ?: [],
+                glob($dir.'/*.jpeg') ?: [],
+                glob($dir.'/*.png') ?: [],
+                glob($dir.'/*.webp') ?: []
+            );
+            sort($presets);
+        }
 
-        return asset('images/community-avatar/'.$community.'.png');
+        if (empty($presets)) {
+            return asset('images/community-avatar/default.svg');
+        }
+
+        return asset('images/avatars/'.basename($presets[$this->id % count($presets)]));
     }
 
     /**

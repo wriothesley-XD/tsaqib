@@ -3,6 +3,7 @@
 <html lang="id" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TSAQIB - Forum Studi Islam SMAN 1 Bukittinggi</title>
     @vite('resources/css/app.css')
@@ -100,15 +101,29 @@
         }
         .cta-primary:hover{ background:var(--green-dark); transform:translateY(-2px); }
 
-        /* ===== Carousel kartu ===== */
+        /* ===== Carousel: seamless loop + interactive (arrows / drag) =====
+           Track = TWO identical sets. JS owns the transform so arrows, drag and
+           auto-scroll can compose. `pos` is unbounded; only the RENDER wraps it
+           mod one-set-width, so crossing the set boundary is an instant, invisible
+           jump (the duplicate set is pixel-identical). Spacing rides on each card
+           via margin-right so the wrap lands dead-on — no seam. */
+        .carousel-viewport{ overflow:hidden; scrollbar-width:none; }
+        .carousel-viewport::-webkit-scrollbar{ display:none; }
         .carousel-track{
-            scroll-snap-type:x mandatory;
-            scrollbar-width:none;
+            display:flex;
+            width:max-content;
+            will-change:transform;
+            cursor:grab;
+            touch-action:pan-y;        /* horizontal gesture = our drag, vertical = scroll page */
+            user-select:none;
         }
-        .carousel-track::-webkit-scrollbar{ display:none; }
-        .carousel-card{
-            scroll-snap-align:start;
-            flex:0 0 auto;
+        .carousel-track:active{ cursor:grabbing; }
+        .carousel-set{ display:flex; }
+        .carousel-set > *{ margin-right:1rem; }   /* gap rides with each card -> seamless seam */
+        .carousel-card{ flex:0 0 auto; touch-action:pan-y; }   /* swipe starts on cards, not just track */
+        @media (prefers-reduced-motion: reduce){
+            .carousel-viewport{ overflow-x:auto; }
+            .carousel-set[aria-hidden="true"]{ display:none; } /* no loop -> originals only */
         }
         .carousel-nav-btn{
             width:38px;height:38px;border-radius:999px;
@@ -240,62 +255,97 @@
                 </div>
             </div>
 
-            <div class="relative">
-                <div id="carousel-track" class="carousel-track flex gap-4 overflow-x-auto pb-3 -mx-1 px-1">
+            <div class="relative carousel-viewport">
+                <div id="carousel-track" class="carousel-track">
 
-                    <a href="{{ route('laboratorium.pai') }}" class="carousel-card card-face c-labor">
-                        <img src="{{ asset('assets/landing/card-labor.jpg') }}" alt="" class="card-photo" onerror="this.remove()">
-                        <i class="card-icon fa-solid fa-flask text-2xl text-white/90 mb-3"></i>
-                        <span class="card-label block font-display font-bold text-white text-lg leading-tight">Laboratorium<br>PAI</span>
-                        <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">Materi, riset, dan simulasi ibadah</span>
-                        <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
-                            Buka <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                        </span>
-                    </a>
+                    {{-- Set 1: originals --}}
+                    <div class="carousel-set">
+                        <a href="{{ route('laboratorium.pai') }}" class="carousel-card card-face c-labor">
+                            <img src="{{ asset('assets/landing/card-labor.jpg') }}" alt="" class="card-photo" onerror="this.remove()">
+                            <i class="card-icon fa-solid fa-flask text-2xl text-white/90 mb-3"></i>
+                            <span class="card-label block font-display font-bold text-white text-lg leading-tight">Laboratorium<br>PAI</span>
+                            <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">Materi, riset, dan simulasi ibadah</span>
+                            <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
+                                Buka <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </span>
+                        </a>
 
-                    <a href="{{ route('perpustakaan') }}" class="carousel-card card-face c-perpus">
-                        <img src="{{ asset('assets/landing/card-perpus.jpg') }}" alt="" class="card-photo" onerror="this.remove()">
-                        <i class="card-icon fa-solid fa-book-open text-2xl text-white/90 mb-3"></i>
-                        <span class="card-label block font-display font-bold text-white text-lg leading-tight">Perpustakaan<br>Digital</span>
-                        <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">Koleksi buku &amp; referensi FSI</span>
-                        <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
-                            Buka <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                        </span>
-                    </a>
+                        <a href="{{ route('perpustakaan') }}" class="carousel-card card-face c-perpus">
+                            <img src="{{ asset('assets/landing/card-perpus.jpg') }}" alt="" class="card-photo" onerror="this.remove()">
+                            <i class="card-icon fa-solid fa-book-open text-2xl text-white/90 mb-3"></i>
+                            <span class="card-label block font-display font-bold text-white text-lg leading-tight">Perpustakaan<br>Digital</span>
+                            <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">Koleksi buku &amp; referensi FSI</span>
+                            <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
+                                Buka <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </span>
+                        </a>
 
-                    <button type="button" onclick="handleKomunitasClick()" class="carousel-card card-face c-komunitas text-left">
-                        <img src="{{ asset('assets/landing/card-komunitas.jpg') }}" alt="" class="card-photo" onerror="this.remove()">
-                        <i class="card-icon fa-solid fa-users text-2xl text-white/90 mb-3"></i>
-                        <span class="card-label block font-display font-bold text-white text-lg leading-tight">Komunitas<br>TSAQIB</span>
-                        <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">7 komunitas minat &amp; bakat</span>
-                        <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
-                            Buka <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                        </span>
-                    </button>
-
-                    <a href="https://www.figma.com/proto/1Azmk9c0fapjsTICrk7hU6/Tsaqib-Adv?node-id=5-4&t=O3fg7rE3EBm3cqZ7-0&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=1%3A2"
-                       target="_blank" rel="noopener noreferrer" class="carousel-card card-face c-figma">
-                        <img src="{{ asset('assets/landing/card-figma.jpg') }}" alt="" class="card-photo" onerror="this.remove()">
-                        <i class="card-icon fa-solid fa-diagram-project text-2xl text-white/90 mb-3"></i>
-                        <span class="card-label block font-display font-bold text-white text-lg leading-tight">Prototype<br>TSAQIB</span>
-                        <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">Desain awal di Figma</span>
-                        <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
-                            Lihat <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-                        </span>
-                    </a>
-
-                </div>
-
-                {{-- Page indicator --}}
-                <div class="flex items-center justify-between mt-1">
-                    <div class="flex sm:hidden items-center gap-2">
-                        <button type="button" id="carousel-prev-mobile" class="carousel-nav-btn" aria-label="Sebelumnya">
-                            <i class="fa-solid fa-chevron-left text-xs"></i>
+                        <button type="button" onclick="handleKomunitasClick()" class="carousel-card card-face c-komunitas text-left">
+                            <img src="{{ asset('assets/landing/card-komunitas.jpg') }}" alt="" class="card-photo" onerror="this.remove()">
+                            <i class="card-icon fa-solid fa-users text-2xl text-white/90 mb-3"></i>
+                            <span class="card-label block font-display font-bold text-white text-lg leading-tight">Komunitas<br>TSAQIB</span>
+                            <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">7 komunitas minat &amp; bakat</span>
+                            <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
+                                Buka <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </span>
                         </button>
-                        <button type="button" id="carousel-next-mobile" class="carousel-nav-btn" aria-label="Berikutnya">
-                            <i class="fa-solid fa-chevron-right text-xs"></i>
-                        </button>
+
+                        <a href="https://www.figma.com/proto/1Azmk9c0fapjsTICrk7hU6/Tsaqib-Adv?node-id=5-4&t=O3fg7rE3EBm3cqZ7-0&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=1%3A2"
+                           target="_blank" rel="noopener noreferrer" class="carousel-card card-face c-figma">
+                            <img src="{{ asset('assets/landing/card-figma.jpg') }}" alt="" class="card-photo" onerror="this.remove()">
+                            <i class="card-icon fa-solid fa-diagram-project text-2xl text-white/90 mb-3"></i>
+                            <span class="card-label block font-display font-bold text-white text-lg leading-tight">Prototype<br>TSAQIB</span>
+                            <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">Desain awal di Figma</span>
+                            <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
+                                Lihat <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                            </span>
+                        </a>
                     </div>
+
+                    {{-- Set 2: identical duplicate (decorative) so translateX -50% loops with no seam --}}
+                    <div class="carousel-set" aria-hidden="true">
+                        <a href="{{ route('laboratorium.pai') }}" class="carousel-card card-face c-labor" tabindex="-1">
+                            <img src="{{ asset('assets/landing/card-labor.jpg') }}" alt="" class="card-photo" onerror="this.remove()">
+                            <i class="card-icon fa-solid fa-flask text-2xl text-white/90 mb-3"></i>
+                            <span class="card-label block font-display font-bold text-white text-lg leading-tight">Laboratorium<br>PAI</span>
+                            <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">Materi, riset, dan simulasi ibadah</span>
+                            <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
+                                Buka <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </span>
+                        </a>
+
+                        <a href="{{ route('perpustakaan') }}" class="carousel-card card-face c-perpus" tabindex="-1">
+                            <img src="{{ asset('assets/landing/card-perpus.jpg') }}" alt="" class="card-photo" onerror="this.remove()">
+                            <i class="card-icon fa-solid fa-book-open text-2xl text-white/90 mb-3"></i>
+                            <span class="card-label block font-display font-bold text-white text-lg leading-tight">Perpustakaan<br>Digital</span>
+                            <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">Koleksi buku &amp; referensi FSI</span>
+                            <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
+                                Buka <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </span>
+                        </a>
+
+                        <button type="button" onclick="handleKomunitasClick()" class="carousel-card card-face c-komunitas text-left" tabindex="-1">
+                            <img src="{{ asset('assets/landing/card-komunitas.jpg') }}" alt="" class="card-photo" onerror="this.remove()">
+                            <i class="card-icon fa-solid fa-users text-2xl text-white/90 mb-3"></i>
+                            <span class="card-label block font-display font-bold text-white text-lg leading-tight">Komunitas<br>TSAQIB</span>
+                            <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">7 komunitas minat &amp; bakat</span>
+                            <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
+                                Buka <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </span>
+                        </button>
+
+                        <a href="https://www.figma.com/proto/1Azmk9c0fapjsTICrk7hU6/Tsaqib-Adv?node-id=5-4&t=O3fg7rE3EBm3cqZ7-0&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=1%3A2"
+                           target="_blank" rel="noopener noreferrer" class="carousel-card card-face c-figma" tabindex="-1">
+                            <img src="{{ asset('assets/landing/card-figma.jpg') }}" alt="" class="card-photo" onerror="this.remove()">
+                            <i class="card-icon fa-solid fa-diagram-project text-2xl text-white/90 mb-3"></i>
+                            <span class="card-label block font-display font-bold text-white text-lg leading-tight">Prototype<br>TSAQIB</span>
+                            <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">Desain awal di Figma</span>
+                            <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
+                                Lihat <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                            </span>
+                        </a>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -385,36 +435,115 @@
         @endauth
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        // ===== Carousel: prev/next + page indicator =====
-        const track = document.getElementById('carousel-track');
-        const indexLabel = document.getElementById('carousel-index');
-        const cards = track ? Array.from(track.children) : [];
-        const totalCards = cards.length;
+    // ===== Program carousel: seamless loop + arrows + drag (auto-scroll resumes) =====
+    (function () {
+        const viewport = document.querySelector('.carousel-viewport');
+        const track    = document.getElementById('carousel-track');
+        if (!viewport || !track) return;
 
-        function scrollByCard(direction) {
-            if (!track || !cards.length) return;
-            const cardWidth = cards[0].getBoundingClientRect().width + 16; // + gap-4
-            track.scrollBy({ left: direction * cardWidth, behavior: 'smooth' });
+        const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (prefersReduced) return;               // CSS media query gives a static scrollable list
+
+        const AUTO_SPEED   = 0.5;   // px / frame (auto-scroll)
+        const RESUME_DELAY = 1500;  // ms idle before auto-scroll resumes after interaction
+        const SNAP_EASE    = 0.25;  // 0..1, convergence per frame for arrow/release snap
+
+        // pitch = one card + its 1rem margin. offsetWidth ignores transforms -> stable.
+        const pitch = () => {
+            const c = track.querySelector('.carousel-card');
+            return c ? c.offsetWidth + 16 : 220;
+        };
+        // setWidth = one full set = the loop length (4 cards here).
+        let setWidth = 0;
+        const measure = () => {
+            const set = track.querySelector('.carousel-set');
+            setWidth = set ? set.children.length * pitch() : 0;
+        };
+        measure();
+
+        let pos = 0;          // unbounded scroll position — only the render wraps it
+        let mode = 'auto';    // 'auto' | 'drag' | 'snap'
+        let target = 0;       // snap destination (unbounded)
+        let resumeAt = 0;     // earliest timestamp auto-scroll may run
+
+        // Seamless boundary reset: pos is unbounded, render pos MOD one set.
+        // Crossing the set width teleports the transform to an identical copy -> invisible.
+        const wrap = () => ((pos % setWidth) + setWidth) % setWidth;
+        const apply = () => { track.style.transform = 'translate3d(' + (-wrap()) + 'px,0,0)'; };
+
+        function tick() {
+            const now = performance.now();
+            if (mode === 'snap') {
+                pos += (target - pos) * SNAP_EASE;
+                if (Math.abs(target - pos) < 0.5) {
+                    pos = target;
+                    mode = 'auto';
+                    resumeAt = now + RESUME_DELAY;   // resume auto-scroll shortly after
+                }
+            } else if (mode === 'auto' && now >= resumeAt) {
+                pos += AUTO_SPEED;
+            }
+            apply();
+            requestAnimationFrame(tick);
         }
 
-        ['carousel-prev', 'carousel-prev-mobile'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.addEventListener('click', () => scrollByCard(-1));
-        });
-        ['carousel-next', 'carousel-next-mobile'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.addEventListener('click', () => scrollByCard(1));
-        });
+        // Arrows: ease exactly one card in either direction.
+        const snapBy = (dir) => {
+            target = Math.round(pos / pitch()) * pitch() + dir * pitch();
+            mode = 'snap';
+            resumeAt = performance.now() + RESUME_DELAY;
+        };
+        const prev = document.getElementById('carousel-prev');
+        const next = document.getElementById('carousel-next');
+        if (prev) prev.addEventListener('click', () => snapBy(-1));
+        if (next) next.addEventListener('click', () => snapBy(1));
 
-        if (track && indexLabel && totalCards) {
-            track.addEventListener('scroll', function () {
-                const cardWidth = cards[0].getBoundingClientRect().width + 16;
-                const current = Math.min(totalCards, Math.max(1, Math.round(track.scrollLeft / cardWidth) + 1));
-                indexLabel.textContent = String(current).padStart(2, '0');
-            }, { passive: true });
-        }
-    });
+        // Unified drag via Pointer Events (mouse / trackpad / touch / pen — one path).
+        // Routed through the same handlers as everything else, so it shares the loop
+        // state (pos/mode/resumeAt) and never conflicts with arrows or auto-scroll.
+        let dragging = false, activeId = null, startX = 0, startPos = 0, moved = false;
+
+        const onDown = (e) => {
+            dragging = true; moved = false; activeId = e.pointerId;
+            startX = e.clientX; startPos = pos;
+            resumeAt = Infinity;                                  // pointerdown: pause auto-scroll now
+            if (track.setPointerCapture) {                        // keep events flowing past the track edge
+                try { track.setPointerCapture(e.pointerId); } catch (_) {}
+            }
+        };
+        const onMove = (e) => {
+            if (!dragging || e.pointerId !== activeId) return;    // ignore other pointers (multi-touch)
+            const dx = e.clientX - startX;
+            if (!moved && Math.abs(dx) > 4) moved = true;         // threshold -> drag vs click
+            if (moved) { mode = 'drag'; pos = startPos - dx; }    // pointermove: follow cursor/finger 1:1
+        };
+        const onUp = (e) => {
+            if (!dragging || e.pointerId !== activeId) return;
+            dragging = false; activeId = null;
+            if (!moved) { resumeAt = performance.now(); return; } // click/tap: just resume
+            // swallow the click that follows a drag so card links don't navigate
+            track.addEventListener('click', (ev) => ev.preventDefault(), { capture: true, once: true });
+            target = Math.round(pos / pitch()) * pitch();         // pointerup: snap to nearest card
+            mode = 'snap';
+            resumeAt = performance.now() + RESUME_DELAY;          // resume auto-scroll shortly after
+        };
+        track.addEventListener('pointerdown', onDown);
+        track.addEventListener('pointermove', onMove);
+        track.addEventListener('pointerup', onUp);
+        track.addEventListener('pointercancel', onUp);
+        // pan-y (CSS on track + cards) reserves horizontal swipes for us while vertical
+        // still scrolls the page; wrap() makes hitting the cloned set reset instantly
+        // (no transition) to the matching real card -> stays infinite.
+
+        // Pause auto-scroll while hovering (desktop nicety); resume on leave.
+        viewport.addEventListener('mouseenter', () => { if (mode === 'auto') resumeAt = Infinity; });
+        viewport.addEventListener('mouseleave', () => { if (mode === 'auto') resumeAt = 0; });
+
+        // Responsive card width (198px <-> 220px): re-measure the loop length on resize.
+        window.addEventListener('resize', measure, { passive: true });
+
+        requestAnimationFrame(tick);
+    })();
 </script>
 
 </body>

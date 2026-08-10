@@ -18,15 +18,15 @@
     ][$size] ?? 'w-10 h-10';
 
     if ($user) {
-        $avatarUrl = $user->avatar_url;
+        $avatarUrl = $user->getAvatar();
         $avatarAlt = $alt ?? $user->name;
     } else {
-        $communitySlug = $slug ?? 'default';
-        $avatarUrl = asset('images/community-avatar/' . $communitySlug . '.png');
-        $avatarAlt = $alt ?? 'Avatar Komunitas';
+        $avatarUrl = asset('images/community-avatar/default.svg');
+        $avatarAlt = $alt ?? 'Avatar';
     }
 @endphp
 
 <img src="{{ $avatarUrl }}"
      alt="{{ $avatarAlt }}"
+     onerror="this.onerror=null;this.src='{{ asset('images/community-avatar/default.svg') }}'"
      class="{{ $sizeClasses }} rounded-full object-cover border-2 border-white shadow-sm hover:scale-105 hover:shadow-md transition-all duration-200 bg-slate-100 shrink-0 {{ $class }}">

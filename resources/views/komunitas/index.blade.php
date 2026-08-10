@@ -1,5 +1,98 @@
 {{-- resources/views/komunitas/index.blade.php --}}
 @php($pageTitle = 'Feed Komunitas TSAQIB - SMAN 1 Bukittinggi')
+
+@push('styles')
+<style>
+    /* Vote buttons — base inactive + state aktif (is-up/is-down).
+       JS hanya toggle class aktif; warna ditata disini. */
+    .vote-btn{ background:rgba(247,245,239,.05); color:rgba(247,245,239,.6); transition:background .15s ease,color .15s ease; }
+    .vote-btn:hover{ background:rgba(247,245,239,.10); color:var(--cream); }
+    .vote-btn.is-up{ background:var(--green); color:#fff; }
+    .vote-btn.is-up:hover{ background:var(--green-dark); color:#fff; }
+    .vote-btn.is-down{ background:rgba(239,68,68,.20); color:#fca5a5; }
+    .vote-btn:disabled{ opacity:.6; cursor:default; }
+
+    /* Action chips + repost active + toast (komentar/repost/share) */
+    .action-chip{ background:rgba(247,245,239,.05); color:rgba(247,245,239,.6); transition:background .15s ease,color .15s ease; cursor:pointer; }
+    .action-chip:hover{ background:rgba(247,245,239,.10); color:var(--cream); }
+    .repost-btn.is-active{ background:var(--green); color:#fff; }
+    .repost-btn.is-active:hover{ background:var(--green-dark); color:#fff; }
+    #toast{ transition:opacity .2s ease; }
+
+    /* FIX mobile drawer (Komunitas-only): backdrop bg-black/50 transparan ->
+       footer tembus pandang. Solid bg + panel setinggi viewport.
+       Selector ID menang dari utility class Tailwind; hanya berlaku di
+       halaman ini karena style di-push dari view Komunitas. */
+    #mobile-menu-backdrop{ background-color:#10140F; }
+    #mobile-menu{ bottom:0; }
+
+    /* ===== MEDIA GRID (feed) — layout menyesuaikan jumlah ===== */
+    .media-grid{ display:grid; gap:.25rem; border-radius:.75rem; overflow:hidden; }
+    .media-grid.cols-1{ grid-template-columns:1fr; }
+    .media-grid.cols-2{ grid-template-columns:1fr 1fr; }
+    .media-grid.cols-3{ grid-template-columns:1fr 1fr; }
+    @media(min-width:640px){ .media-grid.cols-3{ grid-template-columns:1fr 1fr 1fr; } }
+    .media-grid.cols-4{ grid-template-columns:1fr 1fr; }
+    .media-tile{ position:relative; aspect-ratio:1/1; background:rgba(247,245,239,.05); cursor:zoom-in; overflow:hidden; }
+    .media-tile.single{ aspect-ratio:16/10; max-height:24rem; }
+    .media-tile img,.media-tile video{ width:100%; height:100%; object-fit:cover; display:block; }
+    .media-tile.single .media-blur{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center center; filter:blur(24px) saturate(1.2); transform:scale(1.18); transform-origin:center; z-index:0; }
+    .media-grid.cols-1 .media-tile > img:not(.media-blur){ position:absolute; inset:0; margin:auto; width:auto; height:auto; max-width:100%; max-height:100%; z-index:1; background:transparent; }
+    .media-grid.cols-1 .media-tile > video{ object-fit:contain; object-position:center center; background:#000; }
+    .media-more{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+        background:rgba(16,20,15,.65); color:var(--cream); font-weight:800; font-size:1.4rem; }
+    .media-play{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+        background:rgba(16,20,15,.35); pointer-events:none; }
+    .media-play i{ color:#fff; font-size:1.6rem; filter:drop-shadow(0 2px 6px rgba(0,0,0,.6)); }
+
+    /* ===== UPLOADER (modal buat/edit) ===== */
+    .media-drop{ border:1px dashed rgba(247,245,239,.2); border-radius:.75rem; padding:.6rem; }
+    .media-preview{ display:grid; grid-template-columns:repeat(auto-fill,80px); gap:.4rem; margin-top:.4rem; min-height:84px; }
+    .media-preview:empty::before{ content:'Pratinjau foto/video muncul di sini'; grid-column:1/-1; display:flex; align-items:center; justify-content:center; min-height:80px; font-size:10px; color:rgba(247,245,239,.3); }
+    .thumb{ position:relative; aspect-ratio:1/1; border-radius:.5rem; overflow:hidden;
+        background:rgba(247,245,239,.05); border:1px solid rgba(247,245,239,.1); }
+    .thumb img,.thumb video{ width:100%; height:100%; object-fit:cover; }
+    .thumb-video{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:1.1rem; }
+    .thumb-remove{ position:absolute; top:2px; right:2px; width:20px; height:20px; border-radius:999px;
+        background:rgba(239,68,68,.9); color:#fff; font-size:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+    .thumb-remove:hover{ background:rgba(239,68,68,1); }
+    .thumb-bad{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center;
+        background:rgba(127,29,29,.88); color:#fecaca; font-size:9px; font-weight:700; padding:4px; }
+    .media-count{ font-size:10px; color:rgba(247,245,239,.5); margin-top:.4rem; }
+    .media-warn{ color:#fca5a5; font-weight:600; }
+    /* Tombol Terbitkan / Simpan Perubahan saat validasi media memblok submit
+       (foto+video campur, >6 foto, >1 video). Pakai CSS biasa di sini agar tidak
+       bergantung pada build Tailwind — divalidasi via JS, ditata disini. */
+    .btn-submit:disabled{ opacity:.5; cursor:not-allowed; }
+
+    /* ===== LIGHTBOX (galeri: navigasi + transisi + bottom-sheet mobile) ===== */
+    #lightbox{ position:fixed; inset:0; z-index:60; background:rgba(0,0,0,.92);
+        display:flex; align-items:center; justify-content:center; padding:1rem;
+        opacity:0; visibility:hidden; transition:opacity .25s ease, visibility .25s; }
+    #lightbox.open{ opacity:1; visibility:visible; }
+    #lb-item{ transition:opacity .18s ease, transform .18s ease; }
+    #lb-item.fade{ opacity:0; }
+    #lb-item img,#lb-item video{ max-width:100%; max-height:80vh; border-radius:.5rem; display:block; box-shadow:0 20px 60px rgba(0,0,0,.6); }
+    .lb-stage{ position:relative; max-width:100%; max-height:100%; display:flex; align-items:center; justify-content:center; }
+    .lb-btn{ position:absolute; width:42px; height:42px; border-radius:999px;
+        background:rgba(247,245,239,.1); color:rgba(247,245,239,.85); display:flex; align-items:center; justify-content:center;
+        font-size:1rem; transition:background .15s, color .15s; }
+    .lb-btn:hover{ background:rgba(247,245,239,.2); color:var(--gold); }
+    .lb-prev{ left:.5rem; top:50%; transform:translateY(-50%); }
+    .lb-next{ right:.5rem; top:50%; transform:translateY(-50%); }
+    .lb-close{ top:1rem; right:1rem; }
+    .lb-counter{ position:absolute; top:1rem; left:50%; transform:translateX(-50%);
+        background:rgba(16,20,15,.7); color:var(--cream); font-size:11px; font-weight:700;
+        padding:4px 12px; border-radius:999px; }
+    @media(max-width:640px){
+        #lightbox{ align-items:flex-end; padding:0; }
+        .lb-stage{ width:100%; border-radius:1rem 1rem 0 0; background:#000; padding:.5rem .5rem 1.25rem; }
+        #lb-item img,#lb-item video{ max-height:72vh; }
+        .lb-prev{ left:.75rem; } .lb-next{ right:.75rem; }
+    }
+</style>
+@endpush
+
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
 <head>
@@ -10,7 +103,7 @@
     <!-- Unified TSAQIB Navbar -->
     @include('partials.navbar')
 
-    <main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10 space-y-6 w-full">
+    <main class="flex-1 max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-10 space-y-6 w-full">
 
         <!-- Title Banner -->
         <div class="tsaqib-card p-6">
@@ -57,56 +150,35 @@
             </div>
         @endif
 
+        @if ($errors->any())
+            <div class="p-3 rounded-xl bg-red-500/10 text-red-300 border border-red-500/30 text-xs font-semibold">
+                {{ $errors->first() }}
+            </div>
+        @endif
+
+        {{-- SORT TABS: Terbaru (default) / Terpopuler. ?sort= dipreservasi oleh pagination. --}}
+        <div class="tsaqib-card p-1.5 flex items-center gap-1">
+            @foreach(['recent' => ['Terbaru', 'fa-clock'], 'popular' => ['Terpopuler', 'fa-fire']] as $sortKey => $tab)
+                <a href="{{ request()->fullUrlWithQuery(['sort' => $sortKey, 'page' => 1]) }}"
+                   class="flex-1 text-center py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition
+                          {{ $sort === $sortKey
+                              ? 'bg-[#01795F] text-white shadow-sm'
+                              : 'text-white/55 hover:text-white hover:bg-white/5' }}">
+                    <i class="fa-solid {{ $tab[1] }} mr-1.5"></i>{{ $tab[0] }}
+                </a>
+            @endforeach
+        </div>
+
         <!-- POSTS TIMELINE FEED -->
         <div class="space-y-4">
             @forelse($posts as $post)
-                <article class="tsaqib-card p-6 transition duration-150">
-
-                    <!-- Post Header -->
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center space-x-3">
-                            <x-community-avatar :user="$post->user" :slug="$post->community_slug" size="md" />
-                            <div>
-                                <h4 class="font-bold text-xs text-[var(--cream)]">{{ $post->user->name ?? 'Anggota TSAQIB' }}</h4>
-                                <span class="text-[10px] text-white/40">
-                                    {{ $post->created_at->diffForHumans() }} •
-                                    <span class="font-bold text-[var(--gold)] uppercase">{{ $post->community_slug }}</span>
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- EDIT & DELETE BUTTONS FOR OWNER OR ADMIN -->
-                        @if(Auth::check() && (Auth::id() === $post->user_id || Auth::user()->role === 'admin'))
-                            <div class="flex items-center space-x-2">
-                                <button onclick="toggleEditModal('{{ $post->id }}')" class="text-xs text-white/60 hover:text-white font-semibold px-2.5 py-1 rounded-lg bg-white/10">
-                                    <i class="fa-solid fa-pen mr-1"></i>Edit
-                                </button>
-
-                                <form action="{{ route('posts.destroy', $post->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus postingan ini?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-xs text-red-400 hover:text-red-300 font-semibold px-2.5 py-1 rounded-lg bg-red-500/10">
-                                        <i class="fa-solid fa-trash mr-1"></i>Hapus
-                                    </button>
-                                </form>
-                            </div>
-                        @endif
-                    </div>
-
-                    <!-- Post Body -->
-                    <h3 class="font-bold text-base text-[var(--cream)] mb-2 leading-snug">{{ $post->title }}</h3>
-                    <p class="text-xs text-white/75 leading-relaxed whitespace-pre-line mb-4">{{ $post->content }}</p>
-
-                    <!-- ATTACHED IMAGE DISPLAY -->
-                    @if($post->image_path)
-                        <div class="rounded-xl overflow-hidden border border-white/10 bg-white/5 max-h-96 w-full flex items-center justify-center my-3">
-                            <img src="{{ asset('storage/' . $post->image_path) }}" alt="{{ $post->title }}" class="w-full h-full object-contain max-h-96">
-                        </div>
-                    @endif
+                <article class="tsaqib-card p-6 transition duration-150 cursor-pointer"
+                         data-post-url="{{ route('komunitas.post.show', $post->id) }}">
+                    @include('komunitas._post-card', ['post' => $post, 'showManage' => true])
 
                     <!-- EDIT MODAL FORM -->
                     @if(Auth::check() && (Auth::id() === $post->user_id || Auth::user()->role === 'admin'))
-                        <div id="edit-modal-{{ $post->id }}" class="hidden mt-4 pt-4 border-t border-white/10">
+                        <div id="edit-modal-{{ $post->id }}" class="hidden mt-4 pt-4 border-t border-white/10" data-no-nav>
                             <form action="{{ route('posts.update', $post->id) }}" method="POST" enctype="multipart/form-data" class="space-y-3">
                                 @csrf
                                 @method('PUT')
@@ -119,17 +191,37 @@
                                     <textarea name="content" rows="3" required class="tsaqib-input w-full px-3 py-2 text-xs">{{ $post->content }}</textarea>
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold uppercase text-white/50 mb-1">Ganti Foto (Opsional)</label>
-                                    <input type="file" name="image" accept="image/*" class="w-full text-xs text-white/50">
+                                    <label class="block text-[10px] font-bold uppercase text-white/50 mb-1">Media</label>
+                                    @if ($post->media->isNotEmpty())
+                                        <div class="flex gap-1 flex-wrap mb-2">
+                                            @foreach ($post->media as $mItem)
+                                                <div class="w-9 h-9 rounded overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center">
+                                                    @if ($mItem->isVideo())
+                                                        <i class="fa-solid fa-film text-xs text-[var(--gold)]"></i>
+                                                    @else
+                                                        <img src="{{ $mItem->url }}" class="w-full h-full object-cover">
+                                                    @endif
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                    <div class="media-drop">
+                                        <label class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#01795F]/15 hover:bg-[#01795F]/25 text-[#3fd6b0] text-xs font-semibold cursor-pointer border border-[#01795F]/30 transition">
+                                            <i class="fa-solid fa-plus"></i> Tambahkan Foto/Video
+                                            <input type="file" name="media[]" multiple
+                                                   accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" class="sr-only">
+                                        </label>
+                                        <div class="media-preview" data-preview></div>
+                                        <div class="media-count" data-count>Biarkan kosong untuk mempertahankan media lama. Upload baru = ganti semua.</div>
+                                    </div>
                                 </div>
                                 <div class="flex justify-end space-x-2 pt-2">
                                     <button type="button" onclick="toggleEditModal('{{ $post->id }}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 text-white/70">Batal</button>
-                                    <button type="submit" class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-[#01795F] text-white">Simpan Perubahan</button>
+                                    <button type="submit" class="btn-submit px-4 py-1.5 rounded-lg text-xs font-semibold bg-[#01795F] text-white">Simpan Perubahan</button>
                                 </div>
                             </form>
                         </div>
                     @endif
-
                 </article>
             @empty
                 <div class="tsaqib-card-flat p-8 text-center text-white/40 text-xs">
@@ -159,14 +251,14 @@
         </div>
 
         <!-- CREATE POST MODAL -->
-        <div id="create-post-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <div class="bg-[#161a14] border border-white/10 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 relative">
+        <div id="create-post-modal" class="hidden fixed inset-0 z-[80] flex items-center justify-center p-4" style="background:rgba(13,51,39,0.55); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);">
+            <div class="bg-[#161a14] border border-white/10 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto relative">
                 <div class="flex items-center justify-between pb-3 border-b border-white/10">
                     <h3 class="font-display font-bold text-[var(--cream)] text-base flex items-center space-x-2">
                         <i class="fa-solid fa-pen-to-square text-[var(--gold)]"></i>
                         <span>Buat Postingan Baru</span>
                     </h3>
-                    <button onclick="closeCreateModal()" class="text-white/40 hover:text-white">
+                    <button type="button" data-close-create class="text-white/40 hover:text-white">
                         <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
                 </div>
@@ -197,14 +289,21 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-white/80 uppercase mb-1">Lampirkan Foto (Opsional)</label>
-                        <input type="file" name="image" accept="image/*"
-                               class="w-full text-xs text-white/50 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#01795F]/20 file:text-[#3fd6b0] hover:file:bg-[#01795F]/30">
+                        <label class="block text-xs font-bold text-white/80 uppercase mb-1">Foto / Video (Opsional)</label>
+                        <div class="media-drop">
+                            <label class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#01795F]/15 hover:bg-[#01795F]/25 text-[#3fd6b0] text-xs font-semibold cursor-pointer border border-[#01795F]/30 transition">
+                                <i class="fa-solid fa-plus"></i> Tambahkan Foto/Video
+                                <input type="file" name="media[]" multiple
+                                       accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" class="sr-only">
+                            </label>
+                            <div class="media-preview" data-preview></div>
+                            <div class="media-count" data-count>Maks 6 foto (jpg/png/webp, ≤3 MB) atau 1 video (mp4/webm, ≤30 MB).</div>
+                        </div>
                     </div>
 
                     <div class="pt-2 flex items-center justify-end space-x-2 border-t border-white/10">
-                        <button type="button" onclick="closeCreateModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-white/10 text-white/70">Batal</button>
-                        <button type="submit" class="px-5 py-2 rounded-xl text-xs font-semibold bg-[#01795F] hover:bg-[#3F704D] text-white shadow-sm">
+                        <button type="button" data-close-create class="px-4 py-2 rounded-xl text-xs font-semibold bg-white/10 text-white/70">Batal</button>
+                        <button type="submit" class="btn-submit px-5 py-2 rounded-xl text-xs font-semibold bg-[#01795F] hover:bg-[#3F704D] text-white shadow-sm">
                             <i class="fa-solid fa-paper-plane mr-1.5"></i>Terbitkan
                         </button>
                     </div>
@@ -213,23 +312,330 @@
         </div>
     @endauth
 
+    <!-- LIGHTBOX GALERI (navigasi, transisi, bottom-sheet mobile) -->
+    <div id="lightbox" onclick="closeLightbox()">
+        <div class="lb-stage" onclick="event.stopPropagation()">
+            <div id="lb-item"></div>
+            <div class="lb-counter" id="lb-counter"></div>
+            <button class="lb-btn lb-close" onclick="closeLightbox()" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+            <button class="lb-btn lb-prev" onclick="lbNav(-1)" aria-label="Sebelumnya"><i class="fa-solid fa-chevron-left"></i></button>
+            <button class="lb-btn lb-next" onclick="lbNav(1)" aria-label="Berikutnya"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+    </div>
+
+    <!-- Toast (share link) -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[90] hidden bg-[#01795F] text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-lg"></div>
+
     <!-- Footer -->
     @include('partials.site-footer')
 
-    <!-- SCRIPT UNTUK MODAL SAJA -->
+    <!-- SCRIPT: modal, lightbox, voting (AJAX) -->
     <script>
+        /* ===== MODAL BUAT / EDIT ===== */
         function openCreateModal() {
             document.getElementById('create-post-modal').classList.remove('hidden');
         }
         function closeCreateModal() {
-            document.getElementById('create-post-modal').classList.add('hidden');
+            const modal = document.getElementById('create-post-modal');
+            modal.classList.add('hidden');
+            resetMediaIn(modal); // bersihkan pilihan media saat dibatalkan
         }
         function toggleEditModal(id) {
             const el = document.getElementById('edit-modal-' + id);
-            if (el) {
-                el.classList.toggle('hidden');
-            }
+            if (! el) return;
+            const willClose = ! el.classList.contains('hidden');
+            el.classList.toggle('hidden');
+            if (willClose) resetMediaIn(el);
         }
+
+        /* ===== MEDIA UPLOADER (thumbnail, validasi real-time, XOR foto/video) ===== */
+        const MAX_IMG = 6, MAX_VID = 1, IMG_MAX = 3 * 1024 * 1024, VID_MAX = 30 * 1024 * 1024;
+        const OK_EXT = { image: ['jpg', 'jpeg', 'png', 'webp'], video: ['mp4', 'webm'] };
+
+        function classifyMedia(file) {
+            const kind = file.type.startsWith('video/') ? 'video' : 'image';
+            const ext = (file.name.split('.').pop() || '').toLowerCase();
+            const allowed = OK_EXT[kind] || [];
+            let bad = null;
+            if (! allowed.includes(ext)) bad = 'Format tidak didukung';
+            else if (kind === 'image' && file.size > IMG_MAX) bad = '> 3 MB';
+            else if (kind === 'video' && file.size > VID_MAX) bad = '> 30 MB';
+            return { file, kind, bad, url: URL.createObjectURL(file) };
+        }
+
+        function initMediaUploader(input) {
+            const drop = input.closest('.media-drop');
+            const preview = drop.querySelector('[data-preview]');
+            const countEl = drop.querySelector('[data-count]');
+            const submit = input.closest('form')?.querySelector('[type="submit"]');
+            const current = [];
+            const defaultCount = countEl.textContent;
+
+            function refresh() {
+                preview.innerHTML = '';
+                current.forEach((it, idx) => {
+                    const t = document.createElement('div');
+                    t.className = 'thumb';
+                    t.innerHTML = it.bad
+                        ? `<div class="thumb-bad">${it.bad}</div>`
+                        : (it.kind === 'video'
+                            ? `<div class="thumb-video"><i class="fa-solid fa-film"></i></div>`
+                            : `<img src="${it.url}" alt="">`);
+                    const rm = document.createElement('div');
+                    rm.className = 'thumb-remove';
+                    rm.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                    rm.onclick = (e) => { e.preventDefault(); current.splice(idx, 1); syncFiles(); refresh(); };
+                    t.appendChild(rm);
+                    preview.appendChild(t);
+                });
+
+                const imgs = current.filter(i => i.kind === 'image' && ! i.bad);
+                const vids = current.filter(i => i.kind === 'video' && ! i.bad);
+                const bads = current.filter(i => i.bad);
+                let warn = '';
+                // block = benar-benar tidak boleh submit (konflik / over-limit).
+                // File ditolak (bad) TIDAK memblok: syncFiles() sudah otomatis
+                // mengecualikannya, jadi user tetap bisa terbitkan dengan file
+                // valid sisanya — tombol tidak nyangkut mati hanya karena 1 file
+                // kebesaran/cacat format.
+                let block = false;
+                if (imgs.length && vids.length) { warn = 'Hanya foto ATAU video, tidak boleh campur.'; block = true; }
+                else if (vids.length > MAX_VID) { warn = 'Maksimal 1 video.'; block = true; }
+                else if (imgs.length > MAX_IMG) { warn = 'Maksimal 6 foto.'; block = true; }
+                else if (bads.length) { warn = `${bads.length} file ditolak (format/ukuran) — tidak ikut diupload.`; }
+
+                countEl.textContent = warn
+                    ? warn
+                    : (current.length === 0
+                        ? defaultCount
+                        : ((vids.length ? `${vids.length}/1 video` : `${imgs.length}/${MAX_IMG} foto`) + ' terpilih.'));
+                countEl.className = 'media-count' + (warn ? ' media-warn' : '');
+                if (submit) submit.disabled = block;
+            }
+
+            function syncFiles() {
+                const dt = new DataTransfer();
+                current.filter(i => ! i.bad).forEach(i => dt.items.add(i.file));
+                input.files = dt.files;
+            }
+
+            // Kosongkan pilihan (dipanggil saat modal ditutup) supaya state tidak
+            // mengendap dan tombol submit tidak nyangkut disable antar buka/tutup.
+            function reset() {
+                current.length = 0;
+                input.value = '';
+                refresh();
+            }
+
+            input.addEventListener('change', () => {
+                for (const f of input.files) current.push(classifyMedia(f));
+                syncFiles();
+                refresh();
+            });
+
+            refresh();
+            return reset;
+        }
+
+        /* ===== LIGHTBOX GALERI (navigasi + transisi + lazy/preload + bottom-sheet mobile) ===== */
+        let lbMedia = [], lbIndex = 0;
+
+        function openLightbox(tile) {
+            const grid = tile.closest('.media-grid');
+            if (! grid) return;
+            try { lbMedia = JSON.parse(grid.dataset.media); } catch (e) { return; }
+            lbIndex = parseInt(tile.dataset.index || '0', 10) || 0;
+            document.getElementById('lightbox').classList.add('open');
+            document.body.classList.add('overflow-hidden');
+            lbRender(0);
+        }
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('open');
+            document.body.classList.remove('overflow-hidden');
+            const v = document.querySelector('#lb-item video');
+            if (v) v.pause();
+        }
+        function lbNav(dir) {
+            if (! lbMedia.length) return;
+            lbIndex = (lbIndex + dir + lbMedia.length) % lbMedia.length;
+            lbRender(dir);
+        }
+        function lbRender(dir) {
+            const item = document.getElementById('lb-item');
+            const counter = document.getElementById('lb-counter');
+            if (! lbMedia.length) return;
+            counter.textContent = (lbIndex + 1) + ' / ' + lbMedia.length;
+            const m = lbMedia[lbIndex];
+            item.classList.add('fade');
+            item.style.transform = dir === -1 ? 'translateX(-12px)' : (dir === 1 ? 'translateX(12px)' : '');
+            setTimeout(() => {
+                item.innerHTML = m.type === 'video'
+                    ? `<video src="${m.url}" controls autoplay playsinline></video>`
+                    : `<img src="${m.url}" alt="">`;
+                item.classList.remove('fade');
+                item.style.transform = '';
+                // Preload item tetangga (lazy berikutnya) — gambar saja.
+                [lbIndex + 1, lbIndex - 1].forEach(i => {
+                    if (i >= 0 && i < lbMedia.length && lbMedia[i].type === 'image') {
+                        const im = new Image(); im.src = lbMedia[i].url;
+                    }
+                });
+            }, 180);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (! document.getElementById('lightbox').classList.contains('open')) return;
+            if (e.key === 'Escape') closeLightbox();
+            else if (e.key === 'ArrowLeft') lbNav(-1);
+            else if (e.key === 'ArrowRight') lbNav(1);
+        });
+
+        const mediaResetters = new WeakMap(); // input -> reset()
+        document.querySelectorAll('input[name="media[]"]').forEach(input => mediaResetters.set(input, initMediaUploader(input)));
+        function resetMediaIn(scope) {
+            if (scope) scope.querySelectorAll('input[name="media[]"]').forEach(i => mediaResetters.get(i)?.());
+        }
+
+        /* Batal / tombol tutup (X) — pasang via listener (kokoh & ramah CSP, bukan inline onclick) */
+        document.querySelectorAll('[data-close-create]').forEach(el => el.addEventListener('click', closeCreateModal));
+
+        /* ===== VOTING (AJAX) ===== */
+        (function () {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const loginUrl = '{{ route("login") }}';
+
+            document.addEventListener('click', async (e) => {
+                const btn = e.target.closest('.vote-btn');
+                if (! btn) return;
+                e.preventDefault();
+
+                @guest
+                /* Tamu belum login -> arahkan ke halaman login dulu. */
+                window.location.href = loginUrl;
+                return;
+                @endguest
+
+                const postId = btn.dataset.postId;
+                const type = btn.dataset.type;
+                btn.disabled = true;
+
+                try {
+                    const res = await fetch(`/posts/${postId}/vote`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        body: JSON.stringify({ type }),
+                    });
+
+                    if (res.status === 401) { window.location.href = loginUrl; return; }
+                    if (! res.ok) throw new Error('Gagal memproses suara');
+                    const data = await res.json();
+
+                    // Perbarui kedua tombol di kartu ini: jumlah + status aktif.
+                    const article = btn.closest('article');
+                    article.querySelectorAll('.vote-btn').forEach((b) => {
+                        const t = b.dataset.type;
+                        const countEl = b.querySelector('[data-count]');
+                        if (countEl) countEl.textContent = data[t === 'up' ? 'upvotes' : 'downvotes'];
+                        b.classList.toggle('is-up', data.my_vote === 'up' && t === 'up');
+                        b.classList.toggle('is-down', data.my_vote === 'down' && t === 'down');
+                    });
+                } catch (err) {
+                    console.error(err);
+                } finally {
+                    btn.disabled = false;
+                }
+            });
+        })();
+
+        /* ===== Card nav + share + repost + toast ===== */
+        (function () {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const loginUrl = '{{ route("login") }}';
+            let toastTimer;
+            function showToast(msg) {
+                const t = document.getElementById('toast');
+                if (! t) return;
+                t.textContent = msg;
+                t.classList.remove('hidden');
+                clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => t.classList.add('hidden'), 2000);
+            }
+
+            /* Klik area kartu (yang bukan [data-no-nav]) -> halaman detail */
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('[data-no-nav]')) return;
+                const art = e.target.closest('article[data-post-url]');
+                if (art) window.location.href = art.dataset.postUrl;
+            });
+
+            /* Share: salin link + toast */
+            document.addEventListener('click', (e) => {
+                const btn = e.target.closest('.share-btn');
+                if (! btn) return;
+                e.preventDefault();
+                const url = btn.dataset.url;
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(url).then(() => showToast('Link tersalin!')).catch(() => showToast('Link: ' + url));
+                } else {
+                    showToast('Link: ' + url);
+                }
+            });
+
+            /* Repost: toggle via AJAX */
+            document.addEventListener('click', async (e) => {
+                const btn = e.target.closest('.repost-btn');
+                if (! btn) return;
+                e.preventDefault();
+
+                @guest
+                window.location.href = loginUrl;
+                return;
+                @endguest
+
+                btn.disabled = true;
+                try {
+                    const res = await fetch(`/posts/${btn.dataset.postId}/repost`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'X-Requested-With': 'XMLHttpRequest' },
+                        body: '{}',
+                    });
+                    if (res.status === 401) { window.location.href = loginUrl; return; }
+                    if (! res.ok) throw new Error('Gagal repost');
+                    const data = await res.json();
+                    btn.querySelector('[data-repost-count]').textContent = data.reposts;
+                    btn.classList.toggle('is-active', data.reposted);
+                } catch (err) {
+                    console.error(err);
+                } finally {
+                    btn.disabled = false;
+                }
+            });
+
+            /* Lapor konten (post/comment) -> POST /reports */
+            document.addEventListener('click', async (e) => {
+                const btn = e.target.closest('.report-btn');
+                if (! btn) return;
+                e.preventDefault();
+                const reason = prompt('Alasan laporan (singkat):', 'Spam / penyalahgunaan');
+                if (! reason) return;
+                try {
+                    const res = await fetch('/reports', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'X-Requested-With': 'XMLHttpRequest' },
+                        body: JSON.stringify({ reportable_type: btn.dataset.rt, reportable_id: btn.dataset.rid, reason }),
+                    });
+                    if (res.status === 401) { window.location.href = loginUrl; return; }
+                    if (! res.ok) throw new Error('Gagal melaporkan');
+                    const data = await res.json();
+                    showToast(data.already ? (data.message || 'Sudah dilaporkan') : 'Terlapor, terima kasih.');
+                } catch (err) { console.error(err); showToast('Gagal melaporkan.'); }
+            });
+        })();
     </script>
 
 </body>

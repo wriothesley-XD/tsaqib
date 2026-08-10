@@ -6,6 +6,7 @@ use App\Http\Controllers\OpenRecruitmentController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TsaqibController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,6 +32,7 @@ Route::post('/open-recruitment', [OpenRecruitmentController::class, 'submit'])->
 Route::get('/open-recruitment/terima-kasih', [OpenRecruitmentController::class, 'thankYou'])->name('open.recruitment.thank-you');
 
 // Feed Komunitas — bisa dilihat oleh GUEST (tanpa login)
+Route::get('/komunitas/post/{post}', [PostController::class, 'show'])->name('komunitas.post.show');
 Route::get('/komunitas/{slug?}', [PageController::class, 'komunitasIndex'])->name('komunitas');
 Route::get('/komunitas-show/{slug}', [PageController::class, 'komunitasShow'])->name('komunitas.show');
 
@@ -52,6 +54,17 @@ Route::middleware('auth')->group(function () {
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
 
+    // Voting (upvote/downvote) — AJAX, mengembalikan JSON
+    Route::post('/posts/{post}/vote', [PostController::class, 'vote'])->name('posts.vote');
+
+    // Komentar & Repost — AJAX
+    Route::post('/posts/{post}/comments', [PostController::class, 'storeComment'])->name('posts.comments.store');
+    Route::delete('/comments/{comment}', [PostController::class, 'destroyComment'])->name('comments.destroy');
+    Route::post('/posts/{post}/repost', [PostController::class, 'repost'])->name('posts.repost');
+
+    // Lapor konten (post/comment) — AJAX
+    Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
+
     // Profil User
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -65,6 +78,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/books', [AdminController::class, 'storeBook'])->name('books.store');
         Route::delete('/books/{book}', [AdminController::class, 'destroyBook'])->name('books.destroy');
         Route::post('/toggle-recruitment', [AdminController::class, 'toggleRecruitment'])->name('toggle-recruitment');
+        Route::post('/reports/{report}/resolve', [ReportController::class, 'resolve'])->name('reports.resolve');
     });
 
 });

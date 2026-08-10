@@ -15,7 +15,9 @@
     dan query-nya jadi rusak. Lihat perpustakaan.blade.php untuk contoh yang benar.
 --}}
 <meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <title>{{ $pageTitle ?? 'TSAQIB — Forum Studi Islam SMAN 1 Bukittinggi' }}</title>
 @vite('resources/css/app.css')
 {{-- FontAwesome dimuat NON-render-blocking (preload -> swap ke stylesheet).
@@ -124,7 +126,6 @@
         position:relative;
         min-height:100vh;
         background:
-            radial-gradient(circle at 50% 100%, rgba(201,166,107,.10), transparent 38%),
             radial-gradient(circle at 18% 0%, rgba(1,121,95,.20), transparent 55%),
             linear-gradient(180deg, var(--ink) 0%, var(--ink) 35%, rgba(63,112,77,.55) 100%);
     }

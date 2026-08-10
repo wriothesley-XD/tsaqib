@@ -2,6 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
+        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -11,6 +12,10 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&family=Manrope:wght@600;700&display=swap" rel="stylesheet">
+
+        <!-- FontAwesome (ikon di dalam input auth) — non-render-blocking, sama seperti partials/theme-head -->
+        <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
 
         <!-- Scripts. resources/css/app.css sudah menempel gradient gelap + pola girih
              global pada <body> (sama seperti halaman lain), jadi background site-wide
@@ -44,17 +49,22 @@
                 .auth-page{ justify-content:center; padding:2rem 1rem 3rem; }
             }
 
-            /* Link "Kembali ke beranda" — target sentuh ≥40px, ada jarak dari logo */
+            /* Link "Kembali ke beranda" — melayang di pojok kiri-bawah (fixed).
+               Mobile: ikon panah saja; ≥640px: panah + teks. */
             .auth-back{
+                position:fixed; left:1rem; bottom:1rem; z-index:30;
                 display:inline-flex; align-items:center; gap:.4rem;
-                min-height:40px; padding:.5rem .9rem;
-                margin-bottom:1.25rem;             /* tidak nimpa logo */
+                min-height:40px; padding:.5rem .85rem;
                 color:#C0DD97; font-size:13px; font-weight:600;
                 border:1px solid #1a3630; border-radius:9999px;
-                background:rgba(15,38,33,.5); text-decoration:none;
+                background:rgba(15,38,33,.7);
+                -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
+                text-decoration:none;
                 transition:background .2s ease, color .2s ease;
             }
             .auth-back:hover{ background:rgba(29,158,117,.18); color:#F7F5EF; }
+            .auth-back-text{ display:none; }                      /* mobile: panah saja */
+            @media (min-width:640px){ .auth-back-text{ display:inline; } }
 
             /* Logo — sedikit lebih kecil di layar sempit, max-width mencegah overflow */
             .auth-logo{ height:64px; width:auto; max-width:70vw; display:block; }
@@ -81,6 +91,7 @@
             .auth-card input[type=email],
             .auth-card input[type=password]{
                 width:100%;
+                padding:.7rem .75rem .7rem 2.5rem;   /* lebih lega (tinggi) + ruang ikon kiri */
                 background-color:#08140f !important;
                 border:1px solid #1a3630 !important;
                 color:#F7F5EF !important;
@@ -97,6 +108,11 @@
                 background-color:#0a1c18 !important;
                 box-shadow:0 0 0 1px rgba(29,158,117,.45) !important;
             }
+
+            /* Field dengan toggle show/hide → ruang kanan untuk ikon mata.
+               Diclass (.pw-field), bukan [type=password], agar padding tak bergeser
+               saat type dibalik password↔text oleh toggle. */
+            .auth-card input.pw-field{ padding-right:2.5rem; }
 
             /* Checkbox "Remember me" */
             .auth-card input[type=checkbox]{ accent-color:#1D9E75; }
@@ -126,7 +142,8 @@
     <body class="font-sans text-[#F7F5EF] antialiased overflow-x-hidden">
         <div class="auth-page">
             <a href="/" class="auth-back" aria-label="Kembali ke beranda">
-                <span aria-hidden="true">&larr;</span> Kembali ke beranda
+                <span aria-hidden="true">&larr;</span>
+                <span class="auth-back-text">Kembali ke beranda</span>
             </a>
 
             <a href="/" aria-label="Beranda TSAQIB">
@@ -137,5 +154,26 @@
                 {{ $slot }}
             </div>
         </div>
+
+        {{-- Show/hide password toggle (generic: any .pw-toggle via data-toggle) --}}
+        <script>
+        (function () {
+            document.querySelectorAll('.pw-toggle').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    const input = document.getElementById(btn.getAttribute('data-toggle'));
+                    if (!input) return;
+                    const show = input.type === 'password';
+                    input.type = show ? 'text' : 'password';
+                    btn.setAttribute('aria-pressed', show ? 'true' : 'false');
+                    btn.setAttribute('aria-label', show ? 'Sembunyikan password' : 'Tampilkan password');
+                    const icon = btn.querySelector('i');
+                    if (icon) {
+                        icon.classList.toggle('fa-eye', !show);
+                        icon.classList.toggle('fa-eye-slash', show);
+                    }
+                });
+            });
+        })();
+        </script>
     </body>
 </html>

@@ -13,8 +13,8 @@
     /* Action chips */
     .action-chip{ background:rgba(247,245,239,.05); color:rgba(247,245,239,.6); transition:background .15s ease,color .15s ease; cursor:pointer; }
     .action-chip:hover{ background:rgba(247,245,239,.10); color:var(--cream); }
-    .repost-btn.is-active{ background:var(--green); color:#fff; }
-    .repost-btn.is-active:hover{ background:var(--green-dark); color:#fff; }
+    .save-btn.is-active{ background:var(--gold); color:#10140F; }
+    .save-btn.is-active:hover{ background:var(--green-dark); color:#fff; }
 
     /* Media grid */
     .media-grid{ display:grid; gap:.25rem; border-radius:.75rem; overflow:hidden; }
@@ -229,9 +229,9 @@
             finally { btn.disabled = false; }
         });
 
-        /* ===== Repost ===== */
+        /* ===== Simpan / batal simpan (Tersimpan) — pivot post_user ===== */
         document.addEventListener('click', async (e) => {
-            const btn = e.target.closest('.repost-btn');
+            const btn = e.target.closest('.save-btn');
             if (! btn) return;
             e.preventDefault();
             @guest
@@ -240,9 +240,12 @@
             @endguest
             btn.disabled = true;
             try {
-                const data = await postJSON(`/posts/${btn.dataset.postId}/repost`, {});
-                btn.querySelector('[data-repost-count]').textContent = data.reposts;
-                btn.classList.toggle('is-active', data.reposted);
+                const data = await postJSON(`/posts/${btn.dataset.postId}/save`, {});
+                btn.classList.toggle('is-active', data.saved);
+                btn.title = data.saved ? 'Hapus dari Tersimpan' : 'Simpan ke Tersimpan';
+                const label = btn.querySelector('span:not([data-count])');
+                if (label) label.textContent = data.saved ? 'Tersimpan' : 'Simpan';
+                showToast(data.saved ? 'Disimpan ke Tersimpan.' : 'Dihapus dari Tersimpan.');
             } catch (err) { if (err.message !== 'auth') console.error(err); }
             finally { btn.disabled = false; }
         });

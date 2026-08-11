@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\News;
 use App\Models\Post;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,7 +20,11 @@ class PageController extends Controller
         // Data komunitas untuk preview publik di landing (tamu bisa lihat, tanpa auth).
         $daftarKomunitas = Config::get('komunitas.daftar', []);
 
-        return view('landing', compact('daftarKomunitas'));
+        // Berita terbaru (3 terpublikasi) untuk section "BERITA" di Beranda:
+        // ditampilkan sebagai 3 kartu gambar; yang paling baru = unggulan.
+        $kabarTerbaru = News::published()->with('user')->orderByDesc('published_at')->limit(3)->get();
+
+        return view('landing', compact('daftarKomunitas', 'kabarTerbaru'));
     }
 
     /**
@@ -91,15 +96,16 @@ class PageController extends Controller
         // Tab sort: Terbaru (default, latest-first) atau Terpopuler (net votes).
         $sort = request('sort') === 'popular' ? 'popular' : 'recent';
 
-        // Eager-load suara + repost user saat ini (0/1 baris) agar tombol bisa
-        // ditandai aktif sesuai pilihan user. Tamu (guest) tidak dimuat.
+        // Eager-load suara user saat ini (0/1 baris) + status simpan (pivot
+        // post_user) agar tombol vote/bookmark bisa ditandai aktif sesuai
+        // pilihan user. Tamu (guest) tidak dimuat.
         $with = ['user', 'media'];
         if ($user) {
             $with['votes'] = fn ($q) => $q->where('user_id', $user->id)->select(['post_id', 'type']);
-            $with['reposts'] = fn ($q) => $q->where('user_id', $user->id)->select(['post_id']);
+            $with['savedBy'] = fn ($q) => $q->where('user_id', $user->id)->select(['post_id']);
         }
 
-        $query = Post::with($with)->withCount(['comments', 'reposts']);
+        $query = Post::with($with)->withCount(['comments']);
         if ($sort === 'popular') {
             // Terpopuler: selisih upvote-downvote, tiebreak terbaru.
             $query->orderByRaw('(upvotes - downvotes) desc, created_at desc');

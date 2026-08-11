@@ -22,4 +22,22 @@ class Book extends Model
     protected $casts = [
         'is_visible' => 'boolean',
     ];
+
+    /**
+     * Hanya buku yang ditampilkan ke publik di Perpustakaan.
+     */
+    public function scopeVisible($query)
+    {
+        return $query->where('is_visible', true);
+    }
+
+    /**
+     * User yang menyimpan buku ini ke koleksi/tersimpan (pivot book_user.type).
+     */
+    public function savedBy(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(\App\Models\User::class, 'book_user')
+            ->withPivot('type')
+            ->withTimestamps();
+    }
 }

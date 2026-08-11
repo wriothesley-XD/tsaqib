@@ -76,6 +76,7 @@
         .lp-track{
             display:grid;
             grid-template-columns:repeat(3,1fr);
+            gap:1.5rem;
             width:auto;
             animation:none;
             transform:none !important;   /* hapus inline transform sisa drag */
@@ -84,6 +85,57 @@
         }
         .lp-track > .lp-card{ width:auto; margin-right:0; }
         .lp-track > .lp-card.is-clone{ display:none; }
+    }
+
+    /* ===== Section Profil TSAQIB (flipbook embed) =====
+       Header dgn ikon emas bulat (float + ring pulse, 2.4s ease-in-out infinite),
+       diikuti iframe flipbook Heyzine. URL iframe di-set admin via tabel settings. */
+    .lp-profil{ padding:2rem; }
+    .lp-profil-head{
+        display:flex; align-items:center; gap:1.5rem; margin-bottom:1.5rem;
+    }
+    .lp-profil-icon{
+        position:relative; z-index:1;
+        flex:0 0 auto;
+        display:flex; align-items:center; justify-content:center;
+        width:4.5rem; height:4.5rem; border-radius:999px;
+        background:linear-gradient(140deg, var(--gold), #a9893f);
+        color:var(--ink); font-size:1.6rem;
+        box-shadow:0 8px 22px -8px rgba(201,166,107,.7);
+        animation:lp-float 2.4s ease-in-out infinite;
+    }
+    /* ring pulse — mengembang & memudar, durasi sama dgn float agar ritmenya selaras */
+    .lp-profil-icon::before{
+        content:''; position:absolute; inset:-6px; border-radius:inherit;
+        background:rgba(201,166,107,.45);
+        animation:lp-ring 2.4s ease-in-out infinite;
+        z-index:-1;
+    }
+    .lp-profil-head:hover .lp-profil-icon{ transform:scale(1.08); }
+    .lp-profil-icon{ transition:transform .25s ease; }
+
+    /* wrapper iframe — responsive + rounded; override tinggi tetap mobile → desktop */
+    .lp-flipbook-wrap{
+        position:relative; width:100%;
+        border-radius:.85rem; overflow:hidden;
+        background:#fff;
+        box-shadow:0 12px 30px -12px rgba(0,0,0,.6);
+    }
+    .lp-flipbook-wrap iframe{
+        display:block; width:100%;
+        height:clamp(380px, 56vw, 520px);   /* menimpa inline height via !important saat responsif */
+    }
+
+    @keyframes lp-float{
+        0%,100%{ transform:translateY(0); }
+        50%   { transform:translateY(-8px); }
+    }
+    @keyframes lp-ring{
+        0%   { transform:scale(1);   opacity:.55; }
+        100% { transform:scale(1.9); opacity:0; }
+    }
+    @media (prefers-reduced-motion: reduce){
+        .lp-profil-icon, .lp-profil-icon::before{ animation:none; }
     }
 @endpush
 <!DOCTYPE html>
@@ -158,6 +210,31 @@
                 <p class="lp-card-body">Inventaris <strong>aset</strong>, perangkat keras, dan sarana prasarana penunjang kegiatan Laboratorium PAI Digital.</p>
             </div>
 
+            </div>
+        </div>
+
+        {{-- Profil TSAQIB — flipbook embed. Ikon emas (float + ring pulse) sebagai header,
+            iframe Heyzine di bawahnya. URL iframe dari DB (default Heyzine). --}}
+        <div class="tsaqib-card lp-profil">
+            <div class="lp-profil-head">
+                <div class="lp-profil-icon"><i class="ti ti-book-2"></i></div>
+                <div class="flex-1">
+                    <h3 class="lp-card-title">Profil TSAQIB</h3>
+                    <p class="lp-card-body">Kenali lebih dekat <strong>Profil TSAQIB FSI</strong> — sejarah, program kerja, dan kepengurusan dalam satu dokumen interaktif.</p>
+                </div>
+                <a href="{{ $profilTsaqibUrl }}" target="_blank" rel="noopener"
+                   class="flex items-center gap-1.5 text-[var(--gold)] hover:text-[var(--cream)] text-xs font-semibold transition-colors flex-shrink-0">
+                    Buka penuh <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+            </div>
+
+            <div class="lp-flipbook-wrap">
+                <iframe allowfullscreen="allowfullscreen"
+                        allow="autoplay; fullscreen; clipboard-write"
+                        scrolling="no" class="fp-iframe"
+                        src="{{ $profilTsaqibUrl }}"
+                        style="border:1px solid lightgray; width:100%; height:400px;"
+                        title="Flipbook Profil TSAQIB"></iframe>
             </div>
         </div>
 

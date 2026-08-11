@@ -15,7 +15,7 @@
     dan query-nya jadi rusak. Lihat perpustakaan.blade.php untuk contoh yang benar.
 --}}
 <meta charset="UTF-8">
-<link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+<link rel="icon" type="image/png" href="{{ asset('favicon.png') }}?v=2">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>{{ $pageTitle ?? 'TSAQIB — Forum Studi Islam SMAN 1 Bukittinggi' }}</title>
@@ -26,9 +26,13 @@
    halaman tampil lebih cepat dan ikon menyusul tanpa reflow teks. --}}
 <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+{{-- Tabler Icons (webfont) — dimuat NON-render-blocking, sama kayak FontAwesome di atas.
+   Hanya dipakai untuk ikon spesifik (mis. ti-book-2). Mayoritas ikon tetap FontAwesome. --}}
+<link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css"></noscript>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&family=Manrope:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
     :root{
@@ -56,7 +60,7 @@
         background:rgba(247,245,239,.08);
         border:1px solid rgba(247,245,239,.18);
         color:var(--cream);
-        font-family:'Manrope',sans-serif;font-weight:700;
+        font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;
         font-size:11px;letter-spacing:.06em;text-transform:uppercase;
         backdrop-filter:blur(4px);
     }

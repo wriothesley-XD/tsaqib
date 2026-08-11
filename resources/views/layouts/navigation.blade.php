@@ -5,8 +5,8 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ auth()->check() ? route('dashboard') : route('home') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                    <a href="{{ auth()->check() ? route('dashboard') : route('landing') }}">
+                        <img src="{{ asset('images/icon/tsaqib-media.svg.png') }}" alt="TSAQIB" class="block h-10 w-auto object-contain">
                     </a>
                 </div>
 

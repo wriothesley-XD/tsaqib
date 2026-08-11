@@ -12,11 +12,11 @@
     .vote-btn.is-down{ background:rgba(239,68,68,.20); color:#fca5a5; }
     .vote-btn:disabled{ opacity:.6; cursor:default; }
 
-    /* Action chips + repost active + toast (komentar/repost/share) */
+    /* Action chips + save active + toast (komentar/simpan/share) */
     .action-chip{ background:rgba(247,245,239,.05); color:rgba(247,245,239,.6); transition:background .15s ease,color .15s ease; cursor:pointer; }
     .action-chip:hover{ background:rgba(247,245,239,.10); color:var(--cream); }
-    .repost-btn.is-active{ background:var(--green); color:#fff; }
-    .repost-btn.is-active:hover{ background:var(--green-dark); color:#fff; }
+    .save-btn.is-active{ background:var(--gold); color:#10140F; }
+    .save-btn.is-active:hover{ background:var(--green-dark); color:#fff; }
     #toast{ transition:opacity .2s ease; }
 
     /* FIX mobile drawer (Komunitas-only): backdrop bg-black/50 transparan ->
@@ -552,7 +552,7 @@
             });
         })();
 
-        /* ===== Card nav + share + repost + toast ===== */
+        /* ===== Card nav + share + simpan (Tersimpan) + toast ===== */
         (function () {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
             const loginUrl = '{{ route("login") }}';
@@ -586,9 +586,9 @@
                 }
             });
 
-            /* Repost: toggle via AJAX */
+            /* Simpan / batal simpan (Tersimpan): toggle via AJAX — pivot post_user */
             document.addEventListener('click', async (e) => {
-                const btn = e.target.closest('.repost-btn');
+                const btn = e.target.closest('.save-btn');
                 if (! btn) return;
                 e.preventDefault();
 
@@ -599,16 +599,19 @@
 
                 btn.disabled = true;
                 try {
-                    const res = await fetch(`/posts/${btn.dataset.postId}/repost`, {
+                    const res = await fetch(`/posts/${btn.dataset.postId}/save`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'X-Requested-With': 'XMLHttpRequest' },
                         body: '{}',
                     });
                     if (res.status === 401) { window.location.href = loginUrl; return; }
-                    if (! res.ok) throw new Error('Gagal repost');
+                    if (! res.ok) throw new Error('Gagal menyimpan');
                     const data = await res.json();
-                    btn.querySelector('[data-repost-count]').textContent = data.reposts;
-                    btn.classList.toggle('is-active', data.reposted);
+                    btn.classList.toggle('is-active', data.saved);
+                    btn.title = data.saved ? 'Hapus dari Tersimpan' : 'Simpan ke Tersimpan';
+                    const label = btn.querySelector('span:not([data-count])');
+                    if (label) label.textContent = data.saved ? 'Tersimpan' : 'Simpan';
+                    showToast(data.saved ? 'Disimpan ke Tersimpan.' : 'Dihapus dari Tersimpan.');
                 } catch (err) {
                     console.error(err);
                 } finally {

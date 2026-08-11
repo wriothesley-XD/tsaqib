@@ -2,16 +2,16 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
-        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+        <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}?v=2">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
-        <!-- Fonts: samakan dengan tema TSAQIB (Plus Jakarta Sans / Inter / Manrope) -->
+        <!-- Fonts: Plus Jakarta Sans (satu font untuk seluruh situs) -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&family=Manrope:wght@600;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
         <!-- FontAwesome (ikon di dalam input auth) — non-render-blocking, sama seperti partials/theme-head -->
         <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" onload="this.onload=null;this.rel='stylesheet'">
@@ -66,9 +66,10 @@
             .auth-back-text{ display:none; }                      /* mobile: panah saja */
             @media (min-width:640px){ .auth-back-text{ display:inline; } }
 
-            /* Logo — sedikit lebih kecil di layar sempit, max-width mencegah overflow */
-            .auth-logo{ height:64px; width:auto; max-width:70vw; display:block; }
-            @media (min-width:480px){ .auth-logo{ height:80px; } }
+            /* Logo — ukuran kanonik (sama persis dgn navbar: 40px → 44px di ≥640px)
+               supaya konsisten lintas halaman. max-width mencegah overflow di layar sempit. */
+            .auth-logo{ height:40px; width:auto; max-width:70vw; display:block; }
+            @media (min-width:640px){ .auth-logo{ height:44px; } }
 
             /* Kartu — full-width di mobile, max-w-md (28rem) di ≥640px. box-sizing
                memastikan padding px-* dihitung di dalam lebar, tidak menyebabkan overflow. */

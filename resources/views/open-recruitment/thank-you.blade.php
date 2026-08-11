@@ -35,7 +35,7 @@
                    class="w-full sm:w-auto px-6 py-3 rounded-full bg-[var(--gold)] hover:brightness-110 text-[#10140F] font-label font-extrabold text-sm shadow-lg transition duration-200">
                     <i class="fa-solid fa-house-chimney mr-1.5"></i>Kembali ke Beranda
                 </a>
-                <a href="{{ route('komunitas.show', 'tahfidz') }}"
+                <a href="{{ route('komunitas', 'semua') }}"
                    class="w-full sm:w-auto px-6 py-3 rounded-full bg-white/10 border border-white/15 hover:bg-white/20 text-[var(--cream)] text-sm font-bold transition duration-200">
                     Lihat Komunitas
                 </a>

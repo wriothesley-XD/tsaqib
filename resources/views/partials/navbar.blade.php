@@ -3,22 +3,29 @@
     $daftarKomunitasNav = \Illuminate\Support\Facades\Config::get('komunitas.daftar', []);
 
     $isKomunitasZone = str_contains($currentRoute, 'komunitas');
+    $isLainnya       = str_contains($currentRoute, 'open.recruitment');
 
-    // 5 link terpusat, tampil selalu (tanpa zone-hiding biar count & centering stabil).
-    // Komunitas (dropdown) disisipkan di antara $navBefore & $navAfter -> posisi ke-4.
+    // Menu utama (sentence case). Komunitas disisipkan di antara $navBefore & $navAfter.
     $navBefore = [
         ['label' => 'Beranda',          'href' => route('landing'),          'active' => $currentRoute === 'landing'],
         ['label' => 'Laboratorium PAI', 'href' => route('laboratorium.pai'), 'active' => in_array($currentRoute, ['laboratorium.pai', 'labor'])],
         ['label' => 'Perpustakaan',     'href' => route('perpustakaan'),     'active' => $currentRoute === 'perpustakaan'],
     ];
     $navAfter = [
-        ['label' => 'Open Recruitment', 'href' => route('open.recruitment'), 'active' => str_contains($currentRoute, 'open.recruitment')],
+        ['label' => 'Info', 'href' => route('info'), 'active' => $currentRoute === 'info' || $currentRoute === 'berita.show'],
+    ];
+    // Item sekunder yang dirapikan ke dropdown "Lainnya".
+    $navLainnya = [
+        ['label' => 'Open Recruitment', 'href' => route('open.recruitment')],
     ];
 
     // Palet minimalis: tenang saat non-aktif, emas saat aktif. Indikator aktif = garis bawah emas.
     $link      = fn ($active) => $active ? 'text-[var(--gold)]' : 'text-white/55 hover:text-white';
     $underline = fn ($active) => 'absolute left-0 bottom-0 h-[2px] bg-[var(--gold)] transition-all duration-300 '
         . ($active ? 'w-full' : 'w-0 group-hover:w-full');
+    // Base kelas link: sentence case. inline-flex+items-center dipakai SEMUA item
+    // (link & trigger dropdown) agar box-model & baseline identik → sejajar & rapi.
+    $navLinkClass = 'group relative inline-flex items-center pb-1 text-sm font-semibold tracking-tight transition-colors duration-200';
 @endphp
 
 {{-- Token tema gelap (.brand-mark, .cta-primary, CSS vars, font-display/label) di-supply
@@ -31,7 +38,7 @@
 
             {{-- ===== BRAND (kiri) ===== --}}
             <a href="{{ route('landing') }}" class="flex items-center gap-3 group shrink-0" title="Kembali ke Beranda">
-                <div class="brand-mark brand-mark-sm group-hover:scale-105 transition-transform">TS</div>
+                <img src="{{ asset('images/icon/tsaqib-media.svg.png') }}" alt="TSAQIB Logo" class="h-10 sm:h-11 w-auto object-contain shrink-0 group-hover:scale-105 transition-transform">
                 <span class="leading-none hidden sm:block">
                     <span class="font-display font-extrabold text-base tracking-tight text-[var(--cream)] block">TSAQIB</span>
                     <span class="text-[9px] text-[var(--gold)] font-bold tracking-[0.14em] uppercase block mt-1">FSI SMAN 1 Bukittinggi</span>
@@ -43,7 +50,7 @@
 
                 @foreach($navBefore as $item)
                     <a href="{{ $item['href'] }}"
-                       class="group relative pb-1 text-xs uppercase tracking-[0.16em] font-semibold transition-colors duration-200 {{ $link($item['active']) }}">
+                       class="{{ $navLinkClass }} {{ $link($item['active']) }}">
                         {{ $item['label'] }}
                         <span class="{{ $underline($item['active']) }}"></span>
                     </a>
@@ -51,18 +58,43 @@
 
                 {{-- Komunitas — link langsung ke feed gabungan semua komunitas (bukan dropdown) --}}
                 <a href="{{ route('komunitas', 'semua') }}"
-                   class="group relative pb-1 text-xs uppercase tracking-[0.16em] font-semibold transition-colors duration-200 {{ $link($isKomunitasZone) }}">
+                   class="{{ $navLinkClass }} {{ $link($isKomunitasZone) }}">
                     Komunitas
                     <span class="{{ $underline($isKomunitasZone) }}"></span>
                 </a>
 
                 @foreach($navAfter as $item)
                     <a href="{{ $item['href'] }}"
-                       class="group relative pb-1 text-xs uppercase tracking-[0.16em] font-semibold transition-colors duration-200 {{ $link($item['active']) }}">
+                       class="{{ $navLinkClass }} {{ $link($item['active']) }}">
                         {{ $item['label'] }}
                         <span class="{{ $underline($item['active']) }}"></span>
                     </a>
                 @endforeach
+
+                {{-- Lainnya — dropdown berisi menu sekunder (Open Recruitment, dst.).
+                     Click-to-toggle (bukan hover) biar konsisten di mouse, touch, & keyboard.
+                     Tampil/sembunyi diatur via JS (#lainnya-toggle / #lainnya-menu di <script> bawah). --}}
+                <div class="relative inline-flex items-center">
+                    <button type="button" id="lainnya-toggle"
+                            class="{{ $navLinkClass }} gap-1.5 {{ $link($isLainnya) }}"
+                            aria-haspopup="true" aria-expanded="false" aria-controls="lainnya-menu">
+                        <span>Lainnya</span>
+                        <i class="fa-solid fa-chevron-down text-[8px] leading-none opacity-70 transition-transform duration-200"></i>
+                        <span class="{{ $underline($isLainnya) }}"></span>
+                    </button>
+                    <div id="lainnya-menu"
+                         class="absolute left-0 top-full pt-2.5 opacity-0 invisible z-[60]">
+                        <div class="min-w-[210px] rounded-xl border border-white/10 bg-[#161a14] ring-1 ring-black/50 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.8)] overflow-hidden py-2">
+                            @foreach($navLainnya as $item)
+                                <a href="{{ $item['href'] }}"
+                                   class="lainnya-item flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-white/70 hover:text-[var(--gold)] hover:bg-white/5">
+                                    <i class="fa-solid fa-arrow-right text-[9px] text-white/30"></i>
+                                    {{ $item['label'] }}
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
             </nav>
 
             {{-- ===== KANAN: Auth (≥ xl) + Hamburger (< xl) ===== --}}
@@ -81,6 +113,9 @@
                             <i class="fa-brands fa-youtube text-base"></i>
                         </a>
                     </div>
+
+                    {{-- Pembatas tipis sebelum area Admin/Akun --}}
+                    <span class="w-px h-5 bg-white/10" aria-hidden="true"></span>
 
                     @auth
                         @if(Auth::user()->role === 'admin')
@@ -145,6 +180,40 @@
             </a>
         @endforeach
 
+        {{-- Lainnya (mobile) — toggle ekspandable berisi menu sekunder --}}
+        <div>
+            <button type="button" data-mobile-lainnya-toggle
+                    class="w-full flex items-center justify-between py-3 text-sm font-medium tracking-wide text-white/80 hover:text-white transition-colors duration-200"
+                    aria-expanded="false" aria-controls="mobile-lainnya">
+                <span>Lainnya</span>
+                <i class="fa-solid fa-chevron-down text-[10px] transition-transform duration-200"></i>
+            </button>
+            <div id="mobile-lainnya" class="hidden pl-4 border-l border-white/10 ml-1 mb-1 space-y-0.5">
+                @foreach($navLainnya as $item)
+                    <a href="{{ $item['href'] }}"
+                       class="block py-2.5 text-sm text-white/65 hover:text-[var(--gold)] transition-colors duration-200">
+                        {{ $item['label'] }}
+                    </a>
+                @endforeach
+            </div>
+        </div>
+
+        {{-- Social media (mobile) — sama seperti ikon di navbar desktop (≥ xl) --}}
+        <div class="pt-3 mt-2 border-t border-white/5">
+            <p class="px-1 mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/40">Ikuti Kami</p>
+            <div class="flex items-center gap-5 px-1">
+                <a href="https://www.instagram.com/fsi.smansa_landbouw?igsh=MXVzMzd5Nms0eDZpNQ==" target="_blank" rel="noopener" aria-label="TSAQIB di Instagram" class="text-white/70 hover:text-white transition-colors duration-200">
+                    <i class="fa-brands fa-instagram text-xl"></i>
+                </a>
+                <a href="https://www.facebook.com/share/1BJMFJvK5k/" target="_blank" rel="noopener" aria-label="TSAQIB di Facebook" class="text-white/70 hover:text-white transition-colors duration-200">
+                    <i class="fa-brands fa-facebook text-xl"></i>
+                </a>
+                <a href="https://ytfsi.carrd.co" target="_blank" rel="noopener" aria-label="TSAQIB di YouTube" class="text-white/70 hover:text-white transition-colors duration-200">
+                    <i class="fa-brands fa-youtube text-xl"></i>
+                </a>
+            </div>
+        </div>
+
         {{-- Area Auth (mobile) --}}
         <div class="pt-3 mt-2 border-t border-white/5 space-y-1">
             @auth
@@ -164,6 +233,45 @@
             @endauth
         </div>
     </div>
+
+<style>
+    /* ===== "Lainnya" dropdown (desktop) — animasi panel + stagger item =====
+       Visibilitas & animasi panel diatur di sini (bukan lewat kelas Tailwind)
+       supaya transition selalu hadir di setiap halaman, baik yang pakai Tailwind
+       CDN (Beranda) maupun app.css ter-compile. JS hanya toggle .is-open +
+       aria-expanded. opacity-0/invisible di markup menjaga tidak ada FOUC saat
+       halaman pertama dimuat. */
+    #lainnya-menu{
+        transform-origin: top left;
+        transform: translateY(-8px) scale(.96);
+        transition: opacity .18s ease-out, transform .18s ease-out, visibility .18s ease-out;
+    }
+    #lainnya-menu.is-open{
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0) scale(1);
+    }
+    /* Chevron berputar halus mengikuti state (driven by aria-expanded). */
+    #lainnya-toggle i{ transition: transform .2s ease-out; }
+    #lainnya-toggle[aria-expanded="true"] i{ transform: rotate(180deg); }
+    /* Stagger: tiap item muncul bergantian (fade + slide kanan) saat panel dibuka. */
+    #lainnya-menu .lainnya-item{
+        opacity: 0;
+        transform: translateX(-6px);
+        transition: opacity .16s ease-out, transform .16s ease-out, color .15s ease, background-color .15s ease;
+    }
+    #lainnya-menu.is-open .lainnya-item{ opacity: 1; transform: translateX(0); }
+    #lainnya-menu.is-open .lainnya-item:nth-child(1){ transition-delay: .05s; }
+    #lainnya-menu.is-open .lainnya-item:nth-child(2){ transition-delay: .09s; }
+    #lainnya-menu.is-open .lainnya-item:nth-child(3){ transition-delay: .13s; }
+    #lainnya-menu.is-open .lainnya-item:nth-child(4){ transition-delay: .17s; }
+    @media (prefers-reduced-motion: reduce){
+        #lainnya-menu, #lainnya-menu .lainnya-item{
+            transition: none !important;
+            transform: none !important;
+        }
+    }
+</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -199,5 +307,42 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && menu && !menu.classList.contains('hidden')) closeMenu();
         });
+
+        /* ============ "Lainnya" dropdown (mobile) ============ */
+        const lainnyaToggle = document.querySelector('[data-mobile-lainnya-toggle]');
+        const lainnyaPanel  = document.getElementById('mobile-lainnya');
+        if (lainnyaToggle && lainnyaPanel) {
+            const chevron = lainnyaToggle.querySelector('i');
+            lainnyaToggle.addEventListener('click', () => {
+                const open = !lainnyaPanel.classList.contains('hidden');
+                lainnyaPanel.classList.toggle('hidden', open);
+                lainnyaToggle.setAttribute('aria-expanded', open ? 'false' : 'true');
+                if (chevron) chevron.classList.toggle('rotate-180', !open);
+            });
+        }
+
+        /* ============ "Lainnya" dropdown (desktop, ≥ xl) — click-to-toggle ============
+           Sebelumnya hover-only (group-hover), jadi klik (mouse biasa, touch, keyboard)
+           nggak buka apa-apa. Sekarang toggle via klik + tutup otomatis saat klik di luar
+           atau tekan Escape. */
+        const lainnyaBtn  = document.getElementById('lainnya-toggle');
+        const lainnyaMenu = document.getElementById('lainnya-menu');
+        if (lainnyaBtn && lainnyaMenu) {
+            const openLainnya  = () => { lainnyaMenu.classList.add('is-open');    lainnyaBtn.setAttribute('aria-expanded', 'true'); };
+            const closeLainnya = () => { lainnyaMenu.classList.remove('is-open'); lainnyaBtn.setAttribute('aria-expanded', 'false'); };
+            lainnyaBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                lainnyaBtn.getAttribute('aria-expanded') === 'true' ? closeLainnya() : openLainnya();
+            });
+            document.addEventListener('click', (e) => {
+                if (lainnyaBtn.getAttribute('aria-expanded') === 'true' &&
+                    !lainnyaMenu.contains(e.target) && !lainnyaBtn.contains(e.target)) {
+                    closeLainnya();
+                }
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && lainnyaBtn.getAttribute('aria-expanded') === 'true') closeLainnya();
+            });
+        }
     });
 </script>

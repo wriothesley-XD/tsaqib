@@ -3,7 +3,7 @@
 <html lang="id" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}?v=2">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TSAQIB - Forum Studi Islam SMAN 1 Bukittinggi</title>
     @vite('resources/css/app.css')
@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&family=Manrope:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
@@ -19,8 +19,8 @@
                 extend: {
                     fontFamily: {
                         display: ['"Plus Jakarta Sans"', 'sans-serif'],
-                        sans: ['Inter', 'sans-serif'],
-                        label: ['Manrope', 'sans-serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        label: ['"Plus Jakarta Sans"', 'sans-serif'],
                     },
                 }
             }
@@ -89,7 +89,7 @@
             background:rgba(247,245,239,.1);
             border:1px solid rgba(247,245,239,.2);
             color:var(--cream);
-            font-family:'Manrope',sans-serif;font-weight:700;
+            font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;
             font-size:11px;letter-spacing:.06em;text-transform:uppercase;
             backdrop-filter:blur(4px);
         }
@@ -222,7 +222,7 @@
                 TSAQIB
             </h1>
             <p class="font-display font-bold text-[var(--gold)] text-lg sm:text-xl mt-1 tracking-tight">
-                Cerdas Iman, Unggul Prestasi
+                Cerdas, Unggul, dan Berakhlak Mulia
             </p>
 
             <p class="text-white text-sm sm:text-[15px] leading-relaxed mt-5 max-w-md">
@@ -350,6 +350,87 @@
             </div>
         </div>
     </main>
+
+    {{-- ================= BERITA (bg hijau gelap — 3 kartu gambar terbaru) =================
+         3 berita terpublikasi terbaru sebagai kartu gambar full-bleed (rasio 4:5).
+         Berita paling baru (pertama di-loop) ditandai "Unggulan" lewat badge emas.
+         Tanpa slot kosong: kalau jumlah berita < 3, grid tetap rapi dengan yang ada.
+
+         Catatan layout:
+         • mt-auto DIHAPUS — sebelumnya bersaing dgn flex-1 <main> & mt-auto <footer>,
+           memunculkan gap kosong yang nggak konsisten di atas section.
+         • pt ada di <section> (transparent, section tak punya bg) → memisahkan band
+           dari hero. Background hijau dipindah ke inner div full-width.
+         • grid pakai items-start agar aspect-ratio 4:5 kartu nggak ditimpa align-stretch. --}}
+    @if($kabarTerbaru->isNotEmpty())
+    <section class="relative z-10 w-full pt-16 sm:pt-20">
+        <div class="w-full" style="background:linear-gradient(180deg,#0a2e2218 0%,#0618125a 100%);">
+            <div class="max-w-7xl mx-auto px-5 sm:px-8 py-12 sm:py-16">
+
+                {{-- Header: judul "◇✦ BERITA ✦◇" di tengah, "Lihat Semua" kanan-atas --}}
+                <div class="relative text-center mb-8 sm:mb-10">
+                    <h2 class="font-display font-extrabold text-2xl sm:text-3xl tracking-[0.08em] text-[var(--cream)]">
+                        <span class="text-[var(--gold)]">◇✦</span>
+                        <span class="mx-2">BERITA</span>
+                        <span class="text-[var(--gold)]">✦◇</span>
+                    </h2>
+                    <a href="{{ route('info') }}" class="hidden sm:inline-flex items-center gap-1.5 text-sm font-bold text-emerald-400 hover:text-emerald-300 whitespace-nowrap transition absolute right-0 top-1">
+                        Lihat Semua <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </a>
+                </div>
+
+                {{-- Grid 3 kartu gambar (1 kolom mobile → 2 tablet → 3 desktop).
+                     items-start: kartu memakai tinggi aspect-ratio-nya sendiri, BUKAN
+                     direnteng-reng ke tinggi baris (align-stretch menimpa aspect-ratio). --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 items-start">
+                    @foreach($kabarTerbaru as $r)
+                        <a href="{{ route('berita.show', $r->slug) }}"
+                           class="group relative block rounded-3xl overflow-hidden aspect-[4/5] shadow-lg shadow-black/30">
+
+                            {{-- Latar full-bleed: thumbnail asli, fallback gradient emerald kalau tak ada gambar --}}
+                            @if($r->thumbnail)
+                                <img src="{{ asset('storage/' . $r->thumbnail) }}" alt="{{ $r->title }}"
+                                     class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                            @else
+                                <div class="absolute inset-0" style="background:linear-gradient(155deg,#0f7a5c,#0a4a3a);"></div>
+                            @endif
+
+                            {{-- Overlay gelap di bawah demi keterbacaan teks --}}
+                            <div class="absolute inset-0" style="background:linear-gradient(180deg, rgba(6,24,18,.05) 0%, rgba(6,24,18,.35) 45%, rgba(6,24,18,.92) 100%);"></div>
+
+                            {{-- Badge emas "Unggulan" kanan-atas — hanya untuk berita terbaru (featured = pertama) --}}
+                            @if($loop->first)
+                                <span class="absolute top-3 right-3 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#C9A66B] text-[#10140F] font-bold uppercase tracking-wider shadow-md" style="font-size:10px;">
+                                    <i class="fa-solid fa-star" style="font-size:9px;"></i> Unggulan
+                                </span>
+                            @endif
+
+                            {{-- Teks overlay di bawah: judul tebal + baris meta muted (tanggal • penulis) --}}
+                            <div class="absolute inset-x-0 bottom-0 z-10 p-5 sm:p-6">
+                                <div class="flex items-center gap-2 text-[11px] mb-2">
+                                    <i class="fa-regular fa-calendar text-emerald-300/80" style="font-size:10px;"></i>
+                                    <span class="text-emerald-300/80">{{ $r->published_at?->format('d M Y') }}</span>
+                                    @if($r->user)
+                                        <span class="text-white/40">•</span>
+                                        <span class="text-white/55 truncate">{{ $r->user->name }}</span>
+                                    @endif
+                                </div>
+                                <h3 class="font-display font-bold text-lg sm:text-xl text-white leading-snug line-clamp-3">{{ $r->title }}</h3>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+
+                {{-- Mobile "Lihat Semua" --}}
+                <div class="text-center mt-8 sm:hidden">
+                    <a href="{{ route('info') }}" class="cta-primary inline-flex items-center gap-2 text-white font-bold text-xs px-6 py-3.5 rounded-full">
+                        <i class="fa-solid fa-grip text-xs"></i> Lihat Semua Berita
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    @endif
 
     {{-- ================= KOMUNITAS PREVIEW (publik — tamu bisa lihat tanpa login) ================= --}}
     @if(!empty($daftarKomunitas))
@@ -501,36 +582,42 @@
         // Unified drag via Pointer Events (mouse / trackpad / touch / pen — one path).
         // Routed through the same handlers as everything else, so it shares the loop
         // state (pos/mode/resumeAt) and never conflicts with arrows or auto-scroll.
+        //
+        // move/up dipasang ke window, dan kita TIDAK pakai setPointerCapture. Alasan:
+        // setPointerCapture pada ancestor (track) bikin banyak browser me-retarget
+        // event `click` ke track, bukan ke <a> card -> kartu tak pernah navigasi ke
+        // routenya meski cursor di atas <a>. Dengan listener window, drag tetap
+        // terlacak saat pointer keluar track, DAN click bersih jatuh ke <a> card.
         let dragging = false, activeId = null, startX = 0, startPos = 0, moved = false;
 
-        const onDown = (e) => {
-            dragging = true; moved = false; activeId = e.pointerId;
-            startX = e.clientX; startPos = pos;
-            resumeAt = Infinity;                                  // pointerdown: pause auto-scroll now
-            if (track.setPointerCapture) {                        // keep events flowing past the track edge
-                try { track.setPointerCapture(e.pointerId); } catch (_) {}
-            }
-        };
         const onMove = (e) => {
             if (!dragging || e.pointerId !== activeId) return;    // ignore other pointers (multi-touch)
             const dx = e.clientX - startX;
-            if (!moved && Math.abs(dx) > 4) moved = true;         // threshold -> drag vs click
+            if (!moved && Math.abs(dx) > 8) moved = true;         // threshold -> drag vs click (8px, toleransi jitter trackpad/touch)
             if (moved) { mode = 'drag'; pos = startPos - dx; }    // pointermove: follow cursor/finger 1:1
         };
         const onUp = (e) => {
             if (!dragging || e.pointerId !== activeId) return;
             dragging = false; activeId = null;
-            if (!moved) { resumeAt = performance.now(); return; } // click/tap: just resume
-            // swallow the click that follows a drag so card links don't navigate
+            window.removeEventListener('pointermove', onMove);
+            window.removeEventListener('pointerup', onUp);
+            window.removeEventListener('pointercancel', onUp);
+            if (!moved) { resumeAt = performance.now(); return; } // klik/tap bersih -> biarkan <a> navigasi
+            // Hanya setelah drag betul-betul: telan click susulan agar card tak navigasi
             track.addEventListener('click', (ev) => ev.preventDefault(), { capture: true, once: true });
             target = Math.round(pos / pitch()) * pitch();         // pointerup: snap to nearest card
             mode = 'snap';
             resumeAt = performance.now() + RESUME_DELAY;          // resume auto-scroll shortly after
         };
+        const onDown = (e) => {
+            dragging = true; moved = false; activeId = e.pointerId;
+            startX = e.clientX; startPos = pos;
+            resumeAt = Infinity;                                  // pointerdown: pause auto-scroll now
+            window.addEventListener('pointermove', onMove);
+            window.addEventListener('pointerup', onUp);
+            window.addEventListener('pointercancel', onUp);
+        };
         track.addEventListener('pointerdown', onDown);
-        track.addEventListener('pointermove', onMove);
-        track.addEventListener('pointerup', onUp);
-        track.addEventListener('pointercancel', onUp);
         // pan-y (CSS on track + cards) reserves horizontal swipes for us while vertical
         // still scrolls the page; wrap() makes hitting the cloned set reset instantly
         // (no transition) to the matching real card -> stays infinite.

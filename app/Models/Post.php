@@ -36,6 +36,15 @@ class Post extends Model
     }
 
     /**
+     * User yang menyimpan/mem-bookmark post ini (tab "Tersimpan" di profil).
+     */
+    public function savedBy(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'post_user')
+            ->withTimestamps();
+    }
+
+    /**
      * Semua suara pada post ini. CATATAN: di feed di-eager-load HANYA untuk
      * user yang sedang login (lihat PageController::komunitasIndex), sehingga
      * $post->votes berisi 0 atau 1 item (suara user saat ini).

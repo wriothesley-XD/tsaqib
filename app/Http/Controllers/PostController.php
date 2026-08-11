@@ -216,13 +216,13 @@ class PostController extends Controller
     public function show(Post $post)
     {
         $post->load(['user', 'media', 'comments.user']);
-        $post->loadCount(['comments', 'reposts']);
+        $post->loadCount(['comments']);
 
         if (Auth::check()) {
             $userId = Auth::id();
             $post->load([
                 'votes' => fn ($q) => $q->where('user_id', $userId)->select(['post_id', 'type']),
-                'reposts' => fn ($q) => $q->where('user_id', $userId)->select(['post_id']),
+                'savedBy' => fn ($q) => $q->where('user_id', $userId)->select(['post_id']),
             ]);
         }
 
@@ -290,6 +290,24 @@ class PostController extends Controller
         return response()->json([
             'reposts' => Repost::where('post_id', $post->id)->count(),
             'reposted' => $reposted,
+        ]);
+    }
+
+    /**
+     * Simpan / batal simpan sebuah post (bookmark "Tersimpan") via AJAX.
+     * Satu baris per user-post (unique constraint di pivot post_user).
+     * Disimpan server-side di pivot post_user — bukan localStorage — sehingga
+     * sinkron antar perangkat dan muncul di tab "Tersimpan" profil.
+     * Mengembalikan JSON: { saved, saves }.
+     */
+    public function toggleSave(Post $post): JsonResponse
+    {
+        $user = Auth::user();
+        $saved = $user->savedPosts()->toggle([$post->id]);
+
+        return response()->json([
+            'saved' => ! empty($saved['attached']),
+            'saves' => $post->savedBy()->count(),
         ]);
     }
 }

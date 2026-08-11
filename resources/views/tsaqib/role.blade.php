@@ -4,7 +4,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}?v=2">
     <title>Informasi Role</title>
 </head>
 <body>

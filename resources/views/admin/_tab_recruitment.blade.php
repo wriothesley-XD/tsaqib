@@ -25,36 +25,33 @@
         </form>
     </div>
 
-    <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs text-white/75">
-            <thead class="bg-white/5 border-b border-white/10 font-bold uppercase text-[10px] text-white/50">
-                <tr>
-                    <th class="p-3">#</th>
-                    <th class="p-3">Nama Lengkap</th>
-                    <th class="p-3">Panggilan</th>
-                    <th class="p-3">Kelas</th>
-                    <th class="p-3">Instagram</th>
-                    <th class="p-3">Alasan Bergabung</th>
-                    <th class="p-3">Tanggal Submit</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-white/10">
-                @forelse($registrations as $index => $r)
-                    <tr class="hover:bg-white/5">
-                        <td class="p-3 font-bold">{{ $index + 1 }}</td>
-                        <td class="p-3 font-semibold text-[var(--cream)]">{{ $r->nama_lengkap }}</td>
-                        <td class="p-3">{{ $r->nama_panggilan }}</td>
-                        <td class="p-3 font-bold text-[var(--gold)]">{{ $r->kelas }}</td>
-                        <td class="p-3">@ {{ $r->instagram_username }}</td>
-                        <td class="p-3 max-w-xs truncate">{{ $r->alasan_bergabung }}</td>
-                        <td class="p-3 text-white/40">{{ $r->created_at->format('d M Y, H:i') }}</td>
-                    </tr>
-                @empty
+    <div data-admin-list="registrations"
+         data-admin-url="{{ route('admin.list', 'registrations') }}"
+         data-admin-page="{{ $registrations->currentPage() }}"
+         data-admin-last="{{ $registrations->lastPage() }}"
+         data-admin-total="{{ $registrations->total() }}"
+         data-admin-per-page="{{ $registrations->perPage() }}">
+        <div class="overflow-x-auto">
+            <table class="admin-table w-full text-left text-xs text-white/75">
+                <thead class="bg-white/5 border-b border-white/10 font-bold uppercase text-[10px] text-white/50">
                     <tr>
-                        <td colspan="7" class="p-6 text-center text-white/40">Belum ada data pendaftar.</td>
+                        <th class="p-3">#</th>
+                        <th class="p-3">Nama Lengkap</th>
+                        <th class="p-3">Panggilan</th>
+                        <th class="p-3">Kelas</th>
+                        <th class="p-3">Instagram</th>
+                        <th class="p-3">Alasan Bergabung</th>
+                        <th class="p-3">Tanggal Submit</th>
                     </tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody data-admin-list-body class="divide-y divide-white/10">
+                    @include('admin._list_registrations', ['registrations' => $registrations, 'startIndex' => $registrations->firstItem() ?? 1])
+                </tbody>
+            </table>
+        </div>
+
+        @include('admin._pagination', ['paginator' => $registrations])
+        <p data-admin-status class="hidden text-center text-[11px] text-white/40 py-3"></p>
+        <div data-admin-sentinel class="h-1" aria-hidden="true"></div>
     </div>
 </div>

@@ -1,0 +1,318 @@
+/* =========================================================================
+   resources/views/profile/edit.blade.php — stylesheet
+   =========================================================================
+   INI FILE STATIS, di-link langsung via <link> di <head> edit.blade.php.
+
+   Kenapa file terpisah, bukan @push('styles')? Karena edit.blade.php adalah
+   dokumen HTML utuh (punya <head> sendiri, TIDAK @extends layout). Ia
+   @include('partials.theme-head') yang sudah me-render @stack('styles') SAAT
+   di-include. Akibatnya @push('styles') yang ditulis SETELAH include itu
+   jadi yatim — Blade sudah me-yield stack-nya sebelum push sempat dicatat,
+   sehingga CSS modal tak pernah termuat dan modal muncul sebagai blok inline.
+   File statis + <link> menghindari @push/@stack sepenuhnya → pasti termuat.
+
+   Dimuat SETELAH Tailwind (via @vite di theme-head) sehingga aturan di sini
+   dapat meng-override bila perlu. Tidak ada konflik dengan class tema
+   (.tsaqib-card, .tsaqib-input, dll) — file ini hanya mendefinisikan .pr-*.
+   ========================================================================= */
+
+:root{
+    --emerald:#10B981;
+    --emerald-soft:rgba(16,185,129,.16);
+    --gold-2:#E6C98A;
+    --gold-soft:rgba(201,166,107,.16);
+    --danger:#EF4444;
+    --danger-soft:rgba(239,68,68,.08);
+    --danger-line:rgba(239,68,68,.30);
+    --card:rgba(247,245,239,.05);
+}
+
+.pr-display{ font-family:'Plus Jakarta Sans', sans-serif; letter-spacing:-.01em; }
+
+/* ===== Tombol ===== */
+.pr-ghost-btn{
+    display:inline-flex; align-items:center; gap:.4rem;
+    padding:.5rem .8rem; border-radius:.65rem; font-size:12px; font-weight:700;
+    background:rgba(247,245,239,.05); border:1px solid rgba(247,245,239,.14);
+    color:rgba(247,245,239,.8); cursor:pointer;
+    transition:background .15s ease, border-color .15s ease, color .15s ease;
+}
+.pr-ghost-btn:hover{ border-color:rgba(247,245,239,.3); color:var(--cream); }
+
+.pr-save-btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:.3rem;
+    background:linear-gradient(135deg, var(--emerald), var(--green));
+    color:#fff; font-weight:800; font-size:13px; padding:.7rem 1rem; border-radius:.8rem;
+    box-shadow:0 8px 22px -8px rgba(1,121,95,.65);
+    transition:transform .15s ease, opacity .15s ease; cursor:pointer;
+}
+.pr-save-btn:hover{ transform:translateY(-1px); }
+.pr-save-btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
+
+.pr-x-btn{
+    width:2rem; height:2rem; border-radius:.6rem; display:inline-flex; align-items:center; justify-content:center;
+    background:rgba(247,245,239,.06); color:rgba(247,245,239,.6); cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+}
+.pr-x-btn:hover{ background:rgba(247,245,239,.12); color:var(--cream); }
+
+.pr-link-btn{ background:none; border:none; color:var(--gold); font-size:11px; font-weight:700; cursor:pointer; text-decoration:underline; padding:0; margin-top:.35rem; }
+
+/* ===== Tabs ===== */
+.pr-tabs{ display:flex; gap:.5rem; }
+.pr-tab{
+    flex:1; display:inline-flex; align-items:center; justify-content:center; gap:.45rem;
+    padding:.8rem 1rem; font-size:13px; font-weight:700; cursor:pointer;
+    border-radius:.9rem; border:1px solid rgba(247,245,239,.10);
+    background:rgba(247,245,239,.03); color:rgba(247,245,239,.55);
+    transition:background .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.pr-tab:hover{ color:var(--cream); border-color:rgba(247,245,239,.22); }
+.pr-tab.is-active{
+    color:var(--ink); background:linear-gradient(135deg, var(--gold-2), var(--gold));
+    border-color:transparent; box-shadow:0 8px 20px -8px rgba(201,166,107,.5);
+}
+.pr-tab .count{ font-size:11px; opacity:.7; font-weight:800; }
+.pr-tab.is-active .count{ opacity:.85; }
+.pr-panel{ display:none; }
+.pr-panel.is-active{ display:block; }
+
+/* ===== Item list (post / comment) ===== */
+.pr-item{
+    display:flex; gap:.75rem; align-items:flex-start; padding:.85rem .9rem;
+    border-radius:.9rem; background:rgba(247,245,239,.04); border:1px solid rgba(247,245,239,.08);
+    transition:background .18s ease, border-color .18s ease;
+}
+.pr-item + .pr-item{ margin-top:.5rem; }
+.pr-item:hover{ background:rgba(247,245,239,.07); border-color:rgba(247,245,239,.16); }
+.pr-item-icon{
+    width:2.1rem; height:2.1rem; flex-shrink:0; border-radius:.65rem;
+    display:flex; align-items:center; justify-content:center; font-size:.85rem;
+    background:var(--emerald-soft); color:#34d399;
+}
+.pr-item-icon-gold{ background:var(--gold-soft); color:var(--gold); }
+.pr-item-del{
+    flex-shrink:0; width:2.1rem; height:2.1rem; border-radius:.65rem;
+    background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.2);
+    color:#f87171; cursor:pointer; font-size:.8rem;
+    transition:background .15s ease, color .15s ease;
+}
+.pr-item-del:hover{ background:var(--danger); color:#fff; }
+.pr-empty{ padding:2.5rem 1rem; text-align:center; color:rgba(247,245,239,.38); }
+.pr-empty i{ font-size:1.6rem; opacity:.5; display:block; margin-bottom:.5rem; }
+.pr-empty p{ font-size:12px; }
+
+/* ===== Infinite scroll — panel aktivitas desktop (posts/comments/saved) =====
+   Container scrollable tinggi terbatas; sentinel di-observe utk load-more.
+   Tinggi pakai max-height (bukan tetap) agar panel pendek tak memaksa scroll. */
+.pr-dscroll{ max-height:30rem; overflow-y:auto; padding-right:.25rem;
+    scrollbar-width:thin; scrollbar-color:rgba(247,245,239,.18) transparent; }
+.pr-dscroll::-webkit-scrollbar{ width:6px; }
+.pr-dscroll::-webkit-scrollbar-thumb{ background:rgba(247,245,239,.18); border-radius:9999px; }
+.pr-dscroll-sentinel{ padding:.85rem 0; text-align:center; font-size:11px; font-weight:600;
+    color:rgba(247,245,239,.4); min-height:1rem; }
+
+/* ===== Zona berbahaya (delete account) ===== */
+.pr-danger{
+    border:1px solid var(--danger-line);
+    background:linear-gradient(135deg, var(--danger-soft), rgba(239,68,68,.02));
+    border-radius:1rem; padding:1.25rem 1.4rem;
+}
+.pr-danger-ic{
+    width:2.4rem; height:2.4rem; flex-shrink:0; border-radius:.7rem;
+    display:flex; align-items:center; justify-content:center; font-size:1rem;
+    background:rgba(239,68,68,.14); color:#fca5a5; border:1px solid rgba(239,68,68,.25);
+}
+.pr-danger-btn{
+    display:inline-flex; align-items:center; gap:.4rem;
+    padding:.55rem .9rem; border-radius:.7rem; font-size:12px; font-weight:700;
+    background:transparent; border:1px solid var(--danger-line); color:#f87171; cursor:pointer;
+    transition:background .15s ease, color .15s ease, border-color .15s ease;
+}
+.pr-danger-btn:hover{ background:var(--danger); color:#fff; border-color:var(--danger); }
+.pr-danger-confirm-btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:.3rem;
+    background:linear-gradient(135deg, #ef4444, #b91c1c); color:#fff;
+    font-weight:800; font-size:13px; padding:.7rem 1rem; border-radius:.8rem; border:none; cursor:pointer;
+    box-shadow:0 8px 22px -8px rgba(239,68,68,.6);
+    transition:transform .15s ease, opacity .15s ease;
+}
+.pr-danger-confirm-btn:hover:not(:disabled){ transform:translateY(-1px); }
+.pr-danger-confirm-btn:disabled{ opacity:.45; cursor:not-allowed; transform:none; box-shadow:none; }
+
+/* ===== Modal (overlay) =====
+   z-index 80 → di atas navbar (z-[70]). Hidden by default lewat
+   opacity/visibility/pointer-events (display tak bisa di-transition);
+   .is-open ditoggle oleh JS openModal()/closeModal(). */
+.pr-modal{
+    position:fixed; inset:0; z-index:80;
+    display:flex; align-items:center; justify-content:center; padding:1rem;
+    opacity:0; visibility:hidden; pointer-events:none;
+    transition:opacity .18s ease, visibility .18s ease;
+}
+.pr-modal.is-open{ opacity:1; visibility:visible; pointer-events:auto; }
+.pr-modal-bg{ position:absolute; inset:0; background:rgba(0,0,0,.55); backdrop-filter:blur(3px); }
+.pr-modal-card{
+    position:relative; width:min(560px,94vw); max-height:92vh; overflow:auto;
+    border-radius:1rem; padding:1.5rem;
+    background:linear-gradient(180deg, #14181100, #141811 12%), var(--card);
+    border:1px solid rgba(247,245,239,.14);
+    box-shadow:0 30px 60px -20px rgba(0,0,0,.7);
+    transform:scale(.97); transition:transform .18s ease;
+}
+.pr-modal.is-open .pr-modal-card{ transform:scale(1); }
+/* Varian form: header/body/footer — body scroll, header & footer nempel (sticky). */
+.pr-modal-card--form{ padding:0; display:flex; flex-direction:column; overflow:hidden; }
+.pr-confirm-ic{
+    width:2.4rem; height:2.4rem; flex-shrink:0; border-radius:.7rem;
+    display:flex; align-items:center; justify-content:center; font-size:1rem;
+    background:var(--gold-soft); color:var(--gold);
+}
+
+/* ===== Form fields ===== */
+.pr-field{ margin-bottom:.9rem; }
+.pr-field-label{ display:block; font-size:10px; font-weight:800; color:rgba(247,245,239,.45); text-transform:uppercase; letter-spacing:.07em; margin-bottom:.4rem; }
+.pr-err{ font-size:11px; color:#fca5a5; margin-top:.3rem; }
+/* Bio counter: berubah merah mendekati limit (140/160). */
+#pr-bio-count{ color:rgba(247,245,239,.4); transition:color .15s ease; }
+#pr-bio-count.is-warn{ color:#fca5a5; }
+
+/* Avatar upload + preview di modal */
+.pr-upload-ring{
+    width:4.5rem; height:4.5rem; border-radius:999px; padding:3px; flex-shrink:0;
+    background:conic-gradient(from 140deg, var(--emerald), var(--gold), var(--emerald));
+}
+.pr-upload-ring img{ width:100%; height:100%; border-radius:999px; object-fit:cover; display:block; background:#161a14; border:2px solid var(--ink); }
+.pr-upload-btn{
+    display:inline-flex; align-items:center; gap:.4rem; cursor:pointer;
+    padding:.45rem .8rem; border-radius:.65rem; font-size:12px; font-weight:700;
+    background:rgba(1,121,95,.16); border:1px solid rgba(1,121,95,.4); color:#5fd3b0;
+    transition:background .15s ease;
+}
+.pr-upload-btn:hover{ background:rgba(1,121,95,.26); }
+.pr-upload-ring--over{ outline:2px dashed var(--gold); outline-offset:3px; }
+
+.pr-pw-toggle{
+    position:absolute; right:.6rem; top:50%; transform:translateY(-50%);
+    background:none; border:none; color:rgba(247,245,239,.4); cursor:pointer; font-size:.85rem; padding:.2rem;
+}
+.pr-pw-toggle:hover{ color:var(--cream); }
+
+/* ===== Toast ===== */
+.pr-toasts{ position:fixed; top:1rem; right:1rem; z-index:95; display:flex; flex-direction:column; gap:.5rem; max-width:min(360px,92vw); }
+.pr-toast{
+    display:flex; align-items:center; gap:.5rem; padding:.7rem .9rem; border-radius:.75rem;
+    font-size:12px; font-weight:700; color:#fff;
+    transform:translateX(120%); opacity:0;
+    transition:transform .3s cubic-bezier(.2,.8,.2,1), opacity .3s ease;
+    box-shadow:0 14px 34px -12px rgba(0,0,0,.65);
+}
+.pr-toast.show{ transform:translateX(0); opacity:1; }
+.pr-toast-success{ background:linear-gradient(135deg, var(--emerald), var(--green)); border:1px solid rgba(63,214,176,.4); }
+.pr-toast-error{ background:linear-gradient(135deg, #ef4444, #b91c1c); border:1px solid rgba(248,113,113,.5); }
+
+/* =========================================================================
+   Follow system + activity tabs (infinite scroll) + people modal
+   ========================================================================= */
+
+/* Tombol Ikuti / Mengikuti (hanya saat melihat profil orang lain) */
+.pr-follow-btn{
+    display:inline-flex;align-items:center;gap:.5rem;
+    padding:.5rem 1rem;border-radius:.8rem;font-size:13px;font-weight:800;
+    background:linear-gradient(135deg, var(--emerald), var(--green)); color:#fff;
+    border:1px solid transparent;
+    box-shadow:0 8px 22px -8px rgba(1,121,95,.55);
+    transition:transform .15s ease, background .15s ease, color .15s ease, border-color .15s ease;
+    cursor:pointer;
+}
+.pr-follow-btn:hover{ transform:translateY(-1px); }
+.pr-follow-btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
+.pr-follow-btn.is-following{
+    background:rgba(247,245,239,.06); color:rgba(247,245,239,.85);
+    border-color:rgba(247,245,239,.18); box-shadow:none;
+}
+.pr-follow-btn.is-following:hover{
+    background:rgba(239,68,68,.16); color:#fca5a5; border-color:rgba(239,68,68,.4);
+}
+
+/* Link statistik pengikut/mengikuti (klikable → modal orang) */
+.pr-stat-link{ background:none; border:none; color:rgba(247,245,239,.6); font-size:12px; font-weight:600; cursor:pointer; padding:0; transition:color .15s ease; }
+.pr-stat-link:hover{ color:var(--gold); }
+.pr-stat-link strong{ color:var(--cream); font-weight:800; }
+
+/* Avatar stack pengikut terbaru */
+.pr-fstack{ display:flex; align-items:center; }
+.pr-fstack img{ width:1.6rem; height:1.6rem; border-radius:9999px; object-fit:cover; border:2px solid var(--ink); background:#161a14; }
+.pr-fstack img + img{ margin-left:-.5rem; }
+
+/* Baris orang di modal pengikut/mengikuti */
+.pr-person{ display:flex; align-items:center; gap:.7rem; padding:.5rem .25rem; border-radius:.65rem; transition:background .15s ease; }
+.pr-person:hover{ background:rgba(247,245,239,.04); }
+.pr-person-avatar{ width:2.2rem; height:2.2rem; border-radius:9999px; object-fit:cover; flex-shrink:0; background:#161a14; }
+
+/* Header panel tab: judul kecil + "Lihat Semua" */
+.pr-tab-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:.5rem; }
+.pr-tab-head .lbl{ font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:rgba(247,245,239,.4); }
+.pr-see-all{ font-size:11px; font-weight:700; color:var(--gold); text-decoration:none; white-space:nowrap; }
+.pr-see-all:hover{ text-decoration:underline; }
+
+/* Sentinel infinite scroll: zona status di bawah tiap panel.
+   Penting: tetap punya layout box walau kosong (min-height) — jika di-hidden
+   saat empty, IntersectionObserver tidak punya target untuk menembak load. */
+.pr-sentinel{ display:flex; align-items:center; justify-content:center; gap:.4rem; min-height:1.5rem; padding:.4rem; color:rgba(247,245,239,.45); font-size:11px; }
+
+/* Banner defensif: pastikan span 100% di dalam kartu (lihat edit.blade.php) */
+.pr-banner{ width:100%; }
+
+/* Banner display di profil (object-fit cover, rasio 4:1) + drop-box upload di modal */
+.pr-banner-img{ display:block; width:100%; height:200px; object-fit:cover; }
+.pr-banner-drop{ position:relative; background:rgba(247,245,239,.03); cursor:pointer; }
+.pr-banner-preview-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+.pr-banner-placeholder{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:.4rem; color:rgba(247,245,239,.3); font-size:11px; }
+.pr-banner-drop.has-img .pr-banner-placeholder{ display:none; }
+.pr-banner-drop:not(.has-img) .pr-banner-preview-img{ display:none; }
+
+/* =========================================================================
+   PROFILE REDESIGN — desktop card + mobile stat/tab grid
+   ========================================================================= */
+
+/* Kartu profil besar (desktop) */
+.pr-card{ max-width:960px; margin-inline:auto; border-radius:1.5rem; border:1px solid rgba(247,245,239,.10); background:rgba(247,245,239,.025); overflow:hidden; }
+/* Banner emerald: terang di top-center, memudar gelap ke tepi. Kosong (tanpa konten). */
+.pr-banner2{ height:200px; width:100%; background:radial-gradient(circle at 50% -20%, #10B981 0%, #01795F 38%, #0a1f1c 78%, #08140f 100%); }
+/* Avatar besar melingkar, overlap banner & area bawah */
+.pr-avatar{ width:140px; height:140px; border-radius:9999px; object-fit:cover; border:4px solid var(--ink); background:#161a14; box-shadow:0 14px 34px -14px rgba(0,0,0,.75); }
+.pr-avatar-ph{ width:140px; height:140px; border-radius:9999px; border:4px solid var(--ink); background:#161a14; display:flex; align-items:center; justify-content:center; box-shadow:0 14px 34px -14px rgba(0,0,0,.75); }
+/* Pill peran (gold/amber) */
+.pr-role-pill{ display:inline-flex; align-items:center; gap:.35rem; padding:.28rem .8rem; border-radius:9999px; font-size:11px; font-weight:800; letter-spacing:.04em; background:linear-gradient(135deg, #E6C98A, #C9A66B); color:#3a2f12; }
+
+/* Varian komunitas dari role-pill — tint emerald agar berbeda dari pill role
+   (gold). Tautan ke /komunitas/{slug}; dipakai di profil desktop & mobile. */
+.pr-role-pill--community{ background:var(--emerald-soft); color:#34d399; text-decoration:none; transition:background .15s ease, color .15s ease; }
+.pr-role-pill--community:hover{ background:rgba(16,185,129,.28); color:#6ee7b7; }
+
+/* Desktop tabs (horizontal, left-aligned, gold underline) */
+.pr-dtabs{ display:flex; gap:1.75rem; border-bottom:1px solid rgba(247,245,239,.10); }
+.pr-dtab{ position:relative; padding:.9rem .15rem; font-size:13px; font-weight:700; letter-spacing:.02em; color:rgba(247,245,239,.4); background:none; border:none; cursor:pointer; transition:color .15s ease; }
+.pr-dtab:hover{ color:rgba(247,245,239,.75); }
+.pr-dtab.is-active{ color:#fff; }
+.pr-dtab.is-active::after{ content:''; position:absolute; left:0; right:0; bottom:-1px; height:2px; background:var(--gold); border-radius:2px; }
+
+/* Cover buku (2:3) + badge bulat pojok kiri atas */
+.pr-cover{ position:relative; aspect-ratio:2/3; border-radius:.6rem; overflow:hidden; border:1px solid rgba(247,245,239,.12); background:linear-gradient(160deg, rgba(1,121,95,.28), #08140f 92%); }
+.pr-cover img{ width:100%; height:100%; object-fit:cover; display:block; }
+.pr-cover-badge{ position:absolute; top:6px; left:6px; width:1.5rem; height:1.5rem; border-radius:9999px; background:rgba(0,0,0,.55); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,.85); font-size:9px; }
+
+/* Mobile tab grid 2x2 */
+.pr-mtab{ display:flex; align-items:center; gap:.5rem; padding:.85rem .9rem; border-radius:1rem; border:1px solid rgba(247,245,239,.10); background:rgba(247,245,239,.03); color:rgba(247,245,239,.6); font-weight:700; font-size:13px; cursor:pointer; text-align:left; transition:background .15s ease, color .15s ease, border-color .15s ease; }
+.pr-mtab:hover{ color:rgba(247,245,239,.85); }
+.pr-mtab .count{ margin-left:auto; font-size:10px; font-weight:800; background:rgba(247,245,239,.1); color:rgba(247,245,239,.6); padding:1px 8px; border-radius:9999px; }
+.pr-mtab.is-active{ background:linear-gradient(135deg, #E6C98A, #C9A66B); color:#3a2f12; border-color:transparent; }
+.pr-mtab.is-active .count{ background:rgba(58,47,18,.18); color:#3a2f12; }
+
+/* Heading section + See All link (dipakai _activity / recent activity) */
+.pr-sec-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:.5rem; }
+.pr-sec-head .h{ font-size:10px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; color:rgba(247,245,239,.4); }
+.pr-see-all{ font-size:11px; font-weight:700; color:var(--gold); text-decoration:none; white-space:nowrap; }
+.pr-see-all:hover{ text-decoration:underline; }
+.pr-nomore{ text-align:center; font-size:11px; color:rgba(247,245,239,.3); margin-top:.75rem; }

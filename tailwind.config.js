@@ -12,7 +12,8 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                // Konsisten dengan @theme di resources/css/app.css (Tailwind v4).
+                sans: ['"Plus Jakarta Sans"', ...defaultTheme.fontFamily.sans],
             },
         },
     },

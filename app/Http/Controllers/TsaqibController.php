@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
+
 class TsaqibController extends Controller
 {
     /**
@@ -29,20 +31,11 @@ class TsaqibController extends Controller
             ['nama' => 'Nama Wakil', 'jabatan' => 'Wakil Ketua'],
         ];
 
-        return view('tsaqib.labor-pai', compact('visiMisi', 'pembina', 'pengurusSiswa'));
-    }
+        // URL flipbook "Profil TSAQIB" (diisi admin via tabel settings, key: profil_tsaqib_url).
+        // Default ke flipbook Heyzine saat setting belum diisi.
+        $profilTsaqibUrl = Setting::getByKey('profil_tsaqib_url', 'https://heyzine.com/flip-book/8e0a75dc7f.html');
 
-    /**
-     * Informasi Kegiatan FSI — publik (baru).
-     * Konten masih placeholder, sama seperti laborPai() di atas.
-     */
-    public function kegiatan()
-    {
-        $kegiatan = [
-            ['nama' => 'Kegiatan 1 — belum diisi', 'tanggal' => null, 'deskripsi' => 'Menunggu data resmi.'],
-        ];
-
-        return view('tsaqib.kegiatan', compact('kegiatan'));
+        return view('tsaqib.labor-pai', compact('visiMisi', 'pembina', 'pengurusSiswa', 'profilTsaqibUrl'));
     }
 
     /**

@@ -6,8 +6,12 @@
 @source '../**/*.js';
 
 @theme {
+    /* SATU font untuk seluruh situs: Plus Jakarta Sans.
+       --font-display & --font-label sengaja di-set SAMA dengan --font-sans
+       agar kelas utility `font-display` / `font-label` yang sudah dipakai di
+       banyak blade tetap berfungsi, namun kini me-render font yang sama. */
     --font-sans:
-        "Inter", ui-sans-serif, system-ui, sans-serif,
+        "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif,
         "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
         "Noto Color Emoji";
     --font-display:
@@ -15,9 +19,18 @@
         "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
         "Noto Color Emoji";
     --font-label:
-        "Manrope", ui-sans-serif, system-ui, sans-serif,
+        "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif,
         "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
         "Noto Color Emoji";
+}
+
+/* Pastikan SEMUA elemen mewarisi font yang sama. font-family memang diwariskan
+   secara default, TAPI sebagian besar browser memberi <button>/<input>/
+   <select>/<textarea> font sistem sendiri — itulah sebabnya tombol & input
+   selama ini terlihat beda. Paksa mereka mewarisi. */
+@layer base {
+    html { font-family: var(--font-sans); }
+    button, input, optgroup, select, textarea { font-family: inherit; }
 }
 
 /* =========================================================================

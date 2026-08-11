@@ -1,459 +1,786 @@
-{{-- resources/views/profile/edit.blade.php --}}
 <?php $pageTitle = 'Profil - TSAQIB SMAN 1 Bukittinggi'; ?>
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
 <head>
     @include('partials.theme-head')
-    @push('styles')
-        /* ===== Profil Redesign (.pr-*) ===== */
-        .pr-cover{
-            height:7rem;
-            background:
-                radial-gradient(circle at 20% 0%, rgba(201,166,107,.25), transparent 60%),
-                linear-gradient(135deg, var(--green), var(--green-dark));
-            border-radius:1rem 1rem 0 0;
-        }
-        .pr-avatar{
-            width:6rem;height:6rem;border-radius:999px;object-fit:cover;
-            border:4px solid var(--ink);background:#161a14;
-            margin-top:-3rem;box-shadow:0 8px 24px -8px rgba(0,0,0,.6);
-        }
-        .pr-badge{
-            display:inline-flex;align-items:center;gap:.3rem;
-            padding:.2rem .55rem;border-radius:999px;
-            font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;
-        }
-        .pr-badge-role{ background:rgba(1,121,95,.16); color:#3fd6b0; }
-        .pr-badge-admin{ background:rgba(201,166,107,.18); color:var(--gold); }
-        .pr-stat{ display:flex;flex-direction:column; }
-        .pr-stat b{ font-family:'Plus Jakarta Sans',sans-serif;font-size:1.05rem;color:var(--cream); }
-        .pr-stat span{ font-size:11px;color:rgba(247,245,239,.5);text-transform:uppercase;letter-spacing:.05em; }
 
-        .pr-chip{
-            display:inline-flex;align-items:center;gap:.35rem;
-            padding:.35rem .7rem;border-radius:999px;font-size:11px;font-weight:700;
-            background:rgba(247,245,239,.05);border:1px solid rgba(247,245,239,.12);
-            color:rgba(247,245,239,.7);cursor:pointer;
-            transition:background .15s ease,border-color .15s ease,color .15s ease;
-        }
-        .pr-chip:hover{ border-color:rgba(247,245,239,.25); }
-        .pr-chip.is-on{ background:rgba(1,121,95,.2);border-color:var(--green);color:#3fd6b0; }
-
-        .pr-tabs{ display:flex;gap:.25rem;border-bottom:1px solid rgba(247,245,239,.1); }
-        .pr-tab{
-            padding:.7rem 1rem;font-size:13px;font-weight:700;color:rgba(247,245,239,.55);
-            border-bottom:2px solid transparent;cursor:pointer;background:none;
-        }
-        .pr-tab.is-active{ color:var(--cream);border-bottom-color:var(--gold); }
-        .pr-panel{ display:none; }
-        .pr-panel.is-active{ display:block; }
-
-        .pr-follow{ transition:background .15s ease,color .15s ease,border-color .15s ease; }
-        .pr-follow.is-following{
-            background:transparent;border:1px solid rgba(247,245,239,.3);color:var(--cream);
-        }
-        .pr-iconbtn{
-            display:inline-flex;align-items:center;gap:.4rem;
-            padding:.35rem .7rem;border-radius:.6rem;font-size:12px;font-weight:700;
-            background:rgba(247,245,239,.05);border:1px solid rgba(247,245,239,.12);
-            color:rgba(247,245,239,.75);cursor:pointer;
-        }
-        .pr-iconbtn:hover{ border-color:rgba(247,245,239,.28); }
-        .pr-iconbtn.is-on{ background:rgba(201,166,107,.16);border-color:var(--gold);color:var(--gold); }
-
-        .pr-modal{ position:fixed;inset:0;z-index:60;display:none; }
-        .pr-modal.is-open{ display:flex; }
-        .pr-modal-bg{ position:absolute;inset:0;background:rgba(0,0,0,.65); }
-        .pr-modal-card{ position:relative;margin:auto;width:min(440px,92vw);max-height:90vh;overflow:auto; }
-        .pr-empty{ padding:2.5rem 1rem;text-align:center;color:rgba(247,245,239,.4);font-size:12px; }
-    @endpush
+    {{-- CSS profil dari file statis (lihat catatan sebelumnya: @push yatim di sini). --}}
+    <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
 </head>
 <body class="text-[var(--cream)] font-sans antialiased min-h-screen flex flex-col">
 
     @include('partials.navbar')
 
     @php
-        // ---- Konteks: user profil + pemilik? ----
         $authUser = Auth::user();
         $user = $user ?? $authUser;
-        $isOwner = (bool) $authUser && $authUser->id === $user->id;
+        $isOwner = $isOwner ?? ((bool) $authUser && $authUser->id === $user->id);
         $isAdmin = ($user->role ?? null) === 'admin';
+        $roleLabel = $isAdmin ? 'Admin' : 'Anggota';
+        $roleIcon = $isAdmin ? 'fa-shield-halved' : 'fa-user-check';
 
-        // ---- Postingan user (via model, tanpa relasi) ----
-        $postsQuery = \App\Models\Post::where('user_id', $user->id);
-        $postsCount = (clone $postsQuery)->count();
-        $posts = (clone $postsQuery)->latest()->limit(10)->get();
+        // Nama komunitas dari selected_community — SAMA sumber data dengan
+        // /komunitas/{slug} (config('komunitas.daftar')). Bukan relasi Eloquent;
+        // kolom users.selected_community menyimpan slug.
+        $komunitas = collect(\Illuminate\Support\Facades\Config::get('komunitas.daftar', []))
+            ->firstWhere('slug', $user->selected_community);
+        $komunitasNama = $komunitas['nama'] ?? '';
 
-        // ---- Komentar user (defensif) ----
-        $comments = collect(); $commentsCount = 0;
-        if (class_exists(\App\Models\Comment::class)) {
-            try {
-                $commentsCount = \App\Models\Comment::where('user_id', $user->id)->count();
-                $comments = \App\Models\Comment::where('user_id', $user->id)->latest()->limit(10)->get();
-            } catch (\Throwable $e) {}
-        }
-
-        // ---- Followers / following (defensif: relasi belum ada) ----
-        $followersCount = 0; $followingCount = 0; $isFollowing = false;
-        if (method_exists($user, 'followers')) {
-            try { $followersCount = $user->followers()->count(); } catch (\Throwable $e) {}
-        }
-        if (method_exists($user, 'following')) {
-            try { $followingCount = $user->following()->count(); } catch (\Throwable $e) {}
-        }
-        if ($authUser && !$isOwner && method_exists($user, 'followers')) {
-            try { $isFollowing = $user->followers()->where('follower_id', $authUser->id)->exists(); } catch (\Throwable $e) {}
-        }
-
-        // ---- State like user (defensif) ----
-        $likedIds = [];
-        if ($authUser && class_exists(\App\Models\Like::class)) {
-            try { $likedIds = \App\Models\Like::where('user_id', $authUser->id)->pluck('post_id')->all(); } catch (\Throwable $e) {}
-        }
-
-        // ---- Komunitas / chip minat (defensif) ----
-        $communities = collect(); $allCommunities = collect();
-        if (class_exists(\App\Models\Community::class)) {
-            try { $allCommunities = \App\Models\Community::orderBy('name')->get(); } catch (\Throwable $e) {}
-        }
-        if (method_exists($user, 'communities')) {
-            try { $communities = $user->communities()->pluck('communities.id')->all(); } catch (\Throwable $e) {}
-        }
+        $followerCount  = $followerCount ?? 0;
+        $followingCount = $followingCount ?? 0;
+        $isFollowing    = $isFollowing ?? false;
+        $postsCount     = $postsCount ?? 0;
+        $commentsCount  = $commentsCount ?? 0;
+        $savedCount     = $savedCount ?? 0;
+        $booksCount     = $booksCount ?? 0;
     @endphp
 
-    <main class="flex-1 max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-6 w-full">
+    @if(session('status'))
+        <script>window.__prFlash = {{ json_encode((string) session('status')) }};</script>
+    @endif
+    @if($errors->has('password'))
+        <script>window.__prDelErr = true;</script>
+    @endif
 
-        {{-- Status flash --}}
-        @if(session('status'))
-            <div class="tsaqib-card p-3 text-xs text-[#3fd6b0] flex items-center gap-2">
-                <i class="fa-solid fa-circle-check"></i> Profil berhasil diperbarui.
+    <main class="flex-1 w-full">
+
+    {{-- ########################################################################
+         DESKTOP LAYOUT (≥768px)
+         ######################################################################## --}}
+    <div class="hidden md:block py-8 px-4">
+
+        {{-- Profile card --}}
+        <div class="pr-card">
+            <div class="pr-banner2">
+                @if($user->banner_path)
+                    <img data-banner-img src="{{ asset('storage/'.$user->banner_path) }}" alt="" class="pr-banner-img">
+                @endif
             </div>
-        @endif
 
-        {{-- ============ HEADER PROFIL ============ --}}
-        <section class="tsaqib-card overflow-hidden">
-            <div class="pr-cover"></div>
+            <div class="flex flex-col items-center -mt-[70px] px-6">
+                <img data-avatar-img src="{{ $user->getAvatar() }}" alt="{{ $user->name }}" class="pr-avatar">
 
-            <div class="px-5 pb-5">
-                <div class="flex items-end justify-between gap-4">
-                    <img src="{{ $user->getAvatar() }}" alt="Avatar" class="pr-avatar">
+                <h1 class="pr-display font-extrabold text-3xl text-[var(--cream)] mt-3">{{ $user->name }}</h1>
 
+                <div class="mt-2.5 flex items-center justify-center gap-2 flex-wrap">
+                    <span class="pr-role-pill"><i class="fa-solid {{ $roleIcon }} text-[10px]"></i> {{ $roleLabel }}</span>
+                    @if($komunitasNama)
+                        <a href="{{ route('komunitas', $user->selected_community) }}"
+                           class="pr-role-pill pr-role-pill--community"
+                           title="Komunitas {{ $komunitasNama }}">
+                            <i class="fa-solid fa-users text-[10px]"></i> {{ $komunitasNama }}
+                        </a>
+                    @endif
+                </div>
+
+                <p class="text-xs text-white/50 mt-2.5">
+                    <button type="button" class="pr-stat-link" data-people="followers"><strong>{{ $followerCount }}</strong> Pengikut</button>
+                    <span class="text-white/20 mx-1">·</span>
+                    <button type="button" class="pr-stat-link" data-people="following"><strong>{{ $followingCount }}</strong> Mengikuti</button>
+                </p>
+
+                <div class="mt-4 flex items-center gap-2.5">
                     @if($isOwner)
-                        <div class="flex items-center gap-2 pb-1">
-                            <button type="button" class="pr-iconbtn" onclick="document.getElementById('pr-edit-modal').classList.add('is-open')">
-                                <i class="fa-solid fa-pen"></i> Edit Profil
-                            </button>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="pr-iconbtn" title="Keluar">
-                                    <i class="fa-solid fa-right-from-bracket"></i>
-                                </button>
-                            </form>
-                        </div>
+                        <button type="button" onclick="openModal('pr-edit-modal')"
+                                class="px-5 py-2 rounded-full bg-gradient-to-r from-[var(--emerald)] to-[var(--green)] text-white font-bold text-sm hover:-translate-y-0.5 transition shadow-[0_8px_22px_-8px_rgba(1,121,95,0.55)]">
+                            <i class="fa-solid fa-pen mr-1.5"></i> Edit Profil
+                        </button>
+                        <form method="POST" action="{{ route('logout') }}">@csrf
+                            <button type="submit" class="px-5 py-2 rounded-full border border-white/20 text-white/60 font-semibold text-sm hover:bg-white/5 transition">Log Out</button>
+                        </form>
+                        <button type="button" onclick="openModal('pr-delete-modal')"
+                                class="px-5 py-2 rounded-full border border-red-400/40 text-red-300/90 font-semibold text-sm hover:bg-red-500/15 hover:border-red-400/80 transition">
+                            <i class="fa-solid fa-trash-can mr-1.5"></i> Hapus Akun
+                        </button>
                     @else
-                        <button type="button"
-                                class="pr-follow cta-primary text-white text-xs font-bold px-4 py-2 rounded-lg {{ $isFollowing ? 'is-following' : '' }}"
-                                data-follow-user="{{ $user->id }}" data-following="{{ $isFollowing ? '1' : '0' }}">
-                            <i class="fa-solid fa-user-plus mr-1"></i>
+                        <button type="button" id="pr-follow-btn"
+                                data-following="{{ $isFollowing ? '1' : '0' }}"
+                                data-url-follow="{{ route('profile.follow', $user->id) }}"
+                                data-url-unfollow="{{ route('profile.unfollow', $user->id) }}"
+                                class="pr-follow-btn px-5 py-2 {{ $isFollowing ? 'is-following' : '' }}">
+                            <i class="fa-solid {{ $isFollowing ? 'fa-user-check' : 'fa-user-plus' }}"></i>
                             <span>{{ $isFollowing ? 'Mengikuti' : 'Ikuti' }}</span>
                         </button>
                     @endif
                 </div>
+            </div>
 
-                <div class="mt-3">
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <h1 class="text-xl font-display font-extrabold text-[var(--cream)] leading-tight">{{ $user->name }}</h1>
-                        @if($isAdmin)
-                            <span class="pr-badge pr-badge-admin"><i class="fa-solid fa-shield-halved"></i> Admin</span>
-                        @endif
-                    </div>
-                    <p class="text-xs text-white/45">@{{ explode('@', $user->email)[0] }}</p>
-
-                    @if($isAdmin)
-                        <span class="pr-badge pr-badge-role mt-2"><i class="fa-solid fa-user-shield"></i> Administrator Sistem</span>
-                    @else
-                        <span class="pr-badge pr-badge-role mt-2"><i class="fa-solid fa-user-check"></i> Member</span>
-                    @endif
-
-                    @if(!empty($user->bio))
-                        <p class="text-sm text-white/70 leading-relaxed mt-2">{{ $user->bio }}</p>
-                    @endif
-
+            {{-- Tabs + content --}}
+            <div class="px-8">
+                <div class="pr-dtabs mt-7">
+                    <button class="pr-dtab is-active" data-dtab="posts">Postingan</button>
+                    <button class="pr-dtab" data-dtab="comments">Komentar</button>
                     @if($isOwner)
-                        <p class="text-xs text-white/40 mt-2 flex items-center gap-1.5">
-                            <i class="fa-solid fa-envelope"></i> {{ $user->email }}
-                        </p>
+                        <button class="pr-dtab" data-dtab="saved">Tersimpan</button>
+                        <button class="pr-dtab" data-dtab="books">Buku</button>
                     @endif
                 </div>
 
-                {{-- Stats (plain text, no card) --}}
-                <div class="flex items-center gap-6 mt-4 pt-4 border-t border-white/10">
-                    <div class="pr-stat"><b>{{ $postsCount }}</b><span>Postingan</span></div>
-                    <div class="pr-stat"><b>{{ $followersCount }}</b><span>Pengikut</span></div>
-                    <div class="pr-stat"><b>{{ $followingCount }}</b><span>Mengikuti</span></div>
+                <div class="py-6">
+                    <div data-dpanel="posts">
+                        @include('profile._scroll-activity', [
+            'tab' => 'posts',
+            'items' => $postsBatch ?? [], 'total' => $postsTotal ?? 0,
+            'seeAll' => route('profile.list', [$user->id, 'posts']),
+            'emptyIcon' => 'fa-newspaper', 'emptyText' => 'Belum ada postingan.',
+                        ])
+                    </div>
+                    <div data-dpanel="comments" class="hidden">
+                        @include('profile._scroll-activity', [
+            'tab' => 'comments',
+            'items' => $commentsBatch ?? [], 'total' => $commentsTotal ?? 0,
+            'seeAll' => route('profile.list', [$user->id, 'comments']),
+            'emptyIcon' => 'fa-comment', 'emptyText' => 'Belum ada komentar.',
+                        ])
+                    </div>
+                    @if($isOwner)
+                        <div data-dpanel="saved" class="hidden">
+                            @include('profile._scroll-activity', [
+            'tab' => 'saved',
+            'items' => $savedBatch ?? [], 'total' => $savedTotal ?? 0,
+            'seeAll' => route('profile.list', [$user->id, 'saved']),
+            'emptyIcon' => 'fa-bookmark', 'emptyText' => 'Belum ada postingan tersimpan.',
+                            ])
+                        </div>
+                        <div data-dpanel="books" class="hidden">
+                            @include('profile._books', ['booksGrouped' => $booksGrouped ?? collect()])
+                        </div>
+                    @endif
                 </div>
+            </div>
+        </div>
+    </div>
 
-                {{-- Chip minat komunitas (owner: toggle; tamu: read-only) --}}
-                @if($allCommunities->isNotEmpty())
-                    <div class="flex flex-wrap gap-2 mt-4">
-                        @foreach($allCommunities as $c)
-                            @php $on = in_array($c->id, $communities); @endphp
-                            @if($isOwner)
-                                <button type="button" class="pr-chip {{ $on ? 'is-on' : '' }}"
-                                        data-community="{{ $c->id }}" data-on="{{ $on ? '1' : '0' }}">
-                                    <i class="fa-solid {{ $on ? 'fa-check' : 'fa-plus' }}"></i> {{ $c->name }}
-                                </button>
-                            @else
-                                <span class="pr-chip {{ $on ? 'is-on' : '' }}" style="cursor:default">
-                                    <i class="fa-solid fa-layer-group"></i> {{ $c->name }}
-                                </span>
-                            @endif
-                        @endforeach
-                    </div>
+    {{-- ########################################################################
+         MOBILE LAYOUT (<768px) — struktur berbeda, bukan desktop yang disempitkan
+         ######################################################################## --}}
+    <div class="md:hidden px-4 py-5">
+
+        {{-- Compact identity header --}}
+        <div class="pr-card">
+            <div class="pr-banner2" style="height:120px">
+                @if($user->banner_path)
+                    <img data-banner-img src="{{ asset('storage/'.$user->banner_path) }}" alt="" class="pr-banner-img" style="height:120px">
                 @endif
             </div>
-        </section>
-
-        {{-- ============ TABS ============ --}}
-        <section class="tsaqib-card">
-            <div class="pr-tabs px-3">
-                <button class="pr-tab is-active" data-tab="posts"><i class="fa-solid fa-newspaper mr-1"></i> Postingan</button>
-                <button class="pr-tab" data-tab="comments"><i class="fa-solid fa-comment mr-1"></i> Komentar</button>
-                @if($isOwner)
-                    <button class="pr-tab" data-tab="saved"><i class="fa-solid fa-bookmark mr-1"></i> Disimpan</button>
-                @endif
+            <div class="flex flex-col items-center -mt-[48px] px-4 pb-5">
+                    <img data-avatar-img src="{{ $user->getAvatar() }}" alt="{{ $user->name }}" class="pr-avatar" style="width:96px;height:96px;border-width:3px">
+                <h1 class="pr-display font-extrabold text-xl text-[var(--cream)] mt-2">{{ $user->name }}</h1>
+                <div class="mt-1.5 flex items-center justify-center gap-1.5 flex-wrap">
+                    <span class="pr-role-pill text-[10px]"><i class="fa-solid {{ $roleIcon }} text-[9px]"></i> {{ $roleLabel }}</span>
+                    @if($komunitasNama)
+                        <a href="{{ route('komunitas', $user->selected_community) }}"
+                           class="pr-role-pill pr-role-pill--community text-[10px]"
+                           title="Komunitas {{ $komunitasNama }}">
+                            <i class="fa-solid fa-users text-[9px]"></i> {{ $komunitasNama }}
+                        </a>
+                    @endif
+                </div>
+                <p class="text-[11px] text-white/50 mt-1.5">
+                    <button type="button" class="pr-stat-link" data-people="followers"><strong>{{ $followerCount }}</strong> Pengikut</button>
+                    <span class="text-white/20 mx-0.5">·</span>
+                    <button type="button" class="pr-stat-link" data-people="following"><strong>{{ $followingCount }}</strong> Mengikuti</button>
+                </p>
+                <div class="mt-3 flex items-center gap-2">
+                    @if($isOwner)
+                        <button type="button" onclick="openModal('pr-edit-modal')" class="px-4 py-1.5 rounded-full bg-gradient-to-r from-[var(--emerald)] to-[var(--green)] text-white font-bold text-xs">Edit Profil</button>
+                        <form method="POST" action="{{ route('logout') }}">@csrf
+                            <button type="submit" class="px-4 py-1.5 rounded-full border border-white/20 text-white/60 font-semibold text-xs">Log Out</button>
+                        </form>
+                        <button type="button" onclick="openModal('pr-delete-modal')"
+                                class="px-3 py-1.5 rounded-full border border-red-400/40 text-red-300/90 font-semibold text-xs hover:bg-red-500/15 transition">
+                            <i class="fa-solid fa-trash-can"></i> Hapus
+                        </button>
+                    @else
+                        <button type="button" id="pr-follow-btn"
+                                data-following="{{ $isFollowing ? '1' : '0' }}"
+                                data-url-follow="{{ route('profile.follow', $user->id) }}"
+                                data-url-unfollow="{{ route('profile.unfollow', $user->id) }}"
+                                class="pr-follow-btn px-4 py-1.5 text-xs {{ $isFollowing ? 'is-following' : '' }}">
+                            <i class="fa-solid {{ $isFollowing ? 'fa-user-check' : 'fa-user-plus' }}"></i>
+                            <span>{{ $isFollowing ? 'Mengikuti' : 'Ikuti' }}</span>
+                        </button>
+                    @endif
+                </div>
             </div>
+        </div>
 
-            {{-- Panel: Postingan --}}
-            <div class="pr-panel is-active p-4" id="panel-posts">
-                @if($posts->isNotEmpty())
-                    <div class="space-y-3">
-                        @foreach($posts as $post)
-                            @php
-                                $likeCount = method_exists($post, 'likes') ? $post->likes()->count() : 0;
-                                $liked = in_array($post->id, $likedIds);
-                            @endphp
-                            <div class="p-4 rounded-xl bg-white/5 border border-white/10">
-                                <div class="flex items-center justify-between gap-3">
-                                    <a href="{{ route('komunitas.post.show', $post->id) }}" class="min-w-0">
-                                        <span class="text-[10px] font-bold text-[var(--gold)] uppercase tracking-wider block">
-                                            {{ $post->community_slug ?? 'komunitas' }} • {{ $post->created_at->diffForHumans() }}
-                                        </span>
-                                        <h4 class="font-bold text-sm text-[var(--cream)] truncate">{{ $post->title }}</h4>
-                                        <p class="text-xs text-white/60 truncate">{{ $post->content }}</p>
-                                    </a>
-                                    <div class="flex items-center gap-2 flex-shrink-0">
-                                        <button type="button" class="pr-iconbtn pr-like {{ $liked ? 'is-on' : '' }}"
-                                                data-post="{{ $post->id }}" data-liked="{{ $liked ? '1' : '0' }}">
-                                            <i class="fa-solid fa-heart"></i>
-                                            <span class="pr-like-count">{{ $likeCount }}</span>
-                                            <span class="pr-like-label">{{ $liked ? 'Disukai' : 'Suka' }}</span>
-                                        </button>
-                                        @if($isOwner)
-                                            <button type="button" class="pr-iconbtn pr-save" data-post="{{ $post->id }}">
-                                                <i class="fa-regular fa-bookmark"></i> Simpan
-                                            </button>
-                                            <form action="{{ route('posts.destroy', $post->id) }}" method="POST"
-                                                  onsubmit="return confirm('Hapus postingan ini?')">
-                                                @csrf @method('DELETE')
-                                                <button class="pr-iconbtn" style="color:#f87171">
-                                                    <i class="fa-solid fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="pr-empty">
-                        <i class="fa-regular fa-newspaper text-2xl mb-2 block opacity-50"></i>
-                        Belum ada postingan.
-                    </div>
-                @endif
-            </div>
-
-            {{-- Panel: Komentar --}}
-            <div class="pr-panel p-4" id="panel-comments">
-                @if($comments->isNotEmpty())
-                    <div class="space-y-3">
-                        @foreach($comments as $comment)
-                            <div class="p-3 rounded-xl bg-white/5 border border-white/10">
-                                <p class="text-xs text-white/70">{{ $comment->content ?? $comment->body ?? '' }}</p>
-                                <span class="text-[10px] text-white/40 mt-1 block">{{ $comment->created_at->diffForHumans() }}</span>
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="pr-empty">
-                        <i class="fa-regular fa-comment text-2xl mb-2 block opacity-50"></i>
-                        Belum ada komentar.
-                    </div>
-                @endif
-            </div>
-
-            {{-- Panel: Disimpan (owner only) --}}
+        {{-- Tab grid 2x2 --}}
+        <div class="grid grid-cols-2 gap-2 mt-4">
+            <button class="pr-mtab is-active" data-mtab="posts"><i class="fa-solid fa-newspaper text-[var(--gold)]"></i> Postingan <span class="count">{{ $postsCount }}</span></button>
+            <button class="pr-mtab" data-mtab="comments"><i class="fa-solid fa-comment text-[var(--gold)]"></i> Komentar <span class="count">{{ $commentsCount }}</span></button>
             @if($isOwner)
-                <div class="pr-panel p-4" id="panel-saved">
-                    <div class="pr-empty">
-                        <i class="fa-regular fa-bookmark text-2xl mb-2 block opacity-50"></i>
-                        Item tersimpan (buku &amp; postingan) akan tampil di sini.
-                    </div>
+                <button class="pr-mtab" data-mtab="saved"><i class="fa-solid fa-bookmark text-[var(--gold)]"></i> Tersimpan <span class="count">{{ $savedCount }}</span></button>
+                <button class="pr-mtab" data-mtab="books"><i class="fa-solid fa-book text-[var(--gold)]"></i> Koleksi Buku <span class="count">{{ $booksCount }}</span></button>
+            @endif
+        </div>
+
+        {{-- Recent activity / content panel --}}
+        <div class="mt-5">
+            <div class="pr-sec-head">
+                <span class="h" data-mhead>AKTIVITAS TERBARU</span>
+                <a class="pr-see-all" data-mseeall
+                   data-url-posts="{{ route('profile.list', [$user->id, 'posts']) }}"
+                   data-url-comments="{{ route('profile.list', [$user->id, 'comments']) }}"
+                   data-url-saved="{{ route('profile.list', [$user->id, 'saved']) }}"
+                   data-url-books="{{ route('profile.list', [$user->id, 'books']) }}"
+                   href="{{ route('profile.list', [$user->id, 'posts']) }}">Lihat Semua →</a>
+            </div>
+
+            <div data-mpanel="posts">
+                @include('profile._activity', [
+                    'items' => $postsBatch ?? [], 'total' => $postsTotal ?? 0,
+                    'seeAll' => route('profile.list', [$user->id, 'posts']),
+                    'emptyIcon' => 'fa-newspaper', 'emptyText' => 'Belum ada postingan.',
+                ])
+            </div>
+            <div data-mpanel="comments" hidden>
+                @include('profile._activity', [
+                    'items' => $commentsBatch ?? [], 'total' => $commentsTotal ?? 0,
+                    'seeAll' => route('profile.list', [$user->id, 'comments']),
+                    'emptyIcon' => 'fa-comment', 'emptyText' => 'Belum ada komentar.',
+                ])
+            </div>
+            @if($isOwner)
+                <div data-mpanel="saved" hidden>
+                    @include('profile._activity', [
+                        'items' => $savedBatch ?? [], 'total' => $savedTotal ?? 0,
+                        'seeAll' => route('profile.list', [$user->id, 'saved']),
+                        'emptyIcon' => 'fa-bookmark', 'emptyText' => 'Belum ada postingan tersimpan.',
+                    ])
+                </div>
+                <div data-mpanel="books" hidden>
+                    @include('profile._books', ['booksGrouped' => $booksGrouped ?? collect()])
                 </div>
             @endif
-        </section>
-
-        @if($isOwner)
-            <div class="tsaqib-card p-5">
-                <h3 class="font-bold text-sm text-[var(--cream)] mb-1">Hapus Akun</h3>
-                <p class="text-xs text-white/50 mb-3">Tindakan ini permanen dan menghapus data Anda.</p>
-                <button type="button" class="pr-iconbtn" style="color:#f87171;border-color:rgba(248,113,113,.3)"
-                        onclick="document.getElementById('pr-delete-modal').classList.add('is-open')">
-                    <i class="fa-solid fa-trash"></i> Hapus Akun Saya
-                </button>
-            </div>
-        @endif
+        </div>
+    </div>
 
     </main>
 
-    {{-- ============ MODAL: EDIT PROFIL (owner) ============ --}}
+    {{-- ============ MODAL: EDIT PROFIL ============ --}}
     @if($isOwner)
-    <div class="pr-modal" id="pr-edit-modal" role="dialog" aria-modal="true">
-        <div class="pr-modal-bg" onclick="this.parentElement.classList.remove('is-open')"></div>
-        <div class="tsaqib-card pr-modal-card p-6 space-y-4">
-            <div class="flex items-center justify-between">
-                <h3 class="font-display font-bold text-[var(--cream)]">Edit Profil</h3>
-                <button type="button" class="text-white/50 hover:text-white" onclick="this.closest('.pr-modal').classList.remove('is-open')">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+    <div class="pr-modal" id="pr-edit-modal" role="dialog" aria-modal="true" aria-labelledby="pr-edit-title">
+        <div class="pr-modal-bg" onclick="closeModal('pr-edit-modal')"></div>
+        <div class="pr-modal-card pr-modal-card--form">
+            <div class="flex items-center justify-between px-5 py-4 shrink-0 border-b border-white/[0.08]">
+                <h3 id="pr-edit-title" class="pr-display font-bold text-lg text-[var(--cream)]">Edit Profil</h3>
+                <button type="button" class="pr-x-btn" onclick="closeModal('pr-edit-modal')" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
             </div>
-
-            <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
+            <form id="pr-edit-form" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="flex flex-col flex-1 min-h-0">
                 @csrf @method('PATCH')
-                <div class="space-y-3">
-                    <div>
-                        <label class="text-[10px] font-bold text-white/40 uppercase tracking-wider block mb-1">Nama</label>
-                        <input type="text" name="name" value="{{ old('name', $user->name) }}" class="tsaqib-input w-full px-3 py-2 text-sm">
+                <div class="px-5 py-4 overflow-y-auto flex-1">
+                    {{-- Banner (4:1) — divalidasi & di-crop ke 4:1 via canvas sebelum upload --}}
+                    <div class="mb-5">
+                        <label class="pr-field-label">Banner</label>
+                        <div class="pr-banner-drop rounded-xl overflow-hidden border border-white/10 {{ $user->banner_path ? 'has-img' : '' }}" id="pr-banner-drop" style="aspect-ratio:4/1; max-height:150px;" title="Seret & lepas banner ke sini">
+                            <img id="pr-banner-preview" src="{{ $user->banner_path ? asset('storage/'.$user->banner_path) : '' }}" alt="Pratinjau banner" class="pr-banner-preview-img">
+                            <div id="pr-banner-placeholder" class="pr-banner-placeholder"><i class="fa-solid fa-image"></i><span>Pratinjau banner (4:1)</span></div>
+                        </div>
+                        <div class="flex items-center gap-3 mt-2 flex-wrap">
+                            <label class="pr-upload-btn">
+                                <i class="fa-solid fa-image"></i> Ganti Banner
+                                <input type="file" name="banner" id="pr-banner-input" accept="image/jpeg,image/png,image/webp" hidden>
+                            </label>
+                            <p class="text-[10px] text-white/40">Rekomendasi 1200×300px (rasio 4:1), maks 2MB. Disesuaikan otomatis ke 4:1.</p>
+                        </div>
+                        <p class="pr-err hidden" id="pr-err-banner" data-err="banner"></p>
                     </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-white/40 uppercase tracking-wider block mb-1">Email</label>
-                        <input type="email" name="email" value="{{ old('email', $user->email) }}" class="tsaqib-input w-full px-3 py-2 text-sm">
+
+                    <div class="flex items-center gap-4 mb-5">
+                        <div class="pr-upload-ring" id="pr-avatar-drop" title="Seret & lepas foto ke sini">
+                            <img id="pr-avatar-preview" src="{{ $user->getAvatar() }}" alt="Pratinjau avatar">
+                        </div>
+                        <div class="min-w-0">
+                            <label class="pr-upload-btn">
+                                <i class="fa-solid fa-camera"></i> Ganti Foto
+                                <input type="file" name="avatar" id="pr-avatar-input" accept="image/jpeg,image/png,image/webp" hidden>
+                            </label>
+                            <p class="text-[10px] text-white/40 mt-1.5">JPG / PNG / WEBP, maks 2MB. Bisa seret &amp; lepas.</p>
+                            <p class="text-[11px] text-[var(--gold)] mt-1 truncate hidden" id="pr-avatar-name"></p>
+                            @if($user->profile_photo_path || $user->avatar)
+                            <button type="button" id="pr-remove-avatar" data-url="{{ route('profile.avatar.destroy') }}"
+                                    class="mt-2 inline-flex items-center gap-1.5 text-[11px] font-semibold text-red-300/80 hover:text-red-300 transition-colors">
+                                <i class="fa-solid fa-trash-can"></i> Hapus Foto Profil
+                            </button>
+                            @endif
+                        </div>
                     </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-white/40 uppercase tracking-wider block mb-1">Bio (maks 160)</label>
-                        <textarea name="bio" rows="3" maxlength="160" class="tsaqib-input w-full px-3 py-2 text-sm"
-                                  placeholder="Ceritakan sedikit tentang Anda...">{{ old('bio', $user->bio ?? '') }}</textarea>
+                    <p class="pr-err hidden" id="pr-err-avatar" data-err="avatar"></p>
+
+                    {{-- Avatar bawaan (preset) — pre-select avatar saat ini --}}
+                    <div class="mb-5">
+                        <span class="pr-field-label">atau pilih avatar bawaan</span>
+                        <div class="mt-1.5">
+                            <x-avatar-picker name="preset_avatar" :selected="$user->avatar" />
+                        </div>
                     </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-white/40 uppercase tracking-wider block mb-1">Avatar</label>
-                        <input type="file" name="avatar" accept="image/*" class="text-xs text-white/60 w-full">
-                        <p class="text-[10px] text-white/35 mt-1">Maks 2MB. Diresize otomatis 400×400.</p>
+
+                    <div class="pr-field">
+                        <label class="pr-field-label" for="pr-name">Nama</label>
+                        <input type="text" name="name" id="pr-name" value="{{ old('name', $user->name) }}" class="tsaqib-input w-full px-3 py-2.5 text-sm" required>
+                        <p class="pr-err hidden" id="pr-err-name" data-err="name"></p>
                     </div>
-                    @error('bio')<p class="text-[11px] text-red-400">{{ $message }}</p>@enderror
-                    @error('avatar')<p class="text-[11px] text-red-400">{{ $message }}</p>@enderror
+                    <div class="pr-field">
+                        <label class="pr-field-label" for="pr-email">Email</label>
+                        <input type="email" name="email" id="pr-email" value="{{ old('email', $user->email) }}" class="tsaqib-input w-full px-3 py-2.5 text-sm" required>
+                        <p class="pr-err hidden" id="pr-err-email" data-err="email"></p>
+                    </div>
+                    <div class="pr-field">
+                        <div class="flex items-center justify-between">
+                            <label class="pr-field-label" for="pr-bio">Bio</label>
+                            <span class="text-[10px]" id="pr-bio-count">{{ mb_strlen(old('bio', $user->bio ?? '')) }}/160</span>
+                        </div>
+                        <textarea name="bio" id="pr-bio" rows="3" maxlength="160" class="tsaqib-input w-full px-3 py-2.5 text-sm resize-none" placeholder="Ceritakan sedikit tentang Anda...">{{ old('bio', $user->bio ?? '') }}</textarea>
+                        <p class="pr-err hidden" id="pr-err-bio" data-err="bio"></p>
+                    </div>
+
+                    {{-- Ganti Komunitas — daftar SAMA dengan /komunitas/{slug} & select-role
+                         (config('komunitas.daftar')). Pre-select komunitas user saat ini. --}}
+                    <div class="mb-5">
+                        <span class="pr-field-label">Ganti Komunitas</span>
+                        <div class="mt-1.5">
+                            <x-community-picker name="community_slug" :selected="old('community_slug', $user->selected_community)" />
+                        </div>
+                        <p class="pr-err hidden" id="pr-err-community_slug" data-err="community_slug"></p>
+                    </div>
                 </div>
-                <button type="submit" class="cta-primary w-full mt-4 py-2.5 rounded-xl text-white text-sm font-bold">
-                    <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Perubahan
-                </button>
+                <div class="flex gap-2 px-5 py-4 shrink-0 border-t border-white/[0.08]">
+                    <button type="button" class="pr-ghost-btn flex-1 justify-center" onclick="closeModal('pr-edit-modal')">Batal</button>
+                    <button type="submit" class="pr-save-btn flex-1" id="pr-edit-submit"><i class="fa-solid fa-floppy-disk"></i> Simpan</button>
+                </div>
             </form>
         </div>
     </div>
 
-    {{-- ============ MODAL: HAPUS AKUN (owner) ============ --}}
-    <div class="pr-modal" id="pr-delete-modal" role="dialog" aria-modal="true">
-        <div class="pr-modal-bg" onclick="this.parentElement.classList.remove('is-open')"></div>
-        <div class="tsaqib-card pr-modal-card p-6 space-y-4">
-            <h3 class="font-display font-bold text-[var(--cream)]">Hapus Akun?</h3>
-            <p class="text-xs text-white/55">Masukkan password Anda untuk konfirmasi. Tindakan ini tidak dapat dibatalkan.</p>
-            <form method="POST" action="{{ route('profile.destroy') }}">
+    {{-- MODAL: HAPUS AKUN --}}
+    <div class="pr-modal" id="pr-delete-modal" role="dialog" aria-modal="true" aria-labelledby="pr-delete-title">
+        <div class="pr-modal-bg" onclick="closeModal('pr-delete-modal')"></div>
+        <div class="pr-modal-card">
+            <div class="flex items-center gap-3 mb-3">
+                <span class="pr-danger-ic"><i class="fa-solid fa-user-xmark"></i></span>
+                <h3 id="pr-delete-title" class="pr-display font-bold text-lg text-[#fca5a5]">Hapus Akun?</h3>
+            </div>
+            <p class="text-xs text-white/60 mb-4">Masukkan password untuk konfirmasi. Tindakan ini <strong class="text-[#fca5a5]">tidak dapat dibatalkan</strong> dan semua data Anda akan dihapus permanen.</p>
+            <form method="POST" action="{{ route('profile.destroy') }}" id="pr-delete-form">
                 @csrf @method('DELETE')
-                <input type="password" name="password" placeholder="Password" class="tsaqib-input w-full px-3 py-2 text-sm mb-3">
-                <button type="submit" class="w-full py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-bold">
-                    <i class="fa-solid fa-trash mr-1"></i> Hapus Permanen
-                </button>
+                <label class="pr-field-label" for="pr-delete-pw">Password</label>
+                <div class="relative">
+                    <input type="password" name="password" id="pr-delete-pw" placeholder="Masukkan password Anda" class="tsaqib-input w-full px-3 py-2.5 text-sm pr-10" autocomplete="current-password">
+                    <button type="button" class="pr-pw-toggle" data-target="pr-delete-pw" tabindex="-1" aria-label="Tampilkan password"><i class="fa-regular fa-eye"></i></button>
+                </div>
+                @error('password')<p class="pr-err">{{ $message }}</p>@enderror
+                <button type="submit" id="pr-delete-submit" class="pr-danger-confirm-btn w-full mt-4" disabled><i class="fa-solid fa-trash"></i> Hapus Permanen</button>
             </form>
+        </div>
+    </div>
+
+    {{-- MODAL: KONFIRMASI HAPUS POSTINGAN --}}
+    <div class="pr-modal" id="pr-confirm-modal" role="dialog" aria-modal="true">
+        <div class="pr-modal-bg" onclick="closeModal('pr-confirm-modal')"></div>
+        <div class="pr-modal-card">
+            <div class="flex items-center gap-3 mb-2">
+                <span class="pr-confirm-ic"><i class="fa-solid fa-triangle-exclamation"></i></span>
+                <h3 class="pr-display font-bold text-lg text-[var(--cream)]" id="pr-confirm-title">Hapus?</h3>
+            </div>
+            <p class="text-xs text-white/60 mb-4" id="pr-confirm-body">Tindakan ini tidak dapat dibatalkan.</p>
+            <div class="flex gap-2">
+                <button type="button" class="pr-ghost-btn flex-1 justify-center" onclick="closeModal('pr-confirm-modal')">Batal</button>
+                <button type="button" class="pr-danger-confirm-btn flex-1" id="pr-confirm-ok"><i class="fa-solid fa-trash"></i> Hapus</button>
+            </div>
         </div>
     </div>
     @endif
+
+    {{-- MODAL: PENGIKUT / MENIKUTI (semua orang) --}}
+    <div class="pr-modal" id="pr-people-modal" role="dialog" aria-modal="true" aria-labelledby="pr-people-title"
+         data-url-followers="{{ route('profile.followers', $user->id) }}"
+         data-url-following="{{ route('profile.following', $user->id) }}">
+        <div class="pr-modal-bg" onclick="closeModal('pr-people-modal')"></div>
+        <div class="pr-modal-card">
+            <div class="flex items-center justify-between mb-3">
+                <h3 id="pr-people-title" class="pr-display font-bold text-lg text-[var(--cream)]">Pengikut</h3>
+                <button type="button" class="pr-x-btn" onclick="closeModal('pr-people-modal')" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="pr-tabs mb-3">
+                <button class="pr-tab is-active" data-people-tab="followers">Pengikut</button>
+                <button class="pr-tab" data-people-tab="following">Mengikuti</button>
+            </div>
+            <div id="pr-people-list" class="space-y-1 max-h-[50vh] overflow-y-auto">
+                <div id="pr-people-sentinel" class="pr-sentinel"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="pr-toasts" id="pr-toasts" aria-live="polite"></div>
 
     @include('partials.site-footer')
 
     <script>
     (function () {
-        var csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
-        function req(url, method){ return fetch(url,{method:method,headers:{'X-CSRF-TOKEN':csrf,'Accept':'application/json'},credentials:'same-origin'}); }
+        var csrf = document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').content : '';
 
-        // ---- Tabs ----
-        document.querySelectorAll('.pr-tab').forEach(function (tab) {
-            tab.addEventListener('click', function () {
-                document.querySelectorAll('.pr-tab').forEach(function (t){ t.classList.remove('is-active'); });
-                document.querySelectorAll('.pr-panel').forEach(function (p){ p.classList.remove('is-active'); });
-                tab.classList.add('is-active');
-                var panel = document.getElementById('panel-' + tab.dataset.tab);
-                if (panel) panel.classList.add('is-active');
+        /* ---------- Modal helpers ---------- */
+        window.openModal = function (id) { var m = document.getElementById(id); if (m) { m.classList.add('is-open'); document.body.style.overflow = 'hidden'; } };
+        window.closeModal = function (id) { var m = document.getElementById(id); if (m) { m.classList.remove('is-open'); document.body.style.overflow = ''; } };
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { document.querySelectorAll('.pr-modal.is-open').forEach(function (m){ m.classList.remove('is-open'); }); document.body.style.overflow = ''; } });
+
+        /* ---------- Toast ---------- */
+        function toast(msg, type){
+            type = type || 'success';
+            var wrap = document.getElementById('pr-toasts');
+            var el = document.createElement('div');
+            el.className = 'pr-toast pr-toast-' + type;
+            var ic = type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation';
+            el.innerHTML = '<i class="fa-solid ' + ic + '"></i><span></span>';
+            el.querySelector('span').textContent = msg;
+            wrap.appendChild(el);
+            requestAnimationFrame(function (){ el.classList.add('show'); });
+            setTimeout(function (){ el.classList.remove('show'); setTimeout(function (){ if (el.parentNode) el.parentNode.removeChild(el); }, 300); }, 3600);
+        }
+        window.__prToast = toast;
+
+        function escapeHtml(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+        /* ---------- Bio counter ---------- */
+        var bio = document.getElementById('pr-bio');
+        var bioCount = document.getElementById('pr-bio-count');
+        function syncBio(){ if (!bio || !bioCount) return; var n = bio.value.length; bioCount.textContent = n + '/160'; bioCount.classList.toggle('is-warn', n > 140); }
+        if (bio) { bio.addEventListener('input', syncBio); syncBio(); }
+
+        /* ---------- Avatar upload + drag-and-drop ---------- */
+        var avatarInput = document.getElementById('pr-avatar-input');
+        var avatarPreview = document.getElementById('pr-avatar-preview');
+        var avatarName = document.getElementById('pr-avatar-name');
+        var avatarDrop = document.getElementById('pr-avatar-drop');
+        function handleAvatarFile(f){
+            if (!f) return;
+            if (!/^image\/(jpeg|png|webp)$/.test(f.type)) { toast('Format foto harus JPG/PNG/WEBP.', 'error'); if (avatarInput) avatarInput.value = ''; return; }
+            if (f.size > 2 * 1024 * 1024) { toast('Ukuran foto melebihi 2MB.', 'error'); if (avatarInput) avatarInput.value = ''; return; }
+            // Preset picker: kosongkan pilihan agar upload (foto) diutamakan.
+            var pickerActive = document.querySelector('#pr-edit-form .av-pick.is-active');
+            if (pickerActive) pickerActive.classList.remove('is-active');
+            var pickerInput = document.querySelector('#pr-edit-form [data-avatar-input]');
+            if (pickerInput) pickerInput.value = '';
+
+            var reader = new FileReader();
+            reader.onload = function (e){ if (avatarPreview) avatarPreview.src = e.target.result; };
+            reader.readAsDataURL(f);
+            if (avatarName) { avatarName.textContent = f.name; avatarName.classList.remove('hidden'); }
+            try { var dt = new DataTransfer(); dt.items.add(f); if (avatarInput) avatarInput.files = dt.files; } catch (e2) {}
+        }
+        if (avatarInput) avatarInput.addEventListener('change', function (){ handleAvatarFile(this.files && this.files[0]); });
+        if (avatarDrop) {
+            avatarDrop.addEventListener('dragover', function (e){ e.preventDefault(); avatarDrop.classList.add('pr-upload-ring--over'); });
+            avatarDrop.addEventListener('dragleave', function (){ avatarDrop.classList.remove('pr-upload-ring--over'); });
+            avatarDrop.addEventListener('drop', function (e){ e.preventDefault(); avatarDrop.classList.remove('pr-upload-ring--over'); handleAvatarFile(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]); });
+        }
+
+        /* ---------- Preset picker → sinkron pratinjau ring & bersihkan upload ---------- */
+        var editFormScope = document.getElementById('pr-edit-form');
+        if (editFormScope) {
+            editFormScope.addEventListener('avatar:selected', function (e){
+                var d = e.detail || {};
+                if (avatarPreview && d.img) avatarPreview.src = d.img;       // tampilkan preset di ring
+                if (avatarInput) { try { avatarInput.value = ''; } catch (e2){} } // hapus pilihan file upload
+                if (avatarName) avatarName.classList.add('hidden');
             });
+        }
+
+        /* ---------- Hapus foto profil (reset ke default) ---------- */
+        var rmAvatarBtn = document.getElementById('pr-remove-avatar');
+        if (rmAvatarBtn) {
+            rmAvatarBtn.addEventListener('click', function (){
+                var orig = rmAvatarBtn.innerHTML;
+                rmAvatarBtn.disabled = true;
+                rmAvatarBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mereset...';
+                fetch(rmAvatarBtn.dataset.url, { method:'DELETE', headers:{ 'X-CSRF-TOKEN':csrf, 'Accept':'application/json' }, credentials:'same-origin' })
+                    .then(function (r){ return r.json().catch(function(){ return {}; }).then(function(j){ return { ok:r.ok, json:j }; }); })
+                    .then(function (res){
+                        if (res.ok) {
+                            // pratinjau ring + kartu profil (desktop & mobile) → avatar default
+                            if (avatarPreview && res.json && res.json.avatar) avatarPreview.src = res.json.avatar;
+                            document.querySelectorAll('[data-avatar-img]').forEach(function (el){ el.src = res.json.avatar; });
+                            // avatar kini default → kosongkan picker & file input
+                            var pa = document.querySelector('#pr-edit-form .av-pick.is-active'); if (pa) pa.classList.remove('is-active');
+                            var pi = document.querySelector('#pr-edit-form [data-avatar-input]'); if (pi) pi.value = '';
+                            if (avatarInput) { try { avatarInput.value = ''; } catch (e2){} }
+                            if (avatarName) avatarName.classList.add('hidden');
+                            toast((res.json && res.json.message) || 'Foto profil direset.', 'success');
+                        } else {
+                            toast((res.json && res.json.message) || 'Gagal mereset foto.', 'error');
+                        }
+                    })
+                    .catch(function (){ toast('Gagal menyambung ke server.', 'error'); })
+                    .finally(function (){ rmAvatarBtn.disabled = false; rmAvatarBtn.innerHTML = orig; });
+            });
+        }
+
+        /* ---------- Banner upload + crop otomatis 4:1 via canvas ----------
+           Center-crop ke rasio 4:1 (tidak meregang), cap lebar 1200px, lalu
+           re-encode ke JPEG dan masukkan ke <input name="banner"> agar server
+           menerima gambar yang sudah 4:1. */
+        var bannerInput = document.getElementById('pr-banner-input');
+        var bannerDrop = document.getElementById('pr-banner-drop');
+        var bannerPreview = document.getElementById('pr-banner-preview');
+        function handleBannerFile(f){
+            if (!f) return;
+            if (!/^image\/(jpeg|png|webp)$/.test(f.type)) { toast('Format banner harus JPG/PNG/WEBP.', 'error'); if (bannerInput) bannerInput.value = ''; return; }
+            if (f.size > 2 * 1024 * 1024) { toast('Ukuran banner melebihi 2MB.', 'error'); if (bannerInput) bannerInput.value = ''; return; }
+            var reader = new FileReader();
+            reader.onload = function (e){
+                var img = new Image();
+                img.onload = function (){
+                    var sw = img.naturalWidth, sh = img.naturalHeight, ratio = 4;
+                    var cw, ch, sx, sy;
+                    if (sw / sh > ratio) { ch = sh; cw = sh * ratio; sx = (sw - cw) / 2; sy = 0; }   // sumber terlalu lebar → potong kiri/kanan
+                    else { cw = sw; ch = sw / ratio; sx = 0; sy = (sh - ch) / 2; }                    // sumber terlalu tinggi → potong atas/bawah
+                    var outW = Math.round(Math.min(cw, 1200)), outH = Math.round(outW / ratio);
+                    var c = document.createElement('canvas'); c.width = outW; c.height = outH;
+                    c.getContext('2d').drawImage(img, sx, sy, cw, ch, 0, 0, outW, outH);
+                    c.toBlob(function (blob){
+                        if (!blob) { toast('Gagal memproses banner.', 'error'); return; }
+                        if (bannerPreview) bannerPreview.src = URL.createObjectURL(blob);
+                        if (bannerDrop) bannerDrop.classList.add('has-img');
+                        try { var dt = new DataTransfer(); dt.items.add(new File([blob], 'banner.jpg', { type: 'image/jpeg' })); if (bannerInput) bannerInput.files = dt.files; } catch (e2) {}
+                    }, 'image/jpeg', 0.92);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(f);
+        }
+        if (bannerInput) bannerInput.addEventListener('change', function (){ handleBannerFile(this.files && this.files[0]); });
+        if (bannerDrop) {
+            bannerDrop.addEventListener('dragover', function (e){ e.preventDefault(); bannerDrop.classList.add('pr-upload-ring--over'); });
+            bannerDrop.addEventListener('dragleave', function (){ bannerDrop.classList.remove('pr-upload-ring--over'); });
+            bannerDrop.addEventListener('drop', function (e){ e.preventDefault(); bannerDrop.classList.remove('pr-upload-ring--over'); handleBannerFile(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]); });
+        }
+
+        /* ---------- Password gate + eye toggle ---------- */
+        var delPw = document.getElementById('pr-delete-pw');
+        var delBtn = document.getElementById('pr-delete-submit');
+        if (delPw && delBtn) delPw.addEventListener('input', function (){ delBtn.disabled = delPw.value.trim().length === 0; });
+        document.querySelectorAll('.pr-pw-toggle').forEach(function (btn){
+            btn.addEventListener('click', function (){ var inp = document.getElementById(btn.dataset.target); if (!inp) return; var show = inp.type === 'password'; inp.type = show ? 'text' : 'password'; btn.innerHTML = show ? '<i class="fa-regular fa-eye-slash"></i>' : '<i class="fa-regular fa-eye"></i>'; });
         });
 
-        // ---- Follow / unfollow ----
-        document.querySelectorAll('[data-follow-user]').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                var uid = btn.dataset.followUser, following = btn.dataset.following === '1';
-                var label = btn.querySelector('span'), icon = btn.querySelector('i');
-                req('/profile/' + uid + '/follow', following ? 'DELETE' : 'POST')
-                  .then(function (r){ if(!r.ok) throw new Error('x'); return r.json(); })
-                  .then(function () {
-                      btn.dataset.following = following ? '0' : '1';
-                      btn.classList.toggle('is-following', !following);
-                      label.textContent = following ? 'Ikuti' : 'Mengikuti';
-                      icon.className = 'fa-solid mr-1 ' + (following ? 'fa-user-plus' : 'fa-user-check');
-                  })
-                  .catch(function (){ /* endpoint belum ada — revert diam-diam */ });
+        /* ---------- Edit profile form (AJAX) ---------- */
+        var editForm = document.getElementById('pr-edit-form');
+        if (editForm) {
+            var clearErrs = function (){ editForm.querySelectorAll('.pr-err').forEach(function (el){ el.classList.add('hidden'); el.textContent = ''; }); };
+            var showErrs = function (errors){ errors = errors || {}; Object.keys(errors).forEach(function (field){ var slot = editForm.querySelector('.pr-err[data-err="' + field + '"]'); if (slot) { slot.textContent = errors[field][0] || errors[field]; slot.classList.remove('hidden'); } }); };
+            editForm.addEventListener('submit', function (e){
+                e.preventDefault(); clearErrs();
+                var btn = document.getElementById('pr-edit-submit'); var orig = btn.innerHTML;
+                btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+                fetch(editForm.action, { method:'POST', headers:{ 'X-CSRF-TOKEN':csrf, 'Accept':'application/json' }, body:new FormData(editForm), credentials:'same-origin' })
+                    .then(function (r){ return r.json().then(function (j){ return { ok:r.ok, json:j }; }); })
+                    .then(function (res){
+                        if (res.ok) {
+                            toast((res.json && res.json.message) || 'Profil berhasil diperbarui.', 'success');
+                            // live update banner profil (re-upload); first upload tampil saat reload
+                            if (res.json && res.json.banner) {
+                                document.querySelectorAll('[data-banner-img]').forEach(function (el){ el.src = res.json.banner; });
+                            }
+                            // live update avatar profil (preset / upload) tanpa reload
+                            if (res.json && res.json.avatar) {
+                                document.querySelectorAll('[data-avatar-img]').forEach(function (el){ el.src = res.json.avatar; });
+                            }
+                            closeModal('pr-edit-modal');
+                        } else { showErrs(res.json && res.json.errors ? res.json.errors : {}); toast((res.json && res.json.message) || 'Periksa kembali isian Anda.', 'error'); }
+                    })
+                    .catch(function (){ toast('Gagal menyambung ke server.', 'error'); })
+                    .finally(function (){ btn.disabled = false; btn.innerHTML = orig; });
             });
-        });
+        }
 
-        // ---- Like toggle ----
-        document.querySelectorAll('.pr-like').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                var pid = btn.dataset.post, liked = btn.dataset.liked === '1';
-                var countEl = btn.querySelector('.pr-like-count'), labelEl = btn.querySelector('.pr-like-label');
-                var n = parseInt(countEl.textContent || '0', 10) || 0;
-                // optimistic
-                countEl.textContent = liked ? Math.max(0, n - 1) : n + 1;
-                labelEl.textContent = liked ? 'Suka' : 'Disukai';
-                btn.classList.toggle('is-on', !liked);
-                btn.dataset.liked = liked ? '0' : '1';
-                req('/posts/' + pid + '/like', 'POST')
-                  .then(function (r){ return r.ok ? r.json() : Promise.reject(); })
-                  .catch(function (){ /* revert */ countEl.textContent = n; labelEl.textContent = liked ? 'Disukai' : 'Suka'; btn.classList.toggle('is-on', liked); btn.dataset.liked = liked ? '1' : '0'; });
-            });
+        /* ---------- Delete post (delegated AJAX via confirm modal) ---------- */
+        var confirmTitle = document.getElementById('pr-confirm-title');
+        var confirmBody = document.getElementById('pr-confirm-body');
+        var confirmOk = document.getElementById('pr-confirm-ok');
+        var pendingDelete = null;
+        var destroyUrlTpl = "{{ route('posts.destroy', ['__PID__']) }}";
+        document.addEventListener('click', function (e){
+            var btn = e.target.closest('[data-delete-post]'); if (!btn) return;
+            e.preventDefault();
+            pendingDelete = { id: btn.dataset.deletePost, item: btn.closest('.pr-item') };
+            if (confirmTitle) confirmTitle.textContent = 'Hapus postingan?';
+            if (confirmBody) confirmBody.textContent = 'Postingan ini akan dihapus permanen.';
+            openModal('pr-confirm-modal');
         });
+        if (confirmOk) {
+            confirmOk.addEventListener('click', function (){
+                if (!pendingDelete) return;
+                closeModal('pr-confirm-modal');
+                var id = pendingDelete.id, item = pendingDelete.item; pendingDelete = null;
+                fetch(destroyUrlTpl.replace('__PID__', id), { method:'POST', headers:{ 'X-CSRF-TOKEN':csrf, 'Accept':'application/json' }, body:new URLSearchParams({ _method:'DELETE' }), credentials:'same-origin' })
+                    .then(function (r){ return r.json().catch(function(){ return {}; }).then(function(j){ return { ok:r.ok, json:j }; }); })
+                    .then(function (res){ if (res.ok) { if (item) item.remove(); toast('Postingan dihapus.', 'success'); } else { toast('Gagal menghapus.', 'error'); } })
+                    .catch(function (){ toast('Gagal menyambung ke server.', 'error'); });
+            });
+        }
 
-        // ---- Save toggle ----
-        document.querySelectorAll('.pr-save').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                var pid = btn.dataset.post, on = btn.classList.contains('is-on');
-                btn.classList.toggle('is-on', !on);
-                btn.innerHTML = on ? '<i class="fa-regular fa-bookmark"></i> Simpan' : '<i class="fa-solid fa-bookmark"></i> Tersimpan';
-                req('/posts/' + pid + '/save', 'POST')
-                  .catch(function (){ btn.classList.toggle('is-on', on); btn.innerHTML = on ? '<i class="fa-solid fa-bookmark"></i> Tersimpan' : '<i class="fa-regular fa-bookmark"></i> Simpan'; });
+        /* ---------- Follow toggle ---------- */
+        var fb = document.getElementById('pr-follow-btn');
+        if (fb) {
+            fb.addEventListener('click', function (){
+                var following = fb.dataset.following === '1';
+                var url = following ? fb.dataset.urlUnfollow : fb.dataset.urlFollow;
+                fb.disabled = true;
+                fetch(url, { method: following ? 'DELETE' : 'POST', headers:{ 'X-CSRF-TOKEN':csrf, 'Accept':'application/json' }, credentials:'same-origin' })
+                    .then(function (r){ return r.json(); })
+                    .then(function (res){
+                        var now = !!res.following;
+                        fb.dataset.following = now ? '1' : '0';
+                        fb.classList.toggle('is-following', now);
+                        fb.innerHTML = now ? '<i class="fa-solid fa-user-check"></i><span>Mengikuti</span>' : '<i class="fa-solid fa-user-plus"></i><span>Ikuti</span>';
+                        document.querySelectorAll('[data-follower-count]').forEach(function (el){ el.textContent = res.followerCount; });
+                    })
+                    .catch(function (){ toast('Gagal mengubah status ikutan.', 'error'); })
+                    .finally(function (){ fb.disabled = false; });
             });
-        });
+        }
 
-        // ---- Community chip toggle ----
-        document.querySelectorAll('[data-community]').forEach(function (chip) {
-            chip.addEventListener('click', function () {
-                var cid = chip.dataset.community, on = chip.dataset.on === '1';
-                req('/profile/interest/' + cid, on ? 'DELETE' : 'POST')
-                  .then(function (r){ if(!r.ok) throw new Error('x'); })
-                  .then(function () {
-                      chip.dataset.on = on ? '0' : '1';
-                      chip.classList.toggle('is-on', !on);
-                      chip.querySelector('i').className = 'fa-solid ' + (on ? 'fa-plus' : 'fa-check');
-                  })
-                  .catch(function (){});
+        /* ---------- People modal (followers/following, infinite scroll) ---------- */
+        (function (){
+            var peopleModal = document.getElementById('pr-people-modal'); if (!peopleModal) return;
+            var pList = document.getElementById('pr-people-list');
+            var pSentinel = document.getElementById('pr-people-sentinel');
+            var pTabs = peopleModal.querySelectorAll('.pr-tab');
+            var pTitle = document.getElementById('pr-people-title');
+            var st = { which:'followers', cursor:'', loading:false, done:false };
+            function pStatus(h){ if (pSentinel) pSentinel.innerHTML = h || ''; }
+            function pUrl(){ return st.which === 'followers' ? peopleModal.dataset.urlFollowers : peopleModal.dataset.urlFollowing; }
+            function pRenderPerson(u){ return '<div class="pr-person"><img src="'+u.avatar+'" alt="" class="pr-person-avatar"><div class="min-w-0 flex-1"><p class="font-bold text-sm text-[var(--cream)] truncate">'+escapeHtml(u.name)+'</p></div><a href="'+u.profile_url+'" class="pr-ghost-btn">Lihat</a></div>'; }
+            function pLoad(reset){
+                if (st.loading) return;
+                if (reset){ st.cursor=''; st.done=false; if (pList) pList.querySelectorAll('.pr-person').forEach(function(n){ n.remove(); }); }
+                if (st.done) return;
+                st.loading = true; pStatus('<span><i class="fa-solid fa-spinner fa-spin"></i> Memuat…</span>');
+                fetch(pUrl() + '?cursor=' + encodeURIComponent(st.cursor), { headers:{ 'Accept':'application/json' }, credentials:'same-origin' })
+                    .then(function (r){ return r.json(); })
+                    .then(function (res){
+                        (res.items||[]).forEach(function (u){ if (pSentinel) pSentinel.insertAdjacentHTML('beforebegin', pRenderPerson(u)); });
+                        st.cursor = res.next_cursor || ''; st.loading = false;
+                        var hasPeople = !!(pList && pList.querySelector('.pr-person'));
+                        if (res.has_more && st.cursor) { pStatus(hasPeople ? '' : '<span>Tidak ada data.</span>'); if (!hasPeople) st.done = true; }
+                        else { st.done = true; pStatus(hasPeople ? '<span>Tidak ada lagi.</span>' : '<span>Tidak ada data.</span>'); }
+                    })
+                    .catch(function (){ st.loading = false; pStatus('<span>Gagal memuat.</span>'); });
+            }
+            new IntersectionObserver(function (entries){ if (entries[0].isIntersecting) pLoad(false); }, { root:pList, rootMargin:'120px' }).observe(pSentinel);
+            pTabs.forEach(function (t){ t.addEventListener('click', function (){ pTabs.forEach(function (x){ x.classList.remove('is-active'); }); t.classList.add('is-active'); st.which = t.dataset.peopleTab; if (pTitle) pTitle.textContent = st.which === 'followers' ? 'Pengikut' : 'Mengikuti'; pLoad(true); }); });
+            document.querySelectorAll('[data-people]').forEach(function (btn){ btn.addEventListener('click', function (){ var which = btn.dataset.people; pTabs.forEach(function (t){ t.classList.toggle('is-active', t.dataset.peopleTab === which); }); st.which = which; if (pTitle) pTitle.textContent = which === 'followers' ? 'Pengikut' : 'Mengikuti'; openModal('pr-people-modal'); pLoad(true); }); });
+        })();
+
+        /* ---------- DESKTOP tabs (Posts / Comments / Books) ---------- */
+        (function (){
+            var dtabs = document.querySelectorAll('[data-dtab]');
+            if (!dtabs.length) return;
+            dtabs.forEach(function (t){
+                t.addEventListener('click', function (){
+                    dtabs.forEach(function (x){ x.classList.remove('is-active'); });
+                    document.querySelectorAll('[data-dpanel]').forEach(function (p){ p.classList.add('hidden'); });
+                    t.classList.add('is-active');
+                    var p = document.querySelector('[data-dpanel="'+t.dataset.dtab+'"]'); if (p) p.classList.remove('hidden');
+                });
             });
-        });
+        })();
+
+        /* ---------- DESKTOP infinite scroll (posts / comments / saved) ----------
+           Batch pertama dirender server-side (6); sisanya dimuat bertahap dari
+           GET /profile/{user}/tabs/{tab}?cursor= (JSON: items, next_cursor,
+           has_more). Pola identik dengan modal Pengikut/Mengikuti: sentinel
+           di-observe IntersectionObserver, state per-tab {cursor,loading,done}.
+
+           Dedup berbasis id: batch server = 6, halaman tabs() = 10 → halaman
+           pertama bisa tumpang-tindih dgn yg sudah dirender. Id yg sudah ada
+           dilewati agar tak dobel. */
+        (function () {
+            var scrollContainers = document.querySelectorAll('[data-dscroll]');
+            if (!scrollContainers.length) return;
+
+            // Markup HARUS cocok dengan profile/_item.blade.php (render server).
+            function renderItem(it){
+                var iconCell = it.thumb
+                    ? '<img src="'+it.thumb+'" alt="" class="w-full h-full object-cover">'
+                    : '<i class="fa-solid '+(it.icon||'fa-feather')+'"></i>';
+                var eyebrow = it.eyebrow ? '<span class="text-[10px] font-bold text-[var(--gold)] uppercase tracking-wider block">'+escapeHtml(it.eyebrow)+'</span>' : '';
+                var excerpt = it.excerpt ? '<p class="text-xs text-white/55 truncate">'+escapeHtml(it.excerpt)+'</p>' : '';
+                var del = it.deletable ? '<button type="button" class="pr-item-del" data-delete-post="'+it.id+'" title="Hapus postingan" aria-label="Hapus postingan"><i class="fa-solid fa-trash-can"></i></button>' : '';
+                return '<div class="pr-item" data-item-id="'+it.id+'">'
+                    + '<div class="pr-item-icon '+(it.iconGold?'pr-item-icon-gold':'')+'">'+iconCell+'</div>'
+                    + '<div class="min-w-0 flex-1"><a href="'+it.link+'" class="block min-w-0">'+eyebrow
+                    + '<h4 class="font-bold text-sm text-[var(--cream)] truncate">'+escapeHtml(it.title||'')+'</h4>'+excerpt+'</a></div>'
+                    + del + '</div>';
+            }
+
+            scrollContainers.forEach(function (root){
+                var list = root.querySelector('[data-dscroll-list]');
+                var sentinel = root.querySelector('[data-dscroll-sentinel]');
+                if (!list || !sentinel) return; // empty-state: tak ada sentinel
+
+                var url = root.dataset.url;
+                var total = parseInt(root.dataset.total || '0', 10);
+                var st = { cursor:'', loading:false, done:false };
+
+                function haveIds(){ var ids={}; list.querySelectorAll('[data-item-id]').forEach(function(n){ ids[n.dataset.itemId]=1; }); return ids; }
+                function setStatus(h){ sentinel.innerHTML = h || ''; }
+                function reachedEnd(res){
+                    // Berhenti bila endpoint bilang tak ada lagi ATAU jumlah item
+                    // yg dirender sudah >= total server (jaga-jaga bila has_more tak akurat).
+                    var shown = list.querySelectorAll('[data-item-id]').length;
+                    return !res.has_more || !st.cursor || shown >= total;
+                }
+                function load(){
+                    if (st.loading || st.done) return;
+                    st.loading = true;
+                    setStatus('<span><i class="fa-solid fa-spinner fa-spin"></i> Memuat…</span>');
+                    fetch(url + '?cursor=' + encodeURIComponent(st.cursor), { headers:{ 'Accept':'application/json' }, credentials:'same-origin' })
+                        .then(function (r){ return r.json(); })
+                        .then(function (res){
+                            var seen = haveIds();
+                            (res.items||[]).forEach(function (it){
+                                if (seen[it.id]) return;          // dedup vs batch server
+                                list.insertAdjacentHTML('beforeend', renderItem(it));
+                            });
+                            st.cursor = res.next_cursor || '';
+                            st.loading = false;
+                            var shown = list.querySelectorAll('[data-item-id]').length;
+                            if (reachedEnd(res)) { st.done = true; setStatus(shown ? '<span>Tidak ada lagi.</span>' : ''); }
+                            else { setStatus(''); }
+                        })
+                        .catch(function (){ st.loading = false; setStatus('<span>Gagal memuat.</span>'); });
+                }
+
+                new IntersectionObserver(function (entries){
+                    if (entries[0].isIntersecting) load();
+                }, { root:root, rootMargin:'120px' }).observe(sentinel);
+            });
+        })();
+
+        /* ---------- MOBILE tab grid (2x2) + content switch ---------- */
+        (function (){
+            var mtabs = document.querySelectorAll('[data-mtab]'); if (!mtabs.length) return;
+            var mhead = document.querySelector('[data-mhead]');
+            var mseeall = document.querySelector('[data-mseeall]');
+            var headLabel = { posts:'AKTIVITAS TERBARU', comments:'AKTIVITAS TERBARU', saved:'AKTIVITAS TERBARU', books:'KOLEKSI BUKU' };
+            mtabs.forEach(function (t){
+                t.addEventListener('click', function (){
+                    mtabs.forEach(function (x){ x.classList.remove('is-active'); });
+                    document.querySelectorAll('[data-mpanel]').forEach(function (p){ p.hidden = true; });
+                    t.classList.add('is-active');
+                    var key = t.dataset.mtab;
+                    var p = document.querySelector('[data-mpanel="'+key+'"]'); if (p) p.hidden = false;
+                    if (mhead) mhead.textContent = headLabel[key] || 'AKTIVITAS TERBARU';
+                    if (mseeall) { var k = key.charAt(0).toUpperCase() + key.slice(1); mseeall.href = mseeall.dataset['url'+k] || '#'; }
+                });
+            });
+        })();
+
+        /* ---------- Flash / delete-error openers ---------- */
+        if (window.__prFlash) { toast('Profil berhasil diperbarui.', 'success'); }
+        if (window.__prDelErr) { openModal('pr-delete-modal'); toast('Gagal menghapus akun — periksa pesan di form.', 'error'); }
     })();
     </script>
 

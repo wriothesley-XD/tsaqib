@@ -69,6 +69,14 @@
             </div>
         </div>
 
+        <!-- Avatar picker -->
+        <div class="mt-4">
+            <x-input-label :value="__('Pilih Avatar')" />
+            <p class="text-[10px] text-[#8A9B7A] mt-1 mb-2">Pilih ikon avatar Anda — atau biarkan kami memilihkan secara acak.</p>
+            <x-avatar-picker name="avatar" :selected="old('avatar')" :randomize="true" />
+            <x-input-error :messages="$errors->get('avatar')" class="mt-2" />
+        </div>
+
         <div class="flex flex-col sm:flex-row sm:items-center justify-between mt-6 gap-3">
             <div class="text-xs text-[#8A9B7A]">
                 Sudah punya akun?

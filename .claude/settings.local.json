@@ -37,7 +37,25 @@
       "Bash(command -v node)",
       "Bash(awk '/<script>/{f=1;next} /<\\\\/script>/{f=0} f' resources/views/komunitas/index.blade.php)",
       "Bash(node --check /tmp/idx_strip.js)",
-      "Bash(identify struktur.webp kepengurusan.webp)"
+      "Bash(identify struktur.webp kepengurusan.webp)",
+      "Bash(grep -nE \"fillable|protected \\\\\\\\\\\\$|title|content|community|use |class |relation|function\")",
+      "Bash(grep -nE '\\\\$table->' database/migrations/2026_07_30_095824_create_posts_table.php)",
+      "Bash(grep -nE '\\\\$table->' database/migrations/2026_08_09_140000_add_columns_to_comments_table.php)",
+      "Bash(xargs -I{} echo \"  feature tokens found: {}\")",
+      "Bash(command -v sqlite3)",
+      "Bash(sqlite3 database/database.sqlite \".tables\")",
+      "Bash(sqlite3 database/database.sqlite \"SELECT migration FROM migrations ORDER BY id;\")",
+      "Bash(grep -nE '\\\\$[a-zA-Z]+')",
+      "Bash(grep -E '\\\\$request->validate|validateWithBag')",
+      "Bash(grep -viE '\\\\bclass=|\\\\bhref=|\\\\bname=|\\\\bid=|\\\\bvalue=|\\\\btype=|\\\\bdata-|\\\\baria-|\\\\brel=|\\\\baction=|\\\\bmethod=|\\\\bstyle=|\\\\baccept=|\\\\bautocomplete=|\\\\bautofocus\\\\b|\\\\brequired\\\\b|\\\\bhidden\\\\b|\\\\bdisabled\\\\b|\\\\bchecked\\\\b|\\\\bselected\\\\b|\\\\btarget=|\\\\brole=|\\\\bdelay=|\\\\bmultiple\\\\b|\\\\bcolspan=|\\\\bwidth=|\\\\bheight=|\\\\bplaceholder=|=>|::|\\\\$[a-z]+->|fontFamily|font-weight|font-display|font-label|background|color:|opacity|position|transform|transition|cursor|display:|padding|margin|gap|grid|flex|overflow|border|radius|width|max-height|max-width|object-fit|align|justify|scrollbar|aspect|inset|translate|rotate|scale|filter|backdrop|will-change|scroll-margin|scroll-behavior|stroke|fill|viewBox|xmlns|d=\"M|<path|<svg|<script|<style|window\\\\.|document\\\\.|function|const |let |var |return |await |async |fetch\\\\\\(|=>|@extends|@section|@yield|@push|@stack|@include|@props|@auth|@else|@endauth|@endif|@foreach|@endforeach|@forelse|@empty|@endforelse|@if|@elseif|@isset|@endisset|@endunless|@unless|@json|@csrf|@method|@error|@enderror|@php|@endphp|@slot|@endslot|x-[a-z]|fa-[a-z]|align=|width=' .)",
+      "Bash(mkdir -p public/assets/images/avatar)",
+      "Bash(cp public/images/avatars/* public/assets/images/avatar/)",
+      "Bash(php -l app/Http/Controllers/AdminController.php)",
+      "Bash(sqlite3 *)",
+      "Bash(php -l routes/web.php)",
+      "Bash(curl -sIL \"https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css\")",
+      "Bash(curl -s \"https://data.jsdelivr.com/v1/packages/npm/@tabler/icons-webfont/resolved\")",
+      "Bash(grep -n \"mapCollection\\\\|'items'\\\\|->mapCollection\\(\\\\$\" app/Http/Controllers/ProfileController.php)"
     ]
   }
 }

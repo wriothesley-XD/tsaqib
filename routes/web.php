@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LibraryController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\OpenRecruitmentController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PostController;
@@ -21,6 +22,16 @@ Route::get('/hub-masjid', [PageController::class, 'hub'])->name('hub.masjid');
 
 // Perpustakaan Digital Publik (filter ?category= & ?q= + pagination server-side)
 Route::get('/perpustakaan', [LibraryController::class, 'index'])->name('perpustakaan');
+
+// Pusat Informasi: Berita + Buletin dalam satu halaman 2 tab (no reload).
+Route::get('/info', [NewsController::class, 'info'])->name('info');
+
+// Alias lama /berita → /info (jaga-jaga ada link/bookmark lama). Tanpa nama
+// agar route('info') jadi satu-satunya sumber URL berita di view.
+Route::get('/berita', fn () => redirect()->route('info'));
+
+// Detail berita per slug (dicapai dari tab Berita di /info & section Kabar Terbaru).
+Route::get('/berita/{slug}', [NewsController::class, 'show'])->name('berita.show');
 
 // Laboratorium PAI Publik
 Route::get('/laboratorium-pai', [TsaqibController::class, 'laborPai'])->name('laboratorium.pai');
@@ -62,6 +73,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/comments/{comment}', [PostController::class, 'destroyComment'])->name('comments.destroy');
     Route::post('/posts/{post}/repost', [PostController::class, 'repost'])->name('posts.repost');
 
+    // Simpan / batal simpan post (bookmark "Tersimpan") — AJAX. Pivot post_user,
+    // sinkron antar perangkat & dipakai tab Tersimpan di profil.
+    Route::post('/posts/{post}/save', [PostController::class, 'toggleSave'])->name('posts.save');
+
     // Lapor konten (post/comment) — AJAX
     Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
 
@@ -69,14 +84,38 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Hapus foto profil kustom (upload/preset) → reset ke avatar default (AJAX, JSON).
+    Route::delete('/profile/avatar', [ProfileController::class, 'destroyAvatar'])->name('profile.avatar.destroy');
+
+    // Profil publik (user mana pun) + sistem follow + tab aktivitas. Constraint
+    // numeric pada {user} mencegah benturan dengan route literal (mis. tidak ada).
+    Route::get('/profile/{user}', [ProfileController::class, 'show'])->name('profile.show')->where('user', '[0-9]+');
+    Route::post('/profile/{user}/follow', [ProfileController::class, 'follow'])->name('profile.follow')->where('user', '[0-9]+');
+    Route::delete('/profile/{user}/unfollow', [ProfileController::class, 'unfollow'])->name('profile.unfollow')->where('user', '[0-9]+');
+    Route::get('/profile/{user}/followers', [ProfileController::class, 'followers'])->name('profile.followers')->where('user', '[0-9]+');
+    Route::get('/profile/{user}/following', [ProfileController::class, 'following'])->name('profile.following')->where('user', '[0-9]+');
+    Route::get('/profile/{user}/tabs/{tab}', [ProfileController::class, 'tabs'])->name('profile.tabs')->where('user', '[0-9]+')->where('tab', '[a-z]+');
+    Route::get('/profile/{user}/list/{tab}', [ProfileController::class, 'list'])->name('profile.list')->where('user', '[0-9]+')->where('tab', '[a-z]+');
+
     Route::get('/role', [TsaqibController::class, 'role'])->name('role');
+
+    // Perpustakaan — toggle bookmark buku ke "My Collection" / "Saved" (AJAX, JSON).
+    // GET /perpustakaan tetap publik; hanya aksi simpan yang butuh login.
+    Route::post('/perpustakaan/books/{book}/toggle', [LibraryController::class, 'toggleSave'])->name('perpustakaan.toggle');
 
     // Admin Panel (Proteksi Admin Role)
     Route::prefix('admin-panel')->name('admin.')->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('index');
+        // Paginasi AJAX tiap list (HTML satu halaman + metadata, JSON).
+        Route::get('/list/{resource}', [AdminController::class, 'list'])->name('list');
         Route::post('/users/{user}/role', [AdminController::class, 'updateUserRole'])->name('users.role');
         Route::post('/books', [AdminController::class, 'storeBook'])->name('books.store');
+        Route::put('/books/{book}', [AdminController::class, 'updateBook'])->name('books.update');
         Route::delete('/books/{book}', [AdminController::class, 'destroyBook'])->name('books.destroy');
+        Route::post('/news', [AdminController::class, 'storeNews'])->name('news.store');
+        Route::put('/news/{news}', [AdminController::class, 'updateNews'])->name('news.update');
+        Route::delete('/news/{news}', [AdminController::class, 'destroyNews'])->name('news.destroy');
         Route::post('/toggle-recruitment', [AdminController::class, 'toggleRecruitment'])->name('toggle-recruitment');
         Route::post('/reports/{report}/resolve', [ReportController::class, 'resolve'])->name('reports.resolve');
     });

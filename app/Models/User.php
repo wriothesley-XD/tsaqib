@@ -24,6 +24,8 @@ class User extends Authenticatable
         'password',
         'role',
         'selected_community',
+        'bio',
+        'profile_photo_path',
     ];
 
     /**
@@ -50,11 +52,98 @@ class User extends Authenticatable
     }
 
     /**
-     * Centralized avatar URL. A real uploaded photo takes precedence;
-     * otherwise deterministically pick from the preset set in
-     * images/avatars/ (stable per user via id % count, so the navbar
-     * and profile always match and the image never changes between renders).
-     * Falls back to the default community avatar only if no presets exist.
+     * Postingan milik user (untuk tab & jumlah postingan di halaman profil).
+     */
+    public function posts(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(\App\Models\Post::class);
+    }
+
+    /**
+     * Komentar milik user (untuk tab & jumlah komentar di halaman profil).
+     */
+    public function comments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(\App\Models\Comment::class);
+    }
+
+    /**
+     * Buku pribadi user di Perpustakaan — mencakup "My Collection" dan "Saved",
+     * dibedakan via kolom pivot `type` ('collection' | 'saved'). Filter daftar
+     * tertentu: $user->savedBooks()->wherePivot('type', 'collection').
+     */
+    public function savedBooks(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(\App\Models\Book::class, 'book_user')
+            ->withPivot('type')
+            ->withTimestamps();
+    }
+
+    /**
+     * Postingan yang disimpan/bookmark user (tab "Tersimpan" di profil).
+     */
+    public function savedPosts(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(\App\Models\Post::class, 'post_user')
+            ->withTimestamps();
+    }
+
+    /**
+     * User yang dia ikuti. (Saya = follower, mereka = following.)
+     */
+    public function following(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(self::class, 'follows', 'follower_id', 'following_id')
+            ->withPivot('created_at')
+            ->withTimestamps();
+    }
+
+    /**
+     * Pengikut user ini. (Mereka = follower, saya = following.)
+     */
+    public function followers(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(self::class, 'follows', 'following_id', 'follower_id')
+            ->withPivot('created_at')
+            ->withTimestamps();
+    }
+
+    /**
+     * Daftar path avatar bawaan (preset) di public/assets/images/avatar/*,
+     * relatif terhadap document-root (mis. 'assets/images/avatar/guy.webp').
+     *
+     * Memoized + sorted agar urutan stabil antar-render. Dipakai oleh
+     * getAvatar(), validasi (Rule::in), dan komponen <x-avatar-picker>.
+     * Tambahkan file avatar baru ke folder itu dan otomatis muncul di grid.
+     *
+     * @return list<string>
+     */
+    public static function presetAvatars(): array
+    {
+        static $presets = null;
+
+        if ($presets === null) {
+            $dir = public_path('assets/images/avatar');
+            $presets = [];
+            foreach ((array) glob($dir.'/*') as $file) {
+                if (is_file($file)) {
+                    $presets[] = 'assets/images/avatar/'.basename($file);
+                }
+            }
+            sort($presets);
+        }
+
+        return $presets;
+    }
+
+    /**
+     * Centralized avatar URL. Precedence:
+     *  1) Foto yang di-UPLOAD (profile_photo_path, disimpan di disk 'public');
+     *  2) Avatar BAWAAN yang dipilih user (kolom `avatar`, dipilih lewat
+     *     <x-avatar-picker> di register / edit profil);
+     *  3) Deterministic preset via id % count — fallback bagi user lama yang
+     *     belum memilih, agar navbar & profil selalu cocok & stabil;
+     *  4) Default komunitas bila tak ada preset sama sekali.
      */
     public function getAvatar(): string
     {
@@ -62,24 +151,16 @@ class User extends Authenticatable
             return asset('storage/'.$this->profile_photo_path);
         }
 
-        // Memoized + sorted so the id-based pick is deterministic across renders.
-        static $presets = null;
-        if ($presets === null) {
-            $dir = public_path('images/avatars');
-            $presets = array_merge(
-                glob($dir.'/*.jpg') ?: [],
-                glob($dir.'/*.jpeg') ?: [],
-                glob($dir.'/*.png') ?: [],
-                glob($dir.'/*.webp') ?: []
-            );
-            sort($presets);
+        if ($this->avatar) {
+            return asset($this->avatar);
         }
 
-        if (empty($presets)) {
-            return asset('images/community-avatar/default.svg');
+        $presets = self::presetAvatars();
+        if (! empty($presets)) {
+            return asset($presets[$this->id % count($presets)]);
         }
 
-        return asset('images/avatars/'.basename($presets[$this->id % count($presets)]));
+        return asset('images/community-avatar/default.svg');
     }
 
     /**

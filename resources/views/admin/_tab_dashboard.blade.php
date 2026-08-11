@@ -1,31 +1,31 @@
 {{-- Tab: Dashboard — stat cards + Perlu Perhatian --}}
-<div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-    <div class="tsaqib-card p-5 flex items-center space-x-4">
-        <div class="w-12 h-12 rounded-xl bg-[#01795F]/15 text-[#3fd6b0] flex items-center justify-center text-xl font-bold"><i class="fa-solid fa-users"></i></div>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+    <div class="tsaqib-card p-4 sm:p-5 flex items-center space-x-3 sm:space-x-4">
+        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#01795F]/15 text-[#3fd6b0] flex items-center justify-center text-lg sm:text-xl font-bold"><i class="fa-solid fa-users"></i></div>
         <div>
             <span class="text-[10px] font-bold text-white/40 uppercase tracking-wider block">Total Pengguna</span>
-            <span class="text-2xl font-bold text-[var(--cream)]">{{ $stats['total_users'] ?? 0 }}</span>
+            <span class="text-xl sm:text-2xl font-bold text-[var(--cream)]">{{ $stats['total_users'] ?? 0 }}</span>
         </div>
     </div>
-    <div class="tsaqib-card p-5 flex items-center space-x-4">
-        <div class="w-12 h-12 rounded-xl bg-[#01795F]/15 text-[#3fd6b0] flex items-center justify-center text-xl font-bold"><i class="fa-solid fa-newspaper"></i></div>
+    <div class="tsaqib-card p-4 sm:p-5 flex items-center space-x-3 sm:space-x-4">
+        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#01795F]/15 text-[#3fd6b0] flex items-center justify-center text-lg sm:text-xl font-bold"><i class="fa-solid fa-newspaper"></i></div>
         <div>
             <span class="text-[10px] font-bold text-white/40 uppercase tracking-wider block">Total Postingan</span>
-            <span class="text-2xl font-bold text-[var(--cream)]">{{ $stats['total_posts'] ?? 0 }}</span>
+            <span class="text-xl sm:text-2xl font-bold text-[var(--cream)]">{{ $stats['total_posts'] ?? 0 }}</span>
         </div>
     </div>
-    <div class="tsaqib-card p-5 flex items-center space-x-4">
-        <div class="w-12 h-12 rounded-xl bg-[#01795F]/15 text-[#3fd6b0] flex items-center justify-center text-xl font-bold"><i class="fa-solid fa-book"></i></div>
+    <div class="tsaqib-card p-4 sm:p-5 flex items-center space-x-3 sm:space-x-4">
+        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#01795F]/15 text-[#3fd6b0] flex items-center justify-center text-lg sm:text-xl font-bold"><i class="fa-solid fa-book"></i></div>
         <div>
             <span class="text-[10px] font-bold text-white/40 uppercase tracking-wider block">Buku Perpustakaan</span>
-            <span class="text-2xl font-bold text-[var(--cream)]">{{ $stats['total_books'] ?? 0 }}</span>
+            <span class="text-xl sm:text-2xl font-bold text-[var(--cream)]">{{ $stats['total_books'] ?? 0 }}</span>
         </div>
     </div>
-    <div class="tsaqib-card p-5 flex items-center space-x-4">
-        <div class="w-12 h-12 rounded-xl bg-[#01795F]/15 text-[#3fd6b0] flex items-center justify-center text-xl font-bold"><i class="fa-solid fa-user-plus"></i></div>
+    <div class="tsaqib-card p-4 sm:p-5 flex items-center space-x-3 sm:space-x-4">
+        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#01795F]/15 text-[#3fd6b0] flex items-center justify-center text-lg sm:text-xl font-bold"><i class="fa-solid fa-user-plus"></i></div>
         <div>
             <span class="text-[10px] font-bold text-white/40 uppercase tracking-wider block">Pendaftar Kelas X</span>
-            <span class="text-2xl font-bold text-[var(--cream)]">{{ $stats['total_registrations'] ?? 0 }}</span>
+            <span class="text-xl sm:text-2xl font-bold text-[var(--cream)]">{{ $stats['total_registrations'] ?? 0 }}</span>
         </div>
     </div>
 </div>
@@ -41,7 +41,7 @@
     </div>
 
     <div class="space-y-1">
-        @forelse($laporan->take(5) as $r)
+        @forelse($perluPerhatian as $r)
             @php($item = $r->reportable)
             <div class="flex items-center justify-between gap-3 py-2 border-b border-white/5 last:border-0">
                 <div class="min-w-0">

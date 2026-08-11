@@ -2,8 +2,8 @@
     resources/views/komunitas/_post-card.blade.php
     Isi kartu postingan (header, body, media grid, action bar).
     Dipakai feed (article clickable) & detail (article biasa).
-    Variabel: $post (eager-load user, media, votes/reposts scoped utk user login,
-    dengan withCount comments/reposts). $showManage (bool) -> tampil tombol edit/hapus.
+    Variabel: $post (eager-load user, media, votes & savedBy pivot scoped utk user
+    login, dengan withCount comments/reposts). $showManage (bool) -> tampil tombol edit/hapus.
 --}}
 @php($showManage = $showManage ?? false)
 
@@ -70,9 +70,9 @@
     </div>
 @endif
 
-{{-- Action Bar (vote pill + komentar + repost + share) --}}
+{{-- Action Bar (vote pill + komentar + simpan/Tersimpan + share) --}}
 @php($myVote = Auth::check() ? $post->votes->first()?->type : null)
-@php($myRepost = Auth::check() ? $post->reposts->isNotEmpty() : false)
+@php($isSaved = Auth::check() ? $post->savedBy->isNotEmpty() : false)
 <div class="flex items-center gap-2 mt-3 pt-3 border-t border-white/10 flex-wrap">
     <div class="inline-flex rounded-full border border-white/10 overflow-hidden">
         <button type="button" data-no-nav data-post-id="{{ $post->id }}" data-type="up"
@@ -90,8 +90,9 @@
     </span>
 
     <button type="button" data-no-nav data-post-id="{{ $post->id }}"
-            class="repost-btn action-chip flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold {{ $myRepost ? 'is-active' : '' }}">
-        <i class="fa-solid fa-retweet"></i><span data-repost-count>{{ $post->reposts_count }}</span>
+            class="save-btn action-chip flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold {{ $isSaved ? 'is-active' : '' }}"
+            title="{{ $isSaved ? 'Hapus dari Tersimpan' : 'Simpan ke Tersimpan' }}">
+        <i class="fa-solid fa-bookmark"></i><span class="hidden sm:inline">{{ $isSaved ? 'Tersimpan' : 'Simpan' }}</span>
     </button>
 
     <button type="button" data-no-nav

@@ -17,6 +17,14 @@
     // Item sekunder yang dirapikan ke dropdown "Lainnya".
     $navLainnya = [
         ['label' => 'Open Recruitment', 'href' => route('open.recruitment')],
+        [
+            'label'  => 'Saran & Masukan',
+            'href'   => 'https://docs.google.com/forms/d/e/1FAIpQLScLDeCvGI17R7Z-NkckFV-N9Sm1Jfl8-eOEl20ZFVfFDeebgQ/viewform',
+            // Link eksternal (Google Form) → tab baru, aman dibuka via noopener.
+            'target' => '_blank',
+            'rel'    => 'noopener noreferrer',
+            'icon'   => 'fa-message',
+        ],
     ];
 
     // Palet minimalis: tenang saat non-aktif, emas saat aktif. Indikator aktif = garis bawah emas.
@@ -26,6 +34,20 @@
     // Base kelas link: sentence case. inline-flex+items-center dipakai SEMUA item
     // (link & trigger dropdown) agar box-model & baseline identik → sejajar & rapi.
     $navLinkClass = 'group relative inline-flex items-center pb-1 text-sm font-semibold tracking-tight transition-colors duration-200';
+
+    // Ikon per item menu mobile (reuse ikon yang sudah dipakai di halaman terkait).
+    $navIcon = [
+        'Beranda'          => 'fa-house',
+        'Laboratorium PAI' => 'fa-flask',
+        'Perpustakaan'     => 'fa-book-open',
+        'Komunitas'        => 'fa-users',
+        'Info'             => 'fa-bullhorn',
+        'Lainnya'          => 'fa-ellipsis',
+    ];
+
+    // Jumlah komunitas (sumber kanonik: config('komunitas.daftar') — proyek tak
+    // punya tabel communities). Untuk badge pada item "Komunitas" di menu mobile.
+    $jumlahKomunitas = count($daftarKomunitasNav);
 @endphp
 
 {{-- Token tema gelap (.brand-mark, .cta-primary, CSS vars, font-display/label) di-supply
@@ -86,9 +108,17 @@
                          class="absolute left-0 top-full pt-2.5 opacity-0 invisible z-[60]">
                         <div class="min-w-[210px] rounded-xl border border-white/10 bg-[#161a14] ring-1 ring-black/50 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.8)] overflow-hidden py-2">
                             @foreach($navLainnya as $item)
-                                <a href="{{ $item['href'] }}"
+                                @php
+                                    // Ikon opsional per-item (default: panah 'go to' lama);
+                                    // atribut target/rel opsional untuk link eksternal.
+                                    $itemIcon  = $item['icon'] ?? 'fa-arrow-right';
+                                    $itemAttrs = '';
+                                    if (!empty($item['target'])) $itemAttrs .= ' target="'.$item['target'].'"';
+                                    if (!empty($item['rel']))    $itemAttrs .= ' rel="'.$item['rel'].'"';
+                                @endphp
+                                <a href="{{ $item['href'] }}"{{ $itemAttrs }}
                                    class="lainnya-item flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-white/70 hover:text-[var(--gold)] hover:bg-white/5">
-                                    <i class="fa-solid fa-arrow-right text-[9px] text-white/30"></i>
+                                    <i class="fa-solid {{ $itemIcon }} text-[9px] text-white/30"></i>
                                     {{ $item['label'] }}
                                 </a>
                             @endforeach
@@ -160,77 +190,93 @@
 
 <div id="mobile-menu" class="hidden fixed top-16 xl:top-20 inset-x-0 z-50 xl:hidden border-t border-white/5 bg-[#10140F] px-5 py-3 space-y-0.5 shadow-2xl max-h-[calc(100vh-4rem)] overflow-y-auto antialiased">
 
+        {{-- Daftar menu utama (ikon + tap target ≥44px). --}}
         @foreach($navBefore as $item)
             <a href="{{ $item['href'] }}"
-               class="block py-3 text-sm font-medium tracking-wide transition-colors duration-200 {{ $item['active'] ? 'text-[var(--gold)]' : 'text-white/80 hover:text-white' }}">
-                {{ $item['label'] }}
+               class="mnav-item {{ $item['active'] ? 'is-active' : '' }}">
+                <span class="mnav-ikon"><i class="fa-solid {{ $navIcon[$item['label']] ?? 'fa-angle-right' }}"></i></span>
+                <span>{{ $item['label'] }}</span>
             </a>
         @endforeach
 
-        {{-- Komunitas — link langsung ke feed gabungan semua komunitas --}}
+        {{-- Komunitas — kartu unggulan berbingkai emas + badge jumlah + chevron. --}}
         <a href="{{ route('komunitas', 'semua') }}"
-           class="block py-3 text-sm font-medium tracking-wide transition-colors duration-200 {{ $isKomunitasZone ? 'text-[var(--gold)]' : 'text-white/80 hover:text-white' }}">
-            Komunitas
+           class="mnav-komunitas {{ $isKomunitasZone ? 'is-active' : '' }}">
+            <span class="mnav-ikon"><i class="fa-solid {{ $navIcon['Komunitas'] }}"></i></span>
+            <span class="mnav-label">Komunitas</span>
+            <span class="mnav-count">{{ $jumlahKomunitas }}</span>
+            <i class="fa-solid fa-chevron-right text-[11px] text-[var(--gold)]"></i>
         </a>
 
         @foreach($navAfter as $item)
             <a href="{{ $item['href'] }}"
-               class="block py-3 text-sm font-medium tracking-wide transition-colors duration-200 {{ $item['active'] ? 'text-[var(--gold)]' : 'text-white/80 hover:text-white' }}">
-                {{ $item['label'] }}
+               class="mnav-item {{ $item['active'] ? 'is-active' : '' }}">
+                <span class="mnav-ikon"><i class="fa-solid {{ $navIcon[$item['label']] ?? 'fa-angle-right' }}"></i></span>
+                <span>{{ $item['label'] }}</span>
             </a>
         @endforeach
 
-        {{-- Lainnya (mobile) — toggle ekspandable berisi menu sekunder --}}
+        {{-- Lainnya (mobile) — toggle ekspandable berisi menu sekunder. --}}
         <div>
             <button type="button" data-mobile-lainnya-toggle
-                    class="w-full flex items-center justify-between py-3 text-sm font-medium tracking-wide text-white/80 hover:text-white transition-colors duration-200"
+                    class="mnav-item w-full"
                     aria-expanded="false" aria-controls="mobile-lainnya">
+                <span class="mnav-ikon"><i class="fa-solid {{ $navIcon['Lainnya'] }}"></i></span>
                 <span>Lainnya</span>
-                <i class="fa-solid fa-chevron-down text-[10px] transition-transform duration-200"></i>
+                <i class="fa-solid fa-chevron-down text-[10px] text-white/45 transition-transform duration-200 ml-auto"></i>
             </button>
-            <div id="mobile-lainnya" class="hidden pl-4 border-l border-white/10 ml-1 mb-1 space-y-0.5">
+            <div id="mobile-lainnya" class="hidden pl-4 border-l border-white/10 ml-6 mb-1 mt-0.5 space-y-0.5">
                 @foreach($navLainnya as $item)
-                    <a href="{{ $item['href'] }}"
-                       class="block py-2.5 text-sm text-white/65 hover:text-[var(--gold)] transition-colors duration-200">
+                    @php
+                        $itemAttrs = '';
+                        if (!empty($item['target'])) $itemAttrs .= ' target="'.$item['target'].'"';
+                        if (!empty($item['rel']))    $itemAttrs .= ' rel="'.$item['rel'].'"';
+                    @endphp
+                    <a href="{{ $item['href'] }}"{{ $itemAttrs }}
+                       class="block py-2.5 px-2 text-sm text-white/65 hover:text-[var(--gold)] transition-colors duration-200 rounded-lg">
                         {{ $item['label'] }}
                     </a>
                 @endforeach
             </div>
         </div>
 
-        {{-- Social media (mobile) — sama seperti ikon di navbar desktop (≥ xl) --}}
-        <div class="pt-3 mt-2 border-t border-white/5">
-            <p class="px-1 mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/40">Ikuti Kami</p>
-            <div class="flex items-center gap-5 px-1">
-                <a href="https://www.instagram.com/fsi.smansa_landbouw?igsh=MXVzMzd5Nms0eDZpNQ==" target="_blank" rel="noopener" aria-label="TSAQIB di Instagram" class="text-white/70 hover:text-white transition-colors duration-200">
-                    <i class="fa-brands fa-instagram text-xl"></i>
-                </a>
-                <a href="https://www.facebook.com/share/1BJMFJvK5k/" target="_blank" rel="noopener" aria-label="TSAQIB di Facebook" class="text-white/70 hover:text-white transition-colors duration-200">
-                    <i class="fa-brands fa-facebook text-xl"></i>
-                </a>
-                <a href="https://ytfsi.carrd.co" target="_blank" rel="noopener" aria-label="TSAQIB di YouTube" class="text-white/70 hover:text-white transition-colors duration-200">
-                    <i class="fa-brands fa-youtube text-xl"></i>
-                </a>
-            </div>
-        </div>
-
-        {{-- Area Auth (mobile) --}}
-        <div class="pt-3 mt-2 border-t border-white/5 space-y-1">
-            @auth
-                @if(Auth::user()->role === 'admin')
-                    <a href="{{ route('admin.index') }}" class="block py-3 text-sm font-semibold text-amber-300/90 hover:text-amber-200 transition-colors duration-200">
-                        Admin Panel
+        {{-- ===== Seksi terpisah: Ikuti Kami + Masuk (divider di atas) ===== --}}
+        <div class="pt-3 mt-3 border-t border-white/10 space-y-3">
+            {{-- Social media (mobile) --}}
+            <div>
+                <p class="px-1 mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/40">Ikuti Kami</p>
+                <div class="flex items-center gap-5 px-1">
+                    <a href="https://www.instagram.com/fsi.smansa_landbouw?igsh=MXVzMzd5Nms0eDZpNQ==" target="_blank" rel="noopener" aria-label="TSAQIB di Instagram" class="text-white/70 hover:text-white transition-colors duration-200">
+                        <i class="fa-brands fa-instagram text-xl"></i>
                     </a>
-                @endif
-                <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 py-3 text-sm font-medium text-white/85 hover:text-white transition-colors duration-200">
-                    <x-community-avatar :user="Auth::user()" size="xs" />
-                    <span>Profil Saya</span>
-                </a>
-            @else
-                <a href="{{ route('login') }}" class="cta-primary flex justify-center items-center w-full px-4 py-3 rounded-full text-sm font-bold text-white">
-                    Masuk
-                </a>
-            @endauth
+                    <a href="https://www.facebook.com/share/1BJMFJvK5k/" target="_blank" rel="noopener" aria-label="TSAQIB di Facebook" class="text-white/70 hover:text-white transition-colors duration-200">
+                        <i class="fa-brands fa-facebook text-xl"></i>
+                    </a>
+                    <a href="https://ytfsi.carrd.co" target="_blank" rel="noopener" aria-label="TSAQIB di YouTube" class="text-white/70 hover:text-white transition-colors duration-200">
+                        <i class="fa-brands fa-youtube text-xl"></i>
+                    </a>
+                </div>
+            </div>
+
+            {{-- Area Auth (mobile) --}}
+            <div class="space-y-1">
+                @auth
+                    @if(Auth::user()->role === 'admin')
+                        <a href="{{ route('admin.index') }}" class="mnav-item">
+                            <span class="mnav-ikon" style="background:rgba(252,191,73,.15); color:rgb(252,211,77);"><i class="fa-solid fa-shield-halved"></i></span>
+                            <span class="text-amber-300/90">Admin Panel</span>
+                        </a>
+                    @endif
+                    <a href="{{ route('profile.edit') }}" class="mnav-item">
+                        <x-community-avatar :user="Auth::user()" size="xs" />
+                        <span>Profil Saya</span>
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="cta-primary flex justify-center items-center gap-2 w-full px-4 py-3 rounded-full text-sm font-bold text-white">
+                        <i class="fa-solid fa-right-to-bracket"></i> Masuk
+                    </a>
+                @endauth
+            </div>
         </div>
     </div>
 
@@ -270,6 +316,49 @@
             transition: none !important;
             transform: none !important;
         }
+    }
+
+    /* ===== Mobile nav items (#mobile-menu) — visual: ikon + tap target ≥44px =====
+       Hanya mempengaruhi menu mobile; menu desktop (≥ xl) tak tersentuh. */
+    #mobile-menu .mnav-item{
+        display:flex; align-items:center; gap:.85rem;
+        min-height:44px;                 /* tap target aksesibilitas */
+        padding:.6rem .75rem;
+        border-radius:.7rem;
+        font-size:.9rem; font-weight:600;
+        color:rgba(247,245,239,.82);
+        transition:background .15s ease, color .15s ease;
+    }
+    #mobile-menu .mnav-item:hover{ background:rgba(247,245,239,.06); color:var(--cream); }
+    #mobile-menu .mnav-item.is-active{ background:rgba(1,121,95,.18); color:var(--gold); }
+    #mobile-menu .mnav-item .mnav-ikon{
+        width:32px; height:32px; flex-shrink:0;
+        display:flex; align-items:center; justify-content:center;
+        border-radius:.6rem; font-size:.8rem;
+        background:rgba(247,245,239,.06); color:var(--gold);
+    }
+    #mobile-menu .mnav-item.is-active .mnav-ikon{ background:rgba(201,166,107,.18); }
+
+    /* Item "Komunitas" — kartu berbingkai emas + badge jumlah + chevron. */
+    #mobile-menu .mnav-komunitas{
+        display:flex; align-items:center; gap:.85rem;
+        min-height:44px; padding:.7rem .85rem;
+        border-radius:.85rem;
+        border:1px solid rgba(201,166,107,.4);
+        background:linear-gradient(135deg, rgba(201,166,107,.10), rgba(1,121,95,.08));
+        color:var(--cream); font-weight:700; font-size:.9rem;
+        transition:background .15s ease, border-color .15s ease;
+    }
+    #mobile-menu .mnav-komunitas:hover{ background:linear-gradient(135deg, rgba(201,166,107,.16), rgba(1,121,95,.12)); border-color:rgba(201,166,107,.6); }
+    #mobile-menu .mnav-komunitas.is-active{ border-color:var(--gold); }
+    #mobile-menu .mnav-komunitas .mnav-ikon{
+        width:32px; height:32px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+        border-radius:.6rem; font-size:.85rem; background:var(--gold); color:#10140F;
+    }
+    #mobile-menu .mnav-komunitas .mnav-label{ flex:1; min-width:0; }
+    #mobile-menu .mnav-komunitas .mnav-count{
+        font-size:10px; font-weight:800; padding:2px 8px; border-radius:999px;
+        background:var(--gold); color:#10140F;
     }
 </style>
 

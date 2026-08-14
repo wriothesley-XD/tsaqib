@@ -8,11 +8,31 @@
 @php($showManage = $showManage ?? false)
 
 {{-- Post Header --}}
+{{-- $penulisLink = true bila user login & penulis post masih ada (bukan user terhapus).
+     data-no-nav pada <a> mencegah klik ini memicu navigasi kartu feed ke halaman detail. --}}
+@php($penulisLink = Auth::check() && $post->user)
 <div class="flex items-center justify-between mb-3">
     <div class="flex items-center space-x-3">
-        <x-community-avatar :user="$post->user" :slug="$post->community_slug" size="md" />
+        @if ($penulisLink)
+            <a href="{{ route('profile.show', $post->user->id) }}" data-no-nav
+               class="shrink-0 transition-opacity hover:opacity-80"
+               aria-label="Lihat profil {{ $post->user->name ?? 'penulis' }}">
+                <x-community-avatar :user="$post->user" :slug="$post->community_slug" size="md" />
+            </a>
+        @else
+            <div class="shrink-0"><x-community-avatar :user="$post->user" :slug="$post->community_slug" size="md" /></div>
+        @endif
         <div>
-            <h4 class="font-bold text-xs text-[var(--cream)]">{{ $post->user->name ?? 'Anggota TSAQIB' }}</h4>
+            <h4 class="font-bold text-xs text-[var(--cream)]">
+                @if ($penulisLink)
+                    <a href="{{ route('profile.show', $post->user->id) }}" data-no-nav
+                       class="hover:underline decoration-[var(--gold)]/60 underline-offset-2">
+                        {{ $post->user->name ?? 'Anggota TSAQIB' }}
+                    </a>
+                @else
+                    {{ $post->user->name ?? 'Anggota TSAQIB' }}
+                @endif
+            </h4>
             <span class="text-[10px] text-white/40">
                 {{ $post->created_at->diffForHumans() }} •
                 <span class="font-bold text-[var(--gold)] uppercase">{{ $post->community_slug }}</span>

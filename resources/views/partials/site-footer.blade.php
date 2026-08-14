@@ -18,7 +18,16 @@
             <img src="{{ asset('assets/logo-instansi/pendidikan.webp') }}" alt="Tut Wuri Handayani" title="Tut Wuri Handayani" class="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-90 hover:opacity-100 transition" onerror="this.remove()">
             <img src="{{ asset('assets/logo-instansi/sumbar.webp') }}" alt="Pemerintah Provinsi Sumatera Barat" title="Pemerintah Provinsi Sumatera Barat" class="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-90 hover:opacity-100 transition" onerror="this.remove()">
             <img src="{{ asset('assets/logo-instansi/smansa.webp') }}" alt="SMAN 1 Bukittinggi" title="SMAN 1 Bukittinggi" class="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-90 hover:opacity-100 transition" onerror="this.remove()">
+            {{-- Logo FSI = gambar statik (bukan link). --}}
             <img src="{{ asset('assets/logo-instansi/fsi.webp') }}" alt="Forum Studi Islam" title="Forum Studi Islam" class="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-90 hover:opacity-100 transition" onerror="this.remove()">
+            {{-- Logo Liivo = pintu tersembunyi ke halaman Credits (unlisted, tak ada di nav).
+                 Lingkaran gelap + cincin emas setengah-transparan; satu-satunya logo yang
+                 bisa diklik di barisan ini. Diletakkan terakhir untuk menutup barisan. --}}
+            <a href="{{ route('credits') }}" title="Credits — Tim Pembuat"
+               class="group flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-black/90 border border-[rgba(201,166,107,0.45)] hover:border-[rgba(201,166,107,0.9)] hover:-translate-y-0.5 transition-all duration-200"
+               aria-label="Lihat halaman Credits">
+                <img src="{{ asset('assets/logo-instansi/Liivo.png') }}" alt="Liivo" title="Credits — Tim Pembuat" class="h-full w-full object-contain p-1 opacity-95 group-hover:opacity-100 transition" onerror="this.remove()">
+            </a>
         </div>
 
     </div>

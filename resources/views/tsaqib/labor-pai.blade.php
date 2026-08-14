@@ -126,6 +126,72 @@
         height:clamp(380px, 56vw, 520px);   /* menimpa inline height via !important saat responsif */
     }
 
+    /* ===== Fake iframe: thumbnail statis klik-untuk-muat (web perf) =====
+       Lazy-facade: alih-alih memuat iframe Heyzine saat halaman dibuka (berat),
+       tampilkan thumbnail 400px + overlay gelap + ikon Book. Iframe asli baru
+       di-inject (Alpine) saat thumbnail diklik. Tata letak tetap di bawah
+       .lp-flipbook-wrap agar hierarki CSS tidak berubah. */
+    .lp-flipbook-facade{
+        position:relative; width:100%; height:400px;
+        cursor:pointer; overflow:hidden;
+        background:
+            radial-gradient(circle at 30% 20%, rgba(1,121,95,.35), transparent 60%),
+            linear-gradient(135deg, #0a4a3a 0%, #10140f 100%);
+        display:flex; align-items:center; justify-content:center;
+    }
+    .lp-flipbook-facade::after{
+        /* tekstur halaman tipis biar nggak terlihat sebagai flat hitam */
+        content:''; position:absolute; inset:0;
+        background-image:repeating-linear-gradient(90deg, rgba(247,245,239,.04) 0 2px, transparent 2px 44px);
+        pointer-events:none;
+    }
+    .lp-flipbook-facade:hover .lp-facade-play{ transform:scale(1.08); background:var(--gold); color:var(--ink); }
+    .lp-facade-play{
+        position:relative; z-index:2;
+        width:5.5rem; height:5.5rem; border-radius:999px;
+        display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.15rem;
+        background:rgba(247,245,239,.12); color:var(--cream);
+        border:1px solid rgba(247,245,239,.25);
+        backdrop-filter:blur(4px);
+        transition:transform .2s ease, background .2s ease, color .2s ease;
+    }
+    .lp-facade-play i{ font-size:1.5rem; }
+    .lp-facade-play span{ font-size:10px; font-weight:700; letter-spacing:.04em; }
+    .lp-facade-hint{
+        position:absolute; bottom:1rem; left:0; right:0; z-index:2;
+        text-align:center; font-size:11px; color:rgba(247,245,239,.6); font-weight:600;
+    }
+
+    /* ===== Cover asli flipbook (menggantikan ikon buku generik) =====
+       .lp-facade-cover = gambar cover object-cover penuh; overlay gelap di atasnya
+       menjaga tombol Buka & hint tetap terbaca. Bingkai emas + bayangan "halaman
+       tersusun" muncul saat ada cover (.has-cover) untuk kesan kartu buku. */
+    .lp-facade-cover{
+        position:absolute; inset:0; width:100%; height:100%;
+        object-fit:cover; object-position:center;
+        z-index:0;
+    }
+    /* Overlay gelap di atas cover agar teks & tombol kontras.
+       z-index di-ATAS cover (z:0) tapi di bawah tombol Buka (z:2). */
+    .lp-flipbook-facade.has-cover::before{
+        content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
+        background:
+            linear-gradient(180deg, rgba(16,20,15,.15) 0%, rgba(16,20,15,.55) 70%, rgba(16,20,15,.78) 100%);
+    }
+    /* has-cover: sembunyikan tekstur halaman default (konflik dgn foto). */
+    .lp-flipbook-facade.has-cover::after{ display:none; }
+    /* Bingkai emas tipis di tepi facade (frame kartu buku). */
+    .lp-flipbook-facade.has-cover{
+        border:2px solid color-mix(in srgb, var(--gold) 65%, transparent);
+        background:#10140f;
+        /* Bayangan halaman tersusun: dua "stack" di belakang kartu utama. */
+        box-shadow:
+            0 2px 0 rgba(247,245,239,.06),
+            0 4px 0 rgba(247,245,239,.04),
+            0 12px 30px -12px rgba(0,0,0,.6);
+    }
+    @media (prefers-reduced-motion: reduce){ .lp-flipbook-facade:hover .lp-facade-play{ transform:none; } }
+
     @keyframes lp-float{
         0%,100%{ transform:translateY(0); }
         50%   { transform:translateY(-8px); }
@@ -228,13 +294,24 @@
                 </a>
             </div>
 
-            <div class="lp-flipbook-wrap">
-                <iframe allowfullscreen="allowfullscreen"
-                        allow="autoplay; fullscreen; clipboard-write"
-                        scrolling="no" class="fp-iframe"
-                        src="{{ $profilTsaqibUrl }}"
-                        style="border:1px solid lightgray; width:100%; height:400px;"
-                        title="Flipbook Profil TSAQIB"></iframe>
+            <div class="lp-flipbook-wrap" id="lp-flipbook">
+                {{-- Fake iframe (klik-untuk-muat): cover flipbook asli (object-cover) +
+                     overlay gelap + tombol Buka. Iframe Heyzine asli baru di-inject saat
+                     diklik, agar halaman tidak memuat embed berat saat pertama dibuka.
+                     URL iframe di data-src (tidak dimuat sampai klik). Cover image dari
+                     thumbnail Heyzine (diturunkan di controller); bila null → ikon buku. --}}
+                <button type="button" class="lp-flipbook-facade {{ $coverUrl ? 'has-cover' : '' }}"
+                        data-src="{{ $profilTsaqibUrl }}"
+                        aria-label="Buka flipbook Profil TSAQIB">
+                    @if($coverUrl)
+                        <img src="{{ $coverUrl }}" alt="Cover Profil TSAQIB" class="lp-facade-cover" loading="lazy">
+                    @endif
+                    <span class="lp-facade-play">
+                        <i class="fa-solid fa-book-open"></i>
+                        <span>Buka</span>
+                    </span>
+                    <span class="lp-facade-hint">Klik untuk memuat flipbook interaktif</span>
+                </button>
             </div>
         </div>
 
@@ -350,6 +427,38 @@
         }
 
         track.addEventListener('pointerdown', onDown);
+    })();
+
+    /* ===== Fake iframe → muat iframe Heyzine sungguhan saat diklik =====
+       Thumbnail (.lp-flipbook-facade) membawa URL di data-src. Klik mengganti
+       seluruh isinya dengan <iframe> responsif (aturan .lp-flipbook-wrap iframe
+       di <style> sudah mengatur tinggi). URL belum pernah dimuat sebelum klik. */
+    (function () {
+        var wrap = document.getElementById('lp-flipbook');
+        var facade = wrap ? wrap.querySelector('.lp-flipbook-facade') : null;
+        if (! wrap || ! facade) return;
+
+        var src = facade.getAttribute('data-src');
+        if (! src) return;
+
+        function loadIframe() {
+            var iframe = document.createElement('iframe');
+            iframe.setAttribute('allowfullscreen', 'allowfullscreen');
+            iframe.setAttribute('allow', 'autoplay; fullscreen; clipboard-write');
+            iframe.setAttribute('scrolling', 'no');
+            iframe.setAttribute('class', 'fp-iframe');
+            iframe.setAttribute('src', src);
+            iframe.setAttribute('title', 'Flipbook Profil TSAQIB');
+            iframe.setAttribute('loading', 'lazy');
+            iframe.style.cssText = 'border:1px solid lightgray; width:100%; height:400px;';
+            wrap.innerHTML = '';
+            wrap.appendChild(iframe);
+        }
+
+        facade.addEventListener('click', loadIframe);
+        facade.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); loadIframe(); }
+        });
     })();
     </script>
 

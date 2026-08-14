@@ -1,4 +1,6 @@
 <x-guest-layout>
+    @section('title', 'Masuk - TSAQIB SMAN 1 Bukittinggi')
+
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 

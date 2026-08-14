@@ -49,7 +49,8 @@
          ######################################################################## --}}
     <div class="hidden md:block py-8 px-4">
 
-        {{-- Profile card --}}
+        {{-- Profile card: SATU kolom terpusat (banner + identitas + tabs), bukan grid dua kolom.
+             .pr-card sendiri sudah center + max-width:960px (lihat public/css/profile.css). --}}
         <div class="pr-card">
             <div class="pr-banner2">
                 @if($user->banner_path)
@@ -92,7 +93,7 @@
                                 class="px-5 py-2 rounded-full border border-red-400/40 text-red-300/90 font-semibold text-sm hover:bg-red-500/15 hover:border-red-400/80 transition">
                             <i class="fa-solid fa-trash-can mr-1.5"></i> Hapus Akun
                         </button>
-                    @else
+                    @elseif(Auth::check())
                         <button type="button" id="pr-follow-btn"
                                 data-following="{{ $isFollowing ? '1' : '0' }}"
                                 data-url-follow="{{ route('profile.follow', $user->id) }}"
@@ -101,19 +102,26 @@
                             <i class="fa-solid {{ $isFollowing ? 'fa-user-check' : 'fa-user-plus' }}"></i>
                             <span>{{ $isFollowing ? 'Mengikuti' : 'Ikuti' }}</span>
                         </button>
+                    @else
+                        {{-- Tamu (guest) tidak bisa mengikuti → ajak login. --}}
+                        <a href="{{ route('login') }}"
+                           class="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-gradient-to-r from-[var(--emerald)] to-[var(--green)] text-white font-bold text-sm hover:-translate-y-0.5 transition shadow-[0_8px_22px_-8px_rgba(1,121,95,0.55)]">
+                            <i class="fa-solid fa-right-to-bracket"></i>
+                            <span>Masuk untuk mengikuti</span>
+                        </a>
                     @endif
                 </div>
             </div>
 
-            {{-- Tabs + content --}}
+            {{-- Tabs + content (tetap di dalam kartu yang sama, di bawah identitas) --}}
             <div class="px-8">
                 <div class="pr-dtabs mt-7">
                     <button class="pr-dtab is-active" data-dtab="posts">Postingan</button>
                     <button class="pr-dtab" data-dtab="comments">Komentar</button>
                     @if($isOwner)
                         <button class="pr-dtab" data-dtab="saved">Tersimpan</button>
-                        <button class="pr-dtab" data-dtab="books">Buku</button>
                     @endif
+                    <button class="pr-dtab" data-dtab="books">Buku</button>
                 </div>
 
                 <div class="py-6">
@@ -142,10 +150,11 @@
             'emptyIcon' => 'fa-bookmark', 'emptyText' => 'Belum ada postingan tersimpan.',
                             ])
                         </div>
-                        <div data-dpanel="books" class="hidden">
-                            @include('profile._books', ['booksGrouped' => $booksGrouped ?? collect()])
-                        </div>
                     @endif
+                    {{-- Buku = PUBLIK (boleh dilihat non-owner). Tersimpan tetap owner-only di atas. --}}
+                    <div data-dpanel="books" class="hidden">
+                        @include('profile._books', ['booksGrouped' => $booksGrouped ?? collect()])
+                    </div>
                 </div>
             </div>
         </div>
@@ -156,16 +165,21 @@
          ######################################################################## --}}
     <div class="md:hidden px-4 py-5">
 
-        {{-- Compact identity header --}}
+        {{-- Compact identity header (minimalis: banner + avatar lebih kecil) --}}
         <div class="pr-card">
-            <div class="pr-banner2" style="height:120px">
+            <div class="pr-banner2" style="height:96px">
                 @if($user->banner_path)
-                    <img data-banner-img src="{{ asset('storage/'.$user->banner_path) }}" alt="" class="pr-banner-img" style="height:120px">
+                    <img data-banner-img src="{{ asset('storage/'.$user->banner_path) }}" alt="" class="pr-banner-img" style="height:96px">
                 @endif
             </div>
-            <div class="flex flex-col items-center -mt-[48px] px-4 pb-5">
-                    <img data-avatar-img src="{{ $user->getAvatar() }}" alt="{{ $user->name }}" class="pr-avatar" style="width:96px;height:96px;border-width:3px">
+            <div class="flex flex-col items-center -mt-[40px] px-4 pb-5">
+                    <img data-avatar-img src="{{ $user->getAvatar() }}" alt="{{ $user->name }}" class="pr-avatar" style="width:80px;height:80px;border-width:3px">
                 <h1 class="pr-display font-extrabold text-xl text-[var(--cream)] mt-2">{{ $user->name }}</h1>
+
+                @if(!empty($user->bio))
+                    <p class="text-[12px] text-white/55 mt-1.5 text-center leading-snug line-clamp-2 px-2">{{ $user->bio }}</p>
+                @endif
+
                 <div class="mt-1.5 flex items-center justify-center gap-1.5 flex-wrap">
                     <span class="pr-role-pill text-[10px]"><i class="fa-solid {{ $roleIcon }} text-[9px]"></i> {{ $roleLabel }}</span>
                     @if($komunitasNama)
@@ -183,15 +197,13 @@
                 </p>
                 <div class="mt-3 flex items-center gap-2">
                     @if($isOwner)
+                        {{-- Cukup 2 tombol aksi di mobile: Edit & Log Out.
+                             Hapus Akun tersedia via "Zona Berbahaya" di dalam modal Edit Profil. --}}
                         <button type="button" onclick="openModal('pr-edit-modal')" class="px-4 py-1.5 rounded-full bg-gradient-to-r from-[var(--emerald)] to-[var(--green)] text-white font-bold text-xs">Edit Profil</button>
                         <form method="POST" action="{{ route('logout') }}">@csrf
                             <button type="submit" class="px-4 py-1.5 rounded-full border border-white/20 text-white/60 font-semibold text-xs">Log Out</button>
                         </form>
-                        <button type="button" onclick="openModal('pr-delete-modal')"
-                                class="px-3 py-1.5 rounded-full border border-red-400/40 text-red-300/90 font-semibold text-xs hover:bg-red-500/15 transition">
-                            <i class="fa-solid fa-trash-can"></i> Hapus
-                        </button>
-                    @else
+                    @elseif(Auth::check())
                         <button type="button" id="pr-follow-btn"
                                 data-following="{{ $isFollowing ? '1' : '0' }}"
                                 data-url-follow="{{ route('profile.follow', $user->id) }}"
@@ -200,33 +212,31 @@
                             <i class="fa-solid {{ $isFollowing ? 'fa-user-check' : 'fa-user-plus' }}"></i>
                             <span>{{ $isFollowing ? 'Mengikuti' : 'Ikuti' }}</span>
                         </button>
+                    @else
+                        {{-- Tamu (guest) tidak bisa mengikuti → ajak login. --}}
+                        <a href="{{ route('login') }}"
+                           class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-[var(--emerald)] to-[var(--green)] text-white font-bold text-xs">
+                            <i class="fa-solid fa-right-to-bracket"></i>
+                            <span>Masuk untuk mengikuti</span>
+                        </a>
                     @endif
                 </div>
             </div>
         </div>
 
-        {{-- Tab grid 2x2 --}}
-        <div class="grid grid-cols-2 gap-2 mt-4">
-            <button class="pr-mtab is-active" data-mtab="posts"><i class="fa-solid fa-newspaper text-[var(--gold)]"></i> Postingan <span class="count">{{ $postsCount }}</span></button>
-            <button class="pr-mtab" data-mtab="comments"><i class="fa-solid fa-comment text-[var(--gold)]"></i> Komentar <span class="count">{{ $commentsCount }}</span></button>
+        {{-- Tab bar slim (reuse .pr-tabs/.pr-tab) — pengganti grid 2x2 kartu statistik --}}
+        <div class="pr-tabs mt-4">
+            <button class="pr-tab is-active" data-mtab="posts">Postingan <span class="count">{{ $postsCount }}</span></button>
+            <button class="pr-tab" data-mtab="comments">Komentar <span class="count">{{ $commentsCount }}</span></button>
             @if($isOwner)
-                <button class="pr-mtab" data-mtab="saved"><i class="fa-solid fa-bookmark text-[var(--gold)]"></i> Tersimpan <span class="count">{{ $savedCount }}</span></button>
-                <button class="pr-mtab" data-mtab="books"><i class="fa-solid fa-book text-[var(--gold)]"></i> Koleksi Buku <span class="count">{{ $booksCount }}</span></button>
+                <button class="pr-tab" data-mtab="saved">Tersimpan <span class="count">{{ $savedCount }}</span></button>
             @endif
+            <button class="pr-tab" data-mtab="books">Buku <span class="count">{{ $booksCount }}</span></button>
         </div>
 
-        {{-- Recent activity / content panel --}}
-        <div class="mt-5">
-            <div class="pr-sec-head">
-                <span class="h" data-mhead>AKTIVITAS TERBARU</span>
-                <a class="pr-see-all" data-mseeall
-                   data-url-posts="{{ route('profile.list', [$user->id, 'posts']) }}"
-                   data-url-comments="{{ route('profile.list', [$user->id, 'comments']) }}"
-                   data-url-saved="{{ route('profile.list', [$user->id, 'saved']) }}"
-                   data-url-books="{{ route('profile.list', [$user->id, 'books']) }}"
-                   href="{{ route('profile.list', [$user->id, 'posts']) }}">Lihat Semua →</a>
-            </div>
-
+        {{-- Konten tab (tanpa header "Aktivitas Terbaru" terpisah — tiap panel
+             sudah punya "Lihat Semua →"-nya sendiri via _activity). --}}
+        <div class="mt-4">
             <div data-mpanel="posts">
                 @include('profile._activity', [
                     'items' => $postsBatch ?? [], 'total' => $postsTotal ?? 0,
@@ -249,10 +259,11 @@
                         'emptyIcon' => 'fa-bookmark', 'emptyText' => 'Belum ada postingan tersimpan.',
                     ])
                 </div>
-                <div data-mpanel="books" hidden>
-                    @include('profile._books', ['booksGrouped' => $booksGrouped ?? collect()])
-                </div>
             @endif
+            {{-- Buku = PUBLIK (boleh dilihat non-owner). Tersimpan tetap owner-only di atas. --}}
+            <div data-mpanel="books" hidden>
+                @include('profile._books', ['booksGrouped' => $booksGrouped ?? collect()])
+            </div>
         </div>
     </div>
 
@@ -343,6 +354,16 @@
                             <x-community-picker name="community_slug" :selected="old('community_slug', $user->selected_community)" />
                         </div>
                         <p class="pr-err hidden" id="pr-err-community_slug" data-err="community_slug"></p>
+                    </div>
+
+                    {{-- Zona Berbahaya: pintu masuk Hapus Akun dari dalam modal Edit Profil
+                         (menggantikan tombol Hapus di tampilan mobile). Membuka pr-delete-modal. --}}
+                    <div class="mb-1 rounded-xl border border-red-400/25 bg-red-500/[0.05] p-3">
+                        <span class="pr-field-label text-red-300/80">Zona Berbahaya</span>
+                        <button type="button" onclick="openModal('pr-delete-modal')"
+                                class="mt-2 w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-red-400/40 text-red-300/90 font-semibold text-xs hover:bg-red-500/15 hover:border-red-400/80 transition">
+                            <i class="fa-solid fa-user-xmark"></i> Hapus Akun
+                        </button>
                     </div>
                 </div>
                 <div class="flex gap-2 px-5 py-4 shrink-0 border-t border-white/[0.08]">
@@ -671,6 +692,16 @@
             new IntersectionObserver(function (entries){ if (entries[0].isIntersecting) pLoad(false); }, { root:pList, rootMargin:'120px' }).observe(pSentinel);
             pTabs.forEach(function (t){ t.addEventListener('click', function (){ pTabs.forEach(function (x){ x.classList.remove('is-active'); }); t.classList.add('is-active'); st.which = t.dataset.peopleTab; if (pTitle) pTitle.textContent = st.which === 'followers' ? 'Pengikut' : 'Mengikuti'; pLoad(true); }); });
             document.querySelectorAll('[data-people]').forEach(function (btn){ btn.addEventListener('click', function (){ var which = btn.dataset.people; pTabs.forEach(function (t){ t.classList.toggle('is-active', t.dataset.peopleTab === which); }); st.which = which; if (pTitle) pTitle.textContent = which === 'followers' ? 'Pengikut' : 'Mengikuti'; openModal('pr-people-modal'); pLoad(true); }); });
+
+            /* Link profil di dalam modal (follower/following "Lihat") dimuat dinamis,
+               jadi pakai delegated listener. TANPA preventDefault — biarkan <a>
+               navigasi native. Kita cuma menutup modal lebih dulu agar saat user
+               menekan tombol Back, modal tidak tertinggal terbuka di belakang. */
+            if (pList) {
+                pList.addEventListener('click', function (e){
+                    if (e.target.closest('a[href]')) closeModal('pr-people-modal');
+                });
+            }
         })();
 
         /* ---------- DESKTOP tabs (Posts / Comments / Books) ---------- */

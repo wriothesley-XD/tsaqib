@@ -90,6 +90,90 @@
         #lb-item img,#lb-item video{ max-height:72vh; }
         .lb-prev{ left:.75rem; } .lb-next{ right:.75rem; }
     }
+
+    /* ===== LAYOUT 3-KOLOM (Reddit-style) =====
+       xl: sidebar kiri (sticky) | feed (center) | sidebar kanan (sticky).
+       <= lg: turun ke 1 kolom — sidebar kiri jadi chip row horizontal di atas
+       feed, sidebar kanan pindah ke bawah feed. */
+    .komunitas-shell{ display:grid; grid-template-columns:1fr; gap:1.25rem; }
+    @media(min-width:1280px){
+        .komunitas-shell{
+            grid-template-columns:16rem minmax(0,1fr) 18rem;
+            align-items:start;
+        }
+    }
+    .komunitas-aside{
+        position:sticky;
+        top:5.5rem;          /* di bawah navbar sticky (h-16/h-20 + jeda) */
+        max-height:calc(100vh - 6.5rem);
+        overflow-y:auto;
+        scrollbar-width:thin;
+    }
+    @media(max-width:1279px){ .komunitas-aside{ position:static; max-height:none; overflow:visible; } }
+    .komunitas-aside::-webkit-scrollbar{ width:6px; }
+    .komunitas-aside::-webkit-scrollbar-thumb{ background:rgba(247,245,239,.12); border-radius:999px; }
+
+    /* Item daftar komunitas (sidebar kiri) */
+    .kom-item{ display:flex; align-items:center; gap:.6rem; padding:.55rem .65rem; border-radius:.65rem;
+        font-size:.8rem; font-weight:600; color:rgba(247,245,239,.7);
+        transition:background .15s ease, color .15s ease; }
+    .kom-item:hover{ background:rgba(247,245,239,.05); color:var(--cream); }
+    .kom-item.is-active{ background:rgba(1,121,95,.2); color:var(--cream); }
+    .kom-item .kom-ikon{ width:28px; height:28px; border-radius:.5rem; object-fit:cover; background:rgba(247,245,239,.06);
+        display:flex; align-items:center; justify-content:center; color:var(--gold); flex-shrink:0; }
+    .kom-item .kom-nama{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .kom-item .kom-count{ font-size:10px; padding:1px 7px; border-radius:999px;
+        background:rgba(247,245,239,.08); color:rgba(247,245,239,.6); flex-shrink:0; }
+    .kom-item.is-active .kom-count{ background:rgba(201,166,107,.2); color:var(--gold); }
+
+    /* Chip row (sidebar kiri di mobile/tablet) — satu baris, scroll horizontal halus.
+       -webkit-overflow-scrolling:touch = momentum scroll di iOS. */
+    .kom-chips{ display:flex; gap:.5rem; overflow-x:auto; padding-bottom:.25rem; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+    .kom-chips::-webkit-scrollbar{ display:none; }
+    .kom-chip{ display:inline-flex; align-items:center; gap:.4rem; padding:.45rem .85rem; border-radius:999px;
+        font-size:.72rem; font-weight:700; white-space:nowrap; flex-shrink:0;
+        background:rgba(247,245,239,.05); color:rgba(247,245,239,.75);
+        border:1px solid rgba(247,245,239,.1); transition:background .15s ease, color .15s ease, border-color .15s ease; }
+    .kom-chip:hover{ background:rgba(247,245,239,.1); color:var(--cream); }
+    .kom-chip.is-active{ background:rgba(1,121,95,.28); color:var(--gold); border-color:rgba(201,166,107,.35); }
+    /* Mobile: chip diramping (padding/font lebih kecil) agar lebih banyak muat
+       per baris. min-height tetap dipertahankan untuk target tap yang layak. */
+    @media(max-width:1023px){
+        .kom-chip{ padding:.28rem .5rem; font-size:.61rem; gap:.25rem; min-height:36px; line-height:1; }
+        .kom-chip i{ font-size:.58rem; }
+    }
+
+    /* FIX: grid items default min-width:auto → isi lebar (chip row) bisa
+       melebar keluar viewport & memicu scroll halaman. min-width:0 memaksa
+       .kom-chips scroll internal, bukan menggeser seluruh halaman. */
+    .komunitas-shell > *{ min-width:0; }
+
+    /* (Toggle sort Terbaru/Terpopuler .kom-sort dihapus — feed selalu Terbaru.) */
+
+    /* ===== "Postingan Terbaru": accordion inline (mobile/tablet < xl) =====
+       Menggantikan drawer geser. Header (bolt + chevron) selalu tampil;
+       body collapse by default (atribut hidden). Chevron berputar saat buka. */
+    .kom-acc{ border-radius:.85rem; border:1px solid rgba(247,245,239,.08);
+        background:rgba(247,245,239,.025); overflow:hidden; }
+    .kom-acc-head{ width:100%; display:flex; align-items:center; justify-content:space-between;
+        gap:.5rem; padding:.7rem .9rem; background:none; border:none; cursor:pointer;
+        font-size:.72rem; font-weight:700; color:var(--cream); }
+    .kom-acc-chev{ font-size:.7rem; color:rgba(247,245,239,.45); transition:transform .2s ease; }
+    .kom-acc.is-open .kom-acc-chev{ transform:rotate(180deg); }
+    .kom-acc-body{ padding:.25rem .6rem .6rem; }
+
+    /* FAB (+) — rounded-square 44px (lebih kecil dari lingkaran 56px lama). */
+    @media(max-width:1023px){
+        .kom-fab{ width:44px !important; height:44px !important; border-radius:.85rem !important; font-size:1.1rem !important; }
+    }
+
+    /* Baris postingan terbaru (sidebar kanan) */
+    .recent-row{ display:flex; gap:.6rem; padding:.55rem .4rem; border-radius:.5rem; transition:background .15s ease; }
+    .recent-row:hover{ background:rgba(247,245,239,.04); }
+    .recent-thumb{ width:40px; height:40px; border-radius:.4rem; object-fit:cover; background:rgba(247,245,239,.05);
+        flex-shrink:0; display:flex; align-items:center; justify-content:center; color:rgba(247,245,239,.25); }
+
+    /* (Drawer "Postingan Terbaru" lama dihapus — kini inline accordion .kom-acc.) */
 </style>
 @endpush
 
@@ -103,7 +187,61 @@
     <!-- Unified TSAQIB Navbar -->
     @include('partials.navbar')
 
-    <main class="flex-1 max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-10 space-y-6 w-full">
+    <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+        {{-- Shell 3-kolom: sidebar kiri | feed | sidebar kanan (xl+).
+             Di bawah xl, turun 1 kolom: chips komunitas di atas, sidebar kanan di bawah. --}}
+        <div class="komunitas-shell">
+
+        {{-- ============ SIDEBAR KIRI (komunitas) ============ --}}
+        {{-- Mobile/tablet: chip row horizontal di atas feed. --}}
+        <aside class="xl:hidden">
+            <div class="kom-chips">
+                <a href="{{ route('komunitas', 'semua') }}"
+                   class="kom-chip {{ $currentSlug === 'semua' ? 'is-active' : '' }}">
+                    <i class="fa-solid fa-layer-group"></i> Semua
+                    <span class="opacity-60">{{ $totalSemua }}</span>
+                </a>
+                @foreach($komunitasSidebar as $k)
+                    <a href="{{ route('komunitas', $k['slug']) }}"
+                       class="kom-chip {{ $currentSlug === $k['slug'] ? 'is-active' : '' }}">
+                        {{ $k['nama'] }}
+                        <span class="opacity-60">{{ $k['total'] }}</span>
+                    </a>
+                @endforeach
+            </div>
+        </aside>
+
+        {{-- Desktop (xl+): daftar vertikal sticky. --}}
+        <aside class="komunitas-aside hidden xl:block">
+            <div class="tsaqib-card p-3">
+                <p class="px-2 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-white/40 flex items-center gap-1.5">
+                    <i class="fa-solid fa-users text-[var(--gold)]"></i> Komunitas TSAQIB
+                </p>
+                <div class="space-y-0.5">
+                    <a href="{{ route('komunitas', 'semua') }}"
+                       class="kom-item {{ $currentSlug === 'semua' ? 'is-active' : '' }}">
+                        <span class="kom-ikon"><i class="fa-solid fa-layer-group text-xs"></i></span>
+                        <span class="kom-nama">Semua Komunitas</span>
+                        <span class="kom-count">{{ $totalSemua }}</span>
+                    </a>
+                    @foreach($komunitasSidebar as $k)
+                        <a href="{{ route('komunitas', $k['slug']) }}"
+                           class="kom-item {{ $currentSlug === $k['slug'] ? 'is-active' : '' }}">
+                            @if(!empty($k['image']) && file_exists(public_path($k['image'])))
+                                <img src="{{ asset($k['image']) }}" alt="{{ $k['nama'] }}" class="kom-ikon" style="object-fit:cover;">
+                            @else
+                                <span class="kom-ikon"><i class="fa-solid fa-hashtag text-xs"></i></span>
+                            @endif
+                            <span class="kom-nama">{{ $k['nama'] }}</span>
+                            <span class="kom-count">{{ $k['total'] }}</span>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        </aside>
+
+        {{-- ============ FEED (center) ============ --}}
+        <div class="min-w-0 space-y-6">
 
         <!-- Title Banner -->
         <div class="tsaqib-card p-6">
@@ -144,6 +282,49 @@
             </form>
         </div>
 
+        {{-- "Postingan Terbaru" sebagai AKORDION inline (mobile/tablet < xl), collapsed
+             by default. Header (bolt + chevron) selalu tampil; body dibuka via JS.
+             Menggantikan drawer geser lama (boros ruang vertikal & state tersebar). --}}
+        <div class="kom-acc xl:hidden" id="recent-acc">
+            <button type="button" class="kom-acc-head" id="recent-trigger"
+                    aria-expanded="false" aria-controls="recent-acc-body">
+                <span class="flex items-center gap-2"><i class="fa-solid fa-bolt text-[var(--gold)]"></i> Postingan Terbaru</span>
+                <i class="fa-solid fa-chevron-down kom-acc-chev"></i>
+            </button>
+            <div class="kom-acc-body" id="recent-acc-body" hidden>
+                @if($recentPosts->isNotEmpty())
+                    <div class="space-y-0.5">
+                        @foreach($recentPosts as $rp)
+                            @php($rpThumb = $rp->media->first())
+                            <a href="{{ route('komunitas.post.show', $rp->id) }}" class="recent-row group">
+                                @if($rpThumb && $rpThumb->type === 'image')
+                                    <img src="{{ $rpThumb->url }}" alt="" class="recent-thumb" style="object-fit:cover;">
+                                @else
+                                    <span class="recent-thumb"><i class="fa-solid fa-image text-sm"></i></span>
+                                @endif
+                                <div class="min-w-0 flex-1">
+                                    <span class="block text-[10px] font-bold uppercase tracking-wide text-[var(--gold)] truncate">{{ $namaKomunitas[$rp->community_slug] ?? $rp->community_slug }}</span>
+                                    <p class="text-xs font-semibold text-white/80 group-hover:text-[var(--cream)] line-clamp-1 leading-snug">{{ $rp->title }}</p>
+                                    <span class="flex items-center gap-2 text-[10px] text-white/40 mt-0.5">
+                                        <span><i class="fa-regular fa-clock mr-0.5"></i>{{ $rp->created_at->diffForHumans() }}</span>
+                                        @if($rp->comments_count > 0)
+                                            <span><i class="fa-regular fa-comment mr-0.5"></i>{{ $rp->comments_count }}</span>
+                                        @endif
+                                        <span><i class="fa-solid fa-thumbs-up mr-0.5"></i>{{ $rp->upvotes }}</span>
+                                    </span>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                    <a href="{{ route('komunitas', 'semua') }}" class="block text-center text-[11px] font-bold text-[var(--gold)] hover:underline mt-2 pt-2 border-t border-white/10">
+                        Lihat Semua <i class="fa-solid fa-arrow-right text-[9px]"></i>
+                    </a>
+                @else
+                    <p class="px-1 py-4 text-[11px] text-white/40 text-center">Belum ada postingan.</p>
+                @endif
+            </div>
+        </div>
+
         @if(session('success'))
             <div class="p-4 rounded-xl bg-[#01795F]/15 text-[#3fd6b0] border border-[#01795F]/30 text-xs font-semibold">
                 {{ session('success') }}
@@ -156,18 +337,7 @@
             </div>
         @endif
 
-        {{-- SORT TABS: Terbaru (default) / Terpopuler. ?sort= dipreservasi oleh pagination. --}}
-        <div class="tsaqib-card p-1.5 flex items-center gap-1">
-            @foreach(['recent' => ['Terbaru', 'fa-clock'], 'popular' => ['Terpopuler', 'fa-fire']] as $sortKey => $tab)
-                <a href="{{ request()->fullUrlWithQuery(['sort' => $sortKey, 'page' => 1]) }}"
-                   class="flex-1 text-center py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition
-                          {{ $sort === $sortKey
-                              ? 'bg-[#01795F] text-white shadow-sm'
-                              : 'text-white/55 hover:text-white hover:bg-white/5' }}">
-                    <i class="fa-solid {{ $tab[1] }} mr-1.5"></i>{{ $tab[0] }}
-                </a>
-            @endforeach
-        </div>
+        {{-- (Toggle sort Terbaru/Terpopuler dihapus — feed kini selalu Terbaru.) --}}
 
         <!-- POSTS TIMELINE FEED -->
         <div class="space-y-4">
@@ -238,13 +408,63 @@
             </div>
         @endif
 
+        </div>{{-- /FEED center --}}
+
+        {{-- ============ SIDEBAR KANAN (Postingan Terbaru, site-wide) ============
+             Desktop (xl+): sticky. Mobile/tablet: disembunyikan di sini —
+             diakses lewat akordion #recent-acc di dalam feed (bukan drawer lagi). --}}
+        @php($namaKomunitas = collect($daftarKomunitas)->pluck('nama', 'slug'))
+        <aside class="komunitas-aside hidden xl:block">
+            <div class="tsaqib-card p-3">
+                <p class="px-1 mb-2 text-[10px] font-bold uppercase tracking-wider text-white/40 flex items-center gap-1.5">
+                    <i class="fa-solid fa-bolt text-[var(--gold)]"></i> Postingan Terbaru
+                </p>
+
+                @if($recentPosts->isNotEmpty())
+                    <div class="space-y-0.5">
+                        @foreach($recentPosts as $rp)
+                            @php($rpThumb = $rp->media->first())
+                            <a href="{{ route('komunitas.post.show', $rp->id) }}" class="recent-row group">
+                                @if($rpThumb && $rpThumb->type === 'image')
+                                    <img src="{{ $rpThumb->url }}" alt="" class="recent-thumb" style="object-fit:cover;">
+                                @else
+                                    <span class="recent-thumb"><i class="fa-solid fa-image text-sm"></i></span>
+                                @endif
+                                <div class="min-w-0 flex-1">
+                                    <span class="block text-[10px] font-bold uppercase tracking-wide text-[var(--gold)] truncate">{{ $namaKomunitas[$rp->community_slug] ?? $rp->community_slug }}</span>
+                                    <p class="text-xs font-semibold text-white/80 group-hover:text-[var(--cream)] line-clamp-1 leading-snug">{{ $rp->title }}</p>
+                                    <span class="flex items-center gap-2 text-[10px] text-white/40 mt-0.5">
+                                        <span><i class="fa-regular fa-clock mr-0.5"></i>{{ $rp->created_at->diffForHumans() }}</span>
+                                        @if($rp->comments_count > 0)
+                                            <span><i class="fa-regular fa-comment mr-0.5"></i>{{ $rp->comments_count }}</span>
+                                        @endif
+                                        <span><i class="fa-solid fa-thumbs-up mr-0.5"></i>{{ $rp->upvotes }}</span>
+                                    </span>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                    <a href="{{ route('komunitas', 'semua') }}" class="block text-center text-[11px] font-bold text-[var(--gold)] hover:underline mt-2 pt-2 border-t border-white/10">
+                        Lihat Semua <i class="fa-solid fa-arrow-right text-[9px]"></i>
+                    </a>
+                @else
+                    <p class="px-1 py-4 text-[11px] text-white/40 text-center">Belum ada postingan.</p>
+                @endif
+            </div>
+        </aside>
+
+        </div>{{-- /komunitas-shell --}}
+
     </main>
 
+    {{-- ============ SLIDE-IN PANEL "Postingan Terbaru" (mobile/tablet, < xl) ============
+         Markup identik dengan sidebar kanan, dibungkus panel geser. Backdrop + body
+         overflow-hidden + Escape = pola yang sama dengan mobile-drawer partials/navbar. --}}
     <!-- FLOATING ACTION BUTTON (+) -->
     @auth
-        <div class="fixed bottom-6 right-6 z-40">
+        <div class="fixed bottom-5 right-5 z-40">
             <button onclick="openCreateModal()"
-                    class="w-14 h-14 rounded-full bg-[#01795F] hover:bg-[#3F704D] text-white shadow-xl flex items-center justify-center text-2xl font-bold transition-all transform hover:scale-110 focus:outline-none"
+                    class="kom-fab w-14 h-14 rounded-full bg-[#01795F] hover:bg-[#3F704D] text-white shadow-xl flex items-center justify-center text-2xl font-bold transition-all transform hover:scale-110 focus:outline-none"
                     title="Buat Postingan Baru">
                 <i class="fa-solid fa-plus"></i>
             </button>
@@ -331,6 +551,28 @@
 
     <!-- SCRIPT: modal, lightbox, voting (AJAX) -->
     <script>
+        /* ===== AKORDION "Postingan Terbaru" (mobile/tablet < xl) =====
+           Toggle [hidden] pada body + kelas .is-open pada wadah (untuk memutar
+           chevron). Tidak mengunci scroll body (inline accordion, bukan drawer).
+           Escape menutup jika sedang terbuka. */
+        (function () {
+            var trigger = document.getElementById('recent-trigger');
+            var acc     = document.getElementById('recent-acc');
+            var body    = document.getElementById('recent-acc-body');
+            if (! trigger || ! acc || ! body) return;
+
+            function toggle(force) {
+                var willOpen = typeof force === 'boolean' ? force : body.hasAttribute('hidden');
+                if (willOpen) body.removeAttribute('hidden'); else body.setAttribute('hidden', '');
+                acc.classList.toggle('is-open', willOpen);
+                trigger.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+            }
+            trigger.addEventListener('click', function () { toggle(); });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && acc.classList.contains('is-open')) toggle(false);
+            });
+        })();
+
         /* ===== MODAL BUAT / EDIT ===== */
         function openCreateModal() {
             document.getElementById('create-post-modal').classList.remove('hidden');

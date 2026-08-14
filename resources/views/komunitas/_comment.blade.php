@@ -1,10 +1,27 @@
 {{-- Single comment row. Dipakai daftar komentar di detail & response AJAX storeComment. --}}
 @php($canDelete = Auth::check() && (Auth::id() === $c->user_id || Auth::user()->role === 'admin'))
+{{-- $penulisLink = true bila user login & penulis komentar masih ada (bukan user terhapus). --}}
+@php($penulisLink = Auth::check() && $c->user)
 <div class="comment-row flex items-start gap-3 py-3 border-b border-white/5" data-comment-id="{{ $c->id }}">
-    <x-community-avatar :user="$c->user" size="sm" />
+    @if ($penulisLink)
+        <a href="{{ route('profile.show', $c->user->id) }}"
+           class="shrink-0 transition-opacity hover:opacity-80"
+           aria-label="Lihat profil {{ $c->user->name ?? 'penulis' }}">
+            <x-community-avatar :user="$c->user" size="sm" />
+        </a>
+    @else
+        <div class="shrink-0"><x-community-avatar :user="$c->user" size="sm" /></div>
+    @endif
     <div class="flex-1 min-w-0">
         <div class="flex items-center gap-2">
-            <span class="font-bold text-xs text-[var(--cream)]">{{ $c->user->name ?? 'Anggota TSAQIB' }}</span>
+            @if ($penulisLink)
+                <a href="{{ route('profile.show', $c->user->id) }}"
+                   class="font-bold text-xs text-[var(--cream)] hover:underline decoration-[var(--gold)]/60 underline-offset-2">
+                    {{ $c->user->name ?? 'Anggota TSAQIB' }}
+                </a>
+            @else
+                <span class="font-bold text-xs text-[var(--cream)]">{{ $c->user->name ?? 'Anggota TSAQIB' }}</span>
+            @endif
             <span class="text-[10px] text-white/40">{{ $c->created_at->diffForHumans() }}</span>
             @auth
                 <button type="button" class="report-btn ml-auto text-[10px] text-white/40 hover:text-[var(--gold)] font-semibold"

@@ -35,8 +35,8 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('select-role');
         }
 
-        // Jika sudah memilih komunitas, langsung masuk ke /komunitas
-        return redirect()->route('komunitas');
+        // Jika sudah memilih komunitas, masuk ke Beranda (homepage).
+        return redirect()->route('beranda');
     }
 
     /**

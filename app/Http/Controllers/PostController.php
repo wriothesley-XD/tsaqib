@@ -170,9 +170,12 @@ class PostController extends Controller
         ]);
 
         $type = $validated['type'];
+        // Type vote ('up'|'down') != nama kolom counter ('upvotes'|'downvotes').
+        // Petakan eksplisit agar increment()/decrement() mengenai kolom yang benar.
+        $column = $type === 'up' ? 'upvotes' : 'downvotes';
         $userId = Auth::id();
 
-        DB::transaction(function () use ($post, $type, $userId) {
+        DB::transaction(function () use ($post, $type, $column, $userId) {
             $existing = Vote::where('user_id', $userId)
                 ->where('post_id', $post->id)
                 ->first();
@@ -184,17 +187,18 @@ class PostController extends Controller
                     'post_id' => $post->id,
                     'type' => $type,
                 ]);
-                $post->increment($type);
+                $post->increment($column);
             } elseif ($existing->type === $type) {
                 // Jenis sama -> batalkan suara (toggle off).
                 $existing->delete();
-                $post->decrement($type);
+                $post->decrement($column);
             } else {
-                // Jenis berbeda -> pindah suara (up <-> down).
-                $previous = $existing->type;
+                // Jenis berbeda -> pindah suara (up <-> down). Kolom lama dikurangi,
+                // kolom baru ditambah.
+                $previousColumn = $existing->type === 'up' ? 'upvotes' : 'downvotes';
                 $existing->update(['type' => $type]);
-                $post->decrement($previous);
-                $post->increment($type);
+                $post->decrement($previousColumn);
+                $post->increment($column);
             }
         });
 

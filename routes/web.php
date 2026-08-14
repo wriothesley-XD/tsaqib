@@ -47,6 +47,15 @@ Route::get('/komunitas/post/{post}', [PostController::class, 'show'])->name('kom
 Route::get('/komunitas/{slug?}', [PageController::class, 'komunitasIndex'])->name('komunitas');
 Route::get('/komunitas-show/{slug}', [PageController::class, 'komunitasShow'])->name('komunitas.show');
 
+// Credits (halaman tim pembuat) — UNLISTED: tidak ada di navbar/menu, hanya
+// dicapai via logo FSI di footer. Publik (tanpa login).
+Route::get('/credits', [PageController::class, 'credits'])->name('credits');
+
+// Profil publik (read-only) — tamu (guest) BOLEH melihat profil user mana pun.
+// Aksi tulis (edit/delete/follow) + tab/list "See All" tetap di balik auth di
+// bawah. Constraint numeric pada {user} mencegah benturan dgn route literal.
+Route::get('/profile/{user}', [ProfileController::class, 'show'])->name('profile.show')->where('user', '[0-9]+');
+
 // ==========================================================
 // 2. TSAQIB MAIN EXPERIENCE (Wajib Login / Check Auth)
 // ==========================================================
@@ -90,7 +99,8 @@ Route::middleware('auth')->group(function () {
 
     // Profil publik (user mana pun) + sistem follow + tab aktivitas. Constraint
     // numeric pada {user} mencegah benturan dengan route literal (mis. tidak ada).
-    Route::get('/profile/{user}', [ProfileController::class, 'show'])->name('profile.show')->where('user', '[0-9]+');
+    // CATATAN: profile.show (GET view) ada di blok publik di atas — tamu bisa lihat
+    // profil (read-only). follow/unfollow/tabs/list tetap di sini (butuh login).
     Route::post('/profile/{user}/follow', [ProfileController::class, 'follow'])->name('profile.follow')->where('user', '[0-9]+');
     Route::delete('/profile/{user}/unfollow', [ProfileController::class, 'unfollow'])->name('profile.unfollow')->where('user', '[0-9]+');
     Route::get('/profile/{user}/followers', [ProfileController::class, 'followers'])->name('profile.followers')->where('user', '[0-9]+');

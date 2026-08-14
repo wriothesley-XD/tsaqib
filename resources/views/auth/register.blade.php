@@ -1,4 +1,6 @@
 <x-guest-layout>
+    @section('title', 'Daftar - TSAQIB SMAN 1 Bukittinggi')
+
     <div class="mb-6 text-center">
         <h2 class="text-xl font-bold text-white">Daftar Akun TSAQIB Baru</h2>
         <p class="text-xs text-[#8A9B7A] mt-1">Buat akun untuk bergabung dengan ekosistem FSI SMAN 1 Bukittinggi</p>

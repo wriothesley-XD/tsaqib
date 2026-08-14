@@ -251,11 +251,9 @@ class ProfileController extends Controller
      */
     public function tabs(Request $request, User $user, string $tab): JsonResponse
     {
-        $owner = $request->user()->is($user);
-
-        if (in_array($tab, ['saved', 'books'], true) && ! $owner) {
-            abort(403);
-        }
+        $me = $request->user();
+        $owner = $me ? $me->is($user) : false;
+        $this->ensureTabAllowed($tab, $owner);
 
         $pg = $this->tabQuery($user, $tab)->cursorPaginate(10);
 
@@ -268,15 +266,14 @@ class ProfileController extends Controller
 
     /**
      * GET /profile/{user}/list/{tab} — halaman HTML full-list dengan pagination
-     * bernomor (tujuan tombol "See All"). saved/books privat.
+     * bernomor (tujuan tombol "See All"). saved privat (403 untuk non-owner),
+     * books/publik boleh dilihat siapa pun.
      */
     public function list(Request $request, User $user, string $tab): View
     {
-        $owner = $request->user()->is($user);
-
-        if (in_array($tab, ['saved', 'books'], true) && ! $owner) {
-            abort(403);
-        }
+        $me = $request->user();
+        $owner = $me ? $me->is($user) : false;
+        $this->ensureTabAllowed($tab, $owner);
 
         $titles = [
             'posts' => 'Postingan',
@@ -297,6 +294,20 @@ class ProfileController extends Controller
         ]);
     }
 
+    /**
+     * otorisasi tab aktivitas. Aturan privasi profil:
+     *   saved  → PRIBADI (hanya owner). Non-owner → 403.
+     *   books  → PUBLIK (boleh untuk siapa pun).
+     *   posts, comments → publik (konten sudah publik di feed).
+     * Pusatkan di satu tempat agar tabs() & list() tak punya logika ganda.
+     */
+    protected function ensureTabAllowed(string $tab, bool $owner): void
+    {
+        if ($tab === 'saved' && ! $owner) {
+            abort(403);
+        }
+    }
+
     // ========================================================================
     // Shared helpers
     // ========================================================================
@@ -308,7 +319,10 @@ class ProfileController extends Controller
      */
     protected function profileViewData(Request $request, User $user): array
     {
-        $owner = $request->user()->is($user);
+        // Tamu (guest) boleh melihat profil (route profile.show kini publik) →
+        // $me null-aman: bukan owner & tidak mengikuti siapa pun.
+        $me = $request->user();
+        $owner = $me ? $me->is($user) : false;
         $batch = 6;
 
         $postsBatch = $this->mapCollection(
@@ -320,37 +334,39 @@ class ProfileController extends Controller
             'comments', $owner
         );
 
+        // PRIVASI: "saved" (postingan tersimpan) adalah data PRIBADI — hanya owner.
+        // Non-owner tidak pernah menerima batch maupun total-nya.
         $savedBatch = [];
-        $booksGrouped = collect();
-
+        $savedTotal = 0;
         if ($owner) {
             $savedBatch = $this->mapCollection(
                 $user->savedPosts()->orderBy('posts.id', 'desc')->take($batch)->get(),
                 'saved', $owner
             );
-
-            // Buku dari koleksi (type=collection), dikelompokkan per kategori.
-            $booksGrouped = $user->savedBooks()->wherePivot('type', 'collection')
-                ->orderByDesc('books.id')
-                ->get()
-                ->groupBy(fn ($b) => ucfirst($b->category ?? 'Lainnya'))
-                ->map(fn ($group) => $group->map(fn ($b) => [
-                    'title' => $b->title,
-                    'author' => $b->author ?? 'Tim PAI',
-                    'link' => $b->pdf_path ? asset('storage/' . $b->pdf_path) : '#',
-                    'cover' => $b->cover_image ? asset('storage/' . $b->cover_image) : null,
-                ])->values()->all());
+            $savedTotal = $user->savedPosts()->count();
         }
+
+        // Buku koleksi (type=collection) bersifat PUBLIK — boleh dilihat siapa pun.
+        // Dikelompokkan per kategori; hanya field publik (title/author/link/cover).
+        $booksGrouped = $user->savedBooks()->wherePivot('type', 'collection')
+            ->orderByDesc('books.id')
+            ->get()
+            ->groupBy(fn ($b) => ucfirst($b->category ?? 'Lainnya'))
+            ->map(fn ($group) => $group->map(fn ($b) => [
+                'title' => $b->title,
+                'author' => $b->author ?? 'Tim PAI',
+                'link' => $b->pdf_path ? asset('storage/' . $b->pdf_path) : '#',
+                'cover' => $b->cover_image ? asset('storage/' . $b->cover_image) : null,
+            ])->values()->all());
 
         $postsTotal = $user->posts()->count();
         $commentsTotal = $user->comments()->count();
-        $savedTotal = $owner ? $user->savedPosts()->count() : 0;
         $booksTotal = $booksGrouped->flatten(1)->count();
 
         return [
             'user' => $user,
             'isOwner' => $owner,
-            'isFollowing' => $request->user()->following()->where('following_id', $user->id)->exists(),
+            'isFollowing' => $me ? $me->following()->where('following_id', $user->id)->exists() : false,
 
             'postsCount' => $postsTotal,
             'commentsCount' => $commentsTotal,
@@ -369,7 +385,7 @@ class ProfileController extends Controller
             'savedBatch' => $savedBatch,
             'savedTotal' => $savedTotal,
 
-            // buku dikelompokkan per kategori (Books / Book Collection)
+            // buku dikelompokkan per kategori (Books / Book Collection) — publik.
             'booksGrouped' => $booksGrouped,
         ];
     }

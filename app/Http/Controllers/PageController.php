@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Book;
 use App\Models\News;
 use App\Models\Post;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 
 class PageController extends Controller
 {
@@ -20,11 +22,74 @@ class PageController extends Controller
         // Data komunitas untuk preview publik di landing (tamu bisa lihat, tanpa auth).
         $daftarKomunitas = Config::get('komunitas.daftar', []);
 
-        // Berita terbaru (3 terpublikasi) untuk section "BERITA" di Beranda:
-        // ditampilkan sebagai 3 kartu gambar; yang paling baru = unggulan.
-        $kabarTerbaru = News::published()->with('user')->orderByDesc('published_at')->limit(3)->get();
+        // Section "BERITA" di Beranda kini menampilkan feed GABUNGAN:
+        // Berita (News terpublikasi) + Buletin (Book kategori 'buletin'), diurutkan
+        // terbaru. Layout asimetris: 1 kartu besar (featured) + beberapa kartu kecil.
+        $kabarTerbaru = $this->kabarGabungan(4);
 
         return view('landing', compact('daftarKomunitas', 'kabarTerbaru'));
+    }
+
+    /**
+     * Feed gabungan Berita + Buletin untuk section "BERITA" di Beranda.
+     *
+     * Mengambil 3 item terbaru dari kedua sumber sekaligus, lalu menyatukan &
+     * mengurutkan ulang berdasarkan tanggal terbaru. Tiap item dinormalisasi ke
+     * bentuk yang bisa di-loop di view tanpa peduli tipenya:
+     *
+     *   type  : 'berita' | 'buletin'   ← dipakai untuk badge & link tujuan
+     *   title : string
+     *   image : path storage cover/thumbnail (atau null → fallback gradient)
+     *   date  : Carbon|null            ← untuk meta tanggal
+     *   author: string|null
+     *   url   : string                 ← link tujuan kartu
+     *   target: '_self' | '_blank'     ← Buletin PDF dibuka tab baru
+     *
+     * Catatan: ambil top-3 PER SUMBER dulu baru di-sort global. Ini menjamin
+     * 3 teratas yang benar-benar termuda di antara keduanya tanpa harus memuat
+     * seluruh tabel ke memori.
+     */
+    protected function kabarGabungan(int $limit = 3)
+    {
+        $berita = News::published()
+            ->with('user')
+            ->orderByDesc('published_at')
+            ->limit($limit)
+            ->get()
+            ->map(fn (News $n) => [
+                'type' => 'berita',
+                'title' => $n->title,
+                'excerpt' => $n->excerpt,
+                'image' => $n->thumbnail,
+                'date' => $n->published_at,
+                'author' => $n->user?->name,
+                'url' => route('berita.show', $n->slug),
+                'target' => '_self',
+            ]);
+
+        $buletin = Book::visible()
+            ->where('category', 'buletin')
+            ->latest()
+            ->limit($limit)
+            ->get()
+            ->map(function (Book $b) {
+                $pdf = $b->pdf_path ? asset('storage/' . $b->pdf_path) : route('info', ['tab' => 'buletin']);
+                return [
+                    'type' => 'buletin',
+                    'title' => $b->title,
+                    'excerpt' => $b->description,
+                    'image' => $b->cover_image,
+                    'date' => $b->created_at,
+                    'author' => $b->author,
+                    'url' => $pdf,
+                    'target' => $b->pdf_path ? '_blank' : '_self',
+                ];
+            });
+
+        return $berita->merge($buletin)
+            ->sortByDesc('date')
+            ->take($limit)
+            ->values();
     }
 
     /**
@@ -93,9 +158,6 @@ class PageController extends Controller
             $currentSlug = $slug ?? 'semua';
         }
 
-        // Tab sort: Terbaru (default, latest-first) atau Terpopuler (net votes).
-        $sort = request('sort') === 'popular' ? 'popular' : 'recent';
-
         // Eager-load suara user saat ini (0/1 baris) + status simpan (pivot
         // post_user) agar tombol vote/bookmark bisa ditandai aktif sesuai
         // pilihan user. Tamu (guest) tidak dimuat.
@@ -105,13 +167,9 @@ class PageController extends Controller
             $with['savedBy'] = fn ($q) => $q->where('user_id', $user->id)->select(['post_id']);
         }
 
-        $query = Post::with($with)->withCount(['comments']);
-        if ($sort === 'popular') {
-            // Terpopuler: selisih upvote-downvote, tiebreak terbaru.
-            $query->orderByRaw('(upvotes - downvotes) desc, created_at desc');
-        } else {
-            $query->latest();
-        }
+        // Feed selalu Terbaru (latest-first). Toggle Terbaru/Terpopuler sudah
+        // dihapus dari UI; sort tidak lagi diturunkan dari ?sort=.
+        $query = Post::with($with)->withCount(['comments'])->latest();
 
         if ($currentSlug && $currentSlug !== 'semua') {
             $query->where('community_slug', $currentSlug);
@@ -133,11 +191,35 @@ class PageController extends Controller
         $posts = $query->paginate(10)->withQueryString();
         $komunitasAktif = $currentSlug !== 'semua' ? collect($daftarKomunitas)->firstWhere('slug', $currentSlug) : null;
 
+        // Sidebar kiri: jumlah post per komunitas (DB, bukan hardcode). Satu query
+        // grouped lalu dipetakan ke daftarKomunitas (sumber kanonik nama/slug/ikon
+        // dari config). Komunitas tanpa post tetap tampil (count 0).
+        $counts = Post::query()
+            ->select('community_slug', DB::raw('count(*) as total'))
+            ->whereIn('community_slug', collect($daftarKomunitas)->pluck('slug'))
+            ->groupBy('community_slug')
+            ->pluck('total', 'community_slug');
+
+        $komunitasSidebar = collect($daftarKomunitas)->map(function (array $k) use ($counts) {
+            return array_merge($k, ['total' => (int) ($counts[$k['slug']] ?? 0)]);
+        });
+        $totalSemua = $counts->sum();
+
+        // Sidebar kanan: 5 postingan terbaru lintas komunitas (site-wide), untuk
+        // panel "Postingan Terbaru". Eager-load media (thumbnail) + comments_count.
+        $recentPosts = Post::with(['media' => function ($q) { $q->orderBy('order')->limit(1); }])
+            ->withCount(['comments'])
+            ->latest()
+            ->limit(5)
+            ->get();
+
         return view('komunitas.index', [
             'daftarKomunitas' => $daftarKomunitas,
+            'komunitasSidebar' => $komunitasSidebar,
+            'totalSemua' => $totalSemua,
+            'recentPosts' => $recentPosts,
             'komunitasAktif' => $komunitasAktif,
             'currentSlug' => $currentSlug,
-            'sort' => $sort,
             'posts' => $posts,
         ]);
     }
@@ -145,5 +227,131 @@ class PageController extends Controller
     public function komunitasShow(string $slug)
     {
         return $this->komunitasIndex($slug);
+    }
+
+    /**
+     * Halaman Credits (tim pembuat situs). UNLISTED — tidak ada di navbar/menu;
+     * hanya dicapai via logo Liivo di footer. Publik (tanpa login).
+     *
+     * $tim: tim pembuat. Tiap baris =
+     *   ['nama', 'peran', 'accent', 'tagline', 'socials', 'avatar'].
+     *  - nama/peran/tagline/accent wajib. accent = HEX untuk cincin/avatar/tag kartu.
+     *  - tagline (string HTML): boleh memuat satu kata <em>…</em> yang diberi
+     *    warna accent di view.
+     *  - socials: [['icon'=>'fa-brands …','url'=>'…','label'=>'…'], …] (boleh kosong).
+     *  - avatar: path relatif public/ (mis. 'assets/team/fulan-rahman.jpg').
+     *    Swap placeholder → foto asli = UBAH path ini (atau drop file dgn nama sama).
+     *    Bila file BELUM ada di disk → view merender ikon orang di lingkaran accent
+     *    (placeholder jelas "foto belum diunggah"), bukan gambar pecah.
+     *
+     * Route: GET /credits
+     */
+    public function credits()
+    {
+        $tim = [
+            // ── Tim inti (4) ──
+            [
+                'nama'    => 'Galang Putra Bayu Pratama',
+                'peran'   => 'Lead Developer',
+                'accent'  => '#C9A66B',
+                'tagline' => 'Sedikit commit, banyak kredit.',
+                'socials' => [
+                    ['icon' => 'fa-brands fa-github',    'url' => '#', 'label' => 'GitHub'],
+                    ['icon' => 'fa-brands fa-instagram', 'url' => '#', 'label' => 'Instagram'],
+                ],
+                'avatar'  => 'assets/team/fulan-rahman.jpg',
+            ],
+            [
+                'nama'    => 'Bryan Zidhan Kirana',
+                'peran'   => 'Frontend Developer',
+                'accent'  => '#34C9A0',
+                'tagline' => 'Jarang bilang capek, tapi commit-nya nggak berhenti.',
+                'socials' => [
+                    ['icon' => 'fa-brands fa-github',    'url' => '#', 'label' => 'GitHub'],
+                    ['icon' => 'fa-brands fa-instagram', 'url' => '#', 'label' => 'Instagram'],
+                ],
+                'avatar'  => 'assets/team/aisyah-putri.jpg',
+            ],
+            [
+                'nama'    => 'Khairunnisa Zahira',
+                'peran'   => 'Frontend Developer',
+                'accent'  => '#5BAFC4',
+                'tagline' => 'Ngerjain sampai puas, bukan <em>sampai selesai</em>.',
+                'socials' => [
+                    ['icon' => 'fa-brands fa-github',    'url' => '#', 'label' => 'GitHub'],
+                    ['icon' => 'fa-brands fa-instagram', 'url' => '#', 'label' => 'Instagram'],
+                ],
+                'avatar'  => 'assets/team/nadia-salsabila.jpg',
+            ],
+            [
+                'nama'    => 'Rifki Abdillah Muis',
+                'peran'   => 'Backend Developer',
+                'accent'  => '#C9904E',
+                'tagline' => 'Sedikit baris kode, banyak <em>dukungan moral</em>.',
+                'socials' => [
+                    ['icon' => 'fa-brands fa-github',    'url' => '#', 'label' => 'GitHub'],
+                    ['icon' => 'fa-brands fa-instagram', 'url' => '#', 'label' => 'Instagram'],
+                ],
+                'avatar'  => 'assets/team/zaki-alfarizi.jpg',
+            ],
+            // ── Anggota baru (3) — nama/foto masih placeholder; peran/tagline final. ──
+            [
+                'nama'    => 'Dytha Aisha Qamara',
+                'peran'   => 'Digital Artist',
+                'accent'  => '#E07A9B',
+                'tagline' => 'Sketsa asal-asalan, hasil akhir nggak asal-asalan.',
+                'socials' => [
+                    ['icon' => 'fa-brands fa-instagram', 'url' => '#', 'label' => 'Instagram'],
+                ],
+                'avatar'  => 'assets/team/anggota-5.jpg',
+            ],
+            [
+                'nama'    => 'Heykal Fadhila Mudzaki',
+                'peran'   => 'Digital Artist',
+                'accent'  => '#9B7EBD',
+                'tagline' => 'Gambar dulu, baru mikir kenapa bagus.',
+                'socials' => [
+                    ['icon' => 'fa-brands fa-instagram', 'url' => '#', 'label' => 'Instagram'],
+                ],
+                'avatar'  => 'assets/team/anggota-6.jpg',
+            ],
+            [
+                'nama'    => 'Bintang Fachria Luckyano',
+                'peran'   => 'Content Manager',
+                'accent'  => '#D9A441',
+                'tagline' => 'Kontribusi yang ringkas, tapi konsisten.',
+                'socials' => [
+                    ['icon' => 'fa-brands fa-instagram', 'url' => '#', 'label' => 'Instagram'],
+                ],
+                'avatar'  => 'assets/team/anggota-7.jpg',
+            ],
+        ];
+
+        // Prakomputasi per anggota agar view bebas logika PHP/closure.
+        //  - tag:       label pill — kata pertama 'peran', upper-case (LEAD/FRONTEND/…/MEMBER).
+        //  - initials:  huruf depan 2 kata pertama nama.
+        //  - has_img:   TRUE hanya bila 'avatar' terisi DAN file benar-benar ada di disk
+        //               (public_path()). Kalau belum di-upload → placeholder ikon orang.
+        //  - avatar_url: URL foto asli (asset()) bila has_img; null bila belum ada.
+        $tim = collect($tim)->map(function (array $m) {
+            // tag = kata pertama peran, upper-case.
+            $peranKata = array_values(array_filter(explode(' ', trim($m['peran'] ?? ''))));
+            $m['tag'] = mb_strtoupper($peranKata[0] ?? 'TEAM');
+
+            $kata = array_values(array_filter(explode(' ', trim($m['nama'] ?? ''))));
+            $initials = '';
+            for ($i = 0, $n = min(2, count($kata)); $i < $n; $i++) {
+                $initials .= mb_strtoupper(mb_substr($kata[$i], 0, 1));
+            }
+            $m['initials'] = $initials !== '' ? $initials : '?';
+
+            // Foto asli hanya bila path terisi & file ada di disk.
+            $m['has_img'] = ! empty($m['avatar']) && file_exists(public_path($m['avatar']));
+            $m['avatar_url'] = $m['has_img'] ? asset($m['avatar']) : null;
+
+            return $m;
+        })->all();
+
+        return view('credits', compact('tim'));
     }
 }

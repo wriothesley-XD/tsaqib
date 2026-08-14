@@ -316,3 +316,17 @@
 .pr-see-all{ font-size:11px; font-weight:700; color:var(--gold); text-decoration:none; white-space:nowrap; }
 .pr-see-all:hover{ text-decoration:underline; }
 .pr-nomore{ text-align:center; font-size:11px; color:rgba(247,245,239,.3); margin-top:.75rem; }
+
+/* ===== PC redesign: grid 12-kolom (identitas kiri col-span-4, feed kanan col-span-8) =====
+   Didefinisikan eksplisit di sini agar layout langsung jalan tanpa menunggu
+   rebuild Vite/Tailwind mengeluarkan utility grid-cols-12 / lg:col-span-*.
+   Breakpoint lg = 1024px (konvensi Tailwind). Setelah rebuild, utility Tailwind
+   yang sama akan menimpa deklarasi ini (spesifisitas setara) — aman. */
+.pr-grid12{ display:grid; grid-template-columns:1fr; gap:1.5rem; }
+@media(min-width:1024px){
+    .pr-grid12.lg\:grid-cols-12,
+    .pr-grid12{ grid-template-columns:repeat(12, minmax(0, 1fr)); }
+    .lg\:col-span-4{ grid-column:span 4 / span 4; }
+    .lg\:col-span-8{ grid-column:span 8 / span 8; }
+}
+

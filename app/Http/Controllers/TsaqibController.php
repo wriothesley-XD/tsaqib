@@ -35,7 +35,15 @@ class TsaqibController extends Controller
         // Default ke flipbook Heyzine saat setting belum diisi.
         $profilTsaqibUrl = Setting::getByKey('profil_tsaqib_url', 'https://heyzine.com/flip-book/8e0a75dc7f.html');
 
-        return view('tsaqib.labor-pai', compact('visiMisi', 'pembina', 'pengurusSiswa', 'profilTsaqibUrl'));
+        // Cover thumbnail flipbook: diturunkan dari URL flipbook Heyzine.
+        //   https://heyzine.com/flip-book/{id}.html → https://heyzine.com/flip-book/cover/{id}.jpg
+        // Bila URL bukan format Heyzine yang dikenali → null (view fallback ke ikon buku).
+        $coverUrl = null;
+        if (preg_match('#^(https?://heyzine\.com/flip-book/)([^/]+)\.html$#i', $profilTsaqibUrl, $m)) {
+            $coverUrl = $m[1] . 'cover/' . $m[2] . '.jpg';
+        }
+
+        return view('tsaqib.labor-pai', compact('visiMisi', 'pembina', 'pengurusSiswa', 'profilTsaqibUrl', 'coverUrl'));
     }
 
     /**

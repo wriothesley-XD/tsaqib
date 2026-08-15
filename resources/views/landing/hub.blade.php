@@ -63,7 +63,7 @@
                         Open Recruitment
                     </h2>
                     <p class="text-xs sm:text-sm text-white/60 mt-2.5 leading-relaxed">
-                        Pendaftaran terbuka anggota baru khusus siswa/i Kelas X SMAN 1 Bukittinggi. Bergabunglah bersama 13 bidang minat TSAQIB!
+                        Pendaftaran terbuka anggota baru khusus siswa/i Kelas X SMAN 1 Bukittinggi. Bergabunglah bersama 7 bidang minat TSAQIB!
                     </p>
                 </div>
 

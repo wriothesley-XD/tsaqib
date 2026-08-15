@@ -159,14 +159,11 @@
         {{-- SORT TABS: Terbaru (default) / Terpopuler. ?sort= dipreservasi oleh pagination. --}}
         <div class="tsaqib-card p-1.5 flex items-center gap-1">
             @foreach(['recent' => ['Terbaru', 'fa-clock'], 'popular' => ['Terpopuler', 'fa-fire']] as $sortKey => $tab)
-                <a href="{{ request()->fullUrlWithQuery(['sort' => $sortKey, 'page' => 1]) }}"
-                   class="flex-1 text-center py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition
-                          {{ $sort === $sortKey
-                              ? 'bg-[#01795F] text-white shadow-sm'
-                              : 'text-white/55 hover:text-white hover:bg-white/5' }}">
-                    <i class="fa-solid {{ $tab[1] }} mr-1.5"></i>{{ $tab[0] }}
-                </a>
-            @endforeach
+    <a href="{{ request()->fullUrlWithQuery(['sort' => $sortKey, 'page' => 1]) }}"
+       class="flex-1 text-center py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition {{ ($sort ?? request('sort', 'recent')) === $sortKey ? 'bg-[#01795F] text-white shadow-sm' : 'text-white/60 hover:text-white' }}">
+        <i class="fa-solid {{ $tab[1] }} mr-1.5"></i>{{ $tab[0] }}
+    </a>
+@endforeach
         </div>
 
         <!-- POSTS TIMELINE FEED -->

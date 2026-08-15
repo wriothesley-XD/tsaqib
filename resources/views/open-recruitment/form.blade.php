@@ -1,5 +1,5 @@
 @php
-    $pageTitle = 'Open Recruitment FSI - SmAN 1 Bukittinggi';
+    $pageTitle = 'Open Recruitment FSI - SMAN 1 Bukittinggi';
     $isRecruitmentOpen = \App\Models\Setting::getByKey('recruitment_open', '1') === '1';
     $oprecEyebrow = $isRecruitmentOpen ? 'Pendaftaran Sedang DIBUKA' : 'Pendaftaran Saat Ini DITUTUP';
     $oprecEyebrowIcon = $isRecruitmentOpen ? 'fa-solid fa-circle-check' : 'fa-solid fa-lock';
@@ -48,7 +48,7 @@
                 </div>
                 <h3 class="font-bold text-base text-[var(--cream)] mb-2">Informasi FSI</h3>
                 <p class="text-xs text-white/60 leading-relaxed">
-                    Forum Studi Islam TSAQIB memfasilitasi 13 bidang minat komunitas untuk membentuk karakter siswa Rabbani dan berakhlak mulia.
+                    Forum Studi Islam TSAQIB memfasilitasi 7 bidang minat komunitas untuk membentuk karakter siswa Rabbani dan berakhlak mulia.
                 </p>
             </div>
 

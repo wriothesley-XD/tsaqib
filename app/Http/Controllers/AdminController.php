@@ -19,7 +19,14 @@ class AdminController extends Controller
 {
     /**
      * Memeriksa dan memastikan pengguna memiliki hak akses Admin.
-     * Mengubah role test1@gmail.com dan admin@fsi.sch.id menjadi 'admin' secara otomatis.
+     *
+     * SECURITY FIX: logic lama di sini otomatis menaikkan role user manapun
+     * yang login dengan email 'test1@gmail.com' atau 'admin@fsi.sch.id' jadi
+     * 'admin'. Karena pendaftaran akun terbuka untuk publik (lihat
+     * RegisteredUserController), siapa pun bisa mendaftar pakai email
+     * tersebut dan langsung mendapat akses admin penuh — ini backdoor, bukan
+     * fitur. Logic auto-assign sudah dihapus; role admin sekarang murni
+     * dibaca dari kolom `role` di database (ditetapkan manual/lewat seeder).
      */
     private function checkAdmin(): void
     {
@@ -27,13 +34,6 @@ class AdminController extends Controller
 
         if (! $user) {
             abort(401, 'Anda harus login terlebih dahulu.');
-        }
-
-        // Auto-assign role admin untuk email khusus terdaftar
-        if (in_array($user->email, ['test1@gmail.com', 'admin@fsi.sch.id'])) {
-            if ($user->role !== 'admin') {
-                $user->update(['role' => 'admin']);
-            }
         }
 
         if ($user->role !== 'admin') {

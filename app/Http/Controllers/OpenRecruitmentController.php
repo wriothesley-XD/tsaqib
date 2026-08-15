@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\PendaftaranFsiDiterima;
 use App\Models\Registration;
+use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -27,6 +28,19 @@ class OpenRecruitmentController extends Controller
      */
     public function submit(Request $request): RedirectResponse
     {
+        // SECURITY/LOGIC FIX: sebelumnya status buka/tutup rekrutmen cuma
+        // dicek di view (form disembunyikan bila tutup), tapi controller ini
+        // tetap menyimpan submission kalau ada yang kirim POST langsung ke
+        // endpoint ini (mis. lewat Postman, atau form lama yang ter-cache di
+        // browser) selagi rekrutmen sudah ditutup admin. Sekarang dicek juga
+        // di server sebagai sumber kebenaran utama.
+        $isRecruitmentOpen = Setting::getByKey('recruitment_open', '1') === '1';
+        if (! $isRecruitmentOpen) {
+            return redirect()
+                ->route('open.recruitment')
+                ->withErrors(['recruitment' => 'Mohon maaf, pendaftaran Open Recruitment FSI TSAQIB saat ini sedang ditutup.']);
+        }
+
         $validated = $request->validate([
             'nama_lengkap' => ['required', 'string', 'max:255'],
             'nama_panggilan' => ['required', 'string', 'max:100'],

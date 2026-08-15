@@ -163,16 +163,17 @@ class User extends Authenticatable
         return asset('images/community-avatar/default.svg');
     }
 
-    /**
-     * Model booted hook untuk secara otomatis menetapkan role 'admin'
-     * untuk email test1@gmail.com dan admin@fsi.sch.id
-     */
-    protected static function booted(): void
-    {
-        static::saving(function (User $user) {
-            if ($user->email === 'test1@gmail.com' || $user->email === 'admin@fsi.sch.id') {
-                $user->role = 'admin';
-            }
-        });
-    }
+    // NOTE (security fix): hook `booted()` yang lama otomatis menjadikan
+    // SIAPA PUN yang mendaftar dengan email 'test1@gmail.com' atau
+    // 'admin@fsi.sch.id' sebagai admin. Karena /register terbuka untuk
+    // publik tanpa verifikasi domain sekolah, ini adalah backdoor —
+    // penyerang tinggal daftar akun baru pakai email tsb untuk dapat akses
+    // admin penuh. Hook ini sudah dihapus.
+    //
+    // Untuk menetapkan admin sekarang, lakukan manual di database, mis.
+    // lewat tinker:
+    //   php artisan tinker
+    //   >>> User::where('email', 'admin@fsi.sch.id')->update(['role' => 'admin']);
+    // atau tambahkan seeder khusus admin yang HANYA dijalankan di server,
+    // bukan logic otomatis berbasis email yang bisa didaftarkan siapa saja.
 }

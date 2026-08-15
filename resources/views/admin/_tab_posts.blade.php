@@ -5,8 +5,9 @@
         <span>Kelola Postingan Members ({{ $posts->total() }})</span>
     </h3>
 
+    {{-- URL relatif — fetch AJAX bebas mixed-content di belakang proxy TLS. --}}
     <div data-admin-list="posts"
-         data-admin-url="{{ route('admin.list', 'posts') }}"
+         data-admin-url="/admin-panel/list/posts"
          data-admin-page="{{ $posts->currentPage() }}"
          data-admin-last="{{ $posts->lastPage() }}"
          data-admin-total="{{ $posts->total() }}"

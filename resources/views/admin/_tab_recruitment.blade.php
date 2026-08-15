@@ -25,8 +25,9 @@
         </form>
     </div>
 
+    {{-- URL relatif — fetch AJAX bebas mixed-content di belakang proxy TLS. --}}
     <div data-admin-list="registrations"
-         data-admin-url="{{ route('admin.list', 'registrations') }}"
+         data-admin-url="/admin-panel/list/registrations"
          data-admin-page="{{ $registrations->currentPage() }}"
          data-admin-last="{{ $registrations->lastPage() }}"
          data-admin-total="{{ $registrations->total() }}"

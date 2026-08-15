@@ -18,7 +18,13 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        // Aplikasi berada di belakang proxy TLS-terminating (Laravel Cloud &
+        // reverse proxy lokal). Tanpa trust proxies, request terlihat sebagai
+        // http:// sehingga route()/asset() menghasilkan URL absolut http:// di
+        // halaman https:// — fetch AJAX (toggle bookmark perpustakaan, dsb.)
+        // lalu diblokir browser sebagai mixed content. Menyetujui proxy membuat
+        // skema/host mengikuti header X-Forwarded-* dari proxy.
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

@@ -111,7 +111,9 @@
       "Bash(curl -sL --max-time 240 -o /tmp/cloud-cli.zip \"https://codeload.github.com/laravel/cloud-cli/zip/refs/heads/main\")",
       "Bash(curl -s --max-time 30 \"https://repo.packagist.org/p2/laravel/cloud-cli.json\" -o /tmp/cloud-meta.json)",
       "Bash(curl -sL --max-time 120 -H \"Accept: application/vnd.github+json\" \"https://api.github.com/repos/laravel/cloud-cli/zipball/f03d317d33867c1b511b60d8c3a7b3ddd8d29454\" -o /tmp/cloud-cli.zip)",
-      "Bash(timeout 30 curl -sL -H \"Accept: application/vnd.github+json\" \"https://api.github.com/repos/laravel/cloud-cli/zipball/f03d317d33867c1b511b60d8c3a7b3ddd8d29454\" -o /tmp/cloud-cli-part.zip)"
+      "Bash(timeout 30 curl -sL -H \"Accept: application/vnd.github+json\" \"https://api.github.com/repos/laravel/cloud-cli/zipball/f03d317d33867c1b511b60d8c3a7b3ddd8d29454\" -o /tmp/cloud-cli-part.zip)",
+      "Bash(curl -s -o /tmp/live_perpus.html -w '%{http_code}\\\\n' https://tsaqiblandbouw.site/perpustakaan)",
+      "Bash(curl -s -o /tmp/live_admin.html -w '%{http_code}\\\\n' -L https://tsaqiblandbouw.site/admin-panel)"
     ]
   }
 }

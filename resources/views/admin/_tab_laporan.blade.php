@@ -7,8 +7,9 @@
         </h3>
     </div>
 
+    {{-- URL relatif — fetch AJAX bebas mixed-content di belakang proxy TLS. --}}
     <div data-admin-list="laporan"
-         data-admin-url="{{ route('admin.list', 'laporan') }}"
+         data-admin-url="/admin-panel/list/laporan"
          data-admin-page="{{ $laporan->currentPage() }}"
          data-admin-last="{{ $laporan->lastPage() }}"
          data-admin-total="{{ $laporan->total() }}"

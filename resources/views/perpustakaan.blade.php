@@ -306,7 +306,11 @@
     token = token ? token.getAttribute('content') : '';
 
     // Untuk fetch toggle; placeholder __ID__ diganti id buku.
-    var toggleUrlTpl = "{{ route('perpustakaan.toggle', '__ID__') }}";
+    // Pakai path relatif (bukan route() absolut) agar fetch tidak pernah
+    // menjadi mixed-content http:// saat halaman disajikan lewat https://
+    // di belakang proxy TLS (route() mengikuti skema request, yang bisa
+    // salah saat proxy belum di-trust).
+    var toggleUrlTpl = "/perpustakaan/books/__ID__/toggle";
     var loginUrl = "{{ route('login') }}";
 
     /* ---------- Bookmark toggle (optimistic, sync semua instance buku+type) ---------- */

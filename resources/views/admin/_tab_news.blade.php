@@ -70,8 +70,9 @@
     </div>
 
     <!-- TABEL BERITA -->
+    {{-- URL relatif — fetch paginasi bebas mixed-content di belakang proxy TLS. --}}
     <div data-admin-list="news"
-         data-admin-url="{{ route('admin.list', 'news') }}"
+         data-admin-url="/admin-panel/list/news"
          data-admin-page="{{ $news->currentPage() }}"
          data-admin-last="{{ $news->lastPage() }}"
          data-admin-total="{{ $news->total() }}"
@@ -112,8 +113,10 @@
     var cancelBtn   = document.getElementById('news-form-cancel');
     var submitBtn   = document.getElementById('news-submit-btn');
     var thumbHint   = document.getElementById('news-thumb-hint');
-    var storeUrl    = "{{ route('admin.news.store') }}";
-    var updateTpl   = "{{ route('admin.news.update', ['news' => '__ID__']) }}";
+    // Path relatif supaya action form hasil JS tidak pernah http:// absolut
+    // (mixed content) di belakang proxy TLS — pola sama dengan _tab_books.
+    var storeUrl    = "/admin-panel/news";
+    var updateTpl   = "/admin-panel/news/__ID__";
 
     function resetToCreate() {
         form.setAttribute('action', storeUrl);

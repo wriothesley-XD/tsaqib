@@ -5,8 +5,9 @@
         <span>Manajemen Pengguna & Role Sistem</span>
     </h3>
 
+    {{-- URL relatif — fetch AJAX bebas mixed-content di belakang proxy TLS. --}}
     <div data-admin-list="users"
-         data-admin-url="{{ route('admin.list', 'users') }}"
+         data-admin-url="/admin-panel/list/users"
          data-admin-page="{{ $users->currentPage() }}"
          data-admin-last="{{ $users->lastPage() }}"
          data-admin-total="{{ $users->total() }}"

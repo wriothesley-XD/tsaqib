@@ -80,8 +80,11 @@
     </div>
 
     <!-- TABEL BUKU -->
+    {{-- URL relatif (bukan route() absolut) — fetch paginasi/pencarian tidak
+         pernah jadi mixed-content http:// saat halaman disajikan lewat https://
+         di belakang proxy TLS (pola sama dengan perpustakaan.blade.php). --}}
     <div data-admin-list="books"
-         data-admin-url="{{ route('admin.list', 'books') }}"
+         data-admin-url="/admin-panel/list/books"
          data-admin-page="{{ $books->currentPage() }}"
          data-admin-last="{{ $books->lastPage() }}"
          data-admin-total="{{ $books->total() }}"
@@ -144,8 +147,10 @@
     var coverHint = document.getElementById('book-cover-hint');
     var pdfHint   = document.getElementById('book-pdf-hint');
     var pdfMark   = document.getElementById('book-pdf-required-mark');
-    var storeUrl  = "{{ route('admin.books.store') }}";
-    var updateTpl = "{{ route('admin.books.update', ['book' => '__ID__']) }}";
+    // Path relatif (bukan route() absolut) supaya action form hasil JS ini
+    // tidak pernah http:// absolut (mixed content) di belakang proxy TLS.
+    var storeUrl  = "/admin-panel/books";
+    var updateTpl = "/admin-panel/books/__ID__";
 
     function resetToCreate() {
         form.setAttribute('action', storeUrl);

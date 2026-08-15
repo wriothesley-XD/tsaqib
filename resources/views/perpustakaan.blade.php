@@ -2,22 +2,6 @@
 
 @php
     $pageTitle = 'Perpustakaan Digital FSI - TSAQIB SMAN 1 Bukittinggi';
-<<<<<<< Updated upstream
-=======
-
-    // Kategori filter (server-side). 'semua' = tanpa filter kategori.
-    $bookCategories = [
-        'semua'  => 'Semua Buku',
-        'fiqih'  => 'Fiqih',
-        'aqidah' => 'Aqidah',
-        'ski'    => 'SKI',
-        'hadits' => 'Hadits & Tafsir',
-        'modul'  => 'Modul PAI',
-    ];
-  $category = request()->query('category', 'semua');
-$q = request()->query('q', '');
-$activeCat = in_array($category, array_keys($bookCategories), true) ? $category : 'semua';
->>>>>>> Stashed changes
 @endphp
 
 @push('styles')

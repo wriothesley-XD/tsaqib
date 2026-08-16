@@ -34,13 +34,17 @@
     @media(min-width:640px){ .media-grid.cols-3{ grid-template-columns:1fr 1fr 1fr; } }
     .media-grid.cols-4{ grid-template-columns:1fr 1fr; }
     .media-tile{ position:relative; aspect-ratio:1/1; background:rgba(247,245,239,.05); cursor:zoom-in; overflow:hidden; }
-    .media-tile.single{ aspect-ratio:16/10; max-height:24rem; }
     .media-tile img,.media-tile video{ width:100%; height:100%; object-fit:cover; display:block; }
-    .media-tile.single .media-blur{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center center; filter:blur(24px) saturate(1.2); transform:scale(1.18); transform-origin:center; z-index:0; }
-    .media-grid.cols-1 .media-tile > img:not(.media-blur){ position:absolute; inset:0; margin:auto; width:auto; height:auto; max-width:100%; max-height:100%; z-index:1; background:transparent; }
+    /* Foto tunggal: tanpa box 16:10 paksa & tanpa latar blur — tinggi mengikuti
+       rasio asli foto (max-height wajar), foto contain + center horizontal. */
+    .media-tile.single{ aspect-ratio:auto; max-height:32rem; display:flex; align-items:center; justify-content:center; background:rgba(16,20,15,.4); }
+    .media-tile.single > img{ width:auto; height:auto; max-width:100%; max-height:32rem; object-fit:contain; margin:0 auto; }
     .media-grid.cols-1 .media-tile > video{ object-fit:contain; object-position:center center; background:#000; }
-    .media-more{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-        background:rgba(16,20,15,.65); color:var(--cream); font-weight:800; font-size:1.4rem; }
+    /* Overlay "+N": menempel penuh di ATAS tile foto terakhir (.media-tile sudah
+       position:relative). inset:0 = tutup seluruh foto; 55% gelap -> foto tetap
+       samar terlihat; teks center horizontal+vertikal; z-index di atas img. */
+    .media-more{ position:absolute; inset:0; z-index:2; display:flex; align-items:center; justify-content:center;
+        background:rgba(16,20,15,.55); color:var(--cream); font-weight:800; font-size:1.4rem; }
     .media-play{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
         background:rgba(16,20,15,.35); pointer-events:none; }
     .media-play i{ color:#fff; font-size:1.6rem; filter:drop-shadow(0 2px 6px rgba(0,0,0,.6)); }
@@ -155,10 +159,11 @@
             </div>
         </div>
 
-        {{-- Dua kolom (Reddit-style): sidebar komunitas sticky (lg+) + feed.
-             Pola grid mengikuti perpustakaan.blade.php. minmax(0,1fr) wajib agar
-             media-grid di kartu post tidak melebarkan track kolom. --}}
-        <div class="lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6 xl:gap-8">
+        {{-- Tiga kolom (Reddit-style): sidebar komunitas (lg+) | feed | widget
+             Postingan Terbaru (xl+). Kolom ketiga baru muncul di xl agar feed
+             tidak terperes di lg. minmax(0,1fr) wajib agar media-grid di kartu
+             post tidak melebarkan track kolom. --}}
+        <div class="lg:grid lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[280px_minmax(0,1fr)_300px] lg:gap-6 xl:gap-8">
 
             {{-- ============ SIDEBAR KIRI: daftar komunitas (lg+) ============ --}}
             <aside class="hidden lg:block">
@@ -324,8 +329,17 @@
             </div>
         @endif
 
-            </div>{{-- /kolum kanan --}}
-        </div>{{-- /grid dua kolom --}}
+            </div>{{-- /kolum tengah: feed --}}
+
+            {{-- ============ KOLOM KANAN (xl+): widget Postingan Terbaru ============
+                 Komponen sama, cuma pindah kolom. Hidden < xl (feed butuh ruang);
+                 konten/logic widget tidak berubah. --}}
+            <aside class="hidden xl:block">
+                <div class="sticky top-24">
+                    @include('komunitas._recent-posts')
+                </div>
+            </aside>
+        </div>{{-- /grid tiga kolom --}}
 
     </main>
 

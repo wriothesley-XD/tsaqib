@@ -35,7 +35,7 @@
         @endif
         <a href="{{ route('komunitas', $post->community_slug ?? 'semua') }}" data-no-nav
            class="font-bold text-xs text-[var(--cream)] hover:text-[var(--gold)] transition truncate">
-            r/{{ $komunitasKartu['nama'] ?? 'umum' }}
+            {{ $komunitasKartu['nama'] ?? 'umum' }}
         </a>
         <span class="text-white/30 text-xs shrink-0" aria-hidden="true">•</span>
         <span class="text-[11px] text-white/40 shrink-0">{{ $post->created_at->diffForHumans() }}</span>
@@ -140,9 +140,6 @@
                     <video src="{{ $mItem->url }}" preload="none" muted playsinline></video>
                     <div class="media-play"><i class="fa-solid fa-play"></i></div>
                 @else
-                    @if ($mCount === 1)
-                        <img class="media-blur" src="{{ $mItem->url }}" alt="" aria-hidden="true" loading="lazy">
-                    @endif
                     <img src="{{ $mItem->url }}" alt="{{ $post->title }}" loading="lazy">
                 @endif
                 @if ($mExtra)

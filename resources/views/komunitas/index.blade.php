@@ -163,7 +163,7 @@
              Postingan Terbaru (xl+). Kolom ketiga baru muncul di xl agar feed
              tidak terperes di lg. minmax(0,1fr) wajib agar media-grid di kartu
              post tidak melebarkan track kolom. --}}
-        <div class="lg:grid lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[280px_minmax(0,1fr)_300px] lg:gap-6 xl:gap-8">
+        <div class="lg:grid lg:grid-cols-[250px_minmax(0,1fr)] xl:grid-cols-[250px_minmax(0,1fr)_270px] lg:gap-6 xl:gap-8">
 
             {{-- ============ SIDEBAR KIRI: daftar komunitas (lg+) ============ --}}
             <aside class="hidden lg:block">

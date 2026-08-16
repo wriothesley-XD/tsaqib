@@ -61,9 +61,11 @@
             </div>
         @endauth
 
-        {{-- Overlay Read / Download (hover) --}}
+        {{-- Overlay Read / Download — hover-reveal di desktop (perangkat dg hover),
+             SELALU tampil di touchscreen via [@media(hover:none)] (tanpa itu tombol
+             tak pernah terungkap di mobile karena tidak ada :hover). --}}
         @if($pdfUrl)
-            <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/90 via-black/55 to-transparent flex items-center gap-2 opacity-0 translate-y-2 transition duration-200 group-hover:opacity-100 group-hover:translate-y-0">
+            <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/90 via-black/55 to-transparent flex items-center gap-2 opacity-0 translate-y-2 pointer-events-none transition duration-200 group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto [@media(hover:none)]:opacity-100 [@media(hover:none)]:translate-y-0 [@media(hover:none)]:pointer-events-auto">
                 <a href="{{ $pdfUrl }}" target="_blank" rel="noopener"
                    class="flex-1 py-1.5 rounded-lg bg-[#01795F] hover:bg-[#3F704D] text-white text-center font-semibold text-[11px] flex items-center justify-center gap-1.5 transition">
                     <i class="fa-solid fa-eye text-[10px]"></i> Baca PDF
@@ -75,7 +77,7 @@
                 </a>
             </div>
         @else
-            <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/85 to-transparent opacity-0 group-hover:opacity-100 transition">
+            <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/85 to-transparent opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition">
                 <span class="block w-full py-1.5 rounded-lg bg-white/10 text-white/55 text-center text-[10px] font-semibold">
                     PDF Belum Tersedia
                 </span>

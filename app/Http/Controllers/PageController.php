@@ -291,7 +291,7 @@ class PageController extends Controller
                 'nama'    => 'Rifki Abdillah Muis',
                 'peran'   => 'Backend Developer',
                 'accent'  => '#C9904E',
-                'tagline' => 'Sedikit baris kode, banyak <em>dukungan moral</em>.',
+                'tagline' => 'blubub blubub, bub blubub bub',
                 'socials' => [
                     ['icon' => 'fa-brands fa-github',    'url' => 'https://github.com/rifkiabdillahmuis-sawit-enjoyer', 'label' => 'GitHub'],
                     ['icon' => 'fa-brands fa-instagram', 'url' => '#', 'label' => 'Instagram'],
@@ -323,7 +323,7 @@ class PageController extends Controller
                 'nama'    => 'Bintang Fachria Luckyano',
                 'peran'   => 'Content Manager',
                 'accent'  => '#D9A441',
-                'tagline' => '<strong>Umi bintang izin umi</strong>',
+                'tagline' => 'Umi bintang izin umi',
                 'socials' => [
                     ['icon' => 'fa-brands fa-instagram', 'url' => 'https://www.instagram.com/arthfiscl?igsh=azRqb3Bnbjg2dHNo&igsi=azRqb3Bnbjg2dHNo', 'label' => 'Instagram'],
                 ],

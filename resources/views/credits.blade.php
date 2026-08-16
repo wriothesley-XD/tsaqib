@@ -119,7 +119,7 @@
                         <p class="relative z-[1] text-[11.5px] text-white/55 mt-0.5">{{ $m['peran'] }}</p>
 
                         {{-- Tagline (dashed divider di atas). --}}
-                        <p class="dev-tagline relative z-[1] text-[11.5px] italic text-white/55 leading-relaxed mt-3 pt-3 border-t border-dashed border-white/10 w-full">
+                        <p class="dev-tagline relative z-[1] text-[11.5px] normal-case text-white/55 leading-relaxed mt-3 pt-3 border-t border-dashed border-white/10 w-full">
                             {!! $m['tagline'] !!}
                         </p>
 

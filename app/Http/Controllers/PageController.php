@@ -258,34 +258,34 @@ class PageController extends Controller
                 'nama'    => 'Galang Putra Bayu Pratama',
                 'peran'   => 'Lead Developer',
                 'accent'  => '#C9A66B',
-                'tagline' => 'Sedikit commit, banyak kredit.',
+                'tagline' => 'Tolong hamba dalam memimpin tim ini Ya Allah 😭',
                 'socials' => [
-                    ['icon' => 'fa-brands fa-github',    'url' => '#', 'label' => 'GitHub'],
-                    ['icon' => 'fa-brands fa-instagram', 'url' => '#', 'label' => 'Instagram'],
+                    ['icon' => 'fa-brands fa-github',    'url' => 'https://github.com/pejalan214', 'label' => 'GitHub'],
+                    ['icon' => 'fa-brands fa-instagram', 'url' => 'https://www.instagram.com/11putrabayu1?igsh=MTUxOXJ4ZmpjNTRjcw==&igsi=MTUxOXJ4ZmpjNTRjcw==', 'label' => 'Instagram'],
                 ],
-                'avatar'  => 'assets/team/fulan-rahman.jpg',
+                'avatar'  => 'assets/team/galang.jpg',
             ],
             [
                 'nama'    => 'Bryan Zidhan Kirana',
                 'peran'   => 'Frontend Developer',
                 'accent'  => '#34C9A0',
-                'tagline' => 'Jarang bilang capek, tapi commit-nya nggak berhenti.',
+                'tagline' => 'BISA SABAR DULU GA!!! UDAH BANYAK KERJAANKU 😠',
                 'socials' => [
-                    ['icon' => 'fa-brands fa-github',    'url' => '#', 'label' => 'GitHub'],
-                    ['icon' => 'fa-brands fa-instagram', 'url' => '#', 'label' => 'Instagram'],
+                    ['icon' => 'fa-brands fa-github',    'url' => 'https://github.com/wriothesley-XD', 'label' => 'GitHub'],
+                    ['icon' => 'fa-brands fa-instagram', 'url' => 'https://www.instagram.com/bry.luv_g?igsh=MW1meGRoa3Fta2RmaQ==&igsi=MW1meGRoa3Fta2RmaQ==', 'label' => 'Instagram'],
                 ],
-                'avatar'  => 'assets/team/aisyah-putri.jpg',
+                'avatar'  => 'assets/team/bren.jpg',
             ],
             [
                 'nama'    => 'Khairunnisa Zahira',
                 'peran'   => 'Frontend Developer',
                 'accent'  => '#5BAFC4',
-                'tagline' => 'Ngerjain sampai puas, bukan <em>sampai selesai</em>.',
+                'tagline' => 'Apa kerjaanku ??',
                 'socials' => [
-                    ['icon' => 'fa-brands fa-github',    'url' => '#', 'label' => 'GitHub'],
-                    ['icon' => 'fa-brands fa-instagram', 'url' => '#', 'label' => 'Instagram'],
+                    ['icon' => 'fa-brands fa-github',    'url' => 'https://github.com/khaiz-F', 'label' => 'GitHub'],
+                    ['icon' => 'fa-brands fa-instagram', 'url' => 'https://www.instagram.com/mrs.zahira?igsh=anBqaXR5OW0xeDlu&igsi=anBqaXR5OW0xeDlu', 'label' => 'Instagram'],
                 ],
-                'avatar'  => 'assets/team/nadia-salsabila.jpg',
+                'avatar'  => 'assets/team/kesa.jpg',
             ],
             [
                 'nama'    => 'Rifki Abdillah Muis',
@@ -293,10 +293,10 @@ class PageController extends Controller
                 'accent'  => '#C9904E',
                 'tagline' => 'Sedikit baris kode, banyak <em>dukungan moral</em>.',
                 'socials' => [
-                    ['icon' => 'fa-brands fa-github',    'url' => '#', 'label' => 'GitHub'],
+                    ['icon' => 'fa-brands fa-github',    'url' => 'https://github.com/rifkiabdillahmuis-sawit-enjoyer', 'label' => 'GitHub'],
                     ['icon' => 'fa-brands fa-instagram', 'url' => '#', 'label' => 'Instagram'],
                 ],
-                'avatar'  => 'assets/team/zaki-alfarizi.jpg',
+                'avatar'  => 'assets/team/muiz.jpg',
             ],
             // ── Anggota baru (3) — nama/foto masih placeholder; peran/tagline final. ──
             [
@@ -313,7 +313,7 @@ class PageController extends Controller
                 'nama'    => 'Heykal Fadhila Mudzaki',
                 'peran'   => 'Digital Artist',
                 'accent'  => '#9B7EBD',
-                'tagline' => 'Gambar dulu, baru mikir kenapa bagus.',
+                'tagline' => 'Satu piring aja',
                 'socials' => [
                     ['icon' => 'fa-brands fa-instagram', 'url' => '#', 'label' => 'Instagram'],
                 ],
@@ -323,11 +323,11 @@ class PageController extends Controller
                 'nama'    => 'Bintang Fachria Luckyano',
                 'peran'   => 'Content Manager',
                 'accent'  => '#D9A441',
-                'tagline' => 'Kontribusi yang ringkas, tapi konsisten.',
+                'tagline' => '<strong>Umi bintang izin umi</strong>',
                 'socials' => [
-                    ['icon' => 'fa-brands fa-instagram', 'url' => '#', 'label' => 'Instagram'],
+                    ['icon' => 'fa-brands fa-instagram', 'url' => 'https://www.instagram.com/arthfiscl?igsh=azRqb3Bnbjg2dHNo&igsi=azRqb3Bnbjg2dHNo', 'label' => 'Instagram'],
                 ],
-                'avatar'  => 'assets/team/anggota-7.jpg',
+                'avatar'  => 'assets/team/bintang.jpg',
             ],
         ];
 

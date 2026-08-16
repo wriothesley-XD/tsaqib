@@ -7,7 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TSAQIB - Forum Studi Islam SMAN 1 Bukittinggi</title>
     @vite('resources/css/app.css')
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -192,58 +191,6 @@
         @media (prefers-reduced-motion: reduce){
             *{ transition-duration:.01ms !important; animation-duration:.01ms !important; }
         }
-
-        /* ===== Reveal saat scroll: section BERITA/Buletin muncul fade+slide-up =====
-           Dipicu IntersectionObserver (lihat <script> bawah) yang menambah .is-revealed.
-           Awalnya hidden (opacity:0 + translateY); saat .is-revealed, kembali ke posisi.
-           Stagger: featured dulu, lalu tiap kartu daftar bergantian. */
-        .kabar-reveal{ opacity:0; transform:translateY(34px); transition:opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); }
-        .kabar-reveal.is-revealed{ opacity:1; transform:translateY(0); }
-        .kabar-reveal-stagger > *{ opacity:0; transform:translateY(26px); transition:opacity .6s cubic-bezier(.22,1,.36,1) both, transform .6s cubic-bezier(.22,1,.36,1) both; }
-        .kabar-reveal-stagger.is-revealed > *:nth-child(1){ transition-delay:.06s; }
-        .kabar-reveal-stagger.is-revealed > *:nth-child(2){ transition-delay:.16s; }
-        .kabar-reveal-stagger.is-revealed > *:nth-child(3){ transition-delay:.26s; }
-        .kabar-reveal-stagger.is-revealed > *:nth-child(4){ transition-delay:.36s; }
-        .kabar-reveal-stagger.is-revealed > *{ opacity:1; transform:translateY(0); }
-
-        /* Featured: angkat halus saat hover (gambar di dalamnya ikut zoom via group-hover). */
-        .kabar-featured{ transition:transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s ease; }
-        .kabar-featured:hover{ transform:translateY(-6px); box-shadow:0 30px 60px -20px rgba(0,0,0,.6); }
-
-        /* ===== Reveal section "Jelajahi Komunitas" (stagger fade + slide-up) =====
-           Pola SAMA dengan .kabar-reveal di atas: grid diberi [data-reveal] (lihat
-           markup), IntersectionObserver menambah .is-revealed; tiap kartu (anak
-           grid) awalnya hidden lalu muncul bergantian via nth-child delay.
-           translate 20px, ~.45s ease-out, jeda antar-kartu ~70ms. */
-        .kom-reveal > *{ opacity:0; transform:translateY(20px);
-            transition:opacity .45s cubic-bezier(.22,1,.36,1) both, transform .45s cubic-bezier(.22,1,.36,1) both,
-                       border-color .25s ease, box-shadow .25s ease; }
-        .kom-reveal.is-revealed > *{ opacity:1; transform:translateY(0); }
-        .kom-reveal.is-revealed > *:nth-child(1){ transition-delay:.07s; }
-        .kom-reveal.is-revealed > *:nth-child(2){ transition-delay:.14s; }
-        .kom-reveal.is-revealed > *:nth-child(3){ transition-delay:.21s; }
-        .kom-reveal.is-revealed > *:nth-child(4){ transition-delay:.28s; }
-        .kom-reveal.is-revealed > *:nth-child(5){ transition-delay:.35s; }
-        .kom-reveal.is-revealed > *:nth-child(6){ transition-delay:.42s; }
-        .kom-reveal.is-revealed > *:nth-child(7){ transition-delay:.49s; }
-        .kom-reveal.is-revealed > *:nth-child(8){ transition-delay:.56s; }
-        .kom-reveal.is-revealed > *:nth-child(9){ transition-delay:.63s; }
-        .kom-reveal.is-revealed > *:nth-child(10){ transition-delay:.70s; }
-        .kom-reveal.is-revealed > *:nth-child(11){ transition-delay:.77s; }
-        .kom-reveal.is-revealed > *:nth-child(12){ transition-delay:.84s; }
-        .kom-reveal.is-revealed > *:nth-child(13){ transition-delay:.91s; }
-        /* Hover: angkat halus + skala kecil + border emerald/gold (di samping
-           efek group-hover warna yang sudah ada di markup kartu). */
-        .kom-card{ will-change:transform; }
-        .kom-card:hover{ transform:translateY(-4px) scale(1.015) !important;
-            border-color:var(--gold) !important; box-shadow:0 18px 40px -18px rgba(201,166,107,.4); }
-
-        @media (prefers-reduced-motion: reduce){
-            .kabar-reveal, .kabar-reveal-stagger > *{ opacity:1 !important; transform:none !important; transition:none !important; }
-            .kabar-featured:hover{ transform:none; }
-            .kom-reveal > *{ opacity:1 !important; transform:none !important; transition:none !important; }
-            .kom-card:hover{ transform:none !important; }
-        }
     </style>
 </head>
 <body class="antialiased">
@@ -286,7 +233,7 @@
             <div class="flex flex-wrap items-center gap-4 mt-8">
                 <a href="{{ route('open.recruitment') }}" class="cta-primary inline-flex items-center gap-2.5 text-white font-label font-bold text-xs sm:text-sm px-6 py-3.5 rounded-full">
                     <i class="fa-solid fa-user-plus text-xs"></i>
-                    <span>Daftar Jadi Anggota</span>
+                    <span>Daftar Jadi Anggota FSI</span>
                 </a>
             </div>
         </div>
@@ -403,19 +350,19 @@
         </div>
     </main>
 
-    {{-- ================= BERITA (feed gabungan Berita + Buletin) =================
-         Layout: KIRI 1 kartu BESAR (featured = item terbaru) + KANAN daftar kartu
-         kecil berjajar. Feed = News terpublikasi + Book kategori 'buletin', diurutkan
-         terbaru (date desc). Mobile: featured di atas, daftar di bawah (full width). --}}
+    {{-- ================= BERITA (bg hijau gelap — 3 kartu gambar terbaru) =================
+         3 berita terpublikasi terbaru sebagai kartu gambar full-bleed (rasio 4:5).
+         Berita paling baru (pertama di-loop) ditandai "Unggulan" lewat badge emas.
+         Tanpa slot kosong: kalau jumlah berita < 3, grid tetap rapi dengan yang ada.
+
+         Catatan layout:
+         • mt-auto DIHAPUS — sebelumnya bersaing dgn flex-1 <main> & mt-auto <footer>,
+           memunculkan gap kosong yang nggak konsisten di atas section.
+         • pt ada di <section> (transparent, section tak punya bg) → memisahkan band
+           dari hero. Background hijau dipindah ke inner div full-width.
+         • grid pakai items-start agar aspect-ratio 4:5 kartu nggak ditimpa align-stretch. --}}
     @if($kabarTerbaru->isNotEmpty())
-        @php
-            $featured = $kabarTerbaru->first();
-            $others = $kabarTerbaru->slice(1);
-            $fallbackBg = 'background:linear-gradient(155deg,#0f7a5c 0%,#0a4a3a 100%);';
-            // Ikon FA per tipe, dipakai badge & placeholder gambar.
-            $iconOf = fn ($type) => $type === 'berita' ? 'fa-newspaper' : 'fa-book-open';
-        @endphp
-    <section class="kabar-reveal relative z-10 w-full pt-16 sm:pt-20" data-reveal>
+    <section class="relative z-10 w-full pt-16 sm:pt-20">
         <div class="w-full" style="background:linear-gradient(180deg,#0a2e2218 0%,#0618125a 100%);">
             <div class="max-w-7xl mx-auto px-5 sm:px-8 py-12 sm:py-16">
 
@@ -431,107 +378,46 @@
                     </a>
                 </div>
 
-                {{-- Split 60/40 (desktop). Mobile: 1 kolom, featured lalu daftar. --}}
-                <div class="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-5 sm:gap-6">
+                {{-- Grid 3 kartu gambar (1 kolom mobile → 2 tablet → 3 desktop).
+                     items-start: kartu memakai tinggi aspect-ratio-nya sendiri, BUKAN
+                     direnteng-reng ke tinggi baris (align-stretch menimpa aspect-ratio). --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 items-start">
+                    @foreach($kabarTerbaru as $r)
+                        <a href="{{ route('berita.show', $r->slug) }}"
+                           class="group relative block rounded-3xl overflow-hidden aspect-[4/5] shadow-lg shadow-black/30">
 
-                    {{-- ===== KARTU BESAR (featured) ===== --}}
-                    <a href="{{ $featured['url'] }}" @if($featured['target'] === '_blank') target="_blank" rel="noopener" @endif
-                       class="kabar-featured kabar-reveal group relative block rounded-3xl overflow-hidden shadow-lg shadow-black/30"
-                       data-reveal
-                       style="min-height:24rem;">
-                        @if($featured['image'])
-                            <img src="{{ asset('storage/' . $featured['image']) }}" alt="{{ $featured['title'] }}"
-                                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-                            <div class="absolute inset-0 items-center justify-center gap-3 text-white/30" style="{{ $fallbackBg }}display:none;">
-                                <i class="fa-solid {{ $iconOf($featured['type']) }} text-5xl"></i>
-                            </div>
-                        @else
-                            <div class="absolute inset-0 flex items-center justify-center gap-3 text-white/30" style="{{ $fallbackBg }}">
-                                <i class="fa-solid {{ $iconOf($featured['type']) }} text-5xl"></i>
-                            </div>
-                        @endif
-
-                        {{-- Overlay gelap di bawah demi keterbacaan teks --}}
-                        <div class="absolute inset-0" style="background:linear-gradient(180deg, rgba(6,24,18,.05) 0%, rgba(6,24,18,.35) 45%, rgba(6,24,18,.95) 100%);"></div>
-
-                        @if($featured['type'] === 'berita')
-                            <span class="absolute top-4 left-4 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-600/90 text-white font-bold uppercase tracking-wider shadow-md backdrop-blur-sm" style="font-size:11px;">
-                                <i class="fa-solid fa-newspaper" style="font-size:9px;"></i> Berita
-                            </span>
-                        @else
-                            <span class="absolute top-4 left-4 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#C9A66B] text-[#10140F] font-bold uppercase tracking-wider shadow-md backdrop-blur-sm" style="font-size:11px;">
-                                <i class="fa-solid fa-book-open" style="font-size:9px;"></i> Buletin
-                            </span>
-                        @endif
-                        <span class="absolute top-4 right-4 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#C9A66B] text-[#10140F] font-bold uppercase tracking-wider shadow-md" style="font-size:11px;">
-                            <i class="fa-solid fa-star" style="font-size:9px;"></i> Unggulan
-                        </span>
-
-                        {{-- Teks overlay: judul + excerpt 2 baris --}}
-                        <div class="absolute inset-x-0 bottom-0 z-10 p-6 sm:p-8">
-                            <div class="flex items-center gap-2 text-xs mb-2">
-                                <i class="fa-regular fa-calendar text-emerald-300/80" style="font-size:11px;"></i>
-                                <span class="text-emerald-300/80">{{ $featured['date']?->format('d M Y') }}</span>
-                                @if($featured['author'])
-                                    <span class="text-white/40">•</span>
-                                    <span class="text-white/55 truncate">{{ $featured['author'] }}</span>
-                                @endif
-                            </div>
-                            <h3 class="font-display font-extrabold text-2xl sm:text-3xl text-white leading-tight line-clamp-3">{{ $featured['title'] }}</h3>
-                            @if($featured['excerpt'])
-                                <p class="text-white/70 text-sm sm:text-base mt-2 line-clamp-2 leading-relaxed">{{ $featured['excerpt'] }}</p>
+                            {{-- Latar full-bleed: thumbnail asli, fallback gradient emerald kalau tak ada gambar --}}
+                            @if($r->thumbnail)
+                                <img src="{{ asset('storage/' . $r->thumbnail) }}" alt="{{ $r->title }}"
+                                     class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                            @else
+                                <div class="absolute inset-0" style="background:linear-gradient(155deg,#0f7a5c,#0a4a3a);"></div>
                             @endif
-                        </div>
-                    </a>
 
-                    {{-- ===== DAFTAR KARTU KECIL (kanan) =====
-                         Kartu kompak horizontal: thumb kecil kiri + teks (badge, judul,
-                         excerpt 1 baris) kanan. Berjajar vertikal, mengisi kolom kanan. --}}
-                    <div class="kabar-reveal-stagger flex flex-col gap-3 sm:gap-4" data-reveal>
-                        @foreach($others as $r)
-                            <a href="{{ $r['url'] }}" @if($r['target'] === '_blank') target="_blank" rel="noopener" @endif
-                               class="group tsaqib-card flex gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-2xl overflow-hidden hover:border-[var(--gold)]/40 transition-colors duration-200">
-                                {{-- Thumbnail kecil (rasio 4:3), placeholder ikon bila tak ada gambar --}}
-                                <div class="relative w-24 h-20 sm:w-28 sm:h-24 shrink-0 rounded-xl overflow-hidden">
-                                    @if($r['image'])
-                                        <img src="{{ asset('storage/' . $r['image']) }}" alt="{{ $r['title'] }}"
-                                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-                                        <div class="absolute inset-0 items-center justify-center text-white/30" style="{{ $fallbackBg }}display:none;">
-                                            <i class="fa-solid {{ $iconOf($r['type']) }} text-2xl"></i>
-                                        </div>
-                                    @else
-                                        <div class="absolute inset-0 flex items-center justify-center text-white/30" style="{{ $fallbackBg }}">
-                                            <i class="fa-solid {{ $iconOf($r['type']) }} text-2xl"></i>
-                                        </div>
+                            {{-- Overlay gelap di bawah demi keterbacaan teks --}}
+                            <div class="absolute inset-0" style="background:linear-gradient(180deg, rgba(6,24,18,.05) 0%, rgba(6,24,18,.35) 45%, rgba(6,24,18,.92) 100%);"></div>
+
+                            {{-- Badge emas "Unggulan" kanan-atas — hanya untuk berita terbaru (featured = pertama) --}}
+                            @if($loop->first)
+                                <span class="absolute top-3 right-3 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#C9A66B] text-[#10140F] font-bold uppercase tracking-wider shadow-md" style="font-size:10px;">
+                                    <i class="fa-solid fa-star" style="font-size:9px;"></i> Unggulan
+                                </span>
+                            @endif
+
+                            {{-- Teks overlay di bawah: judul tebal + baris meta muted (tanggal • penulis) --}}
+                            <div class="absolute inset-x-0 bottom-0 z-10 p-5 sm:p-6">
+                                <div class="flex items-center gap-2 text-[11px] mb-2">
+                                    <i class="fa-regular fa-calendar text-emerald-300/80" style="font-size:10px;"></i>
+                                    <span class="text-emerald-300/80">{{ $r->published_at?->format('d M Y') }}</span>
+                                    @if($r->user)
+                                        <span class="text-white/40">•</span>
+                                        <span class="text-white/55 truncate">{{ $r->user->name }}</span>
                                     @endif
                                 </div>
-
-                                {{-- Badges + judul + excerpt 1 baris --}}
-                                <div class="min-w-0 flex-1 flex flex-col">
-                                    <div class="flex items-center gap-1.5 mb-1.5">
-                                        @if($r['type'] === 'berita')
-                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-600/90 text-white font-bold uppercase tracking-wider shadow" style="font-size:9px;">
-                                                <i class="fa-solid fa-newspaper" style="font-size:8px;"></i> Berita
-                                            </span>
-                                        @else
-                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#C9A66B] text-[#10140F] font-bold uppercase tracking-wider shadow" style="font-size:9px;">
-                                                <i class="fa-solid fa-book-open" style="font-size:8px;"></i> Buletin
-                                            </span>
-                                        @endif
-                                        <span class="inline-flex items-center gap-1 text-emerald-300/80" style="font-size:10px;">
-                                            <i class="fa-regular fa-calendar" style="font-size:9px;"></i>{{ $r['date']?->format('d M Y') }}
-                                        </span>
-                                    </div>
-                                    <h3 class="font-display font-bold text-sm sm:text-base text-[var(--cream)] leading-snug line-clamp-2 group-hover:text-[var(--gold)] transition-colors">{{ $r['title'] }}</h3>
-                                    @if($r['excerpt'])
-                                        <p class="text-white/45 text-xs mt-1 line-clamp-1 leading-relaxed">{{ $r['excerpt'] }}</p>
-                                    @endif
-                                </div>
-                            </a>
-                        @endforeach
-                    </div>
+                                <h3 class="font-display font-bold text-lg sm:text-xl text-white leading-snug line-clamp-3">{{ $r->title }}</h3>
+                            </div>
+                        </a>
+                    @endforeach
                 </div>
 
                 {{-- Mobile "Lihat Semua" --}}
@@ -561,10 +447,10 @@
             </p>
         </div>
 
-        <div class="kom-reveal grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" data-reveal>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             @foreach($daftarKomunitas as $k)
                 <a href="{{ route('komunitas', $k['slug']) }}"
-                   class="kom-card group flex items-center gap-4 p-4 rounded-2xl bg-white/[.04] border border-white/10 hover:bg-white/[.08] transition">
+                   class="group flex items-center gap-4 p-4 rounded-2xl bg-white/[.04] border border-white/10 hover:bg-white/[.08] hover:border-white/20 transition">
                     <img src="{{ asset($k['image']) }}" alt="{{ $k['nama'] }}"
                          class="w-16 h-16 rounded-xl object-cover shrink-0 bg-white/5"
                          onerror="this.remove()">
@@ -590,9 +476,28 @@
     </section>
     @endif
 
-    {{-- Footer bersama (barisan logo instansi + badge Liivo -> /credits) — sama
-         persis dengan halaman publik lain; jangan duplikasi markup di sini. --}}
-    @include('partials.site-footer')
+    {{-- ================= FOOTER: "Rumah Baru" untuk logo instansi =================
+         Kiri (atau atas di mobile): teks hak cipta.
+         Kanan (atau bawah di mobile): barisan logo instansi pendukung, rapi & horizontal.
+         Semua logo sudah ada di public/assets/logo-instansi/ — kalau salah satu file belum
+         ada, <img>-nya otomatis hilang (onerror) tanpa merusak layout yang lain. --}}
+    <footer class="relative z-10 border-t border-white/10 mt-auto">
+        <div class="max-w-7xl w-full mx-auto px-5 sm:px-8 py-6 flex flex-col lg:flex-row items-center justify-between gap-5">
+
+            <p class="text-white text-[11px] font-label text-center lg:text-left order-2 lg:order-1">
+                &copy; {{ date('Y') }} TSAQIB &middot; Forum Studi Islam SMAN 1 Bukittinggi
+            </p>
+
+            <div class="flex items-center gap-4 sm:gap-6 order-1 lg:order-2 bg-white/[.05] border border-white/10 rounded-2xl px-5 py-3 sm:px-6 sm:py-3.5">
+                <img src="{{ asset('assets/logo-instansi/kemenag.webp') }}" alt="Kementerian Agama" title="Kementerian Agama" class="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-90 hover:opacity-100 transition" onerror="this.remove()">
+                <img src="{{ asset('assets/logo-instansi/pendidikan.webp') }}" alt="Tut Wuri Handayani" title="Tut Wuri Handayani" class="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-90 hover:opacity-100 transition" onerror="this.remove()">
+                <img src="{{ asset('assets/logo-instansi/sumbar.webp') }}" alt="Pemerintah Provinsi Sumatera Barat" title="Pemerintah Provinsi Sumatera Barat" class="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-90 hover:opacity-100 transition" onerror="this.remove()">
+                <img src="{{ asset('assets/logo-instansi/smansa.webp') }}" alt="SMAN 1 Bukittinggi" title="SMAN 1 Bukittinggi" class="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-90 hover:opacity-100 transition" onerror="this.remove()">
+                <img src="{{ asset('assets/logo-instansi/fsi.webp') }}" alt="Forum Studi Islam" title="Forum Studi Islam" class="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-90 hover:opacity-100 transition" onerror="this.remove()">
+            </div>
+
+        </div>
+    </footer>
 </div>
 
 <script>
@@ -724,32 +629,6 @@
         window.addEventListener('resize', measure, { passive: true });
 
         requestAnimationFrame(tick);
-    })();
-
-    // ===== Reveal section BERITA/Buletin saat masuk viewport =====
-    // Elemen bertanda [data-reveal] awalnya hidden (lihat .kabar-reveal di <style>).
-    // Saat terlihat, kelas .is-revealed ditambahkan → fade + slide-up masuk.
-    // Stagger (.kabar-reveal-stagger) membuat anak-anaknya muncul bergantian.
-    (function () {
-        var revealEls = document.querySelectorAll('[data-reveal]');
-        if (!revealEls.length) return;
-
-        // Tanpa IntersectionObserver (browser lama) → tampilkan langsung.
-        if (!('IntersectionObserver' in window)) {
-            revealEls.forEach(function (el) { el.classList.add('is-revealed'); });
-            return;
-        }
-
-        var io = new IntersectionObserver(function (entries) {
-            entries.forEach(function (entry) {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-revealed');
-                    io.unobserve(entry.target);
-                }
-            });
-        }, { rootMargin: '0px 0px -12% 0px', threshold: 0.12 });
-
-        revealEls.forEach(function (el) { io.observe(el); });
     })();
 </script>
 

@@ -90,6 +90,35 @@
         #lb-item img,#lb-item video{ max-height:72vh; }
         .lb-prev{ left:.75rem; } .lb-next{ right:.75rem; }
     }
+
+    /* ===== SIDEBAR KOMUNITAS (lg+) + CHIP FILTER MOBILE =====
+       Nilai diambil dari .genre-link/.genre-pill perpustakaan (didefinisikan lokal
+       di view itu, bukan global) agar bahasa visual sidebar seragam antar-halaman. */
+    .k-nav-link{ display:flex; align-items:center; gap:.6rem; padding:.5rem .6rem;
+        border-radius:.65rem; font-size:.75rem; font-weight:600;
+        color:rgba(247,245,239,.65); transition:background .15s ease,color .15s ease; }
+    .k-nav-link:hover{ background:rgba(247,245,239,.05); color:var(--cream); }
+    .k-nav-link.active{ background:rgba(1,121,95,.2); color:var(--cream); }
+    .k-count{ margin-left:auto; font-size:10px; font-weight:700; padding:2px 8px;
+        border-radius:999px; background:rgba(247,245,239,.06); color:rgba(247,245,239,.45); }
+    .k-nav-link.active .k-count{ background:rgba(201,166,107,.2); color:var(--gold); }
+
+    .k-chip{ display:inline-flex; align-items:center; gap:.4rem; padding:.45rem .8rem;
+        border-radius:999px; border:1px solid rgba(247,245,239,.12);
+        background:rgba(247,245,239,.05); color:rgba(247,245,239,.7);
+        font-size:11px; font-weight:600; transition:background .15s ease,color .15s ease; }
+    .k-chip:hover{ background:rgba(247,245,239,.1); color:var(--cream); }
+    .k-chip.active{ background:rgba(1,121,95,.28); color:var(--gold); border-color:rgba(201,166,107,.35); }
+
+    /* Menu "..." (Edit/Hapus) — dropdown kecil kanan-atas kartu. */
+    .k-menu{ position:relative; }
+    .k-menu > summary{ list-style:none; }
+    .k-menu > summary::-webkit-details-marker{ display:none; }
+    .k-menu-panel{ position:absolute; right:0; top:calc(100% + 4px); min-width:9rem; z-index:30;
+        background:#161a14; border:1px solid rgba(247,245,239,.12); border-radius:.65rem;
+        padding:4px; box-shadow:0 12px 32px rgba(0,0,0,.5); }
+    .k-menu-item{ display:flex; align-items:center; gap:.55rem; width:100%; text-align:left;
+        padding:.5rem .6rem; border-radius:.5rem; font-size:12px; font-weight:600; transition:background .15s ease,color .15s ease; }
 </style>
 @endpush
 
@@ -103,7 +132,7 @@
     <!-- Unified TSAQIB Navbar -->
     @include('partials.navbar')
 
-    <main class="flex-1 max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-10 space-y-6 w-full">
+    <main class="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6 w-full">
 
         <!-- Title Banner -->
         <div class="tsaqib-card p-6">
@@ -125,6 +154,65 @@
                 @endauth
             </div>
         </div>
+
+        {{-- Dua kolom (Reddit-style): sidebar komunitas sticky (lg+) + feed.
+             Pola grid mengikuti perpustakaan.blade.php. minmax(0,1fr) wajib agar
+             media-grid di kartu post tidak melebarkan track kolom. --}}
+        <div class="lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6 xl:gap-8">
+
+            {{-- ============ SIDEBAR KIRI: daftar komunitas (lg+) ============ --}}
+            <aside class="hidden lg:block">
+                <div class="sticky top-24">
+                    <nav class="tsaqib-card p-2 space-y-0.5">
+                        <p class="px-2 mb-1 text-[10px] font-bold uppercase tracking-wider text-white/40">Komunitas FSI</p>
+
+                        {{-- "Semua" pakai slug eksplisit: /komunitas polos akan
+                             me-redirect user login ke selected_community-nya. --}}
+                        <a href="{{ route('komunitas', 'semua') }}"
+                           class="k-nav-link {{ $currentSlug === 'semua' ? 'active' : '' }}"
+                           {{ $currentSlug === 'semua' ? 'aria-current="page"' : '' }}>
+                            <span class="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-layer-group text-[var(--gold)] text-xs"></i>
+                            </span>
+                            <span class="min-w-0 flex-1 truncate">Semua</span>
+                            <span class="k-count">{{ $totalSemua }}</span>
+                        </a>
+
+                        @foreach($komunitasSidebar as $k)
+                            <a href="{{ route('komunitas', $k['slug']) }}"
+                               class="k-nav-link {{ $currentSlug === $k['slug'] ? 'active' : '' }}"
+                               {{ $currentSlug === $k['slug'] ? 'aria-current="page"' : '' }}>
+                                <img src="{{ asset($k['image']) }}" alt="" loading="lazy" onerror="this.remove()"
+                                     class="w-9 h-9 rounded-lg object-cover shrink-0 bg-white/5">
+                                <span class="min-w-0 flex-1 truncate">{{ $k['nama'] }}</span>
+                                <span class="k-count">{{ $k['total'] }}</span>
+                            </a>
+                        @endforeach
+                    </nav>
+                </div>
+            </aside>
+
+            {{-- ============ KOLOM KANAN: feed (search/tabs/postingan) ============ --}}
+            <div class="min-w-0 space-y-6">
+
+                {{-- Chip filter mobile (< lg) — pengganti sidebar, baris horizontal
+                     yang bisa digeser. -mx bleed agar chip terpotong menandakan
+                     masih ada isi (padding main naik ke px-6 di sm). --}}
+                <div class="lg:hidden flex gap-2 overflow-x-auto -mx-4 px-4 sm:-mx-6 sm:px-6 pb-1" style="scrollbar-width:none;">
+                    <a href="{{ route('komunitas', 'semua') }}"
+                       class="k-chip shrink-0 whitespace-nowrap {{ $currentSlug === 'semua' ? 'active' : '' }}">
+                        <i class="fa-solid fa-layer-group text-[10px] text-[var(--gold)]"></i> Semua
+                        <span class="opacity-60 ml-0.5">{{ $totalSemua }}</span>
+                    </a>
+                    @foreach($komunitasSidebar as $k)
+                        <a href="{{ route('komunitas', $k['slug']) }}"
+                           class="k-chip shrink-0 whitespace-nowrap {{ $currentSlug === $k['slug'] ? 'active' : '' }}">
+                            <img src="{{ asset($k['image']) }}" alt="" loading="lazy" onerror="this.remove()"
+                                 class="w-5 h-5 rounded object-cover">
+                            {{ $k['nama'] }} <span class="opacity-60 ml-0.5">{{ $k['total'] }}</span>
+                        </a>
+                    @endforeach
+                </div>
 
         <!-- Search bar — cari postingan di feed (parameter ?q=, diproses di PageController::komunitasIndex) -->
         <div class="tsaqib-card p-3 sm:p-4">
@@ -166,12 +254,13 @@
 @endforeach
         </div>
 
-        <!-- POSTS TIMELINE FEED -->
-        <div class="space-y-4">
+        {{-- POSTS TIMELINE FEED — kartu ala Reddit: kartu terpisah ber-spacing,
+             media full-bleed (overflow-hidden), hover bawaan .tsaqib-card. --}}
+        <div class="space-y-4 sm:space-y-5">
             @forelse($posts as $post)
-                <article class="tsaqib-card p-6 transition duration-150 cursor-pointer"
+                <article class="tsaqib-card overflow-hidden cursor-pointer transition duration-150"
                          data-post-url="{{ route('komunitas.post.show', $post->id) }}">
-                    @include('komunitas._post-card', ['post' => $post, 'showManage' => true])
+                    @include('komunitas._post-card', ['post' => $post, 'showManage' => true, 'compact' => true])
 
                     <!-- EDIT MODAL FORM -->
                     @if(Auth::check() && (Auth::id() === $post->user_id || Auth::user()->role === 'admin'))
@@ -234,6 +323,9 @@
                 {{ $posts->links('partials.pagination') }}
             </div>
         @endif
+
+            </div>{{-- /kolum kanan --}}
+        </div>{{-- /grid dua kolom --}}
 
     </main>
 
@@ -634,6 +726,16 @@
                     const data = await res.json();
                     showToast(data.already ? (data.message || 'Sudah dilaporkan') : 'Terlapor, terima kasih.');
                 } catch (err) { console.error(err); showToast('Gagal melaporkan.'); }
+            });
+        })();
+
+        /* ===== MENU "..." (Edit/Hapus pada kartu feed) ===== */
+        (function () {
+            /* Menu "...": klik di luar panel -> tutup dropdown. */
+            document.addEventListener('click', (e) => {
+                document.querySelectorAll('details.k-menu[open]').forEach((d) => {
+                    if (! d.contains(e.target)) d.removeAttribute('open');
+                });
             });
         })();
     </script>

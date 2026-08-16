@@ -86,7 +86,11 @@ class PageController extends Controller
                 ];
             });
 
-        return $berita->merge($buletin)
+        // toBase() wajib: hasil map() yang KOSONG tetap berupa Eloquent\Collection,
+        // dan merge() miliknya memanggil ->getKey() per item (item di sini array
+        // biasa) → fatal "getKey() on array" saat salah satu sumber tak ada baris.
+        return $berita->toBase()
+            ->merge($buletin->toBase())
             ->sortByDesc('date')
             ->take($limit)
             ->values();

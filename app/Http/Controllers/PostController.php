@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class PostController extends Controller
@@ -21,8 +22,17 @@ class PostController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        // FIX: sebelumnya community_slug hanya divalidasi sebagai string
+        // bebas (max:100), jadi request langsung ke endpoint ini (di luar
+        // form) bisa membuat post dengan slug yang tidak ada di daftar
+        // komunitas resmi — post itu jadi "nyasar", tidak muncul di tab
+        // komunitas manapun. Sekarang dibatasi ke slug yang benar-benar ada.
+        $slugKomunitasValid = collect(config('komunitas.daftar', []))
+            ->pluck('slug')
+            ->all();
+
         $validated = $request->validate([
-            'community_slug' => ['required', 'string', 'max:100'],
+            'community_slug' => ['required', 'string', Rule::in($slugKomunitasValid)],
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string', 'max:5000'],
             'media' => ['nullable', 'array', 'max:6'],

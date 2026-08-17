@@ -174,6 +174,18 @@
         .carousel-card:nth-child(3){ animation-delay:.25s; }
         .carousel-card:nth-child(4){ animation-delay:.35s; }
 
+        /* ===== Reveal on scroll (section BERITA): fade-up sekali per elemen.
+           Hidden-state HANYA aktif ketika JS menandai <html> dengan .js-reveal ->
+           tanpa JS (atau browser tanpa IntersectionObserver) semua tetap terlihat.
+           Delay stagger via --reveal-i (0 = kartu unggulan, 1..3 = buletin). ===== */
+        .js-reveal .reveal{
+            opacity:0;
+            transform:translateY(24px);
+            transition:opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1);
+            transition-delay:calc(var(--reveal-i,0) * 90ms);
+        }
+        .js-reveal .reveal.is-visible{ opacity:1; transform:none; }
+
         @media (prefers-reduced-motion: reduce){
             *{ transition-duration:.01ms !important; animation-duration:.01ms !important; }
         }
@@ -336,18 +348,20 @@
         </div>
     </main>
 
-    {{-- ================= BERITA (bg hijau gelap — 3 kartu gambar terbaru) =================
-         3 berita terpublikasi terbaru sebagai kartu gambar full-bleed (rasio 4:5).
-         Berita paling baru (pertama di-loop) ditandai "Unggulan" lewat badge emas.
-         Tanpa slot kosong: kalau jumlah berita < 3, grid tetap rapi dengan yang ada.
+    {{-- ================= BERITA — Varian B (asimetris 2/3 + 1/3) =================
+         Kiri (lg:col-span-2): 1 kartu berita unggulan besar (gambar full-bleed,
+         badge emas "Unggulan", judul besar + tanggal/penulis).
+         Kanan (lg:col-span-1): sidebar "Buletin terbaru" — 3 kartu horizontal
+         kecil (thumbnail persegi kiri, judul + tanggal kanan).
+         Mobile: kolom kanan menumpuk DI BAWAH kiri (grid-cols-1), tanpa overflow.
 
          Catatan layout:
-         • mt-auto DIHAPUS — sebelumnya bersaing dgn flex-1 <main> & mt-auto <footer>,
-           memunculkan gap kosong yang nggak konsisten di atas section.
          • pt ada di <section> (transparent, section tak punya bg) → memisahkan band
            dari hero. Background hijau dipindah ke inner div full-width.
-         • grid pakai items-start agar aspect-ratio 4:5 kartu nggak ditimpa align-stretch. --}}
-    @if($kabarTerbaru->isNotEmpty())
+         • grid pakai items-start agar aspect-ratio kartu tak ditimpa align-stretch.
+         • Reveal fade-up via IntersectionObserver (class .reveal di wrapper luar,
+           hover transform di kartu dalam — lihat <style> & script bawah halaman). --}}
+    @if($beritaUnggulan || $buletinTerbaru->isNotEmpty())
     <section class="relative z-10 w-full pt-16 sm:pt-20">
         <div class="w-full" style="background:linear-gradient(180deg,#0a2e2218 0%,#0618125a 100%);">
             <div class="max-w-7xl mx-auto px-5 sm:px-8 py-12 sm:py-16">
@@ -364,49 +378,111 @@
                     </a>
                 </div>
 
-                {{-- Grid 3 kartu gambar (1 kolom mobile → 2 tablet → 3 desktop).
-                     items-start: kartu memakai tinggi aspect-ratio-nya sendiri, BUKAN
-                     direnteng-reng ke tinggi baris (align-stretch menimpa aspect-ratio). --}}
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 items-start">
-                    @foreach($kabarTerbaru as $r)
-                        <a href="{{ $r['url'] }}" @if($r['target'] === '_blank') target="_blank" rel="noopener" @endif
-                           class="group relative block rounded-3xl overflow-hidden shadow-lg shadow-black/30"
-                           style="aspect-ratio:4/5;">
+                {{-- Grid 2 kolom (stack di mobile). Kiri kartu unggulan (2/3),
+                     kanan sidebar buletin (1/3). items-start: tinggi tiap kolom
+                     mengikuti kontennya sendiri, sidebar top-aligned. --}}
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 items-start">
 
-                            {{-- Latar full-bleed: thumbnail asli, fallback gradient emerald kalau tak ada gambar --}}
-                            @if($r['image'])
-                                <img src="{{ asset('storage/' . $r['image']) }}" alt="{{ $r['title'] }}"
-                                     class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                     onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
-                                <div class="absolute inset-0" style="background:linear-gradient(155deg,#0f7a5c,#0a4a3a);display:none;"></div>
-                            @else
-                                <div class="absolute inset-0" style="background:linear-gradient(155deg,#0f7a5c,#0a4a3a);"></div>
-                            @endif
+                    {{-- ===== KIRI: kartu berita unggulan (~2/3 lebar) =====
+                         Rasio 4:5 di mobile, lebih landai (16:10) sejak sm agar di
+                         lebar 2/3 desktop kartu tidak terlalu tinggi. --}}
+                    @if($beritaUnggulan)
+                        <div class="lg:col-span-2 reveal" style="--reveal-i:0;">
+                            <a href="{{ $beritaUnggulan['url'] }}"
+                               class="group relative block rounded-3xl overflow-hidden shadow-lg shadow-black/30 transition-transform duration-500 hover:-translate-y-1 aspect-[4/5] sm:aspect-[16/10]">
 
-                            {{-- Overlay gelap di bawah demi keterbacaan teks --}}
-                            <div class="absolute inset-0" style="background:linear-gradient(180deg, rgba(6,24,18,.05) 0%, rgba(6,24,18,.35) 45%, rgba(6,24,18,.92) 100%);"></div>
+                                {{-- Latar full-bleed: thumbnail asli, fallback gradient emerald kalau tak ada gambar --}}
+                                @if($beritaUnggulan['image'])
+                                    <img src="{{ asset('storage/' . $beritaUnggulan['image']) }}" alt="{{ $beritaUnggulan['title'] }}"
+                                         class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                         onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+                                    <div class="absolute inset-0" style="background:linear-gradient(155deg,#0f7a5c,#0a4a3a);display:none;"></div>
+                                @else
+                                    <div class="absolute inset-0" style="background:linear-gradient(155deg,#0f7a5c,#0a4a3a);"></div>
+                                @endif
 
-                            {{-- Badge emas "Unggulan" kanan-atas — hanya untuk berita terbaru (featured = pertama) --}}
-                            @if($loop->first)
+                                {{-- Overlay gelap di bawah demi keterbacaan teks --}}
+                                <div class="absolute inset-0" style="background:linear-gradient(180deg, rgba(6,24,18,.05) 0%, rgba(6,24,18,.35) 45%, rgba(6,24,18,.92) 100%);"></div>
+
+                                {{-- Badge emas "Unggulan" kanan-atas — kartu ini memang selalu yang unggulan --}}
                                 <span class="absolute top-3 right-3 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#C9A66B] text-[#10140F] font-bold uppercase tracking-wider shadow-md" style="font-size:10px;">
                                     <i class="fa-solid fa-star" style="font-size:9px;"></i> Unggulan
                                 </span>
-                            @endif
 
-                            {{-- Teks overlay di bawah: judul tebal + baris meta muted (tanggal • penulis) --}}
-                            <div class="absolute inset-x-0 bottom-0 z-10 p-5 sm:p-6">
-                                <div class="flex items-center gap-2 text-[11px] mb-2">
-                                    <i class="fa-regular fa-calendar text-emerald-300/80" style="font-size:10px;"></i>
-                                    <span class="text-emerald-300/80">{{ $r['date']?->format('d M Y') }}</span>
-                                    @if($r['author'])
-                                        <span class="text-white/40">•</span>
-                                        <span class="text-white/55 truncate">{{ $r['author'] }}</span>
-                                    @endif
+                                {{-- Teks overlay di bawah: judul tebal + baris meta muted (tanggal • penulis) --}}
+                                <div class="absolute inset-x-0 bottom-0 z-10 p-5 sm:p-6">
+                                    <div class="flex items-center gap-2 text-[11px] mb-2">
+                                        <i class="fa-regular fa-calendar text-emerald-300/80" style="font-size:10px;"></i>
+                                        <span class="text-emerald-300/80">{{ $beritaUnggulan['date']?->format('d M Y') }}</span>
+                                        @if($beritaUnggulan['author'])
+                                            <span class="text-white/40">•</span>
+                                            <span class="text-white/55 truncate">{{ $beritaUnggulan['author'] }}</span>
+                                        @endif
+                                    </div>
+                                    <h3 class="font-display font-bold text-xl sm:text-2xl lg:text-3xl text-white leading-snug line-clamp-3">{{ $beritaUnggulan['title'] }}</h3>
                                 </div>
-                                <h3 class="font-display font-bold text-lg sm:text-xl text-white leading-snug line-clamp-3">{{ $r['title'] }}</h3>
+                            </a>
+                        </div>
+                    @endif
+
+                    {{-- ===== KANAN: sidebar "Buletin terbaru" (~1/3 lebar) =====
+                         Kartu horizontal kecil: thumbnail persegi kiri + judul/tanggal
+                         kanan. Kalau berita kosong, sidebar melebar (col-span penuh,
+                         dibatasi max-w) agar daftar tak melar jelek full-container. --}}
+                    <aside class="@if(!$beritaUnggulan) lg:col-span-3 lg:max-w-3xl @else lg:col-span-1 @endif">
+                        <h3 class="font-label text-white text-[11px] font-bold uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-book-open text-[10px] text-[var(--gold)]"></i> Buletin terbaru
+                        </h3>
+
+                        @if($buletinTerbaru->isNotEmpty())
+                            <div class="flex flex-col gap-4">
+                                @foreach($buletinTerbaru as $b)
+                                    <div class="reveal" style="--reveal-i:{{ $loop->index + 1 }};">
+                                        <a href="{{ $b['url'] }}" @if($b['target'] === '_blank') target="_blank" rel="noopener" @endif
+                                           class="group flex items-center gap-4 p-3 rounded-2xl bg-white/[.04] border border-white/10 hover:bg-white/[.08] hover:border-white/20 transition">
+
+                                            {{-- Thumbnail persegi: cover buletin, fallback gradient + ikon buku --}}
+                                            <div class="relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden shrink-0">
+                                                @if($b['image'])
+                                                    <img src="{{ asset('storage/' . $b['image']) }}" alt="{{ $b['title'] }}"
+                                                         class="absolute inset-0 w-full h-full object-cover"
+                                                         onerror="this.remove()">
+                                                @else
+                                                    <div class="absolute inset-0" style="background:linear-gradient(155deg,#0f7a5c,#0a4a3a);"></div>
+                                                    <div class="absolute inset-0 flex items-center justify-center text-white/30">
+                                                        <i class="fa-solid fa-book-open text-xl"></i>
+                                                    </div>
+                                                @endif
+                                            </div>
+
+                                            {{-- Judul + tanggal. min-w-0 wajib agar line-clamp/truncate
+                                                 bekerja di dalam flex dan tak memicu overflow horizontal. --}}
+                                            <div class="min-w-0">
+                                                <h4 class="font-display font-bold text-sm text-[var(--cream)] leading-snug line-clamp-2 group-hover:text-[var(--gold)] transition-colors">
+                                                    {{ $b['title'] }}
+                                                </h4>
+                                                <p class="flex items-center gap-1.5 text-[11px] text-white/50 mt-1.5">
+                                                    <i class="fa-regular fa-calendar text-emerald-300/70" style="font-size:10px;"></i>
+                                                    {{ $b['date']?->format('d M Y') }}
+                                                </p>
+                                            </div>
+
+                                            <i class="fa-solid fa-arrow-right text-white/30 group-hover:text-[var(--gold)] transition-colors ml-auto shrink-0"></i>
+                                        </a>
+                                    </div>
+                                @endforeach
                             </div>
-                        </a>
-                    @endforeach
+                        @else
+                            {{-- Empty state: belum ada buletin sama sekali --}}
+                            <div class="rounded-2xl bg-white/[.03] border border-white/10 p-5 text-center">
+                                <i class="fa-solid fa-book-open text-2xl text-white/15 block mb-2"></i>
+                                <p class="text-white/45 text-xs">Belum ada edisi buletin.</p>
+                                <a href="{{ route('info', ['tab' => 'buletin']) }}" class="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 text-xs font-bold mt-2">
+                                    Lihat arsip <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                                </a>
+                            </div>
+                        @endif
+                    </aside>
                 </div>
 
                 {{-- Mobile "Lihat Semua" --}}
@@ -618,6 +694,30 @@
         window.addEventListener('resize', measure, { passive: true });
 
         requestAnimationFrame(tick);
+    })();
+
+    // ===== BERITA (Varian B): fade-up reveal saat masuk viewport ==================
+    // Sekali per elemen (unobserve setelah tampil — tak re-animasi saat scroll
+    // naik-turun). Stagger diurus CSS lewat --reveal-i (lihat .reveal di <style>).
+    // Guard: tanpa IntersectionObserver / reduced-motion / JS mati -> semua kartu
+    // tetap terlihat karena class .js-reveal (penanda hidden-state) tak pernah
+    // ditambahkan.
+    (function () {
+        var items = document.querySelectorAll('.reveal');
+        if (!items.length) return;
+        if (!('IntersectionObserver' in window)) return;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        document.documentElement.classList.add('js-reveal');
+        var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    io.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+        items.forEach(function (el) { io.observe(el); });
     })();
 </script>
 

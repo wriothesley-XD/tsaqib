@@ -22,52 +22,57 @@ class PageController extends Controller
         // Data komunitas untuk preview publik di landing (tamu bisa lihat, tanpa auth).
         $daftarKomunitas = Config::get('komunitas.daftar', []);
 
-        // Section "BERITA" di Beranda kini menampilkan feed GABUNGAN:
-        // Berita (News terpublikasi) + Buletin (Book kategori 'buletin'), diurutkan
-        // terbaru. Layout asimetris: 1 kartu besar (featured) + beberapa kartu kecil.
-        $kabarTerbaru = $this->kabarGabungan(4);
+        // Section "BERITA" (Varian B): kiri = 1 berita unggulan besar, kanan =
+        // sidebar 3 buletin terbaru. Dua query terpisah (bukan feed gabungan)
+        // agar tiap kolom dijamin berisi tipe konten yang benar.
+        $beritaUnggulan = $this->beritaUnggulan();
+        $buletinTerbaru = $this->buletinTerbaru(3);
 
-        return view('landing', compact('daftarKomunitas', 'kabarTerbaru'));
+        return view('landing', compact('daftarKomunitas', 'beritaUnggulan', 'buletinTerbaru'));
     }
 
     /**
-     * Feed gabungan Berita + Buletin untuk section "BERITA" di Beranda.
+     * Berita terpublikasi terbaru untuk kartu besar "Unggulan" (kolom kiri
+     * section BERITA di Beranda). Null kalau belum ada berita → view
+     * menyembunyikan kolom kiri dan sidebar mengambil lebar penuh.
      *
-     * Mengambil 3 item terbaru dari kedua sumber sekaligus, lalu menyatukan &
-     * mengurutkan ulang berdasarkan tanggal terbaru. Tiap item dinormalisasi ke
-     * bentuk yang bisa di-loop di view tanpa peduli tipenya:
-     *
-     *   type  : 'berita' | 'buletin'   ← dipakai untuk badge & link tujuan
-     *   title : string
-     *   image : path storage cover/thumbnail (atau null → fallback gradient)
-     *   date  : Carbon|null            ← untuk meta tanggal
-     *   author: string|null
-     *   url   : string                 ← link tujuan kartu
-     *   target: '_self' | '_blank'     ← Buletin PDF dibuka tab baru
-     *
-     * Catatan: ambil top-3 PER SUMBER dulu baru di-sort global. Ini menjamin
-     * 3 teratas yang benar-benar termuda di antara keduanya tanpa harus memuat
-     * seluruh tabel ke memori.
+     * Bentuk array (sama seperti mapping buletin di bawah):
+     *   title, excerpt, image (path storage thumbnail | null), date (Carbon),
+     *   author, url (route berita.show), target ('_self').
      */
-    protected function kabarGabungan(int $limit = 3)
+    protected function beritaUnggulan(): ?array
     {
-        $berita = News::published()
+        $n = News::published()
             ->with('user')
             ->orderByDesc('published_at')
-            ->limit($limit)
-            ->get()
-            ->map(fn (News $n) => [
-                'type' => 'berita',
-                'title' => $n->title,
-                'excerpt' => $n->excerpt,
-                'image' => $n->thumbnail,
-                'date' => $n->published_at,
-                'author' => $n->user?->name,
-                'url' => route('berita.show', $n->slug),
-                'target' => '_self',
-            ]);
+            ->first();
 
-        $buletin = Book::visible()
+        if (! $n) {
+            return null;
+        }
+
+        return [
+            'type' => 'berita',
+            'title' => $n->title,
+            'excerpt' => $n->excerpt,
+            'image' => $n->thumbnail,
+            'date' => $n->published_at,
+            'author' => $n->user?->name,
+            'url' => route('berita.show', $n->slug),
+            'target' => '_self',
+        ];
+    }
+
+    /**
+     * N buletin terbaru (Book kategori 'buletin', visible) untuk sidebar
+     * "Buletin terbaru" (kolom kanan section BERITA di Beranda).
+     * Kembalian selalu Collection (bisa kosong → view merender empty state).
+     *
+     * URL: PDF langsung (dibuka tab baru) atau fallback ke tab buletin /info.
+     */
+    protected function buletinTerbaru(int $limit = 3): \Illuminate\Support\Collection
+    {
+        return Book::visible()
             ->where('category', 'buletin')
             ->latest()
             ->limit($limit)
@@ -85,15 +90,6 @@ class PageController extends Controller
                     'target' => $b->pdf_path ? '_blank' : '_self',
                 ];
             });
-
-        // toBase() wajib: hasil map() yang KOSONG tetap berupa Eloquent\Collection,
-        // dan merge() miliknya memanggil ->getKey() per item (item di sini array
-        // biasa) → fatal "getKey() on array" saat salah satu sumber tak ada baris.
-        return $berita->toBase()
-            ->merge($buletin->toBase())
-            ->sortByDesc('date')
-            ->take($limit)
-            ->values();
     }
 
     /**

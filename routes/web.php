@@ -37,9 +37,11 @@ Route::get('/berita/{slug}', [NewsController::class, 'show'])->name('berita.show
 Route::get('/laboratorium-pai', [TsaqibController::class, 'laborPai'])->name('laboratorium.pai');
 Route::get('/labor', [TsaqibController::class, 'laborPai'])->name('labor');
 
-// Open Recruitment Publik (Calon Anggota Kelas X)
+// Open Recruitment Publik (Calon Anggota Kelas X). POST di-throttle: form publik
+// tanpa login — tanpa limiter, bot bisa banjiri tabel registrations + email notif.
 Route::get('/open-recruitment', [OpenRecruitmentController::class, 'showForm'])->name('open.recruitment');
-Route::post('/open-recruitment', [OpenRecruitmentController::class, 'submit'])->name('open.recruitment.submit');
+Route::post('/open-recruitment', [OpenRecruitmentController::class, 'submit'])
+    ->middleware('throttle:5,1')->name('open.recruitment.submit');
 Route::get('/open-recruitment/terima-kasih', [OpenRecruitmentController::class, 'thankYou'])->name('open.recruitment.thank-you');
 
 // Feed Komunitas — bisa dilihat oleh GUEST (tanpa login)
@@ -69,25 +71,33 @@ Route::middleware('auth')->group(function () {
     Route::get('/beranda', [PageController::class, 'beranda'])->name('beranda');
     Route::get('/dashboard', [PageController::class, 'beranda'])->name('dashboard');
 
-    // Post CRUD Actions — wajib login
-    Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+    // Post CRUD Actions — wajib login. Throttle terpisah: POST (create) lebih
+    // ketat daripada update/delete milik sendiri.
+    Route::post('/posts', [PostController::class, 'store'])
+        ->middleware('throttle:20,1')->name('posts.store');
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
 
-    // Voting (upvote/downvote) — AJAX, mengembalikan JSON
-    Route::post('/posts/{post}/vote', [PostController::class, 'vote'])->name('posts.vote');
+    // Voting (upvote/downvote) — AJAX, mengembalikan JSON. Toggle pivot — aksi
+    // ringan, limit longgar cukup untuk mencegah spam-bot tanpa mengganggu user.
+    Route::post('/posts/{post}/vote', [PostController::class, 'vote'])
+        ->middleware('throttle:60,1')->name('posts.vote');
 
     // Komentar & Repost — AJAX
-    Route::post('/posts/{post}/comments', [PostController::class, 'storeComment'])->name('posts.comments.store');
+    Route::post('/posts/{post}/comments', [PostController::class, 'storeComment'])
+        ->middleware('throttle:20,1')->name('posts.comments.store');
     Route::delete('/comments/{comment}', [PostController::class, 'destroyComment'])->name('comments.destroy');
-    Route::post('/posts/{post}/repost', [PostController::class, 'repost'])->name('posts.repost');
+    Route::post('/posts/{post}/repost', [PostController::class, 'repost'])
+        ->middleware('throttle:30,1')->name('posts.repost');
 
     // Simpan / batal simpan post (bookmark "Tersimpan") — AJAX. Pivot post_user,
     // sinkron antar perangkat & dipakai tab Tersimpan di profil.
-    Route::post('/posts/{post}/save', [PostController::class, 'toggleSave'])->name('posts.save');
+    Route::post('/posts/{post}/save', [PostController::class, 'toggleSave'])
+        ->middleware('throttle:60,1')->name('posts.save');
 
     // Lapor konten (post/comment) — AJAX
-    Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
+    Route::post('/reports', [ReportController::class, 'store'])
+        ->middleware('throttle:10,1')->name('reports.store');
 
     // Profil User
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -101,7 +111,8 @@ Route::middleware('auth')->group(function () {
     // numeric pada {user} mencegah benturan dengan route literal (mis. tidak ada).
     // CATATAN: profile.show (GET view) ada di blok publik di atas — tamu bisa lihat
     // profil (read-only). follow/unfollow/tabs/list tetap di sini (butuh login).
-    Route::post('/profile/{user}/follow', [ProfileController::class, 'follow'])->name('profile.follow')->where('user', '[0-9]+');
+    Route::post('/profile/{user}/follow', [ProfileController::class, 'follow'])
+        ->middleware('throttle:60,1')->name('profile.follow')->where('user', '[0-9]+');
     Route::delete('/profile/{user}/unfollow', [ProfileController::class, 'unfollow'])->name('profile.unfollow')->where('user', '[0-9]+');
     Route::get('/profile/{user}/followers', [ProfileController::class, 'followers'])->name('profile.followers')->where('user', '[0-9]+');
     Route::get('/profile/{user}/following', [ProfileController::class, 'following'])->name('profile.following')->where('user', '[0-9]+');
@@ -114,8 +125,10 @@ Route::middleware('auth')->group(function () {
     // GET /perpustakaan tetap publik; hanya aksi simpan yang butuh login.
     Route::post('/perpustakaan/books/{book}/toggle', [LibraryController::class, 'toggleSave'])->name('perpustakaan.toggle');
 
-    // Admin Panel (Proteksi Admin Role)
-    Route::prefix('admin-panel')->name('admin.')->group(function () {
+    // Admin Panel (Proteksi Admin Role). Middleware 'admin' menutup seluruh
+    // group di lapisan routing — method controller baru otomatis terlindungi
+    // walau lupa memanggil checkAdmin().
+    Route::prefix('admin-panel')->name('admin.')->middleware('admin')->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('index');
         // Paginasi AJAX tiap list (HTML satu halaman + metadata, JSON).
         Route::get('/list/{resource}', [AdminController::class, 'list'])->name('list');

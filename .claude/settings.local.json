@@ -118,7 +118,8 @@
       "Bash(grep -o 'if \\($isBeranda[^;]*' storage/framework/views/67362f0b0834b6440fd1f400b78246fb.php)",
       "Bash(grep -oE \"local\\\\.\\(ERROR|CRITICAL\\): [^\\\\\"]{0,110}\")",
       "Bash(echo \"---remaining object access: $?---\")",
-      "Bash(php -l resources/views/landing.blade.php)"
+      "Bash(php -l resources/views/landing.blade.php)",
+      "Bash(awk '/public function \\(index|list|updateUserRole|storeBook|updateBook|destroyBook|storeNews|updateNews|destroyNews|toggleRecruitment\\)\\\\\\(/,/^    \\\\}/' /mnt/c/Users/user/project/web/tsaqib/app/Http/Controllers/AdminController.php)"
     ]
   }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comment;
+use App\Models\Post;
 use App\Models\Report;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -22,6 +24,19 @@ class ReportController extends Controller
             'reportable_id' => ['required', 'integer'],
             'reason' => ['nullable', 'string', 'max:200'],
         ]);
+
+        // Pastikan konten yang dilaporkan benar-benar ada — tanpa ini, laporan
+        // untuk ID acak/postingan terhapus tetap masuk ke antrean moderation.
+        $exists = $validated['reportable_type'] === 'post'
+            ? Post::whereKey($validated['reportable_id'])->exists()
+            : Comment::whereKey($validated['reportable_id'])->exists();
+
+        if (! $exists) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Konten yang dilaporkan tidak ditemukan.',
+            ], 404);
+        }
 
         $already = Report::where('reporter_user_id', Auth::id())
             ->where('reportable_type', $validated['reportable_type'])

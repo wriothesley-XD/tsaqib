@@ -118,7 +118,11 @@
                         <h3 class="relative z-[1] font-display font-bold text-[17px] mt-4 text-[var(--cream)]">{{ $m['nama'] }}</h3>
                         <p class="relative z-[1] text-[11.5px] text-white/55 mt-0.5">{{ $m['peran'] }}</p>
 
-                        {{-- Tagline (dashed divider di atas). --}}
+                        {{-- Tagline (dashed divider di atas).
+                            KEAMANAN: sengaja {!{ }} (unescaped) karena tagline
+                            memakai <em> untuk aksen warna. Data HARUS tetap dari
+                            array statis $credits di file ini — JANGAN pernah
+                            hubungkan ke input user/DB, itu akan jadi stored-XSS. --}}
                         <p class="dev-tagline relative z-[1] text-[11.5px] normal-case text-white/55 leading-relaxed mt-3 pt-3 border-t border-dashed border-white/10 w-full">
                             {!! $m['tagline'] !!}
                         </p>

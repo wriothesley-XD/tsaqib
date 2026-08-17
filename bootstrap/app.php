@@ -5,6 +5,8 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Middleware\EnsureUserIsAdmin;
+
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -25,6 +27,13 @@ return Application::configure(basePath: dirname(__DIR__))
         // lalu diblokir browser sebagai mixed content. Menyetujui proxy membuat
         // skema/host mengikuti header X-Forwarded-* dari proxy.
         $middleware->trustProxies(at: '*');
+
+        // Alias middleware admin: dipasang di route group admin-panel (web.php)
+        // sebagai lapisan pertama otorisasi; checkAdmin() di controller tetap
+        // berjalan sebagai defense in depth.
+        $middleware->alias([
+            'admin' => EnsureUserIsAdmin::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

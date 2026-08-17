@@ -258,7 +258,7 @@ class PageController extends Controller
                 'nama'    => 'Galang Putra Bayu Pratama',
                 'peran'   => 'Lead Developer',
                 'accent'  => '#C9A66B',
-                'tagline' => 'Tolong hamba dalam memimpin tim ini Ya Allah 😭',
+                'tagline' => 'Menjaga arah tim dan memastikan semua bagian saling terhubung dengan baik.',
                 'socials' => [
                     ['icon' => 'fa-brands fa-github',    'url' => 'https://github.com/pejalan214', 'label' => 'GitHub'],
                     ['icon' => 'fa-brands fa-instagram', 'url' => 'https://www.instagram.com/11putrabayu1?igsh=MTUxOXJ4ZmpjNTRjcw==&igsi=MTUxOXJ4ZmpjNTRjcw==', 'label' => 'Instagram'],
@@ -269,7 +269,7 @@ class PageController extends Controller
                 'nama'    => 'Bryan Zidhan Kirana',
                 'peran'   => 'Frontend Developer',
                 'accent'  => '#34C9A0',
-                'tagline' => 'BISA SABAR DULU GA!!! UDAH BANYAK KERJAANKU 😠',
+                'tagline' => 'Menerjemahkan desain jadi antarmuka yang rapi dan enak dipakai.',
                 'socials' => [
                     ['icon' => 'fa-brands fa-github',    'url' => 'https://github.com/wriothesley-XD', 'label' => 'GitHub'],
                     ['icon' => 'fa-brands fa-instagram', 'url' => 'https://www.instagram.com/bry.luv_g?igsh=MW1meGRoa3Fta2RmaQ==&igsi=MW1meGRoa3Fta2RmaQ==', 'label' => 'Instagram'],
@@ -280,7 +280,7 @@ class PageController extends Controller
                 'nama'    => 'Khairunnisa Zahira',
                 'peran'   => 'Frontend Developer',
                 'accent'  => '#5BAFC4',
-                'tagline' => 'Apa kerjaanku ??',
+                'tagline' => 'Fokus pada detail tampilan, dari layout sampai hal-hal kecil yang sering luput dilihat.',
                 'socials' => [
                     ['icon' => 'fa-brands fa-github',    'url' => 'https://github.com/khaiz-F', 'label' => 'GitHub'],
                     ['icon' => 'fa-brands fa-instagram', 'url' => 'https://www.instagram.com/mrs.zahira?igsh=anBqaXR5OW0xeDlu&igsi=anBqaXR5OW0xeDlu', 'label' => 'Instagram'],
@@ -291,39 +291,39 @@ class PageController extends Controller
                 'nama'    => 'Rifki Abdillah Muis',
                 'peran'   => 'Backend Developer',
                 'accent'  => '#C9904E',
-                'tagline' => 'blubub blubub, bub blubub bub',
+                'tagline' => 'Membangun fondasi sistem yang bekerja diam-diam di balik layar.',
                 'socials' => [
                     ['icon' => 'fa-brands fa-github',    'url' => 'https://github.com/rifkiabdillahmuis-sawit-enjoyer', 'label' => 'GitHub'],
-                    ['icon' => 'fa-brands fa-instagram', 'url' => '#', 'label' => 'Instagram'],
+                    ['icon' => 'fa-brands fa-instagram', 'url' => 'https://www.instagram.com/rifki_abdillah_muis?igsh=c2pwMDN4bGhjbzc0', 'label' => 'Instagram'],
                 ],
-                'avatar'  => 'assets/team/muiz.jpg',
+                'avatar'  => 'assets/team/muis.jpg',
             ],
             // ── Anggota baru (3) — nama/foto masih placeholder; peran/tagline final. ──
             [
                 'nama'    => 'Dytha Aisha Qamara',
                 'peran'   => 'Digital Artist',
                 'accent'  => '#E07A9B',
-                'tagline' => 'Sketsa asal-asalan, hasil akhir nggak asal-asalan.',
+                'tagline' => 'Menerjemahkan konsep visual menjadi karya yang punya karakter.',
                 'socials' => [
-                    ['icon' => 'fa-brands fa-instagram', 'url' => '#', 'label' => 'Instagram'],
+                    ['icon' => 'fa-brands fa-instagram', 'url' => 'https://www.instagram.com/aisha_qamara?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==&igsi=ZDNlZDc0MzIxNw==', 'label' => 'Instagram'],
                 ],
-                'avatar'  => 'assets/team/anggota-5.jpg',
+                'avatar'  => 'assets/team/dhyta.jpg',
             ],
             [
                 'nama'    => 'Heykal Fadhila Mudzaki',
                 'peran'   => 'Digital Artist',
                 'accent'  => '#9B7EBD',
-                'tagline' => 'Satu piring aja',
+                'tagline' => 'Mengeksekusi ide visual dengan perhatian pada detail dan komposisi.',
                 'socials' => [
-                    ['icon' => 'fa-brands fa-instagram', 'url' => '#', 'label' => 'Instagram'],
+                    ['icon' => 'fa-brands fa-instagram', 'url' => 'https://www.instagram.com/kellz.fm/?utm_source=ig_web_button_share_sheet', 'label' => 'Instagram'],
                 ],
-                'avatar'  => 'assets/team/anggota-6.jpg',
+                'avatar'  => 'assets/team/heykal.jpg',
             ],
             [
                 'nama'    => 'Bintang Fachria Luckyano',
                 'peran'   => 'Content Manager',
                 'accent'  => '#D9A441',
-                'tagline' => 'Umi bintang izin umi',
+                'tagline' => 'Menyusun narasi dan memastikan setiap konten tersampaikan dengan jelas.',
                 'socials' => [
                     ['icon' => 'fa-brands fa-instagram', 'url' => 'https://www.instagram.com/arthfiscl?igsh=azRqb3Bnbjg2dHNo&igsi=azRqb3Bnbjg2dHNo', 'label' => 'Instagram'],
                 ],

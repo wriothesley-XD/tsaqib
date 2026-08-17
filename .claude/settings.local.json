@@ -114,7 +114,11 @@
       "Bash(timeout 30 curl -sL -H \"Accept: application/vnd.github+json\" \"https://api.github.com/repos/laravel/cloud-cli/zipball/f03d317d33867c1b511b60d8c3a7b3ddd8d29454\" -o /tmp/cloud-cli-part.zip)",
       "Bash(curl -s -o /tmp/live_perpus.html -w '%{http_code}\\\\n' https://tsaqiblandbouw.site/perpustakaan)",
       "Bash(curl -s -o /tmp/live_admin.html -w '%{http_code}\\\\n' -L https://tsaqiblandbouw.site/admin-panel)",
-      "Bash(curl -s https://tsaqiblandbouw.site/komunitas/semua -o /tmp/prod2.html -w 'HTTP %{http_code}\\\\n')"
+      "Bash(curl -s https://tsaqiblandbouw.site/komunitas/semua -o /tmp/prod2.html -w 'HTTP %{http_code}\\\\n')",
+      "Bash(grep -o 'if \\($isBeranda[^;]*' storage/framework/views/67362f0b0834b6440fd1f400b78246fb.php)",
+      "Bash(grep -oE \"local\\\\.\\(ERROR|CRITICAL\\): [^\\\\\"]{0,110}\")",
+      "Bash(echo \"---remaining object access: $?---\")",
+      "Bash(php -l resources/views/landing.blade.php)"
     ]
   }
 }

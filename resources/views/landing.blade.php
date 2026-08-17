@@ -12,20 +12,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        display: ['"Plus Jakarta Sans"', 'sans-serif'],
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                        label: ['"Plus Jakarta Sans"', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
-
     <style>
         :root{
             --cream:#F7F5EF;
@@ -383,13 +369,16 @@
                      direnteng-reng ke tinggi baris (align-stretch menimpa aspect-ratio). --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 items-start">
                     @foreach($kabarTerbaru as $r)
-                        <a href="{{ route('berita.show', $r->slug) }}"
-                           class="group relative block rounded-3xl overflow-hidden aspect-[4/5] shadow-lg shadow-black/30">
+                        <a href="{{ $r['url'] }}" @if($r['target'] === '_blank') target="_blank" rel="noopener" @endif
+                           class="group relative block rounded-3xl overflow-hidden shadow-lg shadow-black/30"
+                           style="aspect-ratio:4/5;">
 
                             {{-- Latar full-bleed: thumbnail asli, fallback gradient emerald kalau tak ada gambar --}}
-                            @if($r->thumbnail)
-                                <img src="{{ asset('storage/' . $r->thumbnail) }}" alt="{{ $r->title }}"
-                                     class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                            @if($r['image'])
+                                <img src="{{ asset('storage/' . $r['image']) }}" alt="{{ $r['title'] }}"
+                                     class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                     onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+                                <div class="absolute inset-0" style="background:linear-gradient(155deg,#0f7a5c,#0a4a3a);display:none;"></div>
                             @else
                                 <div class="absolute inset-0" style="background:linear-gradient(155deg,#0f7a5c,#0a4a3a);"></div>
                             @endif
@@ -408,13 +397,13 @@
                             <div class="absolute inset-x-0 bottom-0 z-10 p-5 sm:p-6">
                                 <div class="flex items-center gap-2 text-[11px] mb-2">
                                     <i class="fa-regular fa-calendar text-emerald-300/80" style="font-size:10px;"></i>
-                                    <span class="text-emerald-300/80">{{ $r->published_at?->format('d M Y') }}</span>
-                                    @if($r->user)
+                                    <span class="text-emerald-300/80">{{ $r['date']?->format('d M Y') }}</span>
+                                    @if($r['author'])
                                         <span class="text-white/40">•</span>
-                                        <span class="text-white/55 truncate">{{ $r->user->name }}</span>
+                                        <span class="text-white/55 truncate">{{ $r['author'] }}</span>
                                     @endif
                                 </div>
-                                <h3 class="font-display font-bold text-lg sm:text-xl text-white leading-snug line-clamp-3">{{ $r->title }}</h3>
+                                <h3 class="font-display font-bold text-lg sm:text-xl text-white leading-snug line-clamp-3">{{ $r['title'] }}</h3>
                             </div>
                         </a>
                     @endforeach

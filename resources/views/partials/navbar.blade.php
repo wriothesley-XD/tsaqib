@@ -1,6 +1,5 @@
 @php
     $currentRoute = Route::currentRouteName() ?? '';
-    $daftarKomunitasNav = \Illuminate\Support\Facades\Config::get('komunitas.daftar', []);
 
     $isKomunitasZone = str_contains($currentRoute, 'komunitas');
     $isLainnya       = str_contains($currentRoute, 'open.recruitment');
@@ -25,6 +24,12 @@
             'rel'    => 'noopener noreferrer',
             'icon'   => 'fa-message',
         ],
+        [
+            // Halaman tim pengembang (/credits) — internal link.
+            'label' => 'Tim Kami',
+            'href'  => route('credits'),
+            'icon'  => 'fa-user-group',
+        ],
     ];
 
     // Palet minimalis: tenang saat non-aktif, emas saat aktif. Indikator aktif = garis bawah emas.
@@ -45,9 +50,7 @@
         'Lainnya'          => 'fa-ellipsis',
     ];
 
-    // Jumlah komunitas (sumber kanonik: config('komunitas.daftar') — proyek tak
-    // punya tabel communities). Untuk badge pada item "Komunitas" di menu mobile.
-    $jumlahKomunitas = count($daftarKomunitasNav);
+    // Catatan: route 'beranda' (/beranda) hanya redirect ke komunitas, bukan home.
 @endphp
 
 {{-- Token tema gelap (.brand-mark, .cta-primary, CSS vars, font-display/label) di-supply
@@ -199,13 +202,11 @@
             </a>
         @endforeach
 
-        {{-- Komunitas — kartu unggulan berbingkai emas + badge jumlah + chevron. --}}
+        {{-- Komunitas — link langsung ke feed gabungan semua komunitas (bukan dropdown). --}}
         <a href="{{ route('komunitas', 'semua') }}"
-           class="mnav-komunitas {{ $isKomunitasZone ? 'is-active' : '' }}">
+           class="mnav-item {{ $isKomunitasZone ? 'is-active' : '' }}">
             <span class="mnav-ikon"><i class="fa-solid {{ $navIcon['Komunitas'] }}"></i></span>
-            <span class="mnav-label">Komunitas</span>
-            <span class="mnav-count">{{ $jumlahKomunitas }}</span>
-            <i class="fa-solid fa-chevron-right text-[11px] text-[var(--gold)]"></i>
+            <span>Komunitas</span>
         </a>
 
         @foreach($navAfter as $item)
@@ -338,28 +339,6 @@
         background:rgba(247,245,239,.06); color:var(--gold);
     }
     #mobile-menu .mnav-item.is-active .mnav-ikon{ background:rgba(201,166,107,.18); }
-
-    /* Item "Komunitas" — kartu berbingkai emas + badge jumlah + chevron. */
-    #mobile-menu .mnav-komunitas{
-        display:flex; align-items:center; gap:.85rem;
-        min-height:44px; padding:.7rem .85rem;
-        border-radius:.85rem;
-        border:1px solid rgba(201,166,107,.4);
-        background:linear-gradient(135deg, rgba(201,166,107,.10), rgba(1,121,95,.08));
-        color:var(--cream); font-weight:700; font-size:.9rem;
-        transition:background .15s ease, border-color .15s ease;
-    }
-    #mobile-menu .mnav-komunitas:hover{ background:linear-gradient(135deg, rgba(201,166,107,.16), rgba(1,121,95,.12)); border-color:rgba(201,166,107,.6); }
-    #mobile-menu .mnav-komunitas.is-active{ border-color:var(--gold); }
-    #mobile-menu .mnav-komunitas .mnav-ikon{
-        width:32px; height:32px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
-        border-radius:.6rem; font-size:.85rem; background:var(--gold); color:#10140F;
-    }
-    #mobile-menu .mnav-komunitas .mnav-label{ flex:1; min-width:0; }
-    #mobile-menu .mnav-komunitas .mnav-count{
-        font-size:10px; font-weight:800; padding:2px 8px; border-radius:999px;
-        background:var(--gold); color:#10140F;
-    }
 </style>
 
 <script>

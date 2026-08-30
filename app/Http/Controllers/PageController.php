@@ -262,13 +262,13 @@ class PageController extends Controller
                 'avatar'  => 'assets/team/galang.jpg',
             ],
             [
-                'nama'    => 'Bryan Zidhan Kirana',
+                'nama'    => 'K',
                 'peran'   => 'Frontend Developer',
                 'accent'  => '#34C9A0',
                 'tagline' => 'Menerjemahkan desain jadi antarmuka yang rapi dan enak dipakai.',
                 'socials' => [
                     ['icon' => 'fa-brands fa-github',    'url' => 'https://github.com/wriothesley-XD', 'label' => 'GitHub'],
-                    ['icon' => 'fa-brands fa-instagram', 'url' => 'https://www.instagram.com/bry.luv_g?igsh=MW1meGRoa3Fta2RmaQ==&igsi=MW1meGRoa3Fta2RmaQ==', 'label' => 'Instagram'],
+                    ['icon' => 'fa-brands fa-instagram', 'url' => 'https://www.instagram.com/kiranax_lestari?utm_source=ig_web_button_share_sheet&igsi=ZDNlZDc0MzIxNw==', 'label' => 'Instagram'],
                 ],
                 'avatar'  => 'assets/team/bren.jpg',
             ],

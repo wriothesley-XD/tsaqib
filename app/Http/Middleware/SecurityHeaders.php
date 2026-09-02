@@ -11,12 +11,15 @@ class SecurityHeaders
     {
         $response = $next($request);
 
-        // Cegah script jahat (XSS) - sesuaikan domain kalau pakai CDN/font eksternal
-        $response->headers->set('Content-Security-Policy', 
+        // Cegah script jahat (XSS) - sesuaikan domain kalau pakai CDN/font eksternal.
+        // style-src wajib memuat CDN ikon yang dipakai theme-head:
+        // cdnjs (Font Awesome) + jsdelivr (Tabler Icons) — tanpa ini semua ikon
+        // hilang dan tombol berbasis ikon (dropdown, edit/hapus, FAB) tampak mati.
+        $response->headers->set('Content-Security-Policy',
     "default-src 'self'; ".
     "script-src 'self' 'unsafe-inline'; ".
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; ".
-    "font-src 'self' https://fonts.gstatic.com; ".
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; ".
+    "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; ".
     "img-src 'self' data: https:; ".
     "connect-src 'self'; ".
     "frame-ancestors 'self';"

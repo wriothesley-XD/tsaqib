@@ -75,7 +75,8 @@ Route::middleware('auth')->group(function () {
     // ketat daripada update/delete milik sendiri.
     Route::post('/posts', [PostController::class, 'store'])
         ->middleware('throttle:20,1')->name('posts.store');
-    Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
+    Route::get('/komunitas/post/{post}/edit', [PostController::class, 'edit'])->name('komunitas.post.edit');
+    Route::put('/komunitas/post/{post}', [PostController::class, 'update'])->name('komunitas.post.update');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
 
     // Voting (upvote/downvote) — AJAX, mengembalikan JSON. Toggle pivot — aksi

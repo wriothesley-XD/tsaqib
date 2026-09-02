@@ -224,7 +224,7 @@
             subtitle="Pusat riset, praktikum ibadah, dan pembinaan karakter Pendidikan Agama Islam SMAN 1 Bukittinggi." />
 
         <!-- 1. SEJARAH SINGKAT, VISI, & MISI -->
-        <div class="lp-carousel">
+        <div id="profil" class="lp-carousel">
             <div class="lp-track lp-cards">
 
             <!-- Sejarah Singkat -->
@@ -304,7 +304,7 @@
                         data-src="{{ $profilTsaqibUrl }}"
                         aria-label="Buka flipbook Profil TSAQIB">
                     @if($coverUrl)
-                        <img src="{{ $coverUrl }}" alt="Cover Profil TSAQIB" class="lp-facade-cover" loading="lazy">
+                        <img src="{{ $coverUrl }}" alt="Cover Profil TSAQIB" width="267" height="400" class="lp-facade-cover" loading="lazy">
                     @endif
                     <span class="lp-facade-play">
                         <i class="fa-solid fa-book-open"></i>
@@ -316,7 +316,7 @@
         </div>
 
         <!-- 2. INFOGRAFIS STRUKTUR ORGANISASI -->
-        <div class="tsaqib-card p-6 sm:p-8">
+        <div id="struktur" class="tsaqib-card p-6 sm:p-8">
             <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-white/10">
                 <div class="w-10 h-10 rounded-xl bg-[#01795F] text-white flex items-center justify-center text-lg shadow-sm">
                     <i class="fa-solid fa-sitemap"></i>
@@ -329,8 +329,8 @@
 
             <!-- INFOGRAPHIC TREE NODES -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <img src="{{ asset('images/struktur.webp') }}" alt="Struktur FSI TSAQIB" class="w-full h-full rounded-xl border border-white/10 bg-white p-2 object-contain" loading="lazy" onerror="this.remove()">
-                <img src="{{ asset('images/kepengurusan.webp') }}" alt="Kepengurusan FSI TSAQIB" class="w-full h-full rounded-xl border border-white/10 bg-white p-2 object-contain" loading="lazy" onerror="this.remove()">
+                <img src="{{ asset('images/struktur.webp') }}" alt="Struktur FSI TSAQIB" width="800" height="600" class="w-full h-full rounded-xl border border-white/10 bg-white p-2 object-contain" loading="lazy" onerror="this.remove()">
+                <img src="{{ asset('images/kepengurusan.webp') }}" alt="Kepengurusan FSI TSAQIB" width="800" height="600" class="w-full h-full rounded-xl border border-white/10 bg-white p-2 object-contain" loading="lazy" onerror="this.remove()">
             </div>
         </div>
 

@@ -15,7 +15,11 @@
 {{-- $penulisLink = true bila user login & penulis post masih ada (bukan user terhapus).
      data-no-nav pada <a> mencegah klik ini memicu navigasi kartu feed ke halaman detail. --}}
 @php($penulisLink = Auth::check() && $post->user)
-@php($canManage = $showManage && Auth::check() && (Auth::id() === $post->user_id || Auth::user()->role === 'admin'))
+@can('update', $post)
+    @php($canManage = $showManage)
+@else
+    @php($canManage = false)
+@endcan
 @php($media = $post->media)
 @php($mCount = $media->count())
 @php($mCols = $mCount >= 4 ? 'cols-4' : 'cols-' . $mCount)
@@ -48,13 +52,12 @@
                     <i class="fa-solid fa-ellipsis text-sm"></i>
                 </summary>
                 <div class="k-menu-panel">
-                    <button type="button"
-                            onclick="toggleEditModal('{{ $post->id }}'); this.closest('details').removeAttribute('open');"
-                            class="k-menu-item text-white/75 hover:bg-white/10 hover:text-white">
+                    <a href="{{ route('komunitas.post.edit', $post->id) }}"
+                       class="k-menu-item text-white/75 hover:bg-white/10 hover:text-white">
                         <i class="fa-solid fa-pen w-3.5 text-center"></i> Edit
-                    </button>
+                    </a>
                     <form action="{{ route('posts.destroy', $post->id) }}" method="POST"
-                          onsubmit="return confirm('Apakah Anda yakin ingin menghapus postingan ini?');">
+                          data-confirm="Apakah Anda yakin ingin menghapus postingan ini?">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="k-menu-item text-red-400 hover:bg-red-500/10">
@@ -106,11 +109,12 @@
 
         @if ($canManage)
             <div class="flex items-center space-x-2 shrink-0" data-no-nav>
-                <button data-no-nav onclick="toggleEditModal('{{ $post->id }}')" class="text-xs text-white/60 hover:text-white font-semibold px-2.5 py-1 rounded-lg bg-white/10">
+                <a href="{{ route('komunitas.post.edit', $post->id) }}"
+                   data-no-nav class="text-xs text-white/60 hover:text-white font-semibold px-2.5 py-1 rounded-lg bg-white/10">
                     <i class="fa-solid fa-pen mr-1"></i>Edit
-                </button>
+                </a>
                 <form data-no-nav action="{{ route('posts.destroy', $post->id) }}" method="POST"
-                      onsubmit="return confirm('Apakah Anda yakin ingin menghapus postingan ini?');">
+                      data-confirm="Apakah Anda yakin ingin menghapus postingan ini?">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="text-xs text-red-400 hover:text-red-300 font-semibold px-2.5 py-1 rounded-lg bg-red-500/10">
@@ -122,8 +126,8 @@
     </div>
 
     {{-- Post Body (varian penuh): konten utuh --}}
-    <h3 class="font-bold text-base text-[var(--cream)] mb-2 leading-snug">{{ $post->title }}</h3>
-    <p class="text-xs text-white/75 leading-relaxed whitespace-pre-line mb-2">{{ $post->content }}</p>
+    <h3 class="post-title font-bold text-base text-[var(--cream)] mb-2 leading-snug">{{ $post->title }}</h3>
+    <p class="post-content text-xs text-white/75 leading-relaxed whitespace-pre-line mb-2">{{ $post->content }}</p>
 @endif
 
 {{-- Media Grid — dibagikan kedua varian. Maks 4 tile; bila lebih, tile ke-4
@@ -135,7 +139,7 @@
         @foreach ($media->take($mVisible) as $mIndex => $mItem)
             @php($mExtra = $mCount > 4 && $mIndex === 3 ? $mCount - 4 : 0)
             <div class="media-tile {{ $mCount === 1 ? 'single' : '' }}" data-no-nav data-index="{{ $mIndex }}"
-                 onclick="openLightbox(this)">
+                 data-action="open-lightbox">
                 @if ($mItem->isVideo())
                     <video src="{{ $mItem->url }}" preload="none" muted playsinline></video>
                     <div class="media-play"><i class="fa-solid fa-play"></i></div>

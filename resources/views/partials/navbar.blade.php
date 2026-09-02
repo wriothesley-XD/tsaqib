@@ -7,8 +7,6 @@
     // Menu utama (sentence case). Komunitas disisipkan di antara $navBefore & $navAfter.
     $navBefore = [
         ['label' => 'Beranda',          'href' => route('landing'),          'active' => $currentRoute === 'landing'],
-        ['label' => 'Laboratorium PAI', 'href' => route('laboratorium.pai'), 'active' => in_array($currentRoute, ['laboratorium.pai', 'labor'])],
-        ['label' => 'Perpustakaan',     'href' => route('perpustakaan'),     'active' => $currentRoute === 'perpustakaan'],
     ];
     $navAfter = [
         ['label' => 'Info', 'href' => route('info'), 'active' => $currentRoute === 'info' || $currentRoute === 'berita.show'],
@@ -59,7 +57,7 @@
 
 <header class="sticky top-0 z-[70] bg-[#10140F] border-b border-white/10 text-[var(--cream)]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16 xl:h-20 gap-4">
+        <div class="flex items-center justify-between h-16 xl:h-20 gap-8 lg:gap-10">
 
             {{-- ===== BRAND (kiri) ===== --}}
             <a href="{{ route('landing') }}" class="flex items-center gap-3 group shrink-0" title="Kembali ke Beranda">
@@ -71,7 +69,7 @@
             </a>
 
             {{-- ===== NAV TENGAH (≥ xl) — terpusat via flex-1 justify-center, BUKAN absolute ===== --}}
-            <nav class="hidden xl:flex flex-1 justify-center items-center gap-8 font-label whitespace-nowrap">
+            <nav class="hidden xl:flex flex-1 justify-center items-center gap-6 lg:gap-8 font-label whitespace-nowrap">
 
                 @foreach($navBefore as $item)
                     <a href="{{ $item['href'] }}"
@@ -80,6 +78,43 @@
                         <span class="{{ $underline($item['active']) }}"></span>
                     </a>
                 @endforeach
+
+                {{-- Laboratorium PAI dropdown --}}
+                <div class="relative inline-flex items-center">
+                    <button type="button" id="labor-toggle"
+                            class="{{ $navLinkClass }} gap-1.5 {{ $link(in_array($currentRoute, ['laboratorium.pai', 'labor'])) }}"
+                            aria-haspopup="true" aria-expanded="false" aria-controls="labor-menu">
+                        <span>Laboratorium PAI</span>
+                        <i class="fa-solid fa-chevron-down text-[8px] leading-none opacity-70 transition-transform duration-200"></i>
+                        <span class="{{ $underline(in_array($currentRoute, ['laboratorium.pai', 'labor'])) }}"></span>
+                    </button>
+                    <div id="labor-menu"
+                         class="absolute left-0 top-full pt-2.5 opacity-0 invisible z-[60]">
+                        <div class="min-w-[210px] rounded-xl border border-white/10 bg-[#161a14] ring-1 ring-black/50 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.8)] overflow-hidden py-2">
+                            <a href="{{ route('laboratorium.pai') }}#profil"
+                               class="labor-item flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-white/70 hover:text-[var(--gold)] hover:bg-white/5">
+                                <i class="fa-solid fa-building-columns text-[9px] text-white/30"></i>
+                                Profil Laboratorium
+                            </a>
+                            <a href="{{ route('laboratorium.pai') }}#modul"
+                               class="labor-item flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-white/70 hover:text-[var(--gold)] hover:bg-white/5">
+                                <i class="fa-solid fa-book-open text-[9px] text-white/30"></i>
+                                Modul Pembelajaran
+                            </a>
+                            <a href="{{ route('laboratorium.pai') }}#tugas"
+                               class="labor-item flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-white/70 hover:text-[var(--gold)] hover:bg-white/5">
+                                <i class="fa-solid fa-clipboard-check text-[9px] text-white/30"></i>
+                                Tugas Siswa
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="{{ route('perpustakaan') }}"
+                   class="{{ $navLinkClass }} {{ $link($currentRoute === 'perpustakaan') }}">
+                    Perpustakaan
+                    <span class="{{ $underline($currentRoute === 'perpustakaan') }}"></span>
+                </a>
 
                 {{-- Komunitas — link langsung ke feed gabungan semua komunitas (bukan dropdown) --}}
                 <a href="{{ route('komunitas', 'semua') }}"
@@ -131,9 +166,9 @@
             </nav>
 
             {{-- ===== KANAN: Auth (≥ xl) + Hamburger (< xl) ===== --}}
-            <div class="flex items-center gap-4 shrink-0">
+            <div class="flex items-center gap-6 lg:gap-8 shrink-0 pr-4 lg:pr-6">
 
-                <div class="hidden xl:flex items-center gap-5">
+                <div class="hidden xl:flex items-center gap-6">
                     {{-- Social media (selalu tampil; tema minimalis — brighten on hover) --}}
                     <div class="flex items-center gap-3">
                         <a href="https://www.instagram.com/fsi.smansa_landbouw?igsh=MXVzMzd5Nms0eDZpNQ==" target="_blank" rel="noopener" aria-label="TSAQIB di Instagram" class="text-white/55 hover:text-white transition-colors duration-200">
@@ -162,9 +197,14 @@
                             <x-community-avatar :user="Auth::user()" size="xs" />
                         </a>
                     @else
-                        {{-- CTA utama: satu-satunya elemen solid green di navbar --}}
-                        <a href="{{ route('login') }}"
+                        {{-- CTA buttons: primary register + secondary login --}}
+                        <a href="{{ route('register') }}"
                            class="cta-primary inline-flex items-center px-5 py-2.5 rounded-full text-xs font-bold tracking-wide text-white">
+                            <span class="hidden sm:inline">Buat Akun Tsaqib</span>
+                            <span class="sm:hidden">Daftar</span>
+                        </a>
+                        <a href="{{ route('login') }}"
+                           class="inline-flex items-center px-5 py-2.5 rounded-full text-xs font-bold tracking-wide text-white border border-white/20 hover:bg-white/5 hover:border-white/30 transition">
                             Masuk
                         </a>
                     @endauth
@@ -172,7 +212,7 @@
 
                 <button id="mobile-menu-btn" type="button"
                         aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="mobile-menu"
-                        class="xl:hidden p-2 -mr-2 text-[var(--cream)] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#01795F] rounded-full transition">
+                        class="xl:hidden p-3 -mr-3 text-[var(--cream)] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#01795F] rounded-full transition relative z-[71]">
                     <i class="fa-solid fa-bars text-xl" id="menu-icon"></i>
                 </button>
             </div>
@@ -216,6 +256,31 @@
                 <span>{{ $item['label'] }}</span>
             </a>
         @endforeach
+
+        {{-- Laboratorium PAI (mobile) — toggle ekspandable berisi submenu --}}
+        <div>
+            <button type="button" data-mobile-labor-toggle
+                    class="mnav-item w-full"
+                    aria-expanded="false" aria-controls="mobile-labor">
+                <span class="mnav-ikon"><i class="fa-solid fa-flask"></i></span>
+                <span>Laboratorium PAI</span>
+                <i class="fa-solid fa-chevron-down text-[10px] text-white/45 transition-transform duration-200 ml-auto"></i>
+            </button>
+            <div id="mobile-labor" class="hidden pl-4 border-l border-white/10 ml-6 mb-1 mt-0.5 space-y-0.5">
+                <a href="{{ route('laboratorium.pai') }}#profil"
+                   class="block py-2.5 px-2 text-sm text-white/65 hover:text-[var(--gold)] transition-colors duration-200 rounded-lg">
+                    <i class="fa-solid fa-building-columns text-[10px] mr-2 text-white/30"></i>Profil Laboratorium
+                </a>
+                <a href="{{ route('laboratorium.pai') }}#modul"
+                   class="block py-2.5 px-2 text-sm text-white/65 hover:text-[var(--gold)] transition-colors duration-200 rounded-lg">
+                    <i class="fa-solid fa-book-open text-[10px] mr-2 text-white/30"></i>Modul Pembelajaran
+                </a>
+                <a href="{{ route('laboratorium.pai') }}#tugas"
+                   class="block py-2.5 px-2 text-sm text-white/65 hover:text-[var(--gold)] transition-colors duration-200 rounded-lg">
+                    <i class="fa-solid fa-clipboard-check text-[10px] mr-2 text-white/30"></i>Tugas Siswa
+                </a>
+            </div>
+        </div>
 
         {{-- Lainnya (mobile) — toggle ekspandable berisi menu sekunder. --}}
         <div>
@@ -312,6 +377,29 @@
     #lainnya-menu.is-open .lainnya-item:nth-child(2){ transition-delay: .09s; }
     #lainnya-menu.is-open .lainnya-item:nth-child(3){ transition-delay: .13s; }
     #lainnya-menu.is-open .lainnya-item:nth-child(4){ transition-delay: .17s; }
+
+    /* ===== "Laboratorium PAI" dropdown (desktop) — animasi panel + stagger item ===== */
+    #labor-menu{
+        transform-origin: top left;
+        transform: translateY(-8px) scale(.96);
+        transition: opacity .18s ease-out, transform .18s ease-out, visibility .18s ease-out;
+    }
+    #labor-menu.is-open{
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0) scale(1);
+    }
+    #labor-toggle i{ transition: transform .2s ease-out; }
+    #labor-toggle[aria-expanded="true"] i{ transform: rotate(180deg); }
+    #labor-menu .labor-item{
+        opacity: 0;
+        transform: translateX(-6px);
+        transition: opacity .16s ease-out, transform .16s ease-out, color .15s ease, background-color .15s ease;
+    }
+    #labor-menu.is-open .labor-item{ opacity: 1; transform: translateX(0); }
+    #labor-menu.is-open .labor-item:nth-child(1){ transition-delay: .05s; }
+    #labor-menu.is-open .labor-item:nth-child(2){ transition-delay: .09s; }
+    #labor-menu.is-open .labor-item:nth-child(3){ transition-delay: .13s; }
     @media (prefers-reduced-motion: reduce){
         #lainnya-menu, #lainnya-menu .lainnya-item{
             transition: none !important;
@@ -367,7 +455,14 @@
         }
 
         if (btn && menu) {
-            btn.addEventListener('click', () => menu.classList.contains('hidden') ? openMenu() : closeMenu());
+            console.log('Mobile menu button found:', btn);
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('Mobile menu button clicked');
+                menu.classList.contains('hidden') ? openMenu() : closeMenu();
+            });
+        } else {
+            console.error('Mobile menu elements not found:', { btn, menu });
         }
         if (backdrop) {
             backdrop.addEventListener('click', closeMenu);
@@ -389,16 +484,40 @@
             });
         }
 
+        /* ============ "Laboratorium PAI" dropdown (mobile) ============ */
+        const laborToggle = document.querySelector('[data-mobile-labor-toggle]');
+        const laborPanel  = document.getElementById('mobile-labor');
+        if (laborToggle && laborPanel) {
+            const chevron = laborToggle.querySelector('i');
+            laborToggle.addEventListener('click', () => {
+                const open = !laborPanel.classList.contains('hidden');
+                laborPanel.classList.toggle('hidden', open);
+                laborToggle.setAttribute('aria-expanded', open ? 'false' : 'true');
+                if (chevron) chevron.classList.toggle('rotate-180', !open);
+            });
+        }
+
         /* ============ "Lainnya" dropdown (desktop, ≥ xl) — click-to-toggle ============
            Sebelumnya hover-only (group-hover), jadi klik (mouse biasa, touch, keyboard)
            nggak buka apa-apa. Sekarang toggle via klik + tutup otomatis saat klik di luar
            atau tekan Escape. */
+        console.log('Dropdown script loaded');
         const lainnyaBtn  = document.getElementById('lainnya-toggle');
         const lainnyaMenu = document.getElementById('lainnya-menu');
+        console.log('Lainnya elements:', { lainnyaBtn, lainnyaMenu });
         if (lainnyaBtn && lainnyaMenu) {
-            const openLainnya  = () => { lainnyaMenu.classList.add('is-open');    lainnyaBtn.setAttribute('aria-expanded', 'true'); };
-            const closeLainnya = () => { lainnyaMenu.classList.remove('is-open'); lainnyaBtn.setAttribute('aria-expanded', 'false'); };
+            const openLainnya  = () => {
+                console.log('Opening Lainnya dropdown');
+                lainnyaMenu.classList.add('is-open');
+                lainnyaBtn.setAttribute('aria-expanded', 'true');
+            };
+            const closeLainnya = () => {
+                console.log('Closing Lainnya dropdown');
+                lainnyaMenu.classList.remove('is-open');
+                lainnyaBtn.setAttribute('aria-expanded', 'false');
+            };
             lainnyaBtn.addEventListener('click', (e) => {
+                console.log('Lainnya button clicked');
                 e.stopPropagation();
                 lainnyaBtn.getAttribute('aria-expanded') === 'true' ? closeLainnya() : openLainnya();
             });
@@ -410,6 +529,37 @@
             });
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && lainnyaBtn.getAttribute('aria-expanded') === 'true') closeLainnya();
+            });
+        }
+
+        /* ============ "Laboratorium PAI" dropdown (desktop, ≥ xl) — click-to-toggle ============ */
+        const laborBtn  = document.getElementById('labor-toggle');
+        const laborMenu = document.getElementById('labor-menu');
+        console.log('Labor elements:', { laborBtn, laborMenu });
+        if (laborBtn && laborMenu) {
+            const openLabor  = () => {
+                console.log('Opening Labor dropdown');
+                laborMenu.classList.add('is-open');
+                laborBtn.setAttribute('aria-expanded', 'true');
+            };
+            const closeLabor = () => {
+                console.log('Closing Labor dropdown');
+                laborMenu.classList.remove('is-open');
+                laborBtn.setAttribute('aria-expanded', 'false');
+            };
+            laborBtn.addEventListener('click', (e) => {
+                console.log('Labor button clicked');
+                e.stopPropagation();
+                laborBtn.getAttribute('aria-expanded') === 'true' ? closeLabor() : openLabor();
+            });
+            document.addEventListener('click', (e) => {
+                if (laborBtn.getAttribute('aria-expanded') === 'true' &&
+                    !laborMenu.contains(e.target) && !laborBtn.contains(e.target)) {
+                    closeLabor();
+                }
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && laborBtn.getAttribute('aria-expanded') === 'true') closeLabor();
             });
         }
     });

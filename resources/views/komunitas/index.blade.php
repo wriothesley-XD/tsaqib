@@ -151,7 +151,7 @@
                     <p class="text-white/50 text-xs mt-0.5">Kumpulan postingan kegiatan, pengumuman, dan karya 7 komunitas FSI</p>
                 </div>
                 @auth
-                    <button onclick="openCreateModal()" class="hidden sm:inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-[#01795F] hover:bg-[#3F704D] text-white font-semibold text-xs shadow-sm transition">
+                    <button type="button" data-action="open-create" class="hidden sm:inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-[#01795F] hover:bg-[#3F704D] text-white font-semibold text-xs shadow-sm transition">
                         <i class="fa-solid fa-plus"></i>
                         <span>Buat Postingan</span>
                     </button>
@@ -264,55 +264,10 @@
         <div class="space-y-4 sm:space-y-5">
             @forelse($posts as $post)
                 <article class="tsaqib-card overflow-hidden cursor-pointer transition duration-150"
+                         data-post-id="{{ $post->id }}"
                          data-post-url="{{ route('komunitas.post.show', $post->id) }}">
                     @include('komunitas._post-card', ['post' => $post, 'showManage' => true, 'compact' => true])
 
-                    <!-- EDIT MODAL FORM -->
-                    @if(Auth::check() && (Auth::id() === $post->user_id || Auth::user()->role === 'admin'))
-                        <div id="edit-modal-{{ $post->id }}" class="hidden mt-4 pt-4 border-t border-white/10" data-no-nav>
-                            <form action="{{ route('posts.update', $post->id) }}" method="POST" enctype="multipart/form-data" class="space-y-3">
-                                @csrf
-                                @method('PUT')
-                                <div>
-                                    <label class="block text-[10px] font-bold uppercase text-white/50 mb-1">Judul Postingan</label>
-                                    <input type="text" name="title" value="{{ $post->title }}" required class="tsaqib-input w-full px-3 py-2 text-xs font-bold">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold uppercase text-white/50 mb-1">Isi Postingan</label>
-                                    <textarea name="content" rows="3" required class="tsaqib-input w-full px-3 py-2 text-xs">{{ $post->content }}</textarea>
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold uppercase text-white/50 mb-1">Media</label>
-                                    @if ($post->media->isNotEmpty())
-                                        <div class="flex gap-1 flex-wrap mb-2">
-                                            @foreach ($post->media as $mItem)
-                                                <div class="w-9 h-9 rounded overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center">
-                                                    @if ($mItem->isVideo())
-                                                        <i class="fa-solid fa-film text-xs text-[var(--gold)]"></i>
-                                                    @else
-                                                        <img src="{{ $mItem->url }}" class="w-full h-full object-cover">
-                                                    @endif
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    @endif
-                                    <div class="media-drop">
-                                        <label class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#01795F]/15 hover:bg-[#01795F]/25 text-[#3fd6b0] text-xs font-semibold cursor-pointer border border-[#01795F]/30 transition">
-                                            <i class="fa-solid fa-plus"></i> Tambahkan Foto/Video
-                                            <input type="file" name="media[]" multiple
-                                                   accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" class="sr-only">
-                                        </label>
-                                        <div class="media-preview" data-preview></div>
-                                        <div class="media-count" data-count>Biarkan kosong untuk mempertahankan media lama. Upload baru = ganti semua.</div>
-                                    </div>
-                                </div>
-                                <div class="flex justify-end space-x-2 pt-2">
-                                    <button type="button" onclick="toggleEditModal('{{ $post->id }}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 text-white/70">Batal</button>
-                                    <button type="submit" class="btn-submit px-4 py-1.5 rounded-lg text-xs font-semibold bg-[#01795F] text-white">Simpan Perubahan</button>
-                                </div>
-                            </form>
-                        </div>
-                    @endif
                 </article>
             @empty
                 <div class="tsaqib-card-flat p-8 text-center text-white/40 text-xs">
@@ -346,7 +301,7 @@
     <!-- FLOATING ACTION BUTTON (+) -->
     @auth
         <div class="fixed bottom-6 right-6 z-40">
-            <button onclick="openCreateModal()"
+            <button type="button" data-action="open-create"
                     class="w-14 h-14 rounded-full bg-[#01795F] hover:bg-[#3F704D] text-white shadow-xl flex items-center justify-center text-2xl font-bold transition-all transform hover:scale-110 focus:outline-none"
                     title="Buat Postingan Baru">
                 <i class="fa-solid fa-plus"></i>
@@ -416,13 +371,13 @@
     @endauth
 
     <!-- LIGHTBOX GALERI (navigasi, transisi, bottom-sheet mobile) -->
-    <div id="lightbox" onclick="closeLightbox()">
-        <div class="lb-stage" onclick="event.stopPropagation()">
+    <div id="lightbox">
+        <div class="lb-stage">
             <div id="lb-item"></div>
             <div class="lb-counter" id="lb-counter"></div>
-            <button class="lb-btn lb-close" onclick="closeLightbox()" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
-            <button class="lb-btn lb-prev" onclick="lbNav(-1)" aria-label="Sebelumnya"><i class="fa-solid fa-chevron-left"></i></button>
-            <button class="lb-btn lb-next" onclick="lbNav(1)" aria-label="Berikutnya"><i class="fa-solid fa-chevron-right"></i></button>
+            <button type="button" class="lb-btn lb-close" data-action="lb-close" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+            <button type="button" class="lb-btn lb-prev" data-action="lb-nav" data-dir="-1" aria-label="Sebelumnya"><i class="fa-solid fa-chevron-left"></i></button>
+            <button type="button" class="lb-btn lb-next" data-action="lb-nav" data-dir="1" aria-label="Berikutnya"><i class="fa-solid fa-chevron-right"></i></button>
         </div>
     </div>
 
@@ -443,13 +398,6 @@
             modal.classList.add('hidden');
             resetMediaIn(modal); // bersihkan pilihan media saat dibatalkan
         }
-        function toggleEditModal(id) {
-            const el = document.getElementById('edit-modal-' + id);
-            if (! el) return;
-            const willClose = ! el.classList.contains('hidden');
-            el.classList.toggle('hidden');
-            if (willClose) resetMediaIn(el);
-        }
 
         /* ===== MEDIA UPLOADER (thumbnail, validasi real-time, XOR foto/video) ===== */
         const MAX_IMG = 6, MAX_VID = 1, IMG_MAX = 3 * 1024 * 1024, VID_MAX = 30 * 1024 * 1024;
@@ -468,8 +416,12 @@
 
         function initMediaUploader(input) {
             const drop = input.closest('.media-drop');
-            const preview = drop.querySelector('[data-preview]');
-            const countEl = drop.querySelector('[data-count]');
+            const preview = drop?.querySelector('[data-preview]');
+            const countEl = drop?.querySelector('[data-count]');
+            // Input tanpa struktur uploader (mis. input "Ganti Media" di modal edit
+            // yang me-replace semua media) — lewati, jangan biarkan error di sini
+            // mematikan seluruh script blok (nav, vote, edit ikut mati).
+            if (! preview || ! countEl) return () => {};
             const submit = input.closest('form')?.querySelector('[type="submit"]');
             const current = [];
             const defaultCount = countEl.textContent;
@@ -601,6 +553,27 @@
 
         /* Batal / tombol tutup (X) — pasang via listener (kokoh & ramah CSP, bukan inline onclick) */
         document.querySelectorAll('[data-close-create]').forEach(el => el.addEventListener('click', closeCreateModal));
+
+        /* ===== AKSI UI via DELEGASI (pengganti seluruh inline onclick — aman CSP) ===== */
+        document.addEventListener('click', (e) => {
+            const el = e.target.closest('[data-action]');
+            if (! el) return;
+            const action = el.dataset.action;
+            if (action === 'open-create') { e.preventDefault(); openCreateModal(); }
+            else if (action === 'open-lightbox') { e.preventDefault(); openLightbox(el); }
+            else if (action === 'lb-close') { e.preventDefault(); closeLightbox(); }
+            else if (action === 'lb-nav') { e.preventDefault(); lbNav(parseInt(el.dataset.dir, 10) || 0); }
+        });
+
+        /* Backdrop lightbox: klik di luar .lb-stage -> tutup */
+        document.getElementById('lightbox')?.addEventListener('click', (e) => {
+            if (! e.target.closest('.lb-stage')) closeLightbox();
+        });
+
+        /* Konfirmasi hapus via delegasi (pengganti onsubmit inline) */
+        document.addEventListener('submit', (e) => {
+            if (e.target.matches('[data-confirm]') && ! confirm(e.target.dataset.confirm)) e.preventDefault();
+        });
 
         /* ===== VOTING (AJAX) ===== */
         (function () {
@@ -752,6 +725,31 @@
                 });
             });
         })();
+
+        /* ===== SCROLL TO EDITED POST ===== */
+        document.addEventListener('DOMContentLoaded', function () {
+            const postId = '{{ session('scrollToPost') ?? '' }}';
+            if (postId) {
+                const targetCard = document.querySelector('[data-post-id="' + postId + '"]');
+                if (targetCard) {
+                    setTimeout(() => {
+                        targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        targetCard.classList.add('ring-2', 'ring-[var(--gold)]');
+                        setTimeout(() => {
+                            targetCard.classList.remove('ring-2', 'ring-[var(--gold)]');
+                        }, 2000);
+                    }, 300);
+                }
+            }
+        });
+
+        /* ===== TOAST NOTIFICATION ===== */
+        const successMessage = '{{ session('success') ?? '' }}';
+        if (successMessage) {
+            document.addEventListener('DOMContentLoaded', function () {
+                showToast(successMessage);
+            });
+        }
     </script>
 
 </body>

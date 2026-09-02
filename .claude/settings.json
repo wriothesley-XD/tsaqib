@@ -1,0 +1,9 @@
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
+    "ANTHROPIC_API_KEY": "ba5bfed1cb1f400196b6be7b8cb27460.69vEko5xTxF8N9wB"
+  },
+  "enabledPlugins": {
+    "ponytail@ponytail": true
+  }
+}

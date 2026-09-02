@@ -11,12 +11,32 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
 
 class PostController extends Controller
 {
+    /**
+     * Halaman edit postingan (bukan modal) — khusus pemilik post / admin.
+     * Route: GET /komunitas/post/{post}/edit
+     */
+    public function edit(Post $post): RedirectResponse|View
+    {
+        // Bukan pemilik/admin -> balik ke detail post dgn pesan (bukan 403 polos).
+        if (! Gate::allows('update', $post)) {
+            return redirect()
+                ->route('komunitas.post.show', $post)
+                ->with('error', 'Anda tidak memiliki akses untuk mengedit postingan ini.');
+        }
+
+        $post->load(['media' => fn ($q) => $q->orderBy('order')]);
+
+        return view('komunitas.edit', ['post' => $post]);
+    }
+
     /**
      * Simpan postingan baru beserta lampiran media (foto / video).
      */
@@ -54,18 +74,24 @@ class PostController extends Controller
     }
 
     /**
-     * Update postingan milik anggota sendiri atau admin.
-     * Media diganti seluruhnya hanya bila ada upload baru (replace-all).
+     * Update postingan milik anggota sendiri atau admin (form halaman edit).
+     * Media: hapus per-item via checkbox remove_media[], tambah baru via upload —
+     * bukan replace-all, jadi media yang tidak disentuh tetap aman.
+     * Sukses -> redirect ke halaman detail post (user langsung lihat hasil edit).
      */
     public function update(Request $request, Post $post): RedirectResponse
     {
-        if ($post->user_id !== Auth::id() && Auth::user()->role !== 'admin') {
-            abort(403, 'Anda tidak memiliki hak untuk mengedit postingan ini.');
+        if (! Gate::allows('update', $post)) {
+            return redirect()
+                ->route('komunitas.post.show', $post)
+                ->with('error', 'Anda tidak memiliki akses untuk mengedit postingan ini.');
         }
 
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string', 'max:5000'],
+            'remove_media' => ['nullable', 'array'],
+            'remove_media.*' => ['integer'],
             'media' => ['nullable', 'array', 'max:6'],
             'media.*' => ['file', 'mimes:jpg,jpeg,png,webp,mp4,webm', 'max:30720'],
         ]);
@@ -75,15 +101,36 @@ class PostController extends Controller
             'content' => $validated['content'],
         ]);
 
-        if ($request->hasFile('media')) {
-            $this->deleteMediaFiles($post);
-            $post->media()->delete();
-            foreach ($this->collectMedia($request) as $row) {
-                $post->media()->create($row);
+        // Hapus media yang dicentang — hanya milik post ini (aman dari ID sembarangan).
+        $removeIds = collect($validated['remove_media'] ?? [])->map(fn ($v) => (int) $v);
+        $removedCount = 0;
+        if ($removeIds->isNotEmpty()) {
+            foreach ($post->media()->whereIn('id', $removeIds)->get() as $m) {
+                Storage::disk('public')->delete($m->path);
+                $m->delete();
+                $removedCount++;
             }
         }
 
-        return redirect()->back()->with('success', 'Postingan berhasil diperbarui!');
+        $newFiles = $request->file('media', []);
+        $newFiles = array_values(array_filter(is_array($newFiles) ? $newFiles : [], fn ($f) => $f && $f->isValid()));
+
+        // Plafon total 6 media (sisa lama + baru) — cek SEBELUM file baru disimpan.
+        $remaining = $post->media()->count() - $removedCount;
+        if ($remaining + count($newFiles) > 6) {
+            throw ValidationException::withMessages(['media' => 'Total media maksimal 6 per postingan.']);
+        }
+
+        // Aturan XOR foto/video & ukuran divalidasi di collectMedia().
+        $order = max($remaining, 0);
+        foreach ($this->collectMedia($request) as $row) {
+            $row['order'] = $order++;
+            $post->media()->create($row);
+        }
+
+        return redirect()
+            ->route('komunitas.post.show', $post)
+            ->with('success', 'Postingan berhasil diperbarui!');
     }
 
     /**
@@ -91,7 +138,7 @@ class PostController extends Controller
      */
     public function destroy(Post $post): RedirectResponse
     {
-        if ($post->user_id !== Auth::id() && Auth::user()->role !== 'admin') {
+        if (! Gate::allows('delete', $post)) {
             abort(403, 'Anda tidak memiliki hak untuk menghapus postingan ini.');
         }
 

@@ -123,13 +123,13 @@
     @include('partials.site-footer')
 
     {{-- Lightbox --}}
-    <div id="lightbox" onclick="closeLightbox()">
-        <div class="lb-stage" onclick="event.stopPropagation()">
+    <div id="lightbox">
+        <div class="lb-stage">
             <div id="lb-item"></div>
             <div class="lb-counter" id="lb-counter"></div>
-            <button class="lb-btn lb-close" onclick="closeLightbox()" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
-            <button class="lb-btn lb-prev" onclick="lbNav(-1)" aria-label="Sebelumnya"><i class="fa-solid fa-chevron-left"></i></button>
-            <button class="lb-btn lb-next" onclick="lbNav(1)" aria-label="Berikutnya"><i class="fa-solid fa-chevron-right"></i></button>
+            <button type="button" class="lb-btn lb-close" data-action="lb-close" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+            <button type="button" class="lb-btn lb-prev" data-action="lb-nav" data-dir="-1" aria-label="Sebelumnya"><i class="fa-solid fa-chevron-left"></i></button>
+            <button type="button" class="lb-btn lb-next" data-action="lb-nav" data-dir="1" aria-label="Berikutnya"><i class="fa-solid fa-chevron-right"></i></button>
         </div>
     </div>
 
@@ -196,6 +196,26 @@
             if (e.key === 'Escape') closeLightbox();
             else if (e.key === 'ArrowLeft') lbNav(-1);
             else if (e.key === 'ArrowRight') lbNav(1);
+        });
+
+        /* ===== AKSI UI via DELEGASI (pengganti inline onclick — aman CSP) ===== */
+        document.addEventListener('click', (e) => {
+            const el = e.target.closest('[data-action]');
+            if (! el) return;
+            const action = el.dataset.action;
+            if (action === 'open-lightbox') { e.preventDefault(); openLightbox(el); }
+            else if (action === 'lb-close') { e.preventDefault(); closeLightbox(); }
+            else if (action === 'lb-nav') { e.preventDefault(); lbNav(parseInt(el.dataset.dir, 10) || 0); }
+        });
+
+        /* Backdrop lightbox: klik di luar .lb-stage -> tutup */
+        document.getElementById('lightbox')?.addEventListener('click', (e) => {
+            if (! e.target.closest('.lb-stage')) closeLightbox();
+        });
+
+        /* Konfirmasi hapus via delegasi (pengganti onsubmit inline) */
+        document.addEventListener('submit', (e) => {
+            if (e.target.matches('[data-confirm]') && ! confirm(e.target.dataset.confirm)) e.preventDefault();
         });
 
         async function postJSON(url, body) {

@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preload" as="image" href="{{ asset('assets/landing/hero-photo.jpg') }}">
 
     <style>
         :root{
@@ -130,6 +131,45 @@
         }
         @media (min-width:1024px){ .card-face{ width:220px; height:320px; } }
         .card-face:hover{ transform:translateY(-10px) scale(1.015); box-shadow:0 24px 48px -14px rgba(0,0,0,.55); }
+
+        /* TSAQIB signature: Islamic 8-point star pattern (section watermark) */
+        .islamic-pattern{
+            position:absolute;
+            inset:0;
+            z-index:0;
+            opacity:0.06;
+            pointer-events:none;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(201,166,107,.3) 1px, transparent 1px),
+                radial-gradient(circle at 80% 70%, rgba(201,166,107,.3) 1px, transparent 1px),
+                radial-gradient(circle at 50% 50%, rgba(1,121,95,.2) 2px, transparent 2px);
+            background-size: 80px 80px, 120px 120px, 200px 200px;
+            background-position: 0 0, 40px 40px, 100px 100px;
+        }
+
+        /* TSAQIB signature micro-interaction: gold gradient border that "lights up" */
+        .card-face::before{
+            content:'';
+            position:absolute;
+            inset:0;
+            border-radius:22px;
+            padding:2px;
+            background:linear-gradient(135deg, transparent 40%, rgba(201,166,107,.6) 50%, transparent 60%);
+            -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite:xor;
+            mask-composite:exclude;
+            opacity:0;
+            transition:opacity .4s ease;
+            z-index:3;
+        }
+        .card-face:hover::before{
+            opacity:1;
+            animation:borderGlow 2s ease-in-out infinite;
+        }
+        @keyframes borderGlow{
+            0%, 100%{ background-position:0% 50%; }
+            50%{ background-position:100% 50%; }
+        }
         .card-face::after{
             content:'';position:absolute;inset:0;z-index:1;
             background:linear-gradient(180deg, transparent 35%, rgba(0,0,0,.75) 100%);
@@ -189,6 +229,99 @@
         @media (prefers-reduced-motion: reduce){
             *{ transition-duration:.01ms !important; animation-duration:.01ms !important; }
         }
+
+        /* ===== Scroll-reveal animations ===== */
+        .reveal-on-scroll{
+            opacity:0;
+            transform:translateY(30px);
+            transition:opacity .6s cubic-bezier(.22,1,.36,1), transform .6s cubic-bezier(.22,1,.36,1);
+        }
+        .reveal-on-scroll.is-visible{
+            opacity:1;
+            transform:translateY(0);
+        }
+        /* Stagger delays for sequential reveal */
+        .reveal-on-scroll:nth-child(1){ transition-delay:.1s; }
+        .reveal-on-scroll:nth-child(2){ transition-delay:.2s; }
+        .reveal-on-scroll:nth-child(3){ transition-delay:.3s; }
+        .reveal-on-scroll:nth-child(4){ transition-delay:.4s; }
+
+        /* Hero entrance animations */
+        .hero-entrance{
+            opacity:0;
+            transform:translateY(20px);
+            animation:heroFadeUp .8s cubic-bezier(.22,1,.36,1) forwards;
+        }
+        @keyframes heroFadeUp{
+            to{ opacity:1; transform:translateY(0); }
+        }
+        .hero-entrance:nth-child(1){ animation-delay:.1s; }
+        .hero-entrance:nth-child(2){ animation-delay:.2s; }
+        .hero-entrance:nth-child(3){ animation-delay:.3s; }
+
+        /* Feature cards styling */
+        .feature-card{
+            background:linear-gradient(155deg, rgba(247,245,239,.06), rgba(247,245,239,.02));
+            border:1px solid rgba(247,245,239,.12);
+            border-radius:20px;
+            padding:2rem;
+            transition:transform .3s cubic-bezier(.22,1,.36,1), box-shadow .3s cubic-bezier(.22,1,.36,1);
+        }
+        .feature-card:hover{
+            transform:translateY(-8px);
+            box-shadow:0 20px 40px -15px rgba(0,0,0,.4);
+        }
+
+        /* Social media style community cards */
+        .social-card{
+            background:rgba(247,245,239,.04);
+            border:1px solid rgba(247,245,239,.10);
+            border-radius:16px;
+            overflow:hidden;
+            transition:transform .3s cubic-bezier(.22,1,.36,1), box-shadow .3s cubic-bezier(.22,1,.36,1);
+        }
+        .social-card:hover{
+            transform:translateY(-6px);
+            box-shadow:0 16px 32px -12px rgba(0,0,0,.5);
+        }
+        .social-card-header{
+            display:flex;
+            align-items:center;
+            gap:.75rem;
+            padding:.75rem 1rem;
+            border-bottom:1px solid rgba(247,245,239,.08);
+        }
+        .social-card-avatar{
+            width:2.5rem;height:2.5rem;
+            border-radius:50%;
+            object-fit:cover;
+            background:rgba(247,245,239,.08);
+        }
+        .social-card-image{
+            width:100%;
+            height:200px;
+            object-fit:cover;
+        }
+        .social-card-caption{
+            padding:1rem;
+        }
+        .social-card-footer{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:.5rem 1rem 1rem;
+            font-size:.75rem;
+            color:rgba(247,245,239,.6);
+        }
+
+        /* Hide scrollbar for mobile carousel */
+        .scrollbar-hide{
+            -ms-overflow-style:none;
+            scrollbar-width:none;
+        }
+        .scrollbar-hide::-webkit-scrollbar{
+            display:none;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -210,27 +343,52 @@
 
         {{-- Kiri: branding + deskripsi + CTA utama --}}
         <div class="lg:w-[46%] pt-4 lg:pt-0">
-            <span class="eyebrow-pill">
+            <span class="eyebrow-pill hero-entrance">
                 <i class="fa-solid fa-mosque text-[10px]"></i>
                 Forum Studi Islam &middot; SMAN 1 Bukittinggi
             </span>
 
-            <h1 class="font-display font-extrabold text-[var(--cream)] leading-[1.05] mt-5 text-5xl sm:text-6xl lg:text-7xl tracking-tight">
+            <h1 class="font-display font-extrabold text-[var(--cream)] leading-[1.05] mt-5 text-5xl sm:text-6xl lg:text-7xl tracking-tight hero-entrance">
                 TSAQIB
             </h1>
-            <p class="font-display font-bold text-[var(--gold)] text-lg sm:text-xl mt-1 tracking-tight">
+            <p class="font-display font-bold text-[var(--gold)] text-lg sm:text-xl mt-1 tracking-tight hero-entrance">
                 Cerdas, Unggul, dan Berakhlak Mulia
             </p>
 
-            <p class="text-white text-sm sm:text-[15px] leading-relaxed mt-5 max-w-md">
+            <p class="text-white text-sm sm:text-[15px] leading-relaxed mt-5 max-w-md hero-entrance">
                 Wadah kaderisasi dan pengembangan diri siswa/i SMAN 1 Bukittinggi berbasis nilai-nilai
                 keislaman &mdash; menghubungkan Laboratorium PAI, Perpustakaan Digital, dan komunitas
                 minat &amp; bakat dalam satu ekosistem.
             </p>
 
+            {{-- Social proof counter strip --}}
+            <div class="flex flex-wrap items-center gap-6 mt-6 text-white/70 text-xs sm:text-sm">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-book text-[var(--gold)] text-sm"></i>
+                    <span class="counter" data-target="{{ $totalModul ?? 0 }}">0</span>
+                    <span>Modul</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-users text-[var(--gold)] text-sm"></i>
+                    <span class="counter" data-target="{{ $totalAnggota ?? 0 }}">0</span>
+                    <span>Anggota</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-people-group text-[var(--gold)] text-sm"></i>
+                    <span class="counter" data-target="{{ $totalKomunitas ?? 0 }}">0</span>
+                    <span>Circle Tersedia</span>
+                </div>
+            </div>
+
             <div class="flex flex-wrap items-center gap-4 mt-8">
-                <a href="{{ route('open.recruitment') }}" class="cta-primary inline-flex items-center gap-2.5 text-white font-label font-bold text-xs sm:text-sm px-6 py-3.5 rounded-full">
+                {{-- Platform account (primary, more prominent) --}}
+                <a href="{{ route('register') }}" class="cta-primary inline-flex items-center gap-2.5 text-white font-label font-bold text-xs sm:text-sm px-6 py-3.5 rounded-full">
                     <i class="fa-solid fa-user-plus text-xs"></i>
+                    <span>Yuk, Gabung TSAQIB!</span>
+                </a>
+                {{-- Organizational recruitment (secondary, clarified) --}}
+                <a href="{{ route('open.recruitment') }}" class="inline-flex items-center gap-2.5 text-white font-label font-bold text-xs sm:text-sm px-6 py-3.5 rounded-full border border-white/20 hover:bg-white/5 hover:border-white/30 transition">
+                    <i class="fa-solid fa-users text-xs"></i>
                     <span>Daftar Jadi Anggota FSI</span>
                 </a>
             </div>
@@ -258,8 +416,13 @@
                     {{-- Set 1: originals --}}
                     <div class="carousel-set">
                         <a href="{{ route('laboratorium.pai') }}" class="carousel-card card-face c-labor">
-                            <img src="{{ asset('assets/landing/card-labor.jpg') }}" alt="" class="card-photo" onerror="this.remove()">
-                            <i class="card-icon fa-solid fa-flask text-2xl text-white/90 mb-3"></i>
+                            <img src="{{ asset('assets/landing/card-labor.jpg') }}" alt="" width="220" height="320" class="card-photo" loading="lazy" onerror="this.remove()">
+                            <svg class="card-icon w-8 h-8 text-white/90 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M12 2L2 7v10c0 5.55 3.84 10.5 9 12 5.16-1.5 9-6.45 9-12V7l-10-5z"/>
+                                <path d="M8 10h8"/>
+                                <path d="M8 14h8"/>
+                                <path d="M12 18v-3"/>
+                            </svg>
                             <span class="card-label block font-display font-bold text-white text-lg leading-tight">Laboratorium<br>PAI</span>
                             <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">Materi, riset, dan simulasi ibadah</span>
                             <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
@@ -268,8 +431,13 @@
                         </a>
 
                         <a href="{{ route('perpustakaan') }}" class="carousel-card card-face c-perpus">
-                            <img src="{{ asset('assets/landing/card-perpus.jpg') }}" alt="" class="card-photo" onerror="this.remove()">
-                            <i class="card-icon fa-solid fa-book-open text-2xl text-white/90 mb-3"></i>
+                            <img src="{{ asset('assets/landing/card-perpus.jpg') }}" alt="" width="220" height="320" class="card-photo" loading="lazy" onerror="this.remove()">
+                            <svg class="card-icon w-8 h-8 text-white/90 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M12 2L2 7v10c0 5.55 3.84 10.5 9 12 5.16-1.5 9-6.45 9-12V7l-10-5z"/>
+                                <path d="M12 2v10m0 0l-3-3m3 3l3-3"/>
+                                <path d="M9 12l3 3 3-3"/>
+                                <circle cx="12" cy="8" r="1.5"/>
+                            </svg>
                             <span class="card-label block font-display font-bold text-white text-lg leading-tight">Perpustakaan<br>Digital</span>
                             <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">Koleksi buku &amp; referensi FSI</span>
                             <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
@@ -278,8 +446,15 @@
                         </a>
 
                         <button type="button" onclick="handleKomunitasClick()" class="carousel-card card-face c-komunitas text-left">
-                            <img src="{{ asset('assets/landing/card-komunitas.jpg') }}" alt="" class="card-photo" onerror="this.remove()">
-                            <i class="card-icon fa-solid fa-users text-2xl text-white/90 mb-3"></i>
+                            <img src="{{ asset('assets/landing/card-komunitas.jpg') }}" alt="" width="220" height="320" class="card-photo" loading="lazy" onerror="this.remove()">
+                            <svg class="card-icon w-8 h-8 text-white/90 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="M12 2v4m0 12v4m8-12h-4m-8 0H4"/>
+                                <circle cx="7" cy="7" r="1.5"/>
+                                <circle cx="17" cy="7" r="1.5"/>
+                                <circle cx="7" cy="17" r="1.5"/>
+                                <circle cx="17" cy="17" r="1.5"/>
+                            </svg>
                             <span class="card-label block font-display font-bold text-white text-lg leading-tight">Komunitas<br>TSAQIB</span>
                             <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">7 komunitas minat &amp; bakat</span>
                             <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
@@ -289,8 +464,12 @@
 
                         <a href="https://www.figma.com/proto/1Azmk9c0fapjsTICrk7hU6/Tsaqib-Adv?node-id=5-4&t=O3fg7rE3EBm3cqZ7-0&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=1%3A2"
                            target="_blank" rel="noopener noreferrer" class="carousel-card card-face c-figma">
-                            <img src="{{ asset('assets/landing/card-figma.jpg') }}" alt="" class="card-photo" onerror="this.remove()">
-                            <i class="card-icon fa-solid fa-diagram-project text-2xl text-white/90 mb-3"></i>
+                            <img src="{{ asset('assets/landing/card-figma.jpg') }}" alt="" width="220" height="320" class="card-photo" loading="lazy" onerror="this.remove()">
+                            <svg class="card-icon w-8 h-8 text-white/90 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M12 2l3 6-5 4 5 4-3 6-3-6 5-4-5-4 3-6z"/>
+                                <path d="M12 12l4 2m-4-2l-4 2"/>
+                                <circle cx="12" cy="12" r="1.5"/>
+                            </svg>
                             <span class="card-label block font-display font-bold text-white text-lg leading-tight">Prototype<br>TSAQIB</span>
                             <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">Desain awal di Figma</span>
                             <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
@@ -302,8 +481,13 @@
                     {{-- Set 2: identical duplicate (decorative) so translateX -50% loops with no seam --}}
                     <div class="carousel-set" aria-hidden="true">
                         <a href="{{ route('laboratorium.pai') }}" class="carousel-card card-face c-labor" tabindex="-1">
-                            <img src="{{ asset('assets/landing/card-labor.jpg') }}" alt="" class="card-photo" onerror="this.remove()">
-                            <i class="card-icon fa-solid fa-flask text-2xl text-white/90 mb-3"></i>
+                            <img src="{{ asset('assets/landing/card-labor.jpg') }}" alt="" width="220" height="320" class="card-photo" loading="lazy" onerror="this.remove()">
+                            <svg class="card-icon w-8 h-8 text-white/90 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M12 2L2 7v10c0 5.55 3.84 10.5 9 12 5.16-1.5 9-6.45 9-12V7l-10-5z"/>
+                                <path d="M8 10h8"/>
+                                <path d="M8 14h8"/>
+                                <path d="M12 18v-3"/>
+                            </svg>
                             <span class="card-label block font-display font-bold text-white text-lg leading-tight">Laboratorium<br>PAI</span>
                             <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">Materi, riset, dan simulasi ibadah</span>
                             <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
@@ -312,8 +496,13 @@
                         </a>
 
                         <a href="{{ route('perpustakaan') }}" class="carousel-card card-face c-perpus" tabindex="-1">
-                            <img src="{{ asset('assets/landing/card-perpus.jpg') }}" alt="" class="card-photo" onerror="this.remove()">
-                            <i class="card-icon fa-solid fa-book-open text-2xl text-white/90 mb-3"></i>
+                            <img src="{{ asset('assets/landing/card-perpus.jpg') }}" alt="" width="220" height="320" class="card-photo" loading="lazy" onerror="this.remove()">
+                            <svg class="card-icon w-8 h-8 text-white/90 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M12 2L2 7v10c0 5.55 3.84 10.5 9 12 5.16-1.5 9-6.45 9-12V7l-10-5z"/>
+                                <path d="M12 2v10m0 0l-3-3m3 3l3-3"/>
+                                <path d="M9 12l3 3 3-3"/>
+                                <circle cx="12" cy="8" r="1.5"/>
+                            </svg>
                             <span class="card-label block font-display font-bold text-white text-lg leading-tight">Perpustakaan<br>Digital</span>
                             <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">Koleksi buku &amp; referensi FSI</span>
                             <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
@@ -322,8 +511,15 @@
                         </a>
 
                         <button type="button" onclick="handleKomunitasClick()" class="carousel-card card-face c-komunitas text-left" tabindex="-1">
-                            <img src="{{ asset('assets/landing/card-komunitas.jpg') }}" alt="" class="card-photo" onerror="this.remove()">
-                            <i class="card-icon fa-solid fa-users text-2xl text-white/90 mb-3"></i>
+                            <img src="{{ asset('assets/landing/card-komunitas.jpg') }}" alt="" width="220" height="320" class="card-photo" loading="lazy" onerror="this.remove()">
+                            <svg class="card-icon w-8 h-8 text-white/90 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="M12 2v4m0 12v4m8-12h-4m-8 0H4"/>
+                                <circle cx="7" cy="7" r="1.5"/>
+                                <circle cx="17" cy="7" r="1.5"/>
+                                <circle cx="7" cy="17" r="1.5"/>
+                                <circle cx="17" cy="17" r="1.5"/>
+                            </svg>
                             <span class="card-label block font-display font-bold text-white text-lg leading-tight">Komunitas<br>TSAQIB</span>
                             <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">7 komunitas minat &amp; bakat</span>
                             <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
@@ -333,8 +529,12 @@
 
                         <a href="https://www.figma.com/proto/1Azmk9c0fapjsTICrk7hU6/Tsaqib-Adv?node-id=5-4&t=O3fg7rE3EBm3cqZ7-0&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=1%3A2"
                            target="_blank" rel="noopener noreferrer" class="carousel-card card-face c-figma" tabindex="-1">
-                            <img src="{{ asset('assets/landing/card-figma.jpg') }}" alt="" class="card-photo" onerror="this.remove()">
-                            <i class="card-icon fa-solid fa-diagram-project text-2xl text-white/90 mb-3"></i>
+                            <img src="{{ asset('assets/landing/card-figma.jpg') }}" alt="" width="220" height="320" class="card-photo" loading="lazy" onerror="this.remove()">
+                            <svg class="card-icon w-8 h-8 text-white/90 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M12 2l3 6-5 4 5 4-3 6-3-6 5-4-5-4 3-6z"/>
+                                <path d="M12 12l4 2m-4-2l-4 2"/>
+                                <circle cx="12" cy="12" r="1.5"/>
+                            </svg>
                             <span class="card-label block font-display font-bold text-white text-lg leading-tight">Prototype<br>TSAQIB</span>
                             <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">Desain awal di Figma</span>
                             <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
@@ -347,6 +547,73 @@
             </div>
         </div>
     </main>
+
+    {{-- ================= FITUR TSAQIB SECTION ================= --}}
+    <section class="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 py-16 sm:py-20">
+        <div class="text-center mb-12 reveal-on-scroll">
+            <h2 class="font-display font-extrabold text-[var(--cream)] text-2xl sm:text-3xl tracking-tight">
+                Semua yang Kamu Butuhkan, dalam Satu Platform
+            </h2>
+            <p class="text-white/60 text-sm mt-3 max-w-xl mx-auto">
+                Laboratorium PAI, Perpustakaan Digital, dan Komunitas — terhubung dalam satu ekosistem untuk mendukung perkembanganmu.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {{-- Laboratorium PAI --}}
+            <a href="{{ route('laboratorium.pai') }}" class="feature-card reveal-on-scroll">
+                <svg class="w-10 h-10 text-[var(--gold)] mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 2L2 7v10c0 5.55 3.84 10.5 9 12 5.16-1.5 9-6.45 9-12V7l-10-5z"/>
+                    <path d="M8 10h8"/>
+                    <path d="M8 14h8"/>
+                    <path d="M12 18v-3"/>
+                </svg>
+                <h3 class="font-display font-bold text-[var(--cream)] text-lg mb-2">Laboratorium PAI</h3>
+                <p class="text-white/60 text-sm leading-relaxed">
+                    Materi, riset, dan simulasi ibadah dengan pendekatan modern dan interaktif.
+                </p>
+                <div class="flex items-center gap-2 mt-4 text-[var(--gold)] text-sm font-semibold">
+                    Buka <i class="fa-solid fa-arrow-right text-xs"></i>
+                </div>
+            </a>
+
+            {{-- Perpustakaan Digital --}}
+            <a href="{{ route('perpustakaan') }}" class="feature-card reveal-on-scroll">
+                <svg class="w-10 h-10 text-[var(--gold)] mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 2L2 7v10c0 5.55 3.84 10.5 9 12 5.16-1.5 9-6.45 9-12V7l-10-5z"/>
+                    <path d="M12 2v10m0 0l-3-3m3 3l3-3"/>
+                    <path d="M9 12l3 3 3-3"/>
+                    <circle cx="12" cy="8" r="1.5"/>
+                </svg>
+                <h3 class="font-display font-bold text-[var(--cream)] text-lg mb-2">Perpustakaan Digital</h3>
+                <p class="text-white/60 text-sm leading-relaxed">
+                    Koleksi buku & referensi FSI yang dapat diakses kapan saja, di mana saja.
+                </p>
+                <div class="flex items-center gap-2 mt-4 text-[var(--gold)] text-sm font-semibold">
+                    Buka <i class="fa-solid fa-arrow-right text-xs"></i>
+                </div>
+            </a>
+
+            {{-- Komunitas --}}
+            <button onclick="handleKomunitasClick()" class="feature-card reveal-on-scroll">
+                <svg class="w-10 h-10 text-[var(--gold)] mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 2v4m0 12v4m8-12h-4m-8 0H4"/>
+                    <circle cx="7" cy="7" r="1.5"/>
+                    <circle cx="17" cy="7" r="1.5"/>
+                    <circle cx="7" cy="17" r="1.5"/>
+                    <circle cx="17" cy="17" r="1.5"/>
+                </svg>
+                <h3 class="font-display font-bold text-[var(--cream)] text-lg mb-2">Komunitas TSAQIB</h3>
+                <p class="text-white/60 text-sm leading-relaxed">
+                    7 komunitas minat & bakat untuk mengembangkan potensi dirimu bersama teman-teman.
+                </p>
+                <div class="flex items-center gap-2 mt-4 text-[var(--gold)] text-sm font-semibold">
+                    Buka <i class="fa-solid fa-arrow-right text-xs"></i>
+                </div>
+            </button>
+        </div>
+    </section>
 
     {{-- ================= BERITA — Varian B (asimetris 2/3 + 1/3) =================
          Kiri (lg:col-span-2): 1 kartu berita unggulan besar (gambar full-bleed,
@@ -446,7 +713,7 @@
                                                 @if($b['image'])
                                                     <img src="{{ asset('storage/' . $b['image']) }}" alt="{{ $b['title'] }}"
                                                          class="absolute inset-0 w-full h-full object-cover"
-                                                         onerror="this.remove()">
+                                                         loading="lazy" onerror="this.remove()">
                                                 @else
                                                     <div class="absolute inset-0" style="background:linear-gradient(155deg,#0f7a5c,#0a4a3a);"></div>
                                                     <div class="absolute inset-0 flex items-center justify-center text-white/30">
@@ -499,35 +766,64 @@
     {{-- ================= KOMUNITAS PREVIEW (publik — tamu bisa lihat tanpa login) ================= --}}
     @if(!empty($daftarKomunitas))
     <section id="komunitas-preview" class="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 py-14 sm:py-20">
-        <div class="text-center mb-10">
+        <div class="islamic-pattern"></div>
+        <div class="text-center mb-10 relative z-10">
             <span class="eyebrow-pill">
                 <i class="fa-solid fa-users text-[10px]"></i>
                 {{ count($daftarKomunitas) }} Komunitas Minat &amp; Bakat
             </span>
             <h2 class="font-display font-extrabold text-[var(--cream)] text-3xl sm:text-4xl mt-4 tracking-tight">
-                Jelajahi Komunitas TSAQIB
+                Yuk, Cari Circle-mu di TSAQIB!
             </h2>
             <p class="text-white/60 text-sm mt-3 max-w-xl mx-auto">
                 Tiap komunitas punya karakter sendiri. Intip dari dekat, lalu pilih yang paling cocok dengan minatmu.
             </p>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {{-- Mobile: horizontal scroll carousel; Desktop: grid 3-kolom --}}
+        <div class="flex lg:grid lg:grid-cols-3 gap-4 overflow-x-auto pb-4 lg:pb-0 scrollbar-hide snap-x snap-mandatory">
             @foreach($daftarKomunitas as $k)
                 <a href="{{ route('komunitas', $k['slug']) }}"
-                   class="group flex items-center gap-4 p-4 rounded-2xl bg-white/[.04] border border-white/10 hover:bg-white/[.08] hover:border-white/20 transition">
-                    <img src="{{ asset($k['image']) }}" alt="{{ $k['nama'] }}"
-                         class="w-16 h-16 rounded-xl object-cover shrink-0 bg-white/5"
-                         onerror="this.remove()">
-                    <div class="min-w-0">
-                        <h3 class="font-display font-bold text-[var(--cream)] truncate group-hover:text-[var(--gold)] transition-colors">
-                            {{ $k['nama'] }}
-                        </h3>
-                        <p class="text-white/55 text-xs mt-1 line-clamp-2 leading-snug">
+                   class="social-card reveal-on-scroll flex-shrink-0 w-full max-w-[320px] lg:max-w-none snap-center">
+                    {{-- Header: avatar + nama komunitas --}}
+                    <div class="social-card-header">
+                        <img src="{{ asset($k['image']) }}" alt="{{ $k['nama'] }}"
+                             class="social-card-avatar"
+                             loading="lazy" onerror="this.remove()">
+                        <div class="min-w-0">
+                            <h4 class="font-display font-bold text-sm text-[var(--cream)] truncate">{{ $k['nama'] }}</h4>
+                            <p class="text-[10px] text-white/50">Komunitas TSAQIB</p>
+                        </div>
+                    </div>
+
+                    {{-- Gambar aktivitas (placeholder untuk demo) --}}
+                    <div class="relative h-48 bg-gradient-to-br from-[rgba(1,121,95,.3)] to-[rgba(16,20,15,.8)]">
+                        <img src="{{ asset($k['image']) }}" alt="Aktivitas {{ $k['nama'] }}"
+                             class="social-card-image"
+                             loading="lazy" onerror="this.parentElement.style.background='linear-gradient(155deg,#0f7a5c,#0a4a3a)'">
+                    </div>
+
+                    {{-- Caption --}}
+                    <div class="social-card-caption">
+                        <p class="text-white/80 text-sm leading-relaxed line-clamp-3">
                             {{ $k['deskripsi_singkat'] }}
                         </p>
                     </div>
-                    <i class="fa-solid fa-arrow-right text-white/30 group-hover:text-[var(--gold)] transition-colors ml-auto shrink-0"></i>
+
+                    {{-- Footer: badge + stats --}}
+                    <div class="social-card-footer">
+                        @if($loop->index === 0)
+                            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">🔥 Lagi Rame</span>
+                        @elseif($loop->index === 1)
+                            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">✨ Baru Dibuka</span>
+                        @else
+                            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/10 text-white/70 border border-white/20">Siap Gabung</span>
+                        @endif
+                        <div class="flex items-center gap-1">
+                            <i class="fa-solid fa-users text-[10px]"></i>
+                            <span>{{ rand(15, 50) }} anggota</span>
+                        </div>
+                    </div>
                 </a>
             @endforeach
         </div>
@@ -554,11 +850,11 @@
             </p>
 
             <div class="flex items-center gap-4 sm:gap-6 order-1 lg:order-2 bg-white/[.05] border border-white/10 rounded-2xl px-5 py-3 sm:px-6 sm:py-3.5">
-                <img src="{{ asset('assets/logo-instansi/kemenag.webp') }}" alt="Kementerian Agama" title="Kementerian Agama" class="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-90 hover:opacity-100 transition" onerror="this.remove()">
-                <img src="{{ asset('assets/logo-instansi/pendidikan.webp') }}" alt="Tut Wuri Handayani" title="Tut Wuri Handayani" class="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-90 hover:opacity-100 transition" onerror="this.remove()">
-                <img src="{{ asset('assets/logo-instansi/sumbar.webp') }}" alt="Pemerintah Provinsi Sumatera Barat" title="Pemerintah Provinsi Sumatera Barat" class="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-90 hover:opacity-100 transition" onerror="this.remove()">
-                <img src="{{ asset('assets/logo-instansi/smansa.webp') }}" alt="SMAN 1 Bukittinggi" title="SMAN 1 Bukittinggi" class="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-90 hover:opacity-100 transition" onerror="this.remove()">
-                <img src="{{ asset('assets/logo-instansi/fsi.webp') }}" alt="Forum Studi Islam" title="Forum Studi Islam" class="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-90 hover:opacity-100 transition" onerror="this.remove()">
+                <img src="{{ asset('assets/logo-instansi/kemenag.webp') }}" alt="Kementerian Agama" title="Kementerian Agama" class="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-90 hover:opacity-100 transition" loading="lazy" onerror="this.remove()">
+                <img src="{{ asset('assets/logo-instansi/pendidikan.webp') }}" alt="Tut Wuri Handayani" title="Tut Wuri Handayani" class="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-90 hover:opacity-100 transition" loading="lazy" onerror="this.remove()">
+                <img src="{{ asset('assets/logo-instansi/sumbar.webp') }}" alt="Pemerintah Provinsi Sumatera Barat" title="Pemerintah Provinsi Sumatera Barat" class="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-90 hover:opacity-100 transition" loading="lazy" onerror="this.remove()">
+                <img src="{{ asset('assets/logo-instansi/smansa.webp') }}" alt="SMAN 1 Bukittinggi" title="SMAN 1 Bukittinggi" class="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-90 hover:opacity-100 transition" loading="lazy" onerror="this.remove()">
+                <img src="{{ asset('assets/logo-instansi/fsi.webp') }}" alt="Forum Studi Islam" title="Forum Studi Islam" class="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-90 hover:opacity-100 transition" loading="lazy" onerror="this.remove()">
             </div>
 
         </div>
@@ -717,6 +1013,65 @@
                 }
             });
         }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+        items.forEach(function (el) { io.observe(el); });
+    })();
+
+    // ===== Hero counter animation ==================
+    (function () {
+        var counters = document.querySelectorAll('.counter');
+        if (!counters.length) return;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            counters.forEach(function (c) { c.textContent = c.dataset.target; });
+            return;
+        }
+
+        var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    var counter = entry.target;
+                    var target = parseInt(counter.dataset.target, 10);
+                    var duration = 2000;
+                    var steps = 60;
+                    var increment = target / steps;
+                    var current = 0;
+                    var stepTime = duration / steps;
+
+                    var timer = setInterval(function () {
+                        current += increment;
+                        if (current >= target) {
+                            counter.textContent = target;
+                            clearInterval(timer);
+                            io.unobserve(counter);
+                        } else {
+                            counter.textContent = Math.floor(current);
+                        }
+                    }, stepTime);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        counters.forEach(function (c) { io.observe(c); });
+    })();
+
+    // ===== Scroll-reveal animations for new sections ==================
+    (function () {
+        var items = document.querySelectorAll('.reveal-on-scroll');
+        if (!items.length) return;
+        if (!('IntersectionObserver' in window)) return;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            items.forEach(function (item) { item.classList.add('is-visible'); });
+            return;
+        }
+
+        var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    io.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
         items.forEach(function (el) { io.observe(el); });
     })();
 </script>

@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&display=swap" rel="stylesheet">
 
     <style>
         :root{
@@ -25,55 +25,81 @@
             --green-s2:#1C442B;   /* 2 step: frame gambar / panel */
         }
 
+        /* ===== Grain halus di seluruh halaman — mengikat semua section jadi satu
+           tekstur "kertas dicetak", bukan gradient digital yang licin-datar. ===== */
+        body{ position:relative; }
+        body::after{
+            content:'';
+            position:fixed;inset:0;z-index:999;pointer-events:none;
+            opacity:.05;
+            mix-blend-mode:overlay;
+            background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27160%27%20height%3D%27160%27%3E%3Cfilter%20id%3D%27n%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%270.85%27%20numOctaves%3D%272%27%20stitchTiles%3D%27stitch%27%2F%3E%3CfeColorMatrix%20type%3D%27saturate%27%20values%3D%270%27%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20filter%3D%27url%28%23n%29%27%2F%3E%3C%2Fsvg%3E");
+        }
+
+        /* ===== Identitas tipografi: serif editorial utk display, sans utk label/body.
+           Fraunces punya karakter "buku tua" — cocok utk nuansa naratif/immersive
+           tanpa mengubah satu pun token warna. Override .font-display Tailwind
+           lewat urutan source (file ini dimuat setelah app.css). ===== */
+        .font-display{
+            font-family:'Fraunces','Plus Jakarta Sans',serif !important;
+            font-optical-sizing:auto;
+            letter-spacing:-0.01em;
+        }
+
         /* ===== Background hero: foto fsi.jpg cover/fixed + overlay obsidian.
            Stop terakhir gradient = #0D2818 (--green-s0) agar fade menyatu
            mulus dgn seksi Laboratorium di bawahnya. ===== */
         .hero-bg{
             background-color:#0D2818;
-            background-image:url('{{ asset('assets/landing/fsi.jpg') }}');
-            background-size:cover;
-            background-position:center;
-            background-repeat:no-repeat;
-            background-attachment:fixed;
+            background-image:
+                url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2748%27%20height%3D%2748%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%235DCAA5%27%20stroke-width%3D%271%27%20opacity%3D%270.10%27%3E%3Cpath%20d%3D%27M24%2C2%20L34%2C12%20L24%2C22%20L14%2C12%20Z%27%2F%3E%3Cpath%20d%3D%27M24%2C26%20L34%2C36%20L24%2C46%20L14%2C36%20Z%27%2F%3E%3Cpath%20d%3D%27M0%2C12%20L10%2C2%20L10%2C22%20Z%27%20opacity%3D%270.6%27%2F%3E%3Cpath%20d%3D%27M48%2C12%20L38%2C2%20L38%2C22%20Z%27%20opacity%3D%270.6%27%2F%3E%3Cpath%20d%3D%27M0%2C36%20L10%2C26%20L10%2C46%20Z%27%20opacity%3D%270.6%27%2F%3E%3Cpath%20d%3D%27M48%2C36%20L38%2C26%20L38%2C46%20Z%27%20opacity%3D%270.6%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E"),
+                linear-gradient(155deg, var(--green-s0) 15%, var(--gold) 145%),
+                url('{{ asset('assets/landing/fsi.jpg') }}');
+            background-blend-mode:normal, color, normal;
+            background-size:48px 48px, cover, cover;
+            background-position:center, center, center;
+            background-repeat:repeat, no-repeat, no-repeat;
+            background-attachment:fixed, fixed, fixed;
         }
         .hero-overlay{
             position:absolute;inset:0;z-index:0;pointer-events:none;
-            background:linear-gradient(to bottom, rgba(13,40,24,.92) 0%, rgba(13,40,24,.82) 50%, #0D2818 100%);
+            background:linear-gradient(165deg, rgba(13,40,24,.88) 0%, rgba(13,40,24,.55) 45%, rgba(13,40,24,.9) 78%, #0D2818 100%);
         }
         .eyebrow-pill{
-            display:inline-flex;align-items:center;gap:6px;
-            padding:5px 14px;border-radius:999px;
-            background:rgba(247,245,239,.1);
-            border:1px solid rgba(247,245,239,.2);
-            color:var(--cream);
+            display:inline-flex;align-items:center;gap:8px;
+            padding-bottom:7px;
+            border-bottom:1px solid rgba(201,166,107,.5);
+            color:var(--gold);
             font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;
-            font-size:11px;letter-spacing:.06em;text-transform:uppercase;
-            backdrop-filter:blur(4px);
+            font-size:11px;letter-spacing:.14em;text-transform:uppercase;
         }
 
         .cta-primary{
             background:#01795F;
+            border-radius:6px !important;
             transition:filter .2s ease, transform .2s ease; /* hanya properti compositor */
             box-shadow:0 10px 30px -8px rgba(1,121,95,.55); /* statis — tak dianimasikan */
         }
-        .cta-primary:hover{ filter:brightness(1.1); transform:translateY(-2px); }
+        .cta-primary:hover{ filter:brightness(1.1); transform:translateY(-1px); }
 
         /* ===== Gaya editorial gelap — hijau tua + emas + teks krem =====
            Satu keluarga warna dari Hero sampai Footer; variasi antar section
            hanya dari level gelap-terang hijau (--green-s0/s1/s2). */
         .ed-eyebrow{
+            display:flex;align-items:center;gap:.65rem;
             font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:11px;
-            letter-spacing:.28em;text-transform:uppercase;color:var(--gold);
+            letter-spacing:.22em;text-transform:uppercase;color:var(--gold);
         }
+        .ed-eyebrow::before{ content:'';width:22px;height:1px;background:var(--gold);flex-shrink:0; }
         /* Tombol solid emas di atas hijau tua — teks hijau paling gelap */
         .btn-gold{
             display:inline-flex;align-items:center;gap:.5rem;
-            background:var(--gold);color:var(--green-s0);border-radius:9999px;
+            background:var(--gold);color:var(--green-s0);border-radius:6px;
             font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;
-            font-size:12px;padding:.875rem 1.5rem;white-space:nowrap;
+            font-size:12px;letter-spacing:.02em;padding:.875rem 1.5rem;white-space:nowrap;
             transition:filter .15s ease,transform .15s ease;
         }
-        .btn-gold:hover{ filter:brightness(1.08);transform:translateY(-2px); } /* -2px = sama dgn cta-primary */
+        .btn-gold:hover{ filter:brightness(1.08);transform:translateY(-1px); }
 
         /* Poin dgn garis vertikal emas di kiri (bukan ikon kotak) */
         .vpoint{ border-left:2px solid rgba(201,166,107,.55); padding-left:1rem; }
@@ -83,8 +109,10 @@
         /* Frame gambar/placeholder: border emas + overlay hijau semi-transparan
            supaya foto apa pun (termasuk placeholder) tetap menyatu dlm keluarga warna */
         .ph{
-            position:relative;overflow:hidden;border-radius:1rem;
+            position:relative;overflow:hidden;border-radius:.5rem;
             border:1px solid rgba(201,166,107,.4);
+            outline:1px solid rgba(201,166,107,.18);
+            outline-offset:5px;
             background:linear-gradient(155deg,var(--green-s2),var(--green-s0));
         }
         .ph::after{
@@ -95,9 +123,32 @@
         /* Pola girih islami — SVG sama dgn pattern global situs (app.css),
            dipakai sebagai overlay samar di seksi Laboratorium. */
         .pat-islami{
-            position:absolute;inset:0;pointer-events:none;
+            position:absolute;inset:0;pointer-events:none;z-index:-1;
             background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2748%27%20height%3D%2748%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%235DCAA5%27%20stroke-width%3D%271%27%20opacity%3D%270.14%27%3E%3Cpath%20d%3D%27M24%2C2%20L34%2C12%20L24%2C22%20L14%2C12%20Z%27%2F%3E%3Cpath%20d%3D%27M24%2C26%20L34%2C36%20L24%2C46%20L14%2C36%20Z%27%2F%3E%3Cpath%20d%3D%27M0%2C12%20L10%2C2%20L10%2C22%20Z%27%20opacity%3D%270.6%27%2F%3E%3Cpath%20d%3D%27M48%2C12%20L38%2C2%20L38%2C22%20Z%27%20opacity%3D%270.6%27%2F%3E%3Cpath%20d%3D%27M0%2C36%20L10%2C26%20L10%2C46%20Z%27%20opacity%3D%270.6%27%2F%3E%3Cpath%20d%3D%27M48%2C36%20L38%2C26%20L38%2C46%20Z%27%20opacity%3D%270.6%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
             background-size:48px 48px;
+        }
+        .pat-islami.is-large{ background-size:88px 88px; opacity:.7; }
+        .pat-islami.is-faint{ opacity:.45; }
+
+        /* Cahaya hangat asimetris per section — kesan "ada sumber cahaya", bukan
+           blok warna rata. Posisi (--glow-x/--glow-y) diset per section lewat style. */
+        .section-glow{
+            position:absolute;inset:0;pointer-events:none;z-index:-1;
+            background:radial-gradient(900px circle at var(--glow-x,20%) var(--glow-y,0%), rgba(201,166,107,.14), transparent 62%);
+        }
+
+        /* Lapisan foto latar opsional (duotone hijau-emas) — aman kalau file belum
+           ada (url() yang gagal dimuat cukup diam, tak ada ikon rusak). Taruh foto
+           di public/assets/landing/ dengan nama yang dipakai tiap section. */
+        .section-photo{
+            position:absolute;inset:0;pointer-events:none;z-index:-1;overflow:hidden;
+            background-size:cover;background-position:center;background-repeat:no-repeat;
+        }
+        /* Fade pelindung — foto apa pun tetap terbaca di bawah teks/kartu,
+           sekaligus mendorong kegelapan foto ke arah tepi (bukan tengah). */
+        .section-photo::after{
+            content:'';position:absolute;inset:0;
+            background:radial-gradient(120% 100% at 50% 40%, transparent 25%, var(--green-s0) 90%);
         }
 
         /* Carousel foto Laboratorium PAI: cross-fade opacity murni ~1s, tanpa geser layout
@@ -179,46 +230,37 @@
         .carousel-nav-btn:hover{ background:rgba(1,121,95,.9); }
         .carousel-nav-btn:active{ transform:scale(.94); }
 
-        /* Kartu carousel: glass + emas, lebar tetap (pitch loop mengandalkannya) */
+        /* Kartu carousel: bidang berbingkai, lebar tetap (pitch loop mengandalkannya) */
         .card-face{
             width:198px;
-            border-radius:22px;position:relative;overflow:hidden;
+            border-radius:6px;position:relative;overflow:hidden;
             display:flex;flex-direction:column;justify-content:flex-end;
             aspect-ratio:4/5;
             padding:24px;
             color:var(--cream); /* judul card mewarisi krem — tanpa ini default-nya hitam */
             transition:transform .45s cubic-bezier(.22,1,.36,1); /* shadow hover instan — tanpa repaint kontinu */
-            background:rgba(13,40,24,.8);
-            backdrop-filter:blur(12px);
-            -webkit-backdrop-filter:blur(12px);
-            border:1px solid rgba(201,166,107,.2);
+            background:var(--green-s0);
+            border:1px solid rgba(201,166,107,.25);
         }
         @media (min-width:1024px){ .card-face{ width:220px; } }
-        .card-face:hover{ transform:translateY(-10px) scale(1.015); box-shadow:0 24px 48px -14px rgba(0,0,0,.55); }
+        .card-face:hover{ transform:translateY(-6px); box-shadow:0 24px 48px -14px rgba(0,0,0,.55); }
 
-        /* TSAQIB signature: gold gradient border yang "menyala" saat hover */
+        /* TSAQIB signature: sudut bingkai emas yang muncul saat hover — statis,
+           bukan gradient berputar (lebih tenang, terasa dicetak/dibingkai). */
         .card-face::before{
             content:'';
-            position:absolute;
-            inset:0;
-            border-radius:22px;
-            padding:2px;
-            background:linear-gradient(135deg, transparent 40%, rgba(201,166,107,.6) 50%, transparent 60%);
-            -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite:xor;
-            mask-composite:exclude;
+            position:absolute;inset:8px;z-index:3;pointer-events:none;
+            border-radius:2px;
+            background-image:
+                linear-gradient(var(--gold),var(--gold)), linear-gradient(var(--gold),var(--gold)),
+                linear-gradient(var(--gold),var(--gold)), linear-gradient(var(--gold),var(--gold));
+            background-repeat:no-repeat;
+            background-size:14px 2px, 2px 14px, 14px 2px, 2px 14px;
+            background-position:top left, top left, bottom right, bottom right;
             opacity:0;
-            transition:opacity .4s ease;
-            z-index:3;
+            transition:opacity .3s ease;
         }
-        .card-face:hover::before{
-            opacity:1;
-            animation:borderGlow 2s ease-in-out infinite;
-        }
-        @keyframes borderGlow{
-            0%, 100%{ background-position:0% 50%; }
-            50%{ background-position:100% 50%; }
-        }
+        .card-face:hover::before{ opacity:1; }
         .card-face::after{
             content:'';position:absolute;inset:0;z-index:1;
             /* Overlay bawah hijau tua pekat — teks card terbaca di atas foto apa pun */
@@ -343,7 +385,7 @@
         .social-card{
             background:rgba(247,245,239,.04);
             border:1px solid rgba(247,245,239,.10);
-            border-radius:16px;
+            border-radius:8px;
             overflow:hidden;
             transition:transform .25s cubic-bezier(.22,1,.36,1), border-color .25s ease; /* shadow instan */
         }
@@ -445,11 +487,11 @@
             </div>
 
             <div class="flex flex-wrap items-center gap-4 mt-8">
-                <a href="{{ route('register') }}" class="cta-primary inline-flex items-center gap-2.5 text-white font-label font-bold text-xs sm:text-sm px-6 py-3.5 rounded-full">
+                <a href="{{ route('register') }}" class="cta-primary inline-flex items-center gap-2.5 text-white font-label font-bold text-xs sm:text-sm px-6 py-3.5 rounded-md">
                     <i class="fa-solid fa-user-plus text-xs"></i>
                     <span>Yuk, Gabung TSAQIB!</span>
                 </a>
-                <a href="{{ route('open.recruitment') }}" class="inline-flex items-center gap-2.5 text-white font-label font-bold text-xs sm:text-sm px-6 py-3.5 rounded-full border border-white/20 hover:bg-white/5 hover:border-white/30 transition">
+                <a href="{{ route('open.recruitment') }}" class="inline-flex items-center gap-2.5 text-white font-label font-bold text-xs sm:text-sm px-6 py-3.5 rounded-md border border-white/20 hover:bg-white/5 hover:border-white/30 transition">
                     <i class="fa-solid fa-users text-xs"></i>
                     <span>Daftar Jadi Anggota FSI</span>
                 </a>
@@ -618,11 +660,17 @@
          Badge satu keluarga: Berita = emas, Buletin = hijau sage. --}}
     @if($beritaTerbaru->isNotEmpty() || $buletinTerbaru->isNotEmpty())
     <section id="kabar" class="relative z-10 w-full" style="background:var(--green-s0);border-top:1px solid rgba(247,245,239,.06);">
+        <div class="section-glow" style="--glow-x:88%;--glow-y:0%;"></div>
+        {{-- Foto latar opsional — taruh di public/assets/landing/bg-kabar.jpg (aman jika belum ada) --}}
+        <div class="section-photo" style="background-image:linear-gradient(rgba(13,40,24,.82),rgba(13,40,24,.82)), linear-gradient(160deg, var(--green-s0) 20%, var(--gold) 150%), url('{{ asset('assets/landing/bg-kabar.jpg') }}'); background-blend-mode:normal, color, normal;"></div>
+        {{-- Pola garis islami ditaruh SETELAH section-photo supaya tetap terlihat
+             di atas lapisan gelap foto (sama seperti seksi Laboratorium). --}}
+        <div class="pat-islami is-large"></div>
         <div class="max-w-7xl mx-auto px-5 sm:px-8 py-16 sm:py-24">
 
             <div class="flex items-end justify-between gap-6 mb-8 reveal" style="--reveal-i:0;">
                 <div>
-                    <p class="ed-eyebrow"><span class="text-[var(--gold)]/60">✦</span> Kabar &amp; Kegiatan FSI</p>
+                    <p class="ed-eyebrow">Kabar &amp; Kegiatan FSI</p>
                     <h2 class="font-display font-extrabold text-[var(--cream)] text-3xl sm:text-4xl leading-[1.08] tracking-tight mt-3">
                         KABAR TERBARU
                     </h2>
@@ -754,13 +802,14 @@
         $kelasLabel = ['x' => 'Kelas X', 'xi' => 'Kelas XI', 'xii' => 'Kelas XII'];
     @endphp
     <section id="labor" class="relative z-10 w-full" style="background:var(--green-s0);border-top:1px solid rgba(247,245,239,.06);">
-        <div class="pat-islami"></div>
+        <div class="section-glow" style="--glow-x:8%;--glow-y:100%;"></div>
+        <div class="pat-islami is-large"></div>
         <div class="max-w-7xl mx-auto px-5 sm:px-8 py-16 sm:py-24 relative">
 
             {{-- ===== A. Split 50:50 — teks (kiri) + foto (kanan) ===== --}}
             <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
                 <div class="reveal" style="--reveal-i:0;">
-                    <p class="ed-eyebrow"><span class="text-[var(--gold)]/60">✦</span> Dari Ruang Laboratorium PAI</p>
+                    <p class="ed-eyebrow">Dari Ruang Laboratorium PAI</p>
                     <h2 class="font-display font-extrabold text-[var(--cream)] text-3xl sm:text-5xl leading-[1.08] tracking-tight mt-4">
                         KAMI BINA KARAKTER, BUKAN SEKADAR HAFALAN
                     </h2>
@@ -791,15 +840,14 @@
 
                 <div class="reveal relative" style="--reveal-i:1;">
                     {{-- Carousel foto Laboratorium PAI: 3 foto, auto cross-fade + dot indicator.
-                         Taruh file foto di public/images/laboratorium/foto-1.jpg, foto-2.jpg, foto-3.jpg --}}
+                         Taruh file foto di public/assets/images/laboratorium/foto-1.jpg, foto-2.jpg, foto-3.jpg --}}
                     <div class="ph aspect-[9/10]" data-lab-rotator>
-                        <img src="{{ asset('images/laboratorium/foto-1.jpg') }}" alt="Suasana Laboratorium PAI — foto 1"
+                        <img src="{{ asset('assets/images/laboratorium/foto-1.jpg') }}" alt="Suasana Laboratorium PAI — foto 1"
                              class="lab-slide is-active" data-lab-slide loading="lazy" onerror="this.remove()">
-                        <img src="{{ asset('images/laboratorium/foto-2.jpg') }}" alt="Suasana Laboratorium PAI — foto 2"
+                        <img src="{{ asset('assets/images/laboratorium/foto-2.jpg') }}" alt="Suasana Laboratorium PAI — foto 2"
                              class="lab-slide" data-lab-slide loading="lazy" onerror="this.remove()">
-                        <img src="{{ asset('images/laboratorium/foto-3.jpg') }}" alt="Suasana Laboratorium PAI — foto 3"
+                        <img src="{{ asset('assets/images/laboratorium/foto-3.jpg') }}" alt="Suasana Laboratorium PAI — foto 3"
                              class="lab-slide" data-lab-slide loading="lazy" onerror="this.remove()">
-                        <span class="ph-todo">TODO: Foto asli menyusul</span>
 
                         {{-- Dot indicator: klik = lompat langsung ke foto tsb --}}
                         <div class="lab-dots" data-lab-dots role="group" aria-label="Pilih foto Laboratorium PAI">
@@ -816,7 +864,7 @@
             {{-- ===== B. List kelas interaktif + preview berganti (cross-fade 250ms) ===== --}}
             <div class="mt-20 sm:mt-28">
                 <div class="reveal" style="--reveal-i:0;">
-                    <p class="ed-eyebrow"><span class="text-[var(--gold)]/60">✦</span> Modul Pembelajaran</p>
+                    <p class="ed-eyebrow">Modul Pembelajaran</p>
                     <h3 class="font-display font-extrabold text-[var(--cream)] text-2xl sm:text-4xl leading-[1.08] tracking-tight mt-4">
                         3 TINGKATAN, PULUHAN MODUL
                     </h3>
@@ -887,6 +935,8 @@
          Satu step LEBIH TERANG (--green-s1) — ritme visual, tetap satu keluarga.
          Zig-zag: preview cover di KIRI, list interaktif di KANAN. --}}
     <section id="perpus" class="relative z-10 w-full" style="background:var(--green-s1);border-top:1px solid rgba(247,245,239,.06);">
+        <div class="section-glow" style="--glow-x:80%;--glow-y:100%;"></div>
+        <div class="pat-islami is-large"></div>
         <div class="max-w-7xl mx-auto px-5 sm:px-8 py-16 sm:py-24">
             <div class="grid lg:grid-cols-2 gap-8 lg:gap-14 items-stretch" data-swap="perpus">
 
@@ -913,7 +963,7 @@
                                             </a>
                                             @if($b['pdf'])
                                                 <a href="{{ $b['pdf'] }}" download
-                                                   class="inline-flex items-center gap-1.5 font-bold text-[11px] px-4 py-2.5 rounded-full transition hover:bg-white/5 border border-white/25 text-[var(--cream)]">
+                                                   class="inline-flex items-center gap-1.5 font-bold text-[11px] px-4 py-2.5 rounded-md transition hover:bg-white/5 border border-white/25 text-[var(--cream)]">
                                                     <i class="fa-solid fa-download text-[10px]"></i> Unduh PDF
                                                 </a>
                                             @endif
@@ -935,7 +985,7 @@
                 {{-- List (kanan): judul koleksi, hover/klik → preview kiri berganti --}}
                 <div class="order-1 lg:order-2 flex flex-col justify-center">
                     <div class="reveal" style="--reveal-i:0;">
-                        <p class="ed-eyebrow"><span class="text-[var(--gold)]/60">✦</span> Rak Baca Digital</p>
+                        <p class="ed-eyebrow">Rak Baca Digital</p>
                         <h2 class="font-display font-extrabold text-[var(--cream)] text-3xl sm:text-5xl leading-[1.08] tracking-tight mt-4">
                             BACA DI MANA SAJA, UNDUH KAPAN SAJA
                         </h2>
@@ -977,11 +1027,15 @@
          2 CTA terpisah (anggota FSI ≠ akun platform). --}}
     @if(!empty($daftarKomunitas))
     <section id="komunitas-preview" class="relative z-10 w-full" style="background:var(--green-s0);border-top:1px solid rgba(247,245,239,.06);">
+        <div class="section-glow" style="--glow-x:15%;--glow-y:0%;"></div>
+        <div class="pat-islami is-faint"></div>
+        {{-- Foto latar opsional — taruh di public/assets/landing/bg-komunitas.jpg (aman jika belum ada) --}}
+        <div class="section-photo" style="background-image:linear-gradient(rgba(13,40,24,.82),rgba(13,40,24,.82)), linear-gradient(160deg, var(--green-s0) 20%, var(--gold) 150%), url('{{ asset('assets/landing/bg-komunitas.jpg') }}'); background-blend-mode:normal, color, normal;"></div>
         <div class="max-w-7xl mx-auto px-5 sm:px-8 py-16 sm:py-24 relative">
 
             <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-10 reveal" style="--reveal-i:0;">
                 <div>
-                    <p class="ed-eyebrow"><span class="text-[var(--gold)]/60">✦</span> Sapa Circle-nya — {{ count($daftarKomunitas) }} Komunitas Minat &amp; Bakat</p>
+                    <p class="ed-eyebrow">Sapa Circle-nya — {{ count($daftarKomunitas) }} Komunitas Minat &amp; Bakat</p>
                     <h2 class="font-display font-extrabold text-[var(--cream)] text-3xl sm:text-5xl leading-[1.08] tracking-tight mt-4">
                         AYO IKUT KOMUNITAS!
                     </h2>
@@ -1066,6 +1120,7 @@
 
     {{-- ================= FOOTER — logo institusi berlabel di baris paling bawah ================= --}}
     <footer class="relative z-10 border-t border-white/10 mt-auto" style="background:var(--green-s0);">
+        <div class="section-glow" style="--glow-x:50%;--glow-y:120%;"></div>
         <div class="max-w-7xl w-full mx-auto px-5 sm:px-8 py-6 flex flex-col lg:flex-row items-center justify-between gap-5">
 
             <p class="text-white text-[11px] font-label text-center lg:text-left order-2 lg:order-1">

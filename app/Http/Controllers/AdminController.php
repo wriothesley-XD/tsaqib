@@ -6,6 +6,7 @@ use App\Models\ActivityDocumentation;
 use App\Models\Book;
 use App\Models\GuruProfile;
 use App\Models\Modul;
+use App\Models\NisnWhitelist;
 use App\Models\News;
 use App\Models\Post;
 use App\Models\Tugas;
@@ -64,6 +65,7 @@ class AdminController extends Controller
         $registrations = Registration::latest()->paginate($perPage);
         $news          = News::with('user')->latest()->paginate($perPage);
         $documentations = ActivityDocumentation::with('photos')->latest()->paginate($perPage);
+        $nisnWhitelist  = NisnWhitelist::latest()->paginate($perPage);
         $isRecruitmentOpen = Setting::getByKey('recruitment_open', '1') === '1';
 
         // Laporan konten pending (untuk badge + Perlu Perhatian + tab Laporan).
@@ -81,7 +83,7 @@ class AdminController extends Controller
             'total_news' => $news->total(),
         ];
 
-        return view('admin.index', compact('users', 'books', 'posts', 'registrations', 'news', 'documentations', 'isRecruitmentOpen', 'stats', 'laporan', 'pendingReportCount', 'perluPerhatian'));
+        return view('admin.index', compact('users', 'books', 'posts', 'registrations', 'news', 'documentations', 'nisnWhitelist', 'isRecruitmentOpen', 'stats', 'laporan', 'pendingReportCount', 'perluPerhatian'));
     }
 
     /**
@@ -106,6 +108,7 @@ class AdminController extends Controller
             'posts'         => ['view' => 'admin._list_posts',         'query' => Post::with('user')->latest(),         'itemView' => 'admin._post_item',   'itemVar' => 'post', 'groupField' => 'community_slug'],
             'registrations' => ['view' => 'admin._list_registrations', 'query' => Registration::latest()],
             'laporan'       => ['view' => 'admin._list_laporan',       'query' => Report::pending()->with(['reportable.user', 'reporter'])->latest(), 'itemView' => 'admin._laporan_item', 'itemVar' => 'r', 'groupField' => 'reportable_type'],
+            'nisn_whitelist' => ['view' => 'admin._list_nisn_whitelist', 'query' => NisnWhitelist::latest(), 'search' => ['nisn', 'nama', 'kelas']],
         ];
 
         if (! isset($map[$resource])) {
@@ -573,6 +576,170 @@ class AdminController extends Controller
      * Buka/Tutup Sakelar Open Recruitment.
      * Route: POST /admin-panel/toggle-recruitment
      */
+    /**
+     * Tambah satu NISN manual ke whitelist.
+     * Route: POST /admin-panel/nisn-whitelist
+     */
+    public function storeNisnWhitelist(Request $request): RedirectResponse
+    {
+        $this->checkAdmin();
+
+        $data = $request->validate([
+            'nisn'  => 'required|string|max:20|unique:nisn_whitelist,nisn',
+            'nama'  => 'nullable|string|max:100',
+            'kelas' => 'nullable|string|max:20',
+        ], [
+            'nisn.unique' => 'NISN ini sudah ada di whitelist.',
+        ]);
+
+        NisnWhitelist::create($data);
+
+        return redirect()->back()->with('success', 'NISN berhasil ditambahkan ke whitelist.');
+    }
+
+    /**
+     * Hapus satu NISN dari whitelist.
+     * Route: DELETE /admin-panel/nisn-whitelist/{whitelist}
+     */
+    public function destroyNisnWhitelist(NisnWhitelist $whitelist): RedirectResponse
+    {
+        $this->checkAdmin();
+
+        $whitelist->delete();
+
+        return redirect()->back()->with('success', 'NISN dihapus dari whitelist.');
+    }
+
+    /**
+     * Import massal NISN dari file CSV atau Excel (.xlsx/.xls).
+     * Kolom yang dikenali (case-insensitive, urutan bebas): nisn, nama, kelas.
+     * Kalau file tidak punya baris header, kolom dibaca berurutan:
+     * kolom 1 = NISN, kolom 2 = nama, kolom 3 = kelas.
+     * NISN yang sudah ada akan diperbarui (nama/kelas), bukan diduplikasi.
+     * Route: POST /admin-panel/nisn-whitelist/import
+     */
+    public function importNisnWhitelist(Request $request): RedirectResponse
+    {
+        $this->checkAdmin();
+
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt,xlsx,xls|max:5120',
+        ]);
+
+        $file = $request->file('file');
+        $extension = strtolower($file->getClientOriginalExtension());
+
+        try {
+            $rows = $this->parseNisnFile($file->getRealPath(), $extension);
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'Gagal membaca file: '.$e->getMessage());
+        }
+
+        if (empty($rows)) {
+            return redirect()->back()->with('error', 'File kosong atau tidak ada baris yang bisa dibaca.');
+        }
+
+        // Deteksi baris header: kalau salah satu sel baris pertama persis "nisn".
+        $firstRow = array_map(fn ($v) => strtolower(trim((string) $v)), $rows[0]);
+        $hasHeader = in_array('nisn', $firstRow, true);
+
+        $colNisn  = 0;
+        $colNama  = 1;
+        $colKelas = 2;
+
+        if ($hasHeader) {
+            $colNisn  = array_search('nisn', $firstRow, true);
+            $colNama  = array_search('nama', $firstRow, true);
+            $colKelas = array_search('kelas', $firstRow, true);
+            $colNama  = $colNama === false ? null : $colNama;
+            $colKelas = $colKelas === false ? null : $colKelas;
+            array_shift($rows);
+        }
+
+        $created = 0;
+        $updated = 0;
+        $skipped = 0;
+
+        foreach ($rows as $row) {
+            $rawNisn = isset($row[$colNisn]) ? (string) $row[$colNisn] : '';
+            // Excel sering mengubah NISN jadi angka ("59123456" -> "59123456.0")
+            // atau notasi ilmiah — ambil digitnya saja.
+            $nisn = preg_replace('/\D/', '', $rawNisn);
+
+            if ($nisn === '') {
+                $skipped++;
+                continue;
+            }
+
+            $nama  = ($colNama !== null && isset($row[$colNama]))
+                ? trim((string) $row[$colNama]) : null;
+            $kelas = ($colKelas !== null && isset($row[$colKelas]))
+                ? trim((string) $row[$colKelas]) : null;
+
+            $record = NisnWhitelist::updateOrCreate(
+                ['nisn' => $nisn],
+                ['nama' => $nama ?: null, 'kelas' => $kelas ?: null]
+            );
+
+            $record->wasRecentlyCreated ? $created++ : $updated++;
+        }
+
+        $message = "Import selesai — {$created} NISN baru, {$updated} diperbarui";
+        $message .= $skipped > 0 ? ", {$skipped} baris dilewati (kosong/tidak valid)." : '.';
+
+        return redirect()->back()->with('success', $message);
+    }
+
+    /**
+     * Baca file NISN jadi array baris (tiap baris = array kolom), tanpa peduli
+     * format. CSV/TXT dibaca native (tanpa dependency). XLSX/XLS butuh
+     * phpoffice/phpspreadsheet — kalau belum ter-install, lempar pesan jelas.
+     */
+    private function parseNisnFile(string $path, string $extension): array
+    {
+        if (in_array($extension, ['csv', 'txt'], true)) {
+            return $this->parseNisnCsv($path);
+        }
+
+        if (in_array($extension, ['xlsx', 'xls'], true)) {
+            if (! class_exists(\PhpOffice\PhpSpreadsheet\IOFactory::class)) {
+                throw new \RuntimeException(
+                    'Membaca file Excel (.xlsx/.xls) butuh package tambahan. '.
+                    'Jalankan "composer require phpoffice/phpspreadsheet" di server, '.
+                    'atau simpan file sebagai CSV lalu upload ulang.'
+                );
+            }
+
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($path);
+
+            return $spreadsheet->getActiveSheet()->toArray(null, true, true, false);
+        }
+
+        throw new \RuntimeException('Format file tidak dikenali.');
+    }
+
+    private function parseNisnCsv(string $path): array
+    {
+        $rows = [];
+        $handle = fopen($path, 'r');
+        if ($handle === false) {
+            return $rows;
+        }
+
+        while (($data = fgetcsv($handle, 0, ',')) !== false) {
+            // Ekspor Excel versi Indonesia sering pakai ";" sbg pemisah kolom —
+            // kalau hasil parse koma cuma dapat 1 kolom, coba lagi pakai ";".
+            if (count($data) === 1 && str_contains((string) $data[0], ';')) {
+                $data = str_getcsv($data[0], ';');
+            }
+            $rows[] = $data;
+        }
+
+        fclose($handle);
+
+        return $rows;
+    }
+
     public function toggleRecruitment(Request $request): RedirectResponse
     {
         $this->checkAdmin();

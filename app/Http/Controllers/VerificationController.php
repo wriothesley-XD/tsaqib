@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\NisnWhitelist;
 use App\Models\StudentVerification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -34,8 +35,9 @@ class VerificationController extends Controller
             'kts_photo' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
-        // Pintu A: whitelist NISN sekolah.
-        if (in_array($data['nisn'], config('nisn.whitelist', []), true)) {
+        // Pintu A: whitelist NISN sekolah (tabel nisn_whitelist, dikelola admin —
+        // manual atau import CSV/Excel massal. Menggantikan config/nisn.php lama).
+        if (NisnWhitelist::where('nisn', $data['nisn'])->exists()) {
             $user->update(['is_verified_student' => true]);
 
             return redirect()->back()->with('success', 'NISN cocok — akun terverifikasi sebagai siswa.');

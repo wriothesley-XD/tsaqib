@@ -40,14 +40,6 @@
             position:absolute;inset:0;z-index:0;pointer-events:none;
             background:linear-gradient(to bottom, rgba(13,40,24,.92) 0%, rgba(13,40,24,.82) 50%, #0D2818 100%);
         }
-        /* Pola girih islami — SVG sama dgn pattern global situs (app.css),
-           dipakai sebagai overlay samar di seksi Laboratorium. */
-        .pat-islami{
-            position:absolute;inset:0;pointer-events:none;
-            background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2748%27%20height%3D%2748%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%235DCAA5%27%20stroke-width%3D%271%27%20opacity%3D%270.14%27%3E%3Cpath%20d%3D%27M24%2C2%20L34%2C12%20L24%2C22%20L14%2C12%20Z%27%2F%3E%3Cpath%20d%3D%27M24%2C26%20L34%2C36%20L24%2C46%20L14%2C36%20Z%27%2F%3E%3Cpath%20d%3D%27M0%2C12%20L10%2C2%20L10%2C22%20Z%27%20opacity%3D%270.6%27%2F%3E%3Cpath%20d%3D%27M48%2C12%20L38%2C2%20L38%2C22%20Z%27%20opacity%3D%270.6%27%2F%3E%3Cpath%20d%3D%27M0%2C36%20L10%2C26%20L10%2C46%20Z%27%20opacity%3D%270.6%27%2F%3E%3Cpath%20d%3D%27M48%2C36%20L38%2C26%20L38%2C46%20Z%27%20opacity%3D%270.6%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
-            background-size:48px 48px;
-        }
-
         .eyebrow-pill{
             display:inline-flex;align-items:center;gap:6px;
             padding:5px 14px;border-radius:999px;
@@ -99,6 +91,38 @@
             content:'';position:absolute;inset:0;pointer-events:none;
             background:linear-gradient(180deg, rgba(13,40,24,.12) 0%, rgba(13,40,24,.42) 100%);
         }
+
+        /* Pola girih islami — SVG sama dgn pattern global situs (app.css),
+           dipakai sebagai overlay samar di seksi Laboratorium. */
+        .pat-islami{
+            position:absolute;inset:0;pointer-events:none;
+            background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2748%27%20height%3D%2748%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%235DCAA5%27%20stroke-width%3D%271%27%20opacity%3D%270.14%27%3E%3Cpath%20d%3D%27M24%2C2%20L34%2C12%20L24%2C22%20L14%2C12%20Z%27%2F%3E%3Cpath%20d%3D%27M24%2C26%20L34%2C36%20L24%2C46%20L14%2C36%20Z%27%2F%3E%3Cpath%20d%3D%27M0%2C12%20L10%2C2%20L10%2C22%20Z%27%20opacity%3D%270.6%27%2F%3E%3Cpath%20d%3D%27M48%2C12%20L38%2C2%20L38%2C22%20Z%27%20opacity%3D%270.6%27%2F%3E%3Cpath%20d%3D%27M0%2C36%20L10%2C26%20L10%2C46%20Z%27%20opacity%3D%270.6%27%2F%3E%3Cpath%20d%3D%27M48%2C36%20L38%2C26%20L38%2C46%20Z%27%20opacity%3D%270.6%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+            background-size:48px 48px;
+        }
+
+        /* Carousel foto Laboratorium PAI: cross-fade opacity murni ~1s, tanpa geser layout
+           (semua slide absolute+stacked, tinggi frame ditentukan aspect-[9/10] di .ph). */
+        .lab-slide{
+            position:absolute;inset:0;width:100%;height:100%;
+            object-fit:cover;opacity:0;pointer-events:none;
+            transition:opacity 1s ease-in-out;
+        }
+        .lab-slide.is-active{ opacity:1; }
+
+        /* Dot indicator — aktif = emas + sedikit lebih besar (scale, tanpa reflow) */
+        .lab-dots{
+            position:absolute;z-index:2;left:0;right:0;bottom:14px;
+            display:flex;align-items:center;justify-content:center;gap:8px;
+        }
+        .lab-dot{
+            width:8px;height:8px;border-radius:999px;
+            background:rgba(247,245,239,.35);
+            border:1px solid rgba(247,245,239,.3);
+            padding:0;cursor:pointer;
+            transition:background-color .3s ease,border-color .3s ease,transform .3s ease;
+        }
+        .lab-dot:hover{ background:rgba(247,245,239,.6); }
+        .lab-dot.is-active{ background:var(--gold);border-color:var(--gold);transform:scale(1.35); }
 
         /* ===== Interaksi "list berganti" (swap): list kiri + preview kanan =====
            Animasi HANYA opacity + translateY kecil. Cross-fade 250ms. */
@@ -766,11 +790,23 @@
                 </div>
 
                 <div class="reveal relative" style="--reveal-i:1;">
-                    <div class="ph">
-                        <img src="{{ asset('images/placeholders/placeholder-laboratorium.png') }}"
-                             alt="Suasana Laboratorium PAI" class="w-full aspect-[9/10] object-cover" loading="lazy"
-                             onerror="this.remove()">
+                    {{-- Carousel foto Laboratorium PAI: 3 foto, auto cross-fade + dot indicator.
+                         Taruh file foto di public/images/laboratorium/foto-1.jpg, foto-2.jpg, foto-3.jpg --}}
+                    <div class="ph aspect-[9/10]" data-lab-rotator>
+                        <img src="{{ asset('images/laboratorium/foto-1.jpg') }}" alt="Suasana Laboratorium PAI — foto 1"
+                             class="lab-slide is-active" data-lab-slide loading="lazy" onerror="this.remove()">
+                        <img src="{{ asset('images/laboratorium/foto-2.jpg') }}" alt="Suasana Laboratorium PAI — foto 2"
+                             class="lab-slide" data-lab-slide loading="lazy" onerror="this.remove()">
+                        <img src="{{ asset('images/laboratorium/foto-3.jpg') }}" alt="Suasana Laboratorium PAI — foto 3"
+                             class="lab-slide" data-lab-slide loading="lazy" onerror="this.remove()">
                         <span class="ph-todo">TODO: Foto asli menyusul</span>
+
+                        {{-- Dot indicator: klik = lompat langsung ke foto tsb --}}
+                        <div class="lab-dots" data-lab-dots role="group" aria-label="Pilih foto Laboratorium PAI">
+                            <button type="button" data-lab-dot aria-label="Foto 1" aria-pressed="true"  class="lab-dot is-active"></button>
+                            <button type="button" data-lab-dot aria-label="Foto 2" aria-pressed="false" class="lab-dot"></button>
+                            <button type="button" data-lab-dot aria-label="Foto 3" aria-pressed="false" class="lab-dot"></button>
+                        </div>
                     </div>
                     {{-- Aksen emas offset di pojok — depth ala editorial --}}
                     <span class="absolute -bottom-3 -left-3 w-24 h-24 rounded-2xl pointer-events-none" style="border:2px solid rgba(201,166,107,.6);"></span>
@@ -1316,6 +1352,41 @@
                 el.classList.toggle('is-active', k === i);
                 el.toggleAttribute('inert', k !== i);
             });
+            dots.forEach(function (el, k) {
+                el.classList.toggle('is-active', k === i);
+                el.setAttribute('aria-pressed', k === i ? 'true' : 'false');
+            });
+        }
+        function stop()  { if (timer) { clearInterval(timer); timer = null; } }
+        function start() { if (!reduced && !timer) timer = setInterval(function () { show(i + 1); }, AUTO_MS); }
+
+        dots.forEach(function (d, k) {
+            d.addEventListener('click', function () { show(k); start(); });
+        });
+        root.addEventListener('mouseenter', stop);
+        root.addEventListener('mouseleave', start);
+        root.addEventListener('focusin',    stop);
+        root.addEventListener('focusout',   start);
+
+        show(0);
+        start();
+    })();
+
+    // ===== Carousel foto Laboratorium PAI: cross-fade 1s + auto-loop 4s + dots =====
+    // Hover/focus = pause sementara, keluar = lanjut. Dot clickable = lompat langsung.
+    (function () {
+        var root   = document.querySelector('[data-lab-rotator]');
+        if (!root) return;
+        var slides = root.querySelectorAll('[data-lab-slide]');
+        var dots   = root.querySelectorAll('[data-lab-dot]');
+        if (slides.length < 2) return;   // 1 foto (atau kurang) → statis, tanpa rotator
+
+        var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var AUTO_MS = 4000, i = 0, timer = null;
+
+        function show(n) {
+            i = (n + slides.length) % slides.length;
+            slides.forEach(function (el, k) { el.classList.toggle('is-active', k === i); });
             dots.forEach(function (el, k) {
                 el.classList.toggle('is-active', k === i);
                 el.setAttribute('aria-pressed', k === i ? 'true' : 'false');

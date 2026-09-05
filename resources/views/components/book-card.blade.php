@@ -28,18 +28,18 @@
 <div class="book-card group" data-book-id="{{ $book->id }}">
 
     {{-- Cover rasio 2:3 --}}
-    <div class="relative aspect-[2/3] rounded-xl overflow-hidden bg-white/5 border border-white/10 transition duration-200 group-hover:border-[#01795F] group-hover:shadow-lg group-hover:shadow-black/30">
+    <div class="relative aspect-[2/3] rounded-xl overflow-hidden bg-[#11161f] border border-[rgba(201,169,77,.14)] transition duration-200 group-hover:border-[#e8cd85]">
 
         @if($coverUrl)
             <img src="{{ $coverUrl }}" alt="{{ $book->title }}"
                  loading="lazy"
                  class="w-full h-full object-cover transition duration-300 group-hover:scale-[1.04]">
         @else
-            <div class="absolute inset-0 flex flex-col items-center justify-center p-3 text-center bg-gradient-to-br from-[#01795F]/15 to-white/[.02]">
-                <div class="w-11 h-11 rounded-xl bg-[#01795F]/25 text-[#3fd6b0] flex items-center justify-center mb-2">
+            <div class="absolute inset-0 flex flex-col items-center justify-center p-3 text-center bg-[#11161f]">
+                <div class="w-11 h-11 rounded-xl bg-[rgba(201,169,77,.1)] border border-[rgba(201,169,77,.2)] text-[#c9a94d] flex items-center justify-center mb-2">
                     <i class="fa-solid fa-file-pdf text-lg"></i>
                 </div>
-                <span class="text-[9px] font-bold text-[#3fd6b0] uppercase tracking-wider">Modul Digital</span>
+                <span class="text-[9px] font-bold text-[#e8cd85] uppercase tracking-wider">Modul Digital</span>
             </div>
         @endif
 
@@ -67,11 +67,11 @@
         @if($pdfUrl)
             <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/90 via-black/55 to-transparent flex items-center gap-2 opacity-0 translate-y-2 pointer-events-none transition duration-200 group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto [@media(hover:none)]:opacity-100 [@media(hover:none)]:translate-y-0 [@media(hover:none)]:pointer-events-auto">
                 <a href="{{ $pdfUrl }}" target="_blank" rel="noopener"
-                   class="flex-1 py-1.5 rounded-lg bg-[#01795F] hover:bg-[#3F704D] text-white text-center font-semibold text-[11px] flex items-center justify-center gap-1.5 transition">
+                   class="flex-1 py-1.5 rounded-lg border border-[rgba(201,169,77,.4)] bg-[rgba(201,169,77,.1)] hover:bg-[rgba(201,169,77,.2)] text-[#e8cd85] text-center font-semibold text-[11px] flex items-center justify-center gap-1.5 transition">
                     <i class="fa-solid fa-eye text-[10px]"></i> Baca PDF
                 </a>
                 <a href="{{ $pdfUrl }}" download
-                   class="w-[30px] h-[30px] shrink-0 rounded-lg bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition"
+                   class="w-[30px] h-[30px] shrink-0 rounded-lg bg-[rgba(245,245,244,.08)] hover:bg-[rgba(245,245,244,.16)] border border-[rgba(201,169,77,.2)] text-stone-200 flex items-center justify-center transition"
                    title="Unduh File" aria-label="Unduh PDF">
                     <i class="fa-solid fa-download text-[11px]"></i>
                 </a>
@@ -87,12 +87,12 @@
 
     {{-- Meta --}}
     <div class="mt-2">
-        <span class="text-[9px] font-bold text-[var(--gold)] uppercase tracking-wider">
+        <span class="text-[9px] font-bold text-[#c9a94d] uppercase tracking-wider">
             {{ $book->category ?? 'Modul PAI' }}
         </span>
-        <h3 class="font-bold text-[13px] leading-snug text-[var(--cream)] group-hover:text-[var(--gold)] transition line-clamp-2 mt-0.5">
+        <h3 class="font-bold text-[13px] leading-snug text-stone-100 group-hover:text-[#e8cd85] transition line-clamp-2 mt-0.5">
             {{ $book->title }}
         </h3>
-        <p class="text-[11px] text-white/45 mt-0.5 line-clamp-1">{{ $book->author ?? 'Tim PAI SMAN 1 Bukittinggi' }}</p>
+        <p class="text-[11px] text-stone-500 mt-0.5 line-clamp-1">{{ $book->author ?? 'Tim PAI SMAN 1 Bukittinggi' }}</p>
     </div>
 </div>

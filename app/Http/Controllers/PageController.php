@@ -22,51 +22,61 @@ class PageController extends Controller
         // Data komunitas untuk preview publik di landing (tamu bisa lihat, tanpa auth).
         $daftarKomunitas = Config::get('komunitas.daftar', []);
 
-        // Section "BERITA" (Varian B): kiri = 1 berita unggulan besar, kanan =
-        // sidebar 3 buletin terbaru. Dua query terpisah (bukan feed gabungan)
-        // agar tiap kolom dijamin berisi tipe konten yang benar.
-        $beritaUnggulan = $this->beritaUnggulan();
+        // Counter hero — angka asli dari DB (bukan placeholder 0).
+        $totalModul     = Book::visible()->where('category', 'modul')->count();
+        $totalAnggota   = \App\Models\User::count();
+        $totalKomunitas = count($daftarKomunitas);
+
+        // Section "KABAR TERBARU" (2 blok asimetris): berita untuk rotator Blok A,
+        // buletin untuk list ringkas Blok B — dipisah, tidak lagi di-merge.
+        $beritaTerbaru  = $this->beritaGrid();
         $buletinTerbaru = $this->buletinTerbaru(3);
 
-        return view('landing', compact('daftarKomunitas', 'beritaUnggulan', 'buletinTerbaru'));
+        // Section "Perpustakaan Digital": 6 koleksi terbaru lintas kategori.
+        $katalogPerpus = Book::visible()
+            ->latest()
+            ->limit(6)
+            ->get()
+            ->map(fn (Book $b) => [
+                'title'    => $b->title,
+                'category' => $b->category,
+                'author'   => $b->author,
+                'image'    => $b->cover_image,
+                'pdf'      => $b->pdf_path ? asset('storage/' . $b->pdf_path) : null,
+            ]);
+
+        return view('landing', compact(
+            'daftarKomunitas', 'totalModul', 'totalAnggota', 'totalKomunitas',
+            'beritaTerbaru', 'buletinTerbaru', 'katalogPerpus'
+        ));
     }
 
     /**
-     * Berita terpublikasi terbaru untuk kartu besar "Unggulan" (kolom kiri
-     * section BERITA di Beranda). Null kalau belum ada berita → view
-     * menyembunyikan kolom kiri dan sidebar mengambil lebar penuh.
-     *
-     * Bentuk array (sama seperti mapping buletin di bawah):
-     *   title, excerpt, image (path storage thumbnail | null), date (Carbon),
-     *   author, url (route berita.show), target ('_self').
+     * 3 berita terpublikasi terbaru untuk grid "Kabar Terbaru" di Beranda
+     * (bentuk array sama dengan buletinTerbaru → bisa di-merge & diurut bareng).
      */
-    protected function beritaUnggulan(): ?array
+    protected function beritaGrid(): \Illuminate\Support\Collection
     {
-        $n = News::published()
+        return News::published()
             ->with('user')
             ->orderByDesc('published_at')
-            ->first();
-
-        if (! $n) {
-            return null;
-        }
-
-        return [
-            'type' => 'berita',
-            'title' => $n->title,
-            'excerpt' => $n->excerpt,
-            'image' => $n->thumbnail,
-            'date' => $n->published_at,
-            'author' => $n->user?->name,
-            'url' => route('berita.show', $n->slug),
-            'target' => '_self',
-        ];
+            ->limit(3)
+            ->get()
+            ->map(fn (News $n) => [
+                'type'    => 'berita',
+                'title'   => $n->title,
+                'excerpt' => $n->excerpt,
+                'image'   => $n->thumbnail,
+                'date'    => $n->published_at,
+                'author'  => $n->user?->name,
+                'url'     => route('berita.show', $n->slug),
+                'target'  => '_self',
+            ]);
     }
 
     /**
-     * N buletin terbaru (Book kategori 'buletin', visible) untuk sidebar
-     * "Buletin terbaru" (kolom kanan section BERITA di Beranda).
-     * Kembalian selalu Collection (bisa kosong → view merender empty state).
+     * N buletin terbaru (Book kategori 'buletin', visible) untuk grid
+     * "Kabar Terbaru" di Beranda. Kembalian selalu Collection.
      *
      * URL: PDF langsung (dibuka tab baru) atau fallback ke tab buletin /info.
      */
@@ -80,14 +90,14 @@ class PageController extends Controller
             ->map(function (Book $b) {
                 $pdf = $b->pdf_path ? asset('storage/' . $b->pdf_path) : route('info', ['tab' => 'buletin']);
                 return [
-                    'type' => 'buletin',
-                    'title' => $b->title,
+                    'type'    => 'buletin',
+                    'title'   => $b->title,
                     'excerpt' => $b->description,
-                    'image' => $b->cover_image,
-                    'date' => $b->created_at,
-                    'author' => $b->author,
-                    'url' => $pdf,
-                    'target' => $b->pdf_path ? '_blank' : '_self',
+                    'image'   => $b->cover_image,
+                    'date'    => $b->created_at,
+                    'author'  => $b->author,
+                    'url'     => $pdf,
+                    'target'  => $b->pdf_path ? '_blank' : '_self',
                 ];
             });
     }

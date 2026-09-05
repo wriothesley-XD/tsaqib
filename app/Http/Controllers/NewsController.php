@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityDocumentation;
 use App\Models\Book;
 use App\Models\News;
 use Illuminate\Http\Request;
@@ -15,6 +16,7 @@ class NewsController extends Controller
      *
      *   Tab "Berita"  → berita terpublikasi (News::published()).
      *   Tab "Buletin" → buku Perpustakaan berkategori 'buletin' (edisi PDF).
+     *   Tab "Dokumentasi" → galeri kegiatan (ActivityDocumentation).
      *
      * Route: GET /info
      */
@@ -30,11 +32,29 @@ class NewsController extends Controller
             ->latest()
             ->get();
 
-        $initialTab = in_array(request('tab'), ['berita', 'buletin'], true)
+        $documentations = ActivityDocumentation::with('photos')
+            ->orderByDesc('event_date')
+            ->orderByDesc('created_at')
+            ->get();
+
+        $initialTab = in_array(request('tab'), ['berita', 'buletin', 'dokumentasi'], true)
             ? request('tab')
             : 'berita';
 
-        return view('info', compact('news', 'buletin', 'initialTab'));
+        return view('info', compact('news', 'buletin', 'documentations', 'initialTab'));
+    }
+
+    /**
+     * Detail satu dokumentasi kegiatan + galeri foto (dengan lightbox).
+     * Route: GET /info/dokumentasi/{slug}
+     */
+    public function showDocumentation(string $slug)
+    {
+        $doc = ActivityDocumentation::with('photos')
+            ->where('slug', $slug)
+            ->firstOrFail();
+
+        return view('dokumentasi.show', compact('doc'));
     }
 
     /**

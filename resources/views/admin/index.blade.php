@@ -1,11 +1,12 @@
 {{-- resources/views/admin/index.blade.php — shell: sidebar nav + tab content --}}
 @php($pageTitle = 'Admin Panel - TSAQIB SMAN 1 Bukittinggi')
-@php($tab = in_array(request('tab'), ['dashboard','laporan','posts','users','books','news','recruitment']) ? request('tab') : 'dashboard')
+@php($tab = in_array(request('tab'), ['dashboard','laporan','posts','users','books','news','documentations','recruitment']) ? request('tab') : 'dashboard')
 @php($adminTabs = [
     'dashboard'   => ['Dashboard', 'fa-gauge-high'],
     'laporan'     => ['Laporan', 'fa-flag'],
     'posts'       => ['Kelola Postingan', 'fa-newspaper'],
     'news'        => ['Kelola Berita', 'fa-bullhorn'],
+    'documentations' => ['Dokumentasi', 'fa-images'],
     'users'       => ['Pengguna & Role', 'fa-users-gear'],
     'books'       => ['Buku PDF', 'fa-book'],
     'recruitment' => ['Pendaftaran', 'fa-user-plus'],
@@ -149,6 +150,7 @@
                 <section data-tab="users"       class="{{ $tab === 'users' ? '' : 'hidden' }}">@include('admin._tab_users')</section>
                 <section data-tab="books"       class="{{ $tab === 'books' ? '' : 'hidden' }}">@include('admin._tab_books')</section>
                 <section data-tab="news"        class="{{ $tab === 'news' ? '' : 'hidden' }}">@include('admin._tab_news')</section>
+                <section data-tab="documentations" class="{{ $tab === 'documentations' ? '' : 'hidden' }}">@include('admin._tab_documentations')</section>
                 <section data-tab="recruitment" class="{{ $tab === 'recruitment' ? '' : 'hidden' }}">@include('admin._tab_recruitment')</section>
             </div>
         </div>

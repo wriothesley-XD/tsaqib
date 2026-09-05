@@ -82,26 +82,31 @@
                 {{-- Laboratorium PAI dropdown --}}
                 <div class="relative inline-flex items-center">
                     <button type="button" id="labor-toggle"
-                            class="{{ $navLinkClass }} gap-1.5 {{ $link(in_array($currentRoute, ['laboratorium.pai', 'labor'])) }}"
+                            class="{{ $navLinkClass }} gap-1.5 {{ $link(in_array($currentRoute, ['laboratorium.pai', 'labor', 'laboratorium.profil', 'laboratorium.modul', 'laboratorium.tugas'])) }}"
                             aria-haspopup="true" aria-expanded="false" aria-controls="labor-menu">
                         <span>Laboratorium PAI</span>
                         <i class="fa-solid fa-chevron-down text-[8px] leading-none opacity-70 transition-transform duration-200"></i>
-                        <span class="{{ $underline(in_array($currentRoute, ['laboratorium.pai', 'labor'])) }}"></span>
+                        <span class="{{ $underline(in_array($currentRoute, ['laboratorium.pai', 'labor', 'laboratorium.profil', 'laboratorium.modul', 'laboratorium.tugas'])) }}"></span>
                     </button>
                     <div id="labor-menu"
                          class="absolute left-0 top-full pt-2.5 opacity-0 invisible z-[60]">
                         <div class="min-w-[210px] rounded-xl border border-white/10 bg-[#161a14] ring-1 ring-black/50 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.8)] overflow-hidden py-2">
-                            <a href="{{ route('laboratorium.pai') }}#profil"
+                            <a href="{{ route('laboratorium.pai') }}"
                                class="labor-item flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-white/70 hover:text-[var(--gold)] hover:bg-white/5">
                                 <i class="fa-solid fa-building-columns text-[9px] text-white/30"></i>
-                                Profil Laboratorium
+                                Ikhtisar Laboratorium
                             </a>
-                            <a href="{{ route('laboratorium.pai') }}#modul"
+                            <a href="{{ route('laboratorium.profil') }}"
+                               class="labor-item flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-white/70 hover:text-[var(--gold)] hover:bg-white/5">
+                                <i class="fa-solid fa-user-tie text-[9px] text-white/30"></i>
+                                Profil &amp; Guru
+                            </a>
+                            <a href="{{ route('laboratorium.modul') }}"
                                class="labor-item flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-white/70 hover:text-[var(--gold)] hover:bg-white/5">
                                 <i class="fa-solid fa-book-open text-[9px] text-white/30"></i>
                                 Modul Pembelajaran
                             </a>
-                            <a href="{{ route('laboratorium.pai') }}#tugas"
+                            <a href="{{ route('laboratorium.tugas') }}"
                                class="labor-item flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-white/70 hover:text-[var(--gold)] hover:bg-white/5">
                                 <i class="fa-solid fa-clipboard-check text-[9px] text-white/30"></i>
                                 Tugas Siswa
@@ -169,19 +174,6 @@
             <div class="flex items-center gap-6 lg:gap-8 shrink-0 pr-4 lg:pr-6">
 
                 <div class="hidden xl:flex items-center gap-6">
-                    {{-- Social media (selalu tampil; tema minimalis — brighten on hover) --}}
-                    <div class="flex items-center gap-3">
-                        <a href="https://www.instagram.com/fsi.smansa_landbouw?igsh=MXVzMzd5Nms0eDZpNQ==" target="_blank" rel="noopener" aria-label="TSAQIB di Instagram" class="text-white/55 hover:text-white transition-colors duration-200">
-                            <i class="fa-brands fa-instagram text-base"></i>
-                        </a>
-                        <a href="https://www.facebook.com/share/1BJMFJvK5k/" target="_blank" rel="noopener" aria-label="TSAQIB di Facebook" class="text-white/55 hover:text-white transition-colors duration-200">
-                            <i class="fa-brands fa-facebook text-base"></i>
-                        </a>
-                        <a href="https://ytfsi.carrd.co" target="_blank" rel="noopener" aria-label="TSAQIB di YouTube" class="text-white/55 hover:text-white transition-colors duration-200">
-                            <i class="fa-brands fa-youtube text-base"></i>
-                        </a>
-                    </div>
-
                     {{-- Pembatas tipis sebelum area Admin/Akun --}}
                     <span class="w-px h-5 bg-white/10" aria-hidden="true"></span>
 
@@ -197,14 +189,9 @@
                             <x-community-avatar :user="Auth::user()" size="xs" />
                         </a>
                     @else
-                        {{-- CTA buttons: primary register + secondary login --}}
-                        <a href="{{ route('register') }}"
-                           class="cta-primary inline-flex items-center px-5 py-2.5 rounded-full text-xs font-bold tracking-wide text-white">
-                            <span class="hidden sm:inline">Buat Akun Tsaqib</span>
-                            <span class="sm:hidden">Daftar</span>
-                        </a>
+                        {{-- CTA: login — ghost dgn border emas tipis --}}
                         <a href="{{ route('login') }}"
-                           class="inline-flex items-center px-5 py-2.5 rounded-full text-xs font-bold tracking-wide text-white border border-white/20 hover:bg-white/5 hover:border-white/30 transition">
+                           class="inline-flex items-center px-5 py-2.5 rounded-full text-xs font-bold tracking-wide text-[var(--gold)] border border-[var(--gold)]/50 hover:bg-[var(--gold)]/10 hover:border-[var(--gold)] transition-colors duration-200">
                             Masuk
                         </a>
                     @endauth
@@ -455,14 +442,10 @@
         }
 
         if (btn && menu) {
-            console.log('Mobile menu button found:', btn);
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
-                console.log('Mobile menu button clicked');
                 menu.classList.contains('hidden') ? openMenu() : closeMenu();
             });
-        } else {
-            console.error('Mobile menu elements not found:', { btn, menu });
         }
         if (backdrop) {
             backdrop.addEventListener('click', closeMenu);
@@ -501,23 +484,18 @@
            Sebelumnya hover-only (group-hover), jadi klik (mouse biasa, touch, keyboard)
            nggak buka apa-apa. Sekarang toggle via klik + tutup otomatis saat klik di luar
            atau tekan Escape. */
-        console.log('Dropdown script loaded');
         const lainnyaBtn  = document.getElementById('lainnya-toggle');
         const lainnyaMenu = document.getElementById('lainnya-menu');
-        console.log('Lainnya elements:', { lainnyaBtn, lainnyaMenu });
         if (lainnyaBtn && lainnyaMenu) {
             const openLainnya  = () => {
-                console.log('Opening Lainnya dropdown');
                 lainnyaMenu.classList.add('is-open');
                 lainnyaBtn.setAttribute('aria-expanded', 'true');
             };
             const closeLainnya = () => {
-                console.log('Closing Lainnya dropdown');
                 lainnyaMenu.classList.remove('is-open');
                 lainnyaBtn.setAttribute('aria-expanded', 'false');
             };
             lainnyaBtn.addEventListener('click', (e) => {
-                console.log('Lainnya button clicked');
                 e.stopPropagation();
                 lainnyaBtn.getAttribute('aria-expanded') === 'true' ? closeLainnya() : openLainnya();
             });
@@ -535,20 +513,16 @@
         /* ============ "Laboratorium PAI" dropdown (desktop, ≥ xl) — click-to-toggle ============ */
         const laborBtn  = document.getElementById('labor-toggle');
         const laborMenu = document.getElementById('labor-menu');
-        console.log('Labor elements:', { laborBtn, laborMenu });
         if (laborBtn && laborMenu) {
             const openLabor  = () => {
-                console.log('Opening Labor dropdown');
                 laborMenu.classList.add('is-open');
                 laborBtn.setAttribute('aria-expanded', 'true');
             };
             const closeLabor = () => {
-                console.log('Closing Labor dropdown');
                 laborMenu.classList.remove('is-open');
                 laborBtn.setAttribute('aria-expanded', 'false');
             };
             laborBtn.addEventListener('click', (e) => {
-                console.log('Labor button clicked');
                 e.stopPropagation();
                 laborBtn.getAttribute('aria-expanded') === 'true' ? closeLabor() : openLabor();
             });

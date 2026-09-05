@@ -8,12 +8,16 @@ use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Menolak akses selain admin — dipasang pada route group admin-panel.
+ * Membatasi akses panel admin untuk role admin & guru — dipasang pada route
+ * group admin-panel.
  *
  * Ini pertahanan PERTAMA di lapisan routing: seluruh group tertutup untuk
- * non-admin walau sebuah method controller lupa memanggil checkAdmin().
+ * role lain walau sebuah method controller lupa memanggil checkAdmin().
  * checkAdmin() di AdminController tetap dipertahankan sebagai defense in
  * depth (lapisan kedua) — jangan dihapus.
+ *
+ * Role siswa/umum (+ legacy 'member') DIALIHKAN (bukan 403) sesuai blueprint
+ * RBAC. Nilai role: admin | guru | siswa | umum ('member' lama = setara umum).
  */
 class EnsureUserIsAdmin
 {
@@ -25,8 +29,9 @@ class EnsureUserIsAdmin
             abort(401, 'Anda harus login terlebih dahulu.');
         }
 
-        if ($user->role !== 'admin') {
-            abort(403, 'Akses Ditolak. Halaman ini hanya dapat diakses oleh Admin.');
+        if (! in_array($user->role, ['admin', 'guru'], true)) {
+            return redirect()->route('landing')
+                ->with('error', 'Akses ditolak. Panel ini hanya untuk Admin & Guru.');
         }
 
         return $next($request);

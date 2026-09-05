@@ -2,10 +2,75 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GuruProfile;
+use App\Models\Modul;
 use App\Models\Setting;
+use App\Models\Tugas;
 
 class TsaqibController extends Controller
 {
+    /**
+     * Gate akses penuh halaman Modul & Tugas: siswa terverifikasi, atau guru/admin.
+     * Belum terverifikasi → view tetap dirender (bukan 403) dengan panel gate.
+     */
+    private function isVerified(): bool
+    {
+        $user = auth()->user();
+
+        return $user !== null
+            && ($user->is_verified_student || in_array($user->role, ['admin', 'guru'], true));
+    }
+
+    /**
+     * Profil Laboratorium & Guru (publik, read-only).
+     * Route: GET /laboratorium-pai/profil
+     */
+    public function laborProfil()
+    {
+        $visiMisi = [
+            'visi' => 'Visi FSI belum diisi — tunggu data resmi.',
+            'misi' => [
+                'Misi 1 — belum diisi',
+                'Misi 2 — belum diisi',
+                'Misi 3 — belum diisi',
+            ],
+        ];
+
+        $gurus = GuruProfile::with('user')->latest()->get();
+
+        return view('tsaqib.labor-profil', compact('visiMisi', 'gurus'));
+    }
+
+    /**
+     * Modul Pembelajaran (PDF) — penuh hanya untuk siswa terverifikasi/guru.
+     * Filter kelas+kategori+search dikerjakan client-side (volume data kelas
+     * sekolah kecil; tanpa endpoint AJAX).
+     * Route: GET /laboratorium-pai/modul
+     */
+    public function laborModul()
+    {
+        $verified = $this->isVerified();
+        $moduls   = $verified
+            ? Modul::with('user')->latest()->get()
+            : collect();
+
+        return view('tsaqib.labor-modul', compact('moduls', 'verified'));
+    }
+
+    /**
+     * Tugas Siswa — penuh hanya untuk siswa terverifikasi/guru.
+     * Urut deadline terdekat di atas (NULL paling akhir).
+     * Route: GET /laboratorium-pai/tugas
+     */
+    public function laborTugas()
+    {
+        $verified = $this->isVerified();
+        $tugas    = $verified
+            ? Tugas::with('user')->orderByRaw('deadline IS NULL, deadline')->get()
+            : collect();
+
+        return view('tsaqib.labor-tugas', compact('tugas', 'verified'));
+    }
     /**
      * Labor PAI: Visi-Misi FSI + Struktur Organisasi (Pembina & Siswa).
      * Konten masih placeholder — tunggu data resmi dari pengurus FSI,

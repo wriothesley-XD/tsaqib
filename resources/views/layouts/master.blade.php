@@ -23,6 +23,22 @@
 
     @include('partials.navbar')
 
+    {{-- Flash global (sukses/error) — dipakai redirect RBAC, simpan berita, dll. --}}
+    @if(session('success') || session('error'))
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-4">
+            @if(session('success'))
+                <div class="rounded-xl border border-[#01795F]/40 bg-[#01795F]/15 px-4 py-2.5 text-xs font-semibold text-[#3fd6b0]">
+                    {{ session('success') }}
+                </div>
+            @endif
+            @if(session('error'))
+                <div class="mt-2 rounded-xl border border-red-500/40 bg-red-500/15 px-4 py-2.5 text-xs font-semibold text-red-300 {{ session('success') ? '' : 'first:mt-0' }}">
+                    {{ session('error') }}
+                </div>
+            @endif
+        </div>
+    @endif
+
     @yield('content')
 
     @include('partials.site-footer')

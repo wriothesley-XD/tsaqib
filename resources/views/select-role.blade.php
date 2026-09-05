@@ -51,7 +51,6 @@
             'peran' => 'Commander, Support',
             'image' => 'images/icon/mushou.jpg',
         ],
-    ],
     ];
 @endphp
 <!DOCTYPE html>

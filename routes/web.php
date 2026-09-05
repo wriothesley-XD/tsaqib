@@ -8,6 +8,7 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\TsaqibController;
 use Illuminate\Support\Facades\Route;
 
@@ -23,8 +24,11 @@ Route::get('/hub-masjid', [PageController::class, 'hub'])->name('hub.masjid');
 // Perpustakaan Digital Publik (filter ?category= & ?q= + pagination server-side)
 Route::get('/perpustakaan', [LibraryController::class, 'index'])->name('perpustakaan');
 
-// Pusat Informasi: Berita + Buletin dalam satu halaman 2 tab (no reload).
+// Pusat Informasi: Berita + Buletin + Dokumentasi dalam satu halaman bertab (no reload).
 Route::get('/info', [NewsController::class, 'info'])->name('info');
+
+// Detail dokumentasi kegiatan (dicapai dari tab Dokumentasi di /info).
+Route::get('/info/dokumentasi/{slug}', [NewsController::class, 'showDocumentation'])->name('info.dokumentasi.show');
 
 // Alias lama /berita → /info (jaga-jaga ada link/bookmark lama). Tanpa nama
 // agar route('info') jadi satu-satunya sumber URL berita di view.
@@ -33,9 +37,14 @@ Route::get('/berita', fn () => redirect()->route('info'));
 // Detail berita per slug (dicapai dari tab Berita di /info & section Kabar Terbaru).
 Route::get('/berita/{slug}', [NewsController::class, 'show'])->name('berita.show');
 
-// Laboratorium PAI Publik
+// Laboratorium PAI Publik + 3 sub-halaman (profil/modul/tugas).
+// Modul & Tugas: akses penuh hanya siswa terverifikasi/guru — belum
+// terverifikasi dirender dengan panel gate (bukan 403).
 Route::get('/laboratorium-pai', [TsaqibController::class, 'laborPai'])->name('laboratorium.pai');
 Route::get('/labor', [TsaqibController::class, 'laborPai'])->name('labor');
+Route::get('/laboratorium-pai/profil', [TsaqibController::class, 'laborProfil'])->name('laboratorium.profil');
+Route::get('/laboratorium-pai/modul', [TsaqibController::class, 'laborModul'])->name('laboratorium.modul');
+Route::get('/laboratorium-pai/tugas', [TsaqibController::class, 'laborTugas'])->name('laboratorium.tugas');
 
 // Open Recruitment Publik (Calon Anggota Kelas X). POST di-throttle: form publik
 // tanpa login — tanpa limiter, bot bisa banjiri tabel registrations + email notif.
@@ -100,6 +109,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/reports', [ReportController::class, 'store'])
         ->middleware('throttle:10,1')->name('reports.store');
 
+    // Verifikasi siswa 2 pintu (Pintu A: whitelist NISN; Pintu B: foto KTS →
+    // approval admin). POST publik ber-login, di-throttle ketat.
+    Route::view('/verifikasi-siswa', 'verifikasi.form')->name('verifikasi.siswa.form');
+    Route::post('/verifikasi-siswa', [VerificationController::class, 'store'])
+        ->middleware('throttle:5,1')->name('verifikasi.siswa');
+
     // Profil User
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -140,6 +155,16 @@ Route::middleware('auth')->group(function () {
         Route::post('/news', [AdminController::class, 'storeNews'])->name('news.store');
         Route::put('/news/{news}', [AdminController::class, 'updateNews'])->name('news.update');
         Route::delete('/news/{news}', [AdminController::class, 'destroyNews'])->name('news.destroy');
+        Route::post('/documentations', [AdminController::class, 'storeDocumentation'])->name('documentations.store');
+        Route::delete('/documentations/{documentation}', [AdminController::class, 'destroyDocumentation'])->name('documentations.destroy');
+        // Modul & Tugas (guru) + resolusi verifikasi siswa (blueprint RBAC).
+        Route::post('/verifications/{verification}/resolve', [VerificationController::class, 'resolve'])->name('verifications.resolve');
+        Route::post('/moduls', [AdminController::class, 'storeModul'])->name('moduls.store');
+        Route::delete('/moduls/{modul}', [AdminController::class, 'destroyModul'])->name('moduls.destroy');
+        Route::post('/tugas', [AdminController::class, 'storeTugas'])->name('tugas.store');
+        Route::delete('/tugas/{tugas}', [AdminController::class, 'destroyTugas'])->name('tugas.destroy');
+        Route::post('/gurus', [AdminController::class, 'storeGuru'])->name('gurus.store');
+        Route::delete('/gurus/{guru}', [AdminController::class, 'destroyGuru'])->name('gurus.destroy');
         Route::post('/toggle-recruitment', [AdminController::class, 'toggleRecruitment'])->name('toggle-recruitment');
         Route::post('/reports/{report}/resolve', [ReportController::class, 'resolve'])->name('reports.resolve');
     });

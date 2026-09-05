@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityDocumentation;
 use App\Models\Book;
+use App\Models\GuruProfile;
+use App\Models\Modul;
 use App\Models\News;
 use App\Models\Post;
+use App\Models\Tugas;
 use App\Models\Registration;
 use App\Models\Report;
 use App\Models\Setting;
@@ -36,8 +40,8 @@ class AdminController extends Controller
             abort(401, 'Anda harus login terlebih dahulu.');
         }
 
-        if ($user->role !== 'admin') {
-            abort(403, 'Akses Ditolak. Halaman ini hanya dapat diakses oleh Admin.');
+        if (! in_array($user->role, ['admin', 'guru'], true)) {
+            abort(403, 'Akses Ditolak. Halaman ini hanya dapat diakses oleh Admin & Guru.');
         }
     }
 
@@ -59,6 +63,7 @@ class AdminController extends Controller
         $posts         = Post::with('user')->latest()->paginate($perPage);
         $registrations = Registration::latest()->paginate($perPage);
         $news          = News::with('user')->latest()->paginate($perPage);
+        $documentations = ActivityDocumentation::with('photos')->latest()->paginate($perPage);
         $isRecruitmentOpen = Setting::getByKey('recruitment_open', '1') === '1';
 
         // Laporan konten pending (untuk badge + Perlu Perhatian + tab Laporan).
@@ -76,7 +81,7 @@ class AdminController extends Controller
             'total_news' => $news->total(),
         ];
 
-        return view('admin.index', compact('users', 'books', 'posts', 'registrations', 'news', 'isRecruitmentOpen', 'stats', 'laporan', 'pendingReportCount', 'perluPerhatian'));
+        return view('admin.index', compact('users', 'books', 'posts', 'registrations', 'news', 'documentations', 'isRecruitmentOpen', 'stats', 'laporan', 'pendingReportCount', 'perluPerhatian'));
     }
 
     /**
@@ -97,6 +102,7 @@ class AdminController extends Controller
             'users'         => ['view' => 'admin._list_users',         'query' => User::latest()],
             'books'         => ['view' => 'admin._list_books',         'query' => Book::latest(), 'search' => ['title', 'author', 'category']],
             'news'          => ['view' => 'admin._list_news',          'query' => News::with('user')->latest()],
+            'documentations' => ['view' => 'admin._list_documentations', 'query' => ActivityDocumentation::with('photos')->latest()],
             'posts'         => ['view' => 'admin._list_posts',         'query' => Post::with('user')->latest(),         'itemView' => 'admin._post_item',   'itemVar' => 'post', 'groupField' => 'community_slug'],
             'registrations' => ['view' => 'admin._list_registrations', 'query' => Registration::latest()],
             'laporan'       => ['view' => 'admin._list_laporan',       'query' => Report::pending()->with(['reportable.user', 'reporter'])->latest(), 'itemView' => 'admin._laporan_item', 'itemVar' => 'r', 'groupField' => 'reportable_type'],
@@ -381,6 +387,186 @@ class AdminController extends Controller
         $news->delete();
 
         return redirect()->back()->with('success', 'Berita berhasil dihapus!');
+    }
+
+    /**
+     * Simpan dokumentasi kegiatan baru + upload banyak foto sekaligus.
+     * Validasi: wajib ada foto; per foto max 5MB, hanya jpg/png/webp.
+     * Route: POST /admin-panel/documentations
+     */
+    public function storeDocumentation(Request $request): RedirectResponse
+    {
+        $this->checkAdmin();
+
+        $data = $request->validate([
+            'title'       => 'required|string|max:255',
+            'description' => 'nullable|string|max:5000',
+            'event_date'  => 'nullable|date',
+            'category'    => 'nullable|string|max:50',
+            'photos'      => 'required|array|min:1',
+            'photos.*'    => 'file|mimes:jpg,jpeg,png,webp|max:5120',
+        ]);
+
+        // Slug unik dari judul (pola uniqueNewsSlug).
+        $base      = Str::slug($data['title']);
+        $slug      = $base;
+        $attempt   = 1;
+        while (ActivityDocumentation::where('slug', $slug)->exists()) {
+            $slug = $base.'-'.(++$attempt);
+        }
+
+        $doc = ActivityDocumentation::create([
+            'title'       => $data['title'],
+            'slug'        => $slug,
+            'description' => $data['description'] ?? null,
+            'event_date'  => $data['event_date'] ?? null,
+            'category'    => $data['category'] ?? null,
+        ]);
+
+        foreach ($request->file('photos') as $photo) {
+            $doc->photos()->create([
+                'image_path' => $photo->store('documentations', 'public'),
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Dokumentasi kegiatan berhasil ditambahkan!');
+    }
+
+    /**
+     * Hapus dokumentasi kegiatan + file fotonya (baris foto terhapus via FK cascade).
+     * Route: DELETE /admin-panel/documentations/{documentation}
+     */
+    public function destroyDocumentation(ActivityDocumentation $documentation): RedirectResponse
+    {
+        $this->checkAdmin();
+
+        Storage::disk('public')->delete(
+            $documentation->photos()->pluck('image_path')->all()
+        );
+
+        $documentation->delete();
+
+        return redirect()->back()->with('success', 'Dokumentasi kegiatan berhasil dihapus!');
+    }
+
+    /**
+     * Simpan modul pembelajaran (PDF) — guru/admin.
+     * Route: POST /admin-panel/moduls
+     */
+    public function storeModul(Request $request): RedirectResponse
+    {
+        $this->checkAdmin();
+
+        $data = $request->validate([
+            'judul'        => 'required|string|max:255',
+            'kategori'     => 'nullable|in:Aqidah,Fiqih,Al-Qur\'an,SKI,Akhlak,Praktikum',
+            'target_kelas' => 'nullable|in:X,XI,XII',
+            'deskripsi'    => 'nullable|string|max:5000',
+            'file'         => 'required|file|mimes:pdf|max:20480', // 20MB
+        ]);
+
+        $data['file_path'] = $request->file('file')->store('moduls', 'public');
+        $data['user_id']   = $request->user()->id;
+        unset($data['file']);
+
+        Modul::create($data);
+
+        return redirect()->back()->with('success', 'Modul berhasil diupload!');
+    }
+
+    /**
+     * Hapus modul + file PDF-nya.
+     * Route: DELETE /admin-panel/moduls/{modul}
+     */
+    public function destroyModul(Modul $modul): RedirectResponse
+    {
+        $this->checkAdmin();
+
+        if ($modul->file_path && Storage::disk('public')->exists($modul->file_path)) {
+            Storage::disk('public')->delete($modul->file_path);
+        }
+
+        $modul->delete();
+
+        return redirect()->back()->with('success', 'Modul berhasil dihapus!');
+    }
+
+    /**
+     * Simpan tugas + link Google Classroom — guru/admin.
+     * Route: POST /admin-panel/tugas
+     */
+    public function storeTugas(Request $request): RedirectResponse
+    {
+        $this->checkAdmin();
+
+        Tugas::create($request->validate([
+            'judul_tugas'          => 'required|string|max:255',
+            'deskripsi'            => 'nullable|string|max:5000',
+            'deadline'             => 'nullable|date',
+            'target_kelas'         => 'nullable|in:X,XI,XII',
+            'link_google_classroom' => ['nullable', 'url', 'regex:#^https://classroom\.google\.com/#'],
+        ]) + ['user_id' => $request->user()->id]);
+
+        return redirect()->back()->with('success', 'Tugas berhasil ditambahkan!');
+    }
+
+    /**
+     * Hapus tugas.
+     * Route: DELETE /admin-panel/tugas/{tugas}
+     */
+    public function destroyTugas(Tugas $tugas): RedirectResponse
+    {
+        $this->checkAdmin();
+
+        $tugas->delete();
+
+        return redirect()->back()->with('success', 'Tugas berhasil dihapus!');
+    }
+
+    /**
+     * Simpan profil guru (untuk halaman publik Profil & Guru).
+     * kelas_diampu dikirim sebagai multiple select/checkbox array.
+     * Route: POST /admin-panel/gurus
+     */
+    public function storeGuru(Request $request): RedirectResponse
+    {
+        $this->checkAdmin();
+
+        $data = $request->validate([
+            'user_id'        => 'required|exists:users,id|unique:guru_profiles,user_id',
+            'nip'            => 'nullable|string|max:30',
+            'mapel_pengampu' => 'nullable|string|max:100',
+            'kelas_diampu'   => 'nullable|array',
+            'kelas_diampu.*' => 'in:X,XI,XII',
+            'foto'           => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'wa_number'      => 'nullable|string|max:20',
+        ]);
+
+        $data['foto_path'] = $request->hasFile('foto')
+            ? $request->file('foto')->store('guru', 'public')
+            : null;
+        unset($data['foto']);
+
+        GuruProfile::create($data);
+
+        return redirect()->back()->with('success', 'Profil guru berhasil ditambahkan!');
+    }
+
+    /**
+     * Hapus profil guru + foto-nya.
+     * Route: DELETE /admin-panel/gurus/{guru}
+     */
+    public function destroyGuru(GuruProfile $guru): RedirectResponse
+    {
+        $this->checkAdmin();
+
+        if ($guru->foto_path && Storage::disk('public')->exists($guru->foto_path)) {
+            Storage::disk('public')->delete($guru->foto_path);
+        }
+
+        $guru->delete();
+
+        return redirect()->back()->with('success', 'Profil guru berhasil dihapus!');
     }
 
     /**

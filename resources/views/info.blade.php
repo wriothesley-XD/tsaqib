@@ -80,6 +80,33 @@
     }
     .info-pager-btn:disabled{ opacity:.35;cursor:not-allowed; }
     .info-pager-ellipsis{ color:rgba(247,245,239,.35);padding:0 .15rem;align-self:center; }
+
+    /* ===== Cross-fade ganti tab (200-220ms) =====
+       Panel masuk dianimasikan (fade + sedikit naik); panel keluar langsung
+       hidden — hasilnya transisi halus tanpa orkestrasi dua arah. */
+    @keyframes panelIn{ from{ opacity:0; transform:translateY(6px); } }
+    .panel-fade{ animation:panelIn .22s ease; }
+
+    /* ===== Kartu Dokumentasi ===== */
+    .doc-card{ transition:transform .25s ease, border-color .25s ease; }
+    .doc-card:hover{ transform:translateY(-4px); border-color:rgba(201,166,107,.4); }
+    .doc-thumb{ background:linear-gradient(155deg,#0f7a5c,#0a4a3a); }
+    .doc-thumb img{ transition:transform .5s ease; }
+    .doc-card:hover .doc-thumb img{ transform:scale(1.06); }
+
+    /* ===== Scroll-reveal + stagger (pola sama dgn landing) =====
+       Hidden-state HANYA saat <html> ber-class .js-reveal → tanpa JS semua
+       tetap terlihat. */
+    .js-reveal .reveal{
+        opacity:0; transform:translateY(14px);
+        transition:opacity .5s ease,transform .5s ease;
+        transition-delay:calc(var(--reveal-i,0) * 90ms);
+    }
+    .js-reveal .reveal.is-visible{ opacity:1; transform:none; }
+    @media (prefers-reduced-motion: reduce){
+        .js-reveal .reveal{ opacity:1; transform:none; transition:none; }
+        .panel-fade{ animation:none; }
+    }
 </style>
 @endpush
 
@@ -93,7 +120,7 @@
             Info <span class="text-[var(--gold)]">TSAQIB</span>
         </h1>
         <p class="text-white/55 text-xs sm:text-sm mt-2 leading-relaxed max-w-xl mx-auto">
-            Berita terbaru dan edisi buletin Forum Studi Islam SMAN 1 Bukittinggi dalam satu tempat.
+            Berita terbaru, edisi buletin, dan galeri kegiatan Forum Studi Islam SMAN 1 Bukittinggi dalam satu tempat.
         </p>
     </div>
 
@@ -115,6 +142,12 @@
                     <i class="fa-solid fa-book-open text-[11px]"></i>
                     <span>Buletin</span>
                     @if($buletin->isNotEmpty())<span class="count">{{ $buletin->count() }}</span>@endif
+                </button>
+                <button type="button" data-info-tab="dokumentasi"
+                        class="info-tab {{ $initialTab === 'dokumentasi' ? 'is-active' : '' }}">
+                    <i class="fa-solid fa-images text-[11px]"></i>
+                    <span>Dokumentasi</span>
+                    @if($documentations->isNotEmpty())<span class="count">{{ $documentations->count() }}</span>@endif
                 </button>
             </div>
         </div>
@@ -218,6 +251,60 @@
             @endif
         </div>
 
+        {{-- ===== Panel: Dokumentasi (galeri kegiatan) ===== --}}
+        <div data-info-panel="dokumentasi" class="{{ $initialTab === 'dokumentasi' ? '' : 'hidden' }}">
+            @if($documentations->isNotEmpty())
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 js-pager-grid" data-per-page="8">
+                    @foreach($documentations as $doc)
+                        <a href="{{ route('info.dokumentasi.show', $doc->slug) }}"
+                           class="doc-card js-pager-item reveal group tsaqib-card overflow-hidden flex flex-col"
+                           style="--reveal-i:{{ $loop->index % 8 }};">
+                            {{-- Cover = foto pertama kegiatan. --}}
+                            <div class="doc-thumb relative aspect-[4/3] overflow-hidden">
+                                @if($doc->photos->first())
+                                    <img src="{{ asset('storage/' . $doc->photos->first()->image_path) }}" alt="{{ $doc->title }}"
+                                         class="absolute inset-0 w-full h-full object-cover" onerror="this.remove()">
+                                @else
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center gap-1.5 text-white/20">
+                                        <i class="fa-solid fa-images text-3xl"></i>
+                                    </div>
+                                @endif
+                                <span class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent"></span>
+                                {{-- Badge jumlah foto. --}}
+                                <span class="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-sm text-[9px] font-bold text-[var(--cream)]">
+                                    <i class="fa-solid fa-camera text-[8px]"></i>{{ $doc->photos->count() }} Foto
+                                </span>
+                                {{-- Badge kategori (kalau ada) — tint hijau/emas/krem. --}}
+                                @if($doc->category)
+                                    <span class="absolute top-2.5 left-2.5 inline-flex items-center px-2 py-0.5 rounded-full border backdrop-blur-sm text-[9px] font-bold uppercase tracking-wider {{ $doc->badgeClass() }}">
+                                        {{ $doc->category }}
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="p-3.5 flex flex-col flex-1">
+                                <h3 class="font-display font-bold text-[13px] text-[var(--cream)] leading-snug line-clamp-2">{{ $doc->title }}</h3>
+                                <div class="mt-auto pt-2.5 flex items-center justify-between gap-2 border-t border-white/5">
+                                    <span class="text-[10px] text-white/40 inline-flex items-center gap-1">
+                                        <i class="fa-regular fa-calendar text-[8px]"></i>{{ $doc->event_date?->format('d M Y') ?? '—' }}
+                                    </span>
+                                    <span class="text-[10px] font-bold text-[var(--gold)] inline-flex items-center gap-1 shrink-0">
+                                        Lihat <i class="fa-solid fa-arrow-right text-[9px]"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+                {{-- Pager di-render JS sesuai jumlah item --}}
+                <nav class="info-pager js-pager-nav" aria-label="Halaman dokumentasi" hidden></nav>
+            @else
+                <div class="tsaqib-card-flat p-12 text-center">
+                    <i class="fa-solid fa-images text-3xl text-white/15 block mb-3"></i>
+                    <p class="text-white/45 text-xs">Belum ada dokumentasi kegiatan yang dipublikasikan.</p>
+                </div>
+            @endif
+        </div>
+
     </div>
 </main>
 @endsection
@@ -231,7 +318,17 @@
 
     function activate(name) {
         tabs.forEach(function (t) { t.classList.toggle('is-active', t.dataset.infoTab === name); });
-        panels.forEach(function (p) { p.classList.toggle('hidden', p.dataset.infoPanel !== name); });
+        panels.forEach(function (p) {
+            if (p.dataset.infoPanel === name) {
+                if (p.classList.contains('hidden')) {
+                    p.classList.remove('hidden');
+                    // Replay animasi cross-fade saat panel muncul.
+                    p.classList.remove('panel-fade'); void p.offsetWidth; p.classList.add('panel-fade');
+                }
+            } else {
+                p.classList.add('hidden');
+            }
+        });
     }
 
     tabs.forEach(function (t) {
@@ -244,7 +341,20 @@
 
     // Honor #hash pada load agar /info#buletin bisa dibagikan.
     var hash = (location.hash || '').replace('#', '');
-    if (hash === 'berita' || hash === 'buletin') activate(hash);
+    if (hash === 'berita' || hash === 'buletin' || hash === 'dokumentasi') activate(hash);
+
+    /* ===== Scroll-reveal + stagger (.reveal + --reveal-i) =====
+       Pola sama dengan landing: IntersectionObserver memunculkan elemen saat
+       masuk viewport. Tanpa JS (tanpa .js-reveal) semua tetap terlihat. */
+    if ('IntersectionObserver' in window) {
+        document.documentElement.classList.add('js-reveal');
+        var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (en) {
+                if (en.isIntersecting) { en.target.classList.add('is-visible'); io.unobserve(en.target); }
+            });
+        }, { threshold: .12 });
+        document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+    }
 
     /* ===== Pagination client-side per-panel =====
        Tiap grid bertanda .js-pager-grid + data-per-page. JS menyembunyikan

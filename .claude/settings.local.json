@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude mcp *)",
+      "Bash(python3 -c ' *)",
+      "Bash(python3 *)"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "21st"
+  ]
+}

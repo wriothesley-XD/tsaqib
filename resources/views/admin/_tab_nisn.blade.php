@@ -24,14 +24,14 @@
 
     {{-- FORM IMPORT MASSAL (HIDDEN BY DEFAULT) --}}
     <div id="nisn-import-form" class="hidden mb-6 p-5 rounded-xl bg-white/5 border border-white/10 space-y-3">
-        <h4 class="font-bold text-xs text-[var(--cream)] uppercase tracking-wider">Import Massal dari File</h4>
+        <h4 class="font-bold text-xs text-[var(--cream)] uppercase tracking-wider">Import Massal dari File Excel / CSV</h4>
         <p class="text-[11px] text-white/50 leading-relaxed">
-            Format kolom: <span class="text-[var(--gold)]">nisn</span>,
-            <span class="text-[var(--gold)]">nama</span> (opsional),
-            <span class="text-[var(--gold)]">kelas</span> (opsional) — boleh pakai baris header atau tidak.
-            NISN yang sudah ada di whitelist akan diperbarui datanya, bukan diduplikasi.
-            <br>File <strong>.csv</strong> langsung didukung. File <strong>.xlsx/.xls</strong> butuh package
-            <code class="text-[10px] bg-black/30 px-1 py-0.5 rounded">phpoffice/phpspreadsheet</code> ter-install di server.
+            Mendukung file <strong>Excel (.xlsx) Format 8355 (Buku Induk Siswa Dapodik)</strong> maupun CSV umum.
+            Sistem otomatis mendeteksi kolom <span class="text-[var(--gold)]">NISN</span>,
+            <span class="text-[var(--gold)]">Nomor Induk (NIS)</span>,
+            <span class="text-[var(--gold)]">Nama Siswa</span>, dan
+            <span class="text-[var(--gold)]">Kelas</span> meskipun baris header berada di baris 14 atau memiliki judul di atasnya.
+            Data yang sudah ada akan diperbarui secara otomatis.
         </p>
         <form action="{{ route('admin.nisn-whitelist.import') }}" method="POST" enctype="multipart/form-data" class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
             @csrf
@@ -45,26 +45,30 @@
 
     {{-- FORM TAMBAH MANUAL SATU NISN (HIDDEN BY DEFAULT) --}}
     <div id="nisn-add-form" class="hidden mb-6 p-5 rounded-xl bg-white/5 border border-white/10 space-y-4">
-        <h4 class="font-bold text-xs text-[var(--cream)] uppercase tracking-wider">Tambah NISN Manual</h4>
+        <h4 class="font-bold text-xs text-[var(--cream)] uppercase tracking-wider">Tambah NISN / NIS Manual</h4>
         <form action="{{ route('admin.nisn-whitelist.store') }}" method="POST" class="space-y-3">
             @csrf
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
                 <div>
                     <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">NISN *</label>
-                    <input type="text" name="nisn" required maxlength="20" class="tsaqib-input w-full px-3 py-2 text-xs">
+                    <input type="text" name="nisn" required maxlength="20" placeholder="mis. 0118703733" class="tsaqib-input w-full px-3 py-2 text-xs">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Nama (opsional)</label>
-                    <input type="text" name="nama" maxlength="100" class="tsaqib-input w-full px-3 py-2 text-xs">
+                    <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Nomor Induk (NIS)</label>
+                    <input type="text" name="nis" maxlength="20" placeholder="mis. 22455" class="tsaqib-input w-full px-3 py-2 text-xs">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Kelas (opsional)</label>
-                    <input type="text" name="kelas" maxlength="20" placeholder="X / XI / XII" class="tsaqib-input w-full px-3 py-2 text-xs">
+                    <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Nama Lengkap</label>
+                    <input type="text" name="nama" maxlength="100" placeholder="Nama siswa" class="tsaqib-input w-full px-3 py-2 text-xs">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Kelas</label>
+                    <input type="text" name="kelas" maxlength="20" placeholder="mis. X-1 / XI" class="tsaqib-input w-full px-3 py-2 text-xs">
                 </div>
             </div>
             <div class="flex justify-end">
                 <button type="submit" class="px-5 py-2 rounded-xl bg-[#01795F] text-white font-bold text-xs shadow-sm">
-                    Simpan NISN
+                    Simpan Siswa
                 </button>
             </div>
         </form>
@@ -82,14 +86,14 @@
             <div class="relative flex-1 sm:max-w-xs">
                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[12px] text-white/40 pointer-events-none"></i>
                 <input type="text" data-admin-search
-                       placeholder="Cari NISN / nama / kelas…" aria-label="Cari NISN"
+                       placeholder="Cari NISN / NIS / nama / kelas…" aria-label="Cari NISN"
                        class="tsaqib-input w-full pl-9 pr-9 py-2 text-xs">
                 <button type="button" data-admin-search-clear aria-label="Hapus pencarian"
                         class="hidden absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-md text-white/45 hover:text-[var(--cream)] hover:bg-white/10 flex items-center justify-center">
                     <i class="fa-solid fa-xmark text-[11px]"></i>
                 </button>
             </div>
-            <p class="text-[11px] text-white/40">Menyaring otomatis — NISN, nama, atau kelas.</p>
+            <p class="text-[11px] text-white/40">Menyaring otomatis — NISN, NIS, nama, atau kelas.</p>
         </div>
 
         <div class="overflow-x-auto">
@@ -98,6 +102,7 @@
                     <tr>
                         <th class="p-3">#</th>
                         <th class="p-3">NISN</th>
+                        <th class="p-3">NIS</th>
                         <th class="p-3">Nama</th>
                         <th class="p-3">Kelas</th>
                         <th class="p-3">Ditambahkan</th>

@@ -6,7 +6,6 @@ use App\Models\NisnWhitelist;
 use App\Models\StudentVerification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 /**
  * Verifikasi siswa 2 pintu (blueprint RBAC poin 3).
@@ -30,17 +29,32 @@ class VerificationController extends Controller
         }
 
         $data = $request->validate([
-            'nisn'      => 'required|string|max:20',
-            'kelas'     => 'nullable|string|max:20',
+            'nisn' => 'required|string|max:20',
+            'kelas' => 'nullable|string|max:20',
             'kts_photo' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
-        // Pintu A: whitelist NISN sekolah (tabel nisn_whitelist, dikelola admin —
-        // manual atau import CSV/Excel massal. Menggantikan config/nisn.php lama).
-        if (NisnWhitelist::where('nisn', $data['nisn'])->exists()) {
-            $user->update(['is_verified_student' => true]);
+        $rawInput = (string) $request->input('nisn', '');
+        $cleanInput = preg_replace('/\D/', '', $rawInput);
 
-            return redirect()->back()->with('success', 'NISN cocok — akun terverifikasi sebagai siswa.');
+        // Pintu A: whitelist NISN / NIS sekolah (tabel nisn_whitelist, dikelola admin).
+        $match = null;
+        if ($cleanInput !== '') {
+            $match = NisnWhitelist::where('nisn', $cleanInput)
+                ->orWhere('nis', $cleanInput)
+                ->orWhere('nisn', 'NIS-'.$cleanInput)
+                ->first();
+        }
+
+        if ($match) {
+            $user->update([
+                'is_verified_student' => true,
+                'nisn' => $match->nisn,
+                'nis' => $match->nis,
+            ]);
+            $studentName = $match->nama ? " ({$match->nama})" : '';
+
+            return redirect()->back()->with('success', "Alhamdulillah! NISN/NIS cocok — akun kamu berhasil terverifikasi sebagai Siswa SMAN 1 Bukittinggi{$studentName}.");
         }
 
         // Pintu B: luar whitelist → wajib foto KTS untuk approval manual.
@@ -56,11 +70,11 @@ class VerificationController extends Controller
         }
 
         StudentVerification::create([
-            'user_id'        => $user->id,
-            'nisn'           => $data['nisn'],
-            'kelas'          => $data['kelas'] ?? null,
+            'user_id' => $user->id,
+            'nisn' => $data['nisn'],
+            'kelas' => $data['kelas'] ?? null,
             'kts_photo_path' => $request->file('kts_photo')->store('verifications', 'public'),
-            'status'         => 'pending',
+            'status' => 'pending',
         ]);
 
         return redirect()->back()->with('success', 'Pengajuan terkirim — menunggu verifikasi admin.');
@@ -78,7 +92,10 @@ class VerificationController extends Controller
         $verification->update(['status' => $status]);
 
         if ($status === 'approved') {
-            $verification->user->update(['is_verified_student' => true]);
+            $verification->user->update([
+                'is_verified_student' => true,
+                'nisn' => $verification->nisn,
+            ]);
         }
 
         return redirect()->back()->with('success', $status === 'approved'

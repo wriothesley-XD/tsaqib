@@ -5,6 +5,8 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -21,6 +23,8 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'name',
         'email',
+        'nisn',
+        'nis',
         'password',
         'role',
         'is_verified_student',
@@ -56,17 +60,17 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Postingan milik user (untuk tab & jumlah postingan di halaman profil).
      */
-    public function posts(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function posts(): HasMany
     {
-        return $this->hasMany(\App\Models\Post::class);
+        return $this->hasMany(Post::class);
     }
 
     /**
      * Komentar milik user (untuk tab & jumlah komentar di halaman profil).
      */
-    public function comments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function comments(): HasMany
     {
-        return $this->hasMany(\App\Models\Comment::class);
+        return $this->hasMany(Comment::class);
     }
 
     /**
@@ -74,9 +78,9 @@ class User extends Authenticatable implements MustVerifyEmail
      * dibedakan via kolom pivot `type` ('collection' | 'saved'). Filter daftar
      * tertentu: $user->savedBooks()->wherePivot('type', 'collection').
      */
-    public function savedBooks(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function savedBooks(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\Book::class, 'book_user')
+        return $this->belongsToMany(Book::class, 'book_user')
             ->withPivot('type')
             ->withTimestamps();
     }
@@ -84,16 +88,16 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Postingan yang disimpan/bookmark user (tab "Tersimpan" di profil).
      */
-    public function savedPosts(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function savedPosts(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\Post::class, 'post_user')
+        return $this->belongsToMany(Post::class, 'post_user')
             ->withTimestamps();
     }
 
     /**
      * User yang dia ikuti. (Saya = follower, mereka = following.)
      */
-    public function following(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function following(): BelongsToMany
     {
         return $this->belongsToMany(self::class, 'follows', 'follower_id', 'following_id')
             ->withPivot('created_at')
@@ -103,7 +107,7 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Pengikut user ini. (Mereka = follower, saya = following.)
      */
-    public function followers(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function followers(): BelongsToMany
     {
         return $this->belongsToMany(self::class, 'follows', 'following_id', 'follower_id')
             ->withPivot('created_at')

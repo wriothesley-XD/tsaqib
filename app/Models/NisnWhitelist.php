@@ -16,5 +16,5 @@ class NisnWhitelist extends Model
 {
     protected $table = 'nisn_whitelist';
 
-    protected $fillable = ['nisn', 'nama', 'kelas'];
+    protected $fillable = ['nisn', 'nis', 'nama', 'kelas'];
 }

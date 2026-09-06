@@ -87,9 +87,9 @@ class ProfileController extends Controller
             return response()->json([
                 'ok' => true,
                 'message' => 'Profil berhasil diperbarui.',
-                'avatar' => $user->getAvatar() . '?v=' . ($user->updated_at?->timestamp ?? ''),
+                'avatar' => $user->getAvatar().'?v='.($user->updated_at?->timestamp ?? ''),
                 'banner' => $user->banner_path
-                    ? asset('storage/' . $user->banner_path) . '?v=' . ($user->updated_at?->timestamp ?? '')
+                    ? asset('storage/'.$user->banner_path).'?v='.($user->updated_at?->timestamp ?? '')
                     : null,
             ]);
         }
@@ -120,7 +120,7 @@ class ProfileController extends Controller
         return response()->json([
             'ok' => true,
             'message' => 'Foto profil direset ke default.',
-            'avatar' => $user->getAvatar() . '?v=' . ($user->updated_at?->timestamp ?? ''),
+            'avatar' => $user->getAvatar().'?v='.($user->updated_at?->timestamp ?? ''),
         ]);
     }
 
@@ -171,6 +171,10 @@ class ProfileController extends Controller
         $avatar = $user->profile_photo_path;
         $banner = $user->banner_path;
 
+        // Logout terlebih dahulu sebelum record dihapus agar cycleRememberToken()
+        // pada SessionGuard tidak membangkitkan (insert ulang) model user yang sudah di-delete.
+        Auth::logout();
+
         // Penghapusan atomik. posts.user_id = nullOnDelete → hapus eksplisit;
         // sisa relasi ikut cascade dari $user->delete().
         DB::transaction(function () use ($user, $postIds) {
@@ -195,7 +199,6 @@ class ProfileController extends Controller
             $disk->delete($banner);
         }
 
-        Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
@@ -355,8 +358,8 @@ class ProfileController extends Controller
             ->map(fn ($group) => $group->map(fn ($b) => [
                 'title' => $b->title,
                 'author' => $b->author ?? 'Tim PAI',
-                'link' => $b->pdf_path ? asset('storage/' . $b->pdf_path) : '#',
-                'cover' => $b->cover_image ? asset('storage/' . $b->cover_image) : null,
+                'link' => $b->pdf_path ? asset('storage/'.$b->pdf_path) : '#',
+                'cover' => $b->cover_image ? asset('storage/'.$b->cover_image) : null,
             ])->values()->all());
 
         $postsTotal = $user->posts()->count();
@@ -430,7 +433,7 @@ class ProfileController extends Controller
             'icon' => 'fa-feather',
             'iconGold' => false,
             'thumb' => null,
-            'eyebrow' => ($p->community_slug ?? 'komunitas') . ' • ' . $p->created_at?->diffForHumans(),
+            'eyebrow' => ($p->community_slug ?? 'komunitas').' • '.$p->created_at?->diffForHumans(),
             'title' => $p->title ?? '(tanpa judul)',
             'excerpt' => Str::limit($p->content ?? '', 120),
             'link' => route('komunitas.post.show', $p->id),
@@ -440,14 +443,14 @@ class ProfileController extends Controller
 
     protected function mapComment($c): array
     {
-        $where = ! empty($c->post) ? 'di "' . Str::limit($c->post->title, 30) . '"' : 'komentar';
+        $where = ! empty($c->post) ? 'di "'.Str::limit($c->post->title, 30).'"' : 'komentar';
 
         return [
             'id' => $c->id,
             'icon' => 'fa-comment-dots',
             'iconGold' => true,
             'thumb' => null,
-            'eyebrow' => $where . ' • ' . $c->created_at?->diffForHumans(),
+            'eyebrow' => $where.' • '.$c->created_at?->diffForHumans(),
             'title' => Str::limit($c->body ?? '', 90),
             'excerpt' => null,
             'link' => ! empty($c->post) ? route('komunitas.post.show', $c->post->id) : '#',
@@ -464,7 +467,7 @@ class ProfileController extends Controller
             'icon' => 'fa-bookmark',
             'iconGold' => false,
             'thumb' => null,
-            'eyebrow' => ($p->community_slug ?? 'komunitas') . ' • disimpan ' . $savedAt?->diffForHumans(),
+            'eyebrow' => ($p->community_slug ?? 'komunitas').' • disimpan '.$savedAt?->diffForHumans(),
             'title' => $p->title ?? '(tanpa judul)',
             'excerpt' => Str::limit($p->content ?? '', 120),
             'link' => route('komunitas.post.show', $p->id),
@@ -478,11 +481,11 @@ class ProfileController extends Controller
             'id' => $b->id,
             'icon' => 'fa-book',
             'iconGold' => true,
-            'thumb' => $b->cover_image ? asset('storage/' . $b->cover_image) : null,
-            'eyebrow' => ($b->category ?? 'buku') . ' • ' . ($b->author ?? 'Tim PAI'),
+            'thumb' => $b->cover_image ? asset('storage/'.$b->cover_image) : null,
+            'eyebrow' => ($b->category ?? 'buku').' • '.($b->author ?? 'Tim PAI'),
             'title' => $b->title,
             'excerpt' => null,
-            'link' => $b->pdf_path ? asset('storage/' . $b->pdf_path) : '#',
+            'link' => $b->pdf_path ? asset('storage/'.$b->pdf_path) : '#',
             'deletable' => false,
         ];
     }

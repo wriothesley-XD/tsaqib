@@ -249,6 +249,9 @@
                     b.classList.toggle('is-up', data.my_vote === 'up' && t === 'up');
                     b.classList.toggle('is-down', data.my_vote === 'down' && t === 'down');
                 });
+                if (window.triggerUpvoteAnimation) {
+                    window.triggerUpvoteAnimation(btn, data.my_vote === 'up');
+                }
             } catch (err) { if (err.message !== 'auth') console.error(err); }
             finally { btn.disabled = false; }
         });

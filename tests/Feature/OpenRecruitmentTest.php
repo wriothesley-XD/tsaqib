@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Registration;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -64,5 +66,28 @@ class OpenRecruitmentTest extends TestCase
             'username_ig' => 'ahmad_rabbani',
             'reason' => 'Ingin memperdalam ilmu keislaman dan aktif di komunitas TSAQIB SMAN 1 Bukittinggi.',
         ]);
+    }
+
+    /**
+     * Admin dapat melihat detail pendaftar (nama, kelas, ig, alasan) di tabel pendaftaran.
+     */
+    public function test_admin_can_view_registration_details_in_list(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        Registration::create([
+            'full_name' => 'Fathur Rahman',
+            'nickname' => 'Fathur',
+            'class' => 'XI.2',
+            'username_ig' => 'fathur_rh',
+            'reason' => 'Ingin berkontribusi dalam dakwah sekolah.',
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('admin.list', ['resource' => 'registrations']));
+
+        $response->assertStatus(200);
+        $response->assertSee('Fathur Rahman');
+        $response->assertSee('XI.2');
+        $response->assertSee('fathur_rh');
+        $response->assertSee('Ingin berkontribusi dalam dakwah sekolah.');
     }
 }

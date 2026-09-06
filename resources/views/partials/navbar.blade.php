@@ -3,42 +3,33 @@
 
     $isKomunitasZone = str_contains($currentRoute, 'komunitas');
     $isLainnya       = str_contains($currentRoute, 'open.recruitment');
+    $isLaborZone     = in_array($currentRoute, ['laboratorium.pai', 'labor', 'laboratorium.profil', 'laboratorium.modul', 'laboratorium.tugas']);
 
-    // Menu utama (sentence case). Komunitas disisipkan di antara $navBefore & $navAfter.
+    // Menu utama
     $navBefore = [
-        ['label' => 'Beranda',          'href' => route('landing'),          'active' => $currentRoute === 'landing'],
+        ['label' => 'Beranda', 'href' => route('landing'), 'active' => $currentRoute === 'landing'],
     ];
     $navAfter = [
         ['label' => 'Info', 'href' => route('info'), 'active' => $currentRoute === 'info' || $currentRoute === 'berita.show'],
     ];
-    // Item sekunder yang dirapikan ke dropdown "Lainnya".
+
+    // Item sekunder di dropdown "Lainnya"
     $navLainnya = [
-        ['label' => 'Open Recruitment', 'href' => route('open.recruitment')],
+        ['label' => 'Open Recruitment', 'href' => route('open.recruitment'), 'icon' => 'fa-user-plus'],
         [
             'label'  => 'Saran & Masukan',
             'href'   => 'https://docs.google.com/forms/d/e/1FAIpQLScLDeCvGI17R7Z-NkckFV-N9Sm1Jfl8-eOEl20ZFVfFDeebgQ/viewform',
-            // Link eksternal (Google Form) → tab baru, aman dibuka via noopener.
             'target' => '_blank',
             'rel'    => 'noopener noreferrer',
-            'icon'   => 'fa-message',
-        ],
-        [
-            // Halaman tim pengembang (/credits) — internal link.
-            'label' => 'Tim Kami',
-            'href'  => route('credits'),
-            'icon'  => 'fa-user-group',
+            'icon'   => 'fa-comment-dots',
         ],
     ];
 
-    // Palet minimalis: tenang saat non-aktif, emas saat aktif. Indikator aktif = garis bawah emas.
-    $link      = fn ($active) => $active ? 'text-[var(--gold)]' : 'text-white/55 hover:text-white';
+    $link = fn ($active) => $active ? 'text-[var(--gold)]' : 'text-white/70 hover:text-white';
     $underline = fn ($active) => 'absolute left-0 bottom-0 h-[2px] bg-[var(--gold)] transition-all duration-300 '
         . ($active ? 'w-full' : 'w-0 group-hover:w-full');
-    // Base kelas link: sentence case. inline-flex+items-center dipakai SEMUA item
-    // (link & trigger dropdown) agar box-model & baseline identik → sejajar & rapi.
     $navLinkClass = 'group relative inline-flex items-center pb-1 text-sm font-semibold tracking-tight transition-colors duration-200';
 
-    // Ikon per item menu mobile (reuse ikon yang sudah dipakai di halaman terkait).
     $navIcon = [
         'Beranda'          => 'fa-house',
         'Laboratorium PAI' => 'fa-flask',
@@ -47,33 +38,28 @@
         'Info'             => 'fa-bullhorn',
         'Lainnya'          => 'fa-ellipsis',
     ];
-
-    // Catatan: route 'beranda' (/beranda) hanya redirect ke komunitas, bukan home.
 @endphp
 
-{{-- Token tema gelap (.brand-mark, .cta-primary, CSS vars, font-display/label) di-supply
-    tiap halaman via @include('partials.theme-head'). Navbar ini sticky (memesan tempat
-    sendiri) -> konten di bawahnya nggak ketimpa, nggak butuh padding-top. --}}
+<header class="sticky top-0 z-[70] bg-[#0D2818]/95 backdrop-blur-md border-b border-white/10 text-[var(--cream)] transition-all">
+    {{-- Reading progress bar --}}
+    <div id="reading-progress" class="reading-progress-bar"></div>
 
-<header class="sticky top-0 z-[70] bg-[#10140F] border-b border-white/10 text-[var(--cream)]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16 xl:h-20 gap-8 lg:gap-10">
+        <div class="flex items-center justify-between h-16 xl:h-20">
 
             {{-- ===== BRAND (kiri) ===== --}}
             <a href="{{ route('landing') }}" class="flex items-center gap-3 group shrink-0" title="Kembali ke Beranda">
-                <img src="{{ asset('images/icon/tsaqib-media.svg.png') }}" alt="TSAQIB Logo" class="h-10 sm:h-11 w-auto object-contain shrink-0 group-hover:scale-105 transition-transform">
-                <span class="leading-none hidden sm:block">
-                    <span class="font-display font-extrabold text-base tracking-tight text-[var(--cream)] block">TSAQIB</span>
-                    <span class="text-[9px] text-[var(--gold)] font-bold tracking-[0.14em] uppercase block mt-1">FSI SMAN 1 Bukittinggi</span>
+                <img src="{{ asset('images/icon/tsaqib-media.svg.png') }}" alt="TSAQIB Logo" class="h-9 sm:h-10 w-auto object-contain shrink-0 group-hover:scale-105 transition-transform duration-200">
+                <span class="leading-none">
+                    <span class="font-display font-extrabold text-base sm:text-lg tracking-tight text-[var(--cream)] block">TSAQIB</span>
+                    <span class="text-[9px] sm:text-[10px] text-[var(--gold)] font-bold tracking-[0.14em] uppercase block mt-0.5">FSI SMAN 1 Bukittinggi</span>
                 </span>
             </a>
 
-            {{-- ===== NAV TENGAH (≥ xl) — terpusat via flex-1 justify-center, BUKAN absolute ===== --}}
-            <nav class="hidden xl:flex flex-1 justify-center items-center gap-6 lg:gap-8 font-label whitespace-nowrap">
-
+            {{-- ===== NAV TENGAH (≥ xl) ===== --}}
+            <nav class="hidden xl:flex items-center gap-7 lg:gap-8 font-label whitespace-nowrap">
                 @foreach($navBefore as $item)
-                    <a href="{{ $item['href'] }}"
-                       class="{{ $navLinkClass }} {{ $link($item['active']) }}">
+                    <a href="{{ $item['href'] }}" class="{{ $navLinkClass }} {{ $link($item['active']) }}">
                         {{ $item['label'] }}
                         <span class="{{ $underline($item['active']) }}"></span>
                     </a>
@@ -82,63 +68,52 @@
                 {{-- Laboratorium PAI dropdown --}}
                 <div class="relative inline-flex items-center">
                     <button type="button" id="labor-toggle"
-                            class="{{ $navLinkClass }} gap-1.5 {{ $link(in_array($currentRoute, ['laboratorium.pai', 'labor', 'laboratorium.profil', 'laboratorium.modul', 'laboratorium.tugas'])) }}"
+                            class="{{ $navLinkClass }} gap-1.5 {{ $link($isLaborZone) }}"
                             aria-haspopup="true" aria-expanded="false" aria-controls="labor-menu">
                         <span>Laboratorium PAI</span>
                         <i class="fa-solid fa-chevron-down text-[8px] leading-none opacity-70 transition-transform duration-200"></i>
-                        <span class="{{ $underline(in_array($currentRoute, ['laboratorium.pai', 'labor', 'laboratorium.profil', 'laboratorium.modul', 'laboratorium.tugas'])) }}"></span>
+                        <span class="{{ $underline($isLaborZone) }}"></span>
                     </button>
-                    <div id="labor-menu"
-                         class="absolute left-0 top-full pt-2.5 opacity-0 invisible z-[60]">
-                        <div class="min-w-[210px] rounded-xl border border-white/10 bg-[#161a14] ring-1 ring-black/50 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.8)] overflow-hidden py-2">
-                            <a href="{{ route('laboratorium.pai') }}"
-                               class="labor-item flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-white/70 hover:text-[var(--gold)] hover:bg-white/5">
-                                <i class="fa-solid fa-building-columns text-[9px] text-white/30"></i>
+                    <div id="labor-menu" class="absolute left-0 top-full pt-2.5 opacity-0 invisible z-[60] transition-all duration-200">
+                        <div class="min-w-[220px] rounded-xl border border-white/10 bg-[#143520] shadow-2xl overflow-hidden py-2 backdrop-blur-md">
+                            <a href="{{ route('laboratorium.pai') }}" class="labor-item flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-white/75 hover:text-[var(--gold)] hover:bg-white/5 transition-colors">
+                                <i class="fa-solid fa-building-columns text-[10px] text-[var(--gold)]/70 w-4"></i>
                                 Ikhtisar Laboratorium
                             </a>
-                            <a href="{{ route('laboratorium.profil') }}"
-                               class="labor-item flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-white/70 hover:text-[var(--gold)] hover:bg-white/5">
-                                <i class="fa-solid fa-user-tie text-[9px] text-white/30"></i>
+                            <a href="{{ route('laboratorium.profil') }}" class="labor-item flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-white/75 hover:text-[var(--gold)] hover:bg-white/5 transition-colors">
+                                <i class="fa-solid fa-user-tie text-[10px] text-[var(--gold)]/70 w-4"></i>
                                 Profil &amp; Guru
                             </a>
-                            <a href="{{ route('laboratorium.modul') }}"
-                               class="labor-item flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-white/70 hover:text-[var(--gold)] hover:bg-white/5">
-                                <i class="fa-solid fa-book-open text-[9px] text-white/30"></i>
+                            <a href="{{ route('laboratorium.modul') }}" class="labor-item flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-white/75 hover:text-[var(--gold)] hover:bg-white/5 transition-colors">
+                                <i class="fa-solid fa-book-open text-[10px] text-[var(--gold)]/70 w-4"></i>
                                 Modul Pembelajaran
                             </a>
-                            <a href="{{ route('laboratorium.tugas') }}"
-                               class="labor-item flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-white/70 hover:text-[var(--gold)] hover:bg-white/5">
-                                <i class="fa-solid fa-clipboard-check text-[9px] text-white/30"></i>
+                            <a href="{{ route('laboratorium.tugas') }}" class="labor-item flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-white/75 hover:text-[var(--gold)] hover:bg-white/5 transition-colors">
+                                <i class="fa-solid fa-clipboard-check text-[10px] text-[var(--gold)]/70 w-4"></i>
                                 Tugas Siswa
                             </a>
                         </div>
                     </div>
                 </div>
 
-                <a href="{{ route('perpustakaan') }}"
-                   class="{{ $navLinkClass }} {{ $link($currentRoute === 'perpustakaan') }}">
+                <a href="{{ route('perpustakaan') }}" class="{{ $navLinkClass }} {{ $link($currentRoute === 'perpustakaan') }}">
                     Perpustakaan
                     <span class="{{ $underline($currentRoute === 'perpustakaan') }}"></span>
                 </a>
 
-                {{-- Komunitas — link langsung ke feed gabungan semua komunitas (bukan dropdown) --}}
-                <a href="{{ route('komunitas', 'semua') }}"
-                   class="{{ $navLinkClass }} {{ $link($isKomunitasZone) }}">
+                <a href="{{ route('komunitas', 'semua') }}" class="{{ $navLinkClass }} {{ $link($isKomunitasZone) }}">
                     Komunitas
                     <span class="{{ $underline($isKomunitasZone) }}"></span>
                 </a>
 
                 @foreach($navAfter as $item)
-                    <a href="{{ $item['href'] }}"
-                       class="{{ $navLinkClass }} {{ $link($item['active']) }}">
+                    <a href="{{ $item['href'] }}" class="{{ $navLinkClass }} {{ $link($item['active']) }}">
                         {{ $item['label'] }}
                         <span class="{{ $underline($item['active']) }}"></span>
                     </a>
                 @endforeach
 
-                {{-- Lainnya — dropdown berisi menu sekunder (Open Recruitment, dst.).
-                     Click-to-toggle (bukan hover) biar konsisten di mouse, touch, & keyboard.
-                     Tampil/sembunyi diatur via JS (#lainnya-toggle / #lainnya-menu di <script> bawah). --}}
+                {{-- Lainnya dropdown --}}
                 <div class="relative inline-flex items-center">
                     <button type="button" id="lainnya-toggle"
                             class="{{ $navLinkClass }} gap-1.5 {{ $link($isLainnya) }}"
@@ -147,21 +122,17 @@
                         <i class="fa-solid fa-chevron-down text-[8px] leading-none opacity-70 transition-transform duration-200"></i>
                         <span class="{{ $underline($isLainnya) }}"></span>
                     </button>
-                    <div id="lainnya-menu"
-                         class="absolute left-0 top-full pt-2.5 opacity-0 invisible z-[60]">
-                        <div class="min-w-[210px] rounded-xl border border-white/10 bg-[#161a14] ring-1 ring-black/50 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.8)] overflow-hidden py-2">
+                    <div id="lainnya-menu" class="absolute left-0 top-full pt-2.5 opacity-0 invisible z-[60] transition-all duration-200">
+                        <div class="min-w-[210px] rounded-xl border border-white/10 bg-[#143520] shadow-2xl overflow-hidden py-2 backdrop-blur-md">
                             @foreach($navLainnya as $item)
                                 @php
-                                    // Ikon opsional per-item (default: panah 'go to' lama);
-                                    // atribut target/rel opsional untuk link eksternal.
-                                    $itemIcon  = $item['icon'] ?? 'fa-arrow-right';
                                     $itemAttrs = '';
                                     if (!empty($item['target'])) $itemAttrs .= ' target="'.$item['target'].'"';
                                     if (!empty($item['rel']))    $itemAttrs .= ' rel="'.$item['rel'].'"';
                                 @endphp
-                                <a href="{{ $item['href'] }}"{{ $itemAttrs }}
-                                   class="lainnya-item flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-white/70 hover:text-[var(--gold)] hover:bg-white/5">
-                                    <i class="fa-solid {{ $itemIcon }} text-[9px] text-white/30"></i>
+                                <a href="{{ $item['href'] }}"{!! $itemAttrs !!}
+                                   class="lainnya-item flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-white/75 hover:text-[var(--gold)] hover:bg-white/5 transition-colors">
+                                    <i class="fa-solid {{ $item['icon'] ?? 'fa-arrow-right' }} text-[10px] text-[var(--gold)]/70 w-4"></i>
                                     {{ $item['label'] }}
                                 </a>
                             @endforeach
@@ -170,255 +141,235 @@
                 </div>
             </nav>
 
-            {{-- ===== KANAN: Auth (≥ xl) + Hamburger (< xl) ===== --}}
-            <div class="flex items-center gap-6 lg:gap-8 shrink-0 pr-4 lg:pr-6">
+            {{-- ===== KANAN: Search & Auth (≥ xl) & Hamburger (< xl) ===== --}}
+            <div class="flex items-center gap-2.5 sm:gap-4 shrink-0">
+                {{-- Command Palette Trigger (Desktop/Tablet) --}}
+                <button type="button" data-open-cmd
+                        class="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[var(--gold)]/40 text-white/55 hover:text-white text-xs transition cursor-pointer"
+                        title="Pencarian Cepat (Ctrl+K)">
+                    <i class="fa-solid fa-magnifying-glass text-[10px] text-[var(--gold)]"></i>
+                    <span class="text-[11px] font-medium hidden md:inline">Cari fitur...</span>
+                    <span class="cmd-kbd text-[10px] py-0 px-1.5 h-4 ml-0.5">⌘K</span>
+                </button>
 
-                <div class="hidden xl:flex items-center gap-6">
-                    {{-- Pembatas tipis sebelum area Admin/Akun --}}
+                {{-- Desktop auth buttons --}}
+                <div class="hidden xl:flex items-center gap-4">
                     <span class="w-px h-5 bg-white/10" aria-hidden="true"></span>
-
                     @auth
                         @if(Auth::user()->role === 'admin')
                             <a href="{{ route('admin.index') }}"
-                               class="text-xs uppercase tracking-[0.16em] font-semibold text-amber-300/85 hover:text-amber-200 transition-colors duration-200">
-                                Admin
+                               class="text-xs uppercase tracking-[0.16em] font-bold text-amber-300 hover:text-amber-200 transition-colors duration-200">
+                                Admin Panel
                             </a>
                         @endif
                         <a href="{{ route('profile.edit') }}" title="Profil"
-                           class="rounded-full p-0.5 ring-1 ring-white/15 hover:ring-[var(--gold)] transition duration-200">
+                           class="rounded-full p-0.5 ring-1 ring-white/20 hover:ring-[var(--gold)] transition duration-200">
                             <x-community-avatar :user="Auth::user()" size="xs" />
                         </a>
                     @else
-                        {{-- CTA: login — ghost dgn border emas tipis --}}
                         <a href="{{ route('login') }}"
-                           class="inline-flex items-center px-5 py-2.5 rounded-full text-xs font-bold tracking-wide text-[var(--gold)] border border-[var(--gold)]/50 hover:bg-[var(--gold)]/10 hover:border-[var(--gold)] transition-colors duration-200">
-                            Masuk
+                           class="inline-flex items-center px-4 py-2 rounded-full text-xs font-bold tracking-wide text-[var(--gold)] border border-[var(--gold)]/50 hover:bg-[var(--gold)]/10 hover:border-[var(--gold)] transition-colors duration-200">
+                            <i class="fa-solid fa-right-to-bracket mr-1.5 text-[10px]"></i> Masuk
                         </a>
                     @endauth
                 </div>
 
-                <button id="mobile-menu-btn" type="button"
-                        aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="mobile-menu"
-                        class="xl:hidden p-3 -mr-3 text-[var(--cream)] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#01795F] rounded-full transition relative z-[71]">
-                    <i class="fa-solid fa-bars text-xl" id="menu-icon"></i>
-                </button>
+                {{-- Mobile: Search icon, user avatar, hamburger --}}
+                <div class="flex xl:hidden items-center gap-2">
+                    <button type="button" data-open-cmd
+                            class="w-10 h-10 flex sm:hidden items-center justify-center text-white/70 hover:text-[var(--gold)] bg-white/5 border border-white/10 hover:border-[var(--gold)]/40 rounded-xl transition cursor-pointer"
+                            aria-label="Pencarian cepat">
+                        <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                    </button>
+
+                    @auth
+                        <a href="{{ route('profile.edit') }}" class="rounded-full p-0.5 ring-1 ring-white/20">
+                            <x-community-avatar :user="Auth::user()" size="xs" />
+                        </a>
+                    @else
+                        <a href="{{ route('login') }}" class="inline-flex items-center px-3 py-1.5 rounded-full text-[11px] font-bold text-[var(--gold)] border border-[var(--gold)]/40 hover:bg-[var(--gold)]/10">
+                            Masuk
+                        </a>
+                    @endauth
+
+                    {{-- Accessible 44x44 Hamburger Button --}}
+                    <button id="mobile-menu-btn" type="button"
+                            aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="mobile-menu"
+                            class="w-10 h-10 flex items-center justify-center text-[var(--cream)] hover:text-white bg-white/5 border border-white/10 hover:border-[var(--gold)]/40 rounded-xl transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold)]">
+                        <i class="fa-solid fa-bars text-base" id="menu-icon"></i>
+                    </button>
+                </div>
             </div>
+
         </div>
     </div>
 </header>
 
-{{--
-    ===== MOBILE DRAWER (< xl) =====
-    Sengaja ditarik KELUAR dari <header>. Header memakai backdrop-blur-md
-    (backdrop-filter), dan ancestor ber-backdrop-filter memaksa seluruh
-    subtree ter-rasterize pada layer terpisah sekaligus menonaktifkan
-    subpixel font rendering -> teks link menu tampak blur/lembek.
-    Di luar header, container teks bukan lagi descendant backdrop-filter,
-    posisi memakai fixed relatif viewport, dan teks kembali tajam.
---}}
-<div id="mobile-menu-backdrop" class="hidden fixed top-16 xl:top-20 inset-x-0 bottom-0 z-40 bg-black/50 backdrop-blur-sm xl:hidden"></div>
+{{-- ===== MOBILE DRAWER (< xl) ===== --}}
+<div id="mobile-menu-backdrop" class="hidden fixed inset-0 z-40 bg-black/70 backdrop-blur-sm xl:hidden transition-opacity"></div>
 
-<div id="mobile-menu" class="hidden fixed top-16 xl:top-20 inset-x-0 z-50 xl:hidden border-t border-white/5 bg-[#10140F] px-5 py-3 space-y-0.5 shadow-2xl max-h-[calc(100vh-4rem)] overflow-y-auto antialiased">
-
-        {{-- Daftar menu utama (ikon + tap target ≥44px). --}}
-        @foreach($navBefore as $item)
-            <a href="{{ $item['href'] }}"
-               class="mnav-item {{ $item['active'] ? 'is-active' : '' }}">
-                <span class="mnav-ikon"><i class="fa-solid {{ $navIcon[$item['label']] ?? 'fa-angle-right' }}"></i></span>
-                <span>{{ $item['label'] }}</span>
-            </a>
-        @endforeach
-
-        {{-- Komunitas — link langsung ke feed gabungan semua komunitas (bukan dropdown). --}}
-        <a href="{{ route('komunitas', 'semua') }}"
-           class="mnav-item {{ $isKomunitasZone ? 'is-active' : '' }}">
-            <span class="mnav-ikon"><i class="fa-solid {{ $navIcon['Komunitas'] }}"></i></span>
-            <span>Komunitas</span>
+<div id="mobile-menu" class="hidden fixed top-16 inset-x-0 z-50 xl:hidden border-t border-white/10 bg-[#0D2818]/98 px-5 py-4 space-y-1 shadow-2xl max-h-[calc(100vh-4.5rem)] overflow-y-auto antialiased">
+    @foreach($navBefore as $item)
+        <a href="{{ $item['href'] }}" class="mnav-item {{ $item['active'] ? 'is-active' : '' }}">
+            <span class="mnav-ikon"><i class="fa-solid {{ $navIcon[$item['label']] ?? 'fa-angle-right' }}"></i></span>
+            <span>{{ $item['label'] }}</span>
         </a>
+    @endforeach
 
-        @foreach($navAfter as $item)
-            <a href="{{ $item['href'] }}"
-               class="mnav-item {{ $item['active'] ? 'is-active' : '' }}">
-                <span class="mnav-ikon"><i class="fa-solid {{ $navIcon[$item['label']] ?? 'fa-angle-right' }}"></i></span>
-                <span>{{ $item['label'] }}</span>
+    {{-- Laboratorium PAI (mobile) --}}
+    <div>
+        <button type="button" data-mobile-labor-toggle class="mnav-item w-full" aria-expanded="false" aria-controls="mobile-labor">
+            <span class="mnav-ikon"><i class="fa-solid fa-flask"></i></span>
+            <span>Laboratorium PAI</span>
+            <i class="fa-solid fa-chevron-down text-[10px] text-white/45 transition-transform duration-200 ml-auto"></i>
+        </button>
+        <div id="mobile-labor" class="hidden pl-4 border-l border-white/15 ml-6 mb-1 mt-0.5 space-y-0.5">
+            <a href="{{ route('laboratorium.pai') }}" class="block py-2 px-2 text-xs text-white/75 hover:text-[var(--gold)] transition-colors rounded-lg">
+                <i class="fa-solid fa-building-columns text-[10px] mr-2 text-[var(--gold)]/70"></i>Ikhtisar Laboratorium
             </a>
-        @endforeach
-
-        {{-- Laboratorium PAI (mobile) — toggle ekspandable berisi submenu --}}
-        <div>
-            <button type="button" data-mobile-labor-toggle
-                    class="mnav-item w-full"
-                    aria-expanded="false" aria-controls="mobile-labor">
-                <span class="mnav-ikon"><i class="fa-solid fa-flask"></i></span>
-                <span>Laboratorium PAI</span>
-                <i class="fa-solid fa-chevron-down text-[10px] text-white/45 transition-transform duration-200 ml-auto"></i>
-            </button>
-            <div id="mobile-labor" class="hidden pl-4 border-l border-white/10 ml-6 mb-1 mt-0.5 space-y-0.5">
-                <a href="{{ route('laboratorium.pai') }}#profil"
-                   class="block py-2.5 px-2 text-sm text-white/65 hover:text-[var(--gold)] transition-colors duration-200 rounded-lg">
-                    <i class="fa-solid fa-building-columns text-[10px] mr-2 text-white/30"></i>Profil Laboratorium
-                </a>
-                <a href="{{ route('laboratorium.pai') }}#modul"
-                   class="block py-2.5 px-2 text-sm text-white/65 hover:text-[var(--gold)] transition-colors duration-200 rounded-lg">
-                    <i class="fa-solid fa-book-open text-[10px] mr-2 text-white/30"></i>Modul Pembelajaran
-                </a>
-                <a href="{{ route('laboratorium.pai') }}#tugas"
-                   class="block py-2.5 px-2 text-sm text-white/65 hover:text-[var(--gold)] transition-colors duration-200 rounded-lg">
-                    <i class="fa-solid fa-clipboard-check text-[10px] mr-2 text-white/30"></i>Tugas Siswa
-                </a>
-            </div>
-        </div>
-
-        {{-- Lainnya (mobile) — toggle ekspandable berisi menu sekunder. --}}
-        <div>
-            <button type="button" data-mobile-lainnya-toggle
-                    class="mnav-item w-full"
-                    aria-expanded="false" aria-controls="mobile-lainnya">
-                <span class="mnav-ikon"><i class="fa-solid {{ $navIcon['Lainnya'] }}"></i></span>
-                <span>Lainnya</span>
-                <i class="fa-solid fa-chevron-down text-[10px] text-white/45 transition-transform duration-200 ml-auto"></i>
-            </button>
-            <div id="mobile-lainnya" class="hidden pl-4 border-l border-white/10 ml-6 mb-1 mt-0.5 space-y-0.5">
-                @foreach($navLainnya as $item)
-                    @php
-                        $itemAttrs = '';
-                        if (!empty($item['target'])) $itemAttrs .= ' target="'.$item['target'].'"';
-                        if (!empty($item['rel']))    $itemAttrs .= ' rel="'.$item['rel'].'"';
-                    @endphp
-                    <a href="{{ $item['href'] }}"{{ $itemAttrs }}
-                       class="block py-2.5 px-2 text-sm text-white/65 hover:text-[var(--gold)] transition-colors duration-200 rounded-lg">
-                        {{ $item['label'] }}
-                    </a>
-                @endforeach
-            </div>
-        </div>
-
-        {{-- ===== Seksi terpisah: Ikuti Kami + Masuk (divider di atas) ===== --}}
-        <div class="pt-3 mt-3 border-t border-white/10 space-y-3">
-            {{-- Social media (mobile) --}}
-            <div>
-                <p class="px-1 mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/40">Ikuti Kami</p>
-                <div class="flex items-center gap-5 px-1">
-                    <a href="https://www.instagram.com/fsi.smansa_landbouw?igsh=MXVzMzd5Nms0eDZpNQ==" target="_blank" rel="noopener" aria-label="TSAQIB di Instagram" class="text-white/70 hover:text-white transition-colors duration-200">
-                        <i class="fa-brands fa-instagram text-xl"></i>
-                    </a>
-                    <a href="https://www.facebook.com/share/1BJMFJvK5k/" target="_blank" rel="noopener" aria-label="TSAQIB di Facebook" class="text-white/70 hover:text-white transition-colors duration-200">
-                        <i class="fa-brands fa-facebook text-xl"></i>
-                    </a>
-                    <a href="https://ytfsi.carrd.co" target="_blank" rel="noopener" aria-label="TSAQIB di YouTube" class="text-white/70 hover:text-white transition-colors duration-200">
-                        <i class="fa-brands fa-youtube text-xl"></i>
-                    </a>
-                </div>
-            </div>
-
-            {{-- Area Auth (mobile) --}}
-            <div class="space-y-1">
-                @auth
-                    @if(Auth::user()->role === 'admin')
-                        <a href="{{ route('admin.index') }}" class="mnav-item">
-                            <span class="mnav-ikon" style="background:rgba(252,191,73,.15); color:rgb(252,211,77);"><i class="fa-solid fa-shield-halved"></i></span>
-                            <span class="text-amber-300/90">Admin Panel</span>
-                        </a>
-                    @endif
-                    <a href="{{ route('profile.edit') }}" class="mnav-item">
-                        <x-community-avatar :user="Auth::user()" size="xs" />
-                        <span>Profil Saya</span>
-                    </a>
-                @else
-                    <a href="{{ route('login') }}" class="cta-primary flex justify-center items-center gap-2 w-full px-4 py-3 rounded-full text-sm font-bold text-white">
-                        <i class="fa-solid fa-right-to-bracket"></i> Masuk
-                    </a>
-                @endauth
-            </div>
+            <a href="{{ route('laboratorium.profil') }}" class="block py-2 px-2 text-xs text-white/75 hover:text-[var(--gold)] transition-colors rounded-lg">
+                <i class="fa-solid fa-user-tie text-[10px] mr-2 text-[var(--gold)]/70"></i>Profil &amp; Guru
+            </a>
+            <a href="{{ route('laboratorium.modul') }}" class="block py-2 px-2 text-xs text-white/75 hover:text-[var(--gold)] transition-colors rounded-lg">
+                <i class="fa-solid fa-book-open text-[10px] mr-2 text-[var(--gold)]/70"></i>Modul Pembelajaran
+            </a>
+            <a href="{{ route('laboratorium.tugas') }}" class="block py-2 px-2 text-xs text-white/75 hover:text-[var(--gold)] transition-colors rounded-lg">
+                <i class="fa-solid fa-clipboard-check text-[10px] mr-2 text-[var(--gold)]/70"></i>Tugas Siswa
+            </a>
         </div>
     </div>
 
+    <a href="{{ route('perpustakaan') }}" class="mnav-item {{ $currentRoute === 'perpustakaan' ? 'is-active' : '' }}">
+        <span class="mnav-ikon"><i class="fa-solid fa-book-open"></i></span>
+        <span>Perpustakaan</span>
+    </a>
+
+    <a href="{{ route('komunitas', 'semua') }}" class="mnav-item {{ $isKomunitasZone ? 'is-active' : '' }}">
+        <span class="mnav-ikon"><i class="fa-solid fa-users"></i></span>
+        <span>Komunitas</span>
+    </a>
+
+    @foreach($navAfter as $item)
+        <a href="{{ $item['href'] }}" class="mnav-item {{ $item['active'] ? 'is-active' : '' }}">
+            <span class="mnav-ikon"><i class="fa-solid {{ $navIcon[$item['label']] ?? 'fa-angle-right' }}"></i></span>
+            <span>{{ $item['label'] }}</span>
+        </a>
+    @endforeach
+
+    {{-- Lainnya (mobile) --}}
+    <div>
+        <button type="button" data-mobile-lainnya-toggle class="mnav-item w-full" aria-expanded="false" aria-controls="mobile-lainnya">
+            <span class="mnav-ikon"><i class="fa-solid fa-ellipsis"></i></span>
+            <span>Lainnya</span>
+            <i class="fa-solid fa-chevron-down text-[10px] text-white/45 transition-transform duration-200 ml-auto"></i>
+        </button>
+        <div id="mobile-lainnya" class="hidden pl-4 border-l border-white/15 ml-6 mb-1 mt-0.5 space-y-0.5">
+            @foreach($navLainnya as $item)
+                @php
+                    $itemAttrs = '';
+                    if (!empty($item['target'])) $itemAttrs .= ' target="'.$item['target'].'"';
+                    if (!empty($item['rel']))    $itemAttrs .= ' rel="'.$item['rel'].'"';
+                @endphp
+                <a href="{{ $item['href'] }}"{!! $itemAttrs !!} class="block py-2 px-2 text-xs text-white/75 hover:text-[var(--gold)] transition-colors rounded-lg">
+                    <i class="fa-solid {{ $item['icon'] ?? 'fa-arrow-right' }} text-[10px] mr-2 text-[var(--gold)]/70"></i>{{ $item['label'] }}
+                </a>
+            @endforeach
+        </div>
+    </div>
+
+    {{-- Mobile auth & social --}}
+    <div class="pt-3 mt-3 border-t border-white/10 space-y-3">
+        <div class="flex items-center justify-between px-1">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-white/40">Media Sosial</span>
+            <div class="flex items-center gap-4">
+                <a href="https://www.instagram.com/fsi.smansa_landbouw?igsh=MXVzMzd5Nms0eDZpNQ==" target="_blank" rel="noopener" class="text-white/60 hover:text-[var(--gold)] transition-colors">
+                    <i class="fa-brands fa-instagram text-lg"></i>
+                </a>
+                <a href="https://www.facebook.com/share/1BJMFJvK5k/" target="_blank" rel="noopener" class="text-white/60 hover:text-[var(--gold)] transition-colors">
+                    <i class="fa-brands fa-facebook text-lg"></i>
+                </a>
+                <a href="https://ytfsi.carrd.co" target="_blank" rel="noopener" class="text-white/60 hover:text-[var(--gold)] transition-colors">
+                    <i class="fa-brands fa-youtube text-lg"></i>
+                </a>
+            </div>
+        </div>
+
+        @auth
+            @if(Auth::user()->role === 'admin')
+                <a href="{{ route('admin.index') }}" class="mnav-item text-amber-300">
+                    <span class="mnav-ikon" style="background:rgba(252,191,73,.15); color:rgb(252,211,77);"><i class="fa-solid fa-shield-halved"></i></span>
+                    <span>Admin Panel</span>
+                </a>
+            @endif
+            <a href="{{ route('profile.edit') }}" class="mnav-item">
+                <x-community-avatar :user="Auth::user()" size="xs" />
+                <span>Profil Saya</span>
+            </a>
+        @else
+            <a href="{{ route('login') }}" class="btn-primary w-full py-3">
+                <i class="fa-solid fa-right-to-bracket mr-1.5"></i> Masuk ke TSAQIB
+            </a>
+        @endauth
+    </div>
+</div>
+
 <style>
-    /* ===== "Lainnya" dropdown (desktop) — animasi panel + stagger item =====
-       Visibilitas & animasi panel diatur di sini (bukan lewat kelas Tailwind)
-       supaya transition selalu hadir di setiap halaman, baik yang pakai Tailwind
-       CDN (Beranda) maupun app.css ter-compile. JS hanya toggle .is-open +
-       aria-expanded. opacity-0/invisible di markup menjaga tidak ada FOUC saat
-       halaman pertama dimuat. */
-    #lainnya-menu{
+    /* Dropdown transitions */
+    #lainnya-menu, #labor-menu {
         transform-origin: top left;
-        transform: translateY(-8px) scale(.96);
-        transition: opacity .18s ease-out, transform .18s ease-out, visibility .18s ease-out;
+        transform: translateY(-6px) scale(0.97);
+        transition: opacity 0.18s ease-out, transform 0.18s ease-out, visibility 0.18s ease-out;
     }
-    #lainnya-menu.is-open{
+    #lainnya-menu.is-open, #labor-menu.is-open {
         opacity: 1;
         visibility: visible;
         transform: translateY(0) scale(1);
     }
-    /* Chevron berputar halus mengikuti state (driven by aria-expanded). */
-    #lainnya-toggle i{ transition: transform .2s ease-out; }
-    #lainnya-toggle[aria-expanded="true"] i{ transform: rotate(180deg); }
-    /* Stagger: tiap item muncul bergantian (fade + slide kanan) saat panel dibuka. */
-    #lainnya-menu .lainnya-item{
-        opacity: 0;
-        transform: translateX(-6px);
-        transition: opacity .16s ease-out, transform .16s ease-out, color .15s ease, background-color .15s ease;
-    }
-    #lainnya-menu.is-open .lainnya-item{ opacity: 1; transform: translateX(0); }
-    #lainnya-menu.is-open .lainnya-item:nth-child(1){ transition-delay: .05s; }
-    #lainnya-menu.is-open .lainnya-item:nth-child(2){ transition-delay: .09s; }
-    #lainnya-menu.is-open .lainnya-item:nth-child(3){ transition-delay: .13s; }
-    #lainnya-menu.is-open .lainnya-item:nth-child(4){ transition-delay: .17s; }
-
-    /* ===== "Laboratorium PAI" dropdown (desktop) — animasi panel + stagger item ===== */
-    #labor-menu{
-        transform-origin: top left;
-        transform: translateY(-8px) scale(.96);
-        transition: opacity .18s ease-out, transform .18s ease-out, visibility .18s ease-out;
-    }
-    #labor-menu.is-open{
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0) scale(1);
-    }
-    #labor-toggle i{ transition: transform .2s ease-out; }
-    #labor-toggle[aria-expanded="true"] i{ transform: rotate(180deg); }
-    #labor-menu .labor-item{
-        opacity: 0;
-        transform: translateX(-6px);
-        transition: opacity .16s ease-out, transform .16s ease-out, color .15s ease, background-color .15s ease;
-    }
-    #labor-menu.is-open .labor-item{ opacity: 1; transform: translateX(0); }
-    #labor-menu.is-open .labor-item:nth-child(1){ transition-delay: .05s; }
-    #labor-menu.is-open .labor-item:nth-child(2){ transition-delay: .09s; }
-    #labor-menu.is-open .labor-item:nth-child(3){ transition-delay: .13s; }
-    @media (prefers-reduced-motion: reduce){
-        #lainnya-menu, #lainnya-menu .lainnya-item{
-            transition: none !important;
-            transform: none !important;
-        }
+    #labor-toggle[aria-expanded="true"] i, #lainnya-toggle[aria-expanded="true"] i {
+        transform: rotate(180deg);
     }
 
-    /* ===== Mobile nav items (#mobile-menu) — visual: ikon + tap target ≥44px =====
-       Hanya mempengaruhi menu mobile; menu desktop (≥ xl) tak tersentuh. */
-    #mobile-menu .mnav-item{
-        display:flex; align-items:center; gap:.85rem;
-        min-height:44px;                 /* tap target aksesibilitas */
-        padding:.6rem .75rem;
-        border-radius:.7rem;
-        font-size:.9rem; font-weight:600;
-        color:rgba(247,245,239,.82);
-        transition:background .15s ease, color .15s ease;
+    /* Mobile drawer items */
+    #mobile-menu .mnav-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        min-height: 44px;
+        padding: 0.55rem 0.75rem;
+        border-radius: 0.65rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: rgba(247, 245, 239, 0.85);
+        transition: background 0.15s ease, color 0.15s ease;
     }
-    #mobile-menu .mnav-item:hover{ background:rgba(247,245,239,.06); color:var(--cream); }
-    #mobile-menu .mnav-item.is-active{ background:rgba(1,121,95,.18); color:var(--gold); }
-    #mobile-menu .mnav-item .mnav-ikon{
-        width:32px; height:32px; flex-shrink:0;
-        display:flex; align-items:center; justify-content:center;
-        border-radius:.6rem; font-size:.8rem;
-        background:rgba(247,245,239,.06); color:var(--gold);
+    #mobile-menu .mnav-item:hover {
+        background: rgba(247, 245, 239, 0.06);
+        color: var(--cream);
     }
-    #mobile-menu .mnav-item.is-active .mnav-ikon{ background:rgba(201,166,107,.18); }
+    #mobile-menu .mnav-item.is-active {
+        background: rgba(1, 121, 95, 0.2);
+        color: var(--gold);
+        border: 1px solid rgba(201, 166, 107, 0.25);
+    }
+    #mobile-menu .mnav-ikon {
+        width: 30px;
+        height: 30px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.5rem;
+        font-size: 0.75rem;
+        background: rgba(247, 245, 239, 0.06);
+        color: var(--gold);
+    }
+    #mobile-menu .mnav-item.is-active .mnav-ikon {
+        background: rgba(201, 166, 107, 0.2);
+    }
 </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        /* ============ MOBILE DRAWER TOGGLE ============ */
         const btn      = document.getElementById('mobile-menu-btn');
         const menu     = document.getElementById('mobile-menu');
         const backdrop = document.getElementById('mobile-menu-backdrop');
@@ -429,7 +380,6 @@
             backdrop.classList.remove('hidden');
             document.body.classList.add('overflow-hidden');
             btn.setAttribute('aria-expanded', 'true');
-            btn.setAttribute('aria-label', 'Tutup menu navigasi');
             menuIcon.classList.replace('fa-bars', 'fa-xmark');
         }
         function closeMenu() {
@@ -437,7 +387,6 @@
             backdrop.classList.add('hidden');
             document.body.classList.remove('overflow-hidden');
             btn.setAttribute('aria-expanded', 'false');
-            btn.setAttribute('aria-label', 'Buka menu navigasi');
             menuIcon.classList.replace('fa-xmark', 'fa-bars');
         }
 
@@ -454,87 +403,46 @@
             if (e.key === 'Escape' && menu && !menu.classList.contains('hidden')) closeMenu();
         });
 
-        /* ============ "Lainnya" dropdown (mobile) ============ */
-        const lainnyaToggle = document.querySelector('[data-mobile-lainnya-toggle]');
-        const lainnyaPanel  = document.getElementById('mobile-lainnya');
-        if (lainnyaToggle && lainnyaPanel) {
-            const chevron = lainnyaToggle.querySelector('i');
-            lainnyaToggle.addEventListener('click', () => {
-                const open = !lainnyaPanel.classList.contains('hidden');
-                lainnyaPanel.classList.toggle('hidden', open);
-                lainnyaToggle.setAttribute('aria-expanded', open ? 'false' : 'true');
-                if (chevron) chevron.classList.toggle('rotate-180', !open);
-            });
-        }
+        // Mobile sub-toggles
+        const setupMobileToggle = (toggleSelector, panelId) => {
+            const toggle = document.querySelector(toggleSelector);
+            const panel  = document.getElementById(panelId);
+            if (toggle && panel) {
+                const chevron = toggle.querySelector('.fa-chevron-down');
+                toggle.addEventListener('click', () => {
+                    const open = !panel.classList.contains('hidden');
+                    panel.classList.toggle('hidden', open);
+                    toggle.setAttribute('aria-expanded', open ? 'false' : 'true');
+                    if (chevron) chevron.classList.toggle('rotate-180', !open);
+                });
+            }
+        };
+        setupMobileToggle('[data-mobile-labor-toggle]', 'mobile-labor');
+        setupMobileToggle('[data-mobile-lainnya-toggle]', 'mobile-lainnya');
 
-        /* ============ "Laboratorium PAI" dropdown (mobile) ============ */
-        const laborToggle = document.querySelector('[data-mobile-labor-toggle]');
-        const laborPanel  = document.getElementById('mobile-labor');
-        if (laborToggle && laborPanel) {
-            const chevron = laborToggle.querySelector('i');
-            laborToggle.addEventListener('click', () => {
-                const open = !laborPanel.classList.contains('hidden');
-                laborPanel.classList.toggle('hidden', open);
-                laborToggle.setAttribute('aria-expanded', open ? 'false' : 'true');
-                if (chevron) chevron.classList.toggle('rotate-180', !open);
-            });
-        }
+        // Desktop click toggles
+        const setupDropdown = (btnId, menuId) => {
+            const dBtn  = document.getElementById(btnId);
+            const dMenu = document.getElementById(menuId);
+            if (!dBtn || !dMenu) return;
 
-        /* ============ "Lainnya" dropdown (desktop, ≥ xl) — click-to-toggle ============
-           Sebelumnya hover-only (group-hover), jadi klik (mouse biasa, touch, keyboard)
-           nggak buka apa-apa. Sekarang toggle via klik + tutup otomatis saat klik di luar
-           atau tekan Escape. */
-        const lainnyaBtn  = document.getElementById('lainnya-toggle');
-        const lainnyaMenu = document.getElementById('lainnya-menu');
-        if (lainnyaBtn && lainnyaMenu) {
-            const openLainnya  = () => {
-                lainnyaMenu.classList.add('is-open');
-                lainnyaBtn.setAttribute('aria-expanded', 'true');
-            };
-            const closeLainnya = () => {
-                lainnyaMenu.classList.remove('is-open');
-                lainnyaBtn.setAttribute('aria-expanded', 'false');
-            };
-            lainnyaBtn.addEventListener('click', (e) => {
+            const open = () => { dMenu.classList.add('is-open'); dBtn.setAttribute('aria-expanded', 'true'); };
+            const close = () => { dMenu.classList.remove('is-open'); dBtn.setAttribute('aria-expanded', 'false'); };
+
+            dBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                lainnyaBtn.getAttribute('aria-expanded') === 'true' ? closeLainnya() : openLainnya();
+                dBtn.getAttribute('aria-expanded') === 'true' ? close() : open();
             });
             document.addEventListener('click', (e) => {
-                if (lainnyaBtn.getAttribute('aria-expanded') === 'true' &&
-                    !lainnyaMenu.contains(e.target) && !lainnyaBtn.contains(e.target)) {
-                    closeLainnya();
+                if (dBtn.getAttribute('aria-expanded') === 'true' && !dMenu.contains(e.target) && !dBtn.contains(e.target)) {
+                    close();
                 }
             });
             document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && lainnyaBtn.getAttribute('aria-expanded') === 'true') closeLainnya();
+                if (e.key === 'Escape' && dBtn.getAttribute('aria-expanded') === 'true') close();
             });
-        }
-
-        /* ============ "Laboratorium PAI" dropdown (desktop, ≥ xl) — click-to-toggle ============ */
-        const laborBtn  = document.getElementById('labor-toggle');
-        const laborMenu = document.getElementById('labor-menu');
-        if (laborBtn && laborMenu) {
-            const openLabor  = () => {
-                laborMenu.classList.add('is-open');
-                laborBtn.setAttribute('aria-expanded', 'true');
-            };
-            const closeLabor = () => {
-                laborMenu.classList.remove('is-open');
-                laborBtn.setAttribute('aria-expanded', 'false');
-            };
-            laborBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                laborBtn.getAttribute('aria-expanded') === 'true' ? closeLabor() : openLabor();
-            });
-            document.addEventListener('click', (e) => {
-                if (laborBtn.getAttribute('aria-expanded') === 'true' &&
-                    !laborMenu.contains(e.target) && !laborBtn.contains(e.target)) {
-                    closeLabor();
-                }
-            });
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && laborBtn.getAttribute('aria-expanded') === 'true') closeLabor();
-            });
-        }
+        };
+        setupDropdown('labor-toggle', 'labor-menu');
+        setupDropdown('lainnya-toggle', 'lainnya-menu');
     });
 </script>

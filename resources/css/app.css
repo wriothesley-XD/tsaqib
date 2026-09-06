@@ -5,48 +5,816 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
+/* =========================================================================
+   TSAQIB DESIGN SYSTEM TOKENS (Tailwind CSS v4 @theme)
+   ========================================================================= */
 @theme {
-    /* SATU font untuk seluruh situs: Plus Jakarta Sans.
-       --font-display & --font-label sengaja di-set SAMA dengan --font-sans
-       agar kelas utility `font-display` / `font-label` yang sudah dipakai di
-       banyak blade tetap berfungsi, namun kini me-render font yang sama. */
-    --font-sans:
-        "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif,
-        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
-        "Noto Color Emoji";
-    --font-display:
-        "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif,
-        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
-        "Noto Color Emoji";
-    --font-label:
-        "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif,
-        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
-        "Noto Color Emoji";
+    --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-display: "Fraunces", "Plus Jakarta Sans", Georgia, serif;
+    --font-label: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+
+    /* Theme color palette */
+    --color-ts-ink: #10140F;
+    --color-ts-dark-0: #0D2818;
+    --color-ts-dark-1: #143520;
+    --color-ts-dark-2: #1C442B;
+    --color-ts-green: #01795F;
+    --color-ts-green-dark: #3F704D;
+    --color-ts-gold: #C9A66B;
+    --color-ts-gold-light: #E0C58E;
+    --color-ts-cream: #F7F5EF;
 }
 
-/* Pastikan SEMUA elemen mewarisi font yang sama. font-family memang diwariskan
-   secara default, TAPI sebagian besar browser memberi <button>/<input>/
-   <select>/<textarea> font sistem sendiri — itulah sebabnya tombol & input
-   selama ini terlihat beda. Paksa mereka mewarisi. */
+/* CSS Variables for legacy and inline style compatibility */
+:root {
+    --cream: #F7F5EF;
+    --ink: #10140F;
+    --green: #01795F;
+    --green-dark: #3F704D;
+    --gold: #C9A66B;
+    --gold-light: #E0C58E;
+    --green-s0: #0D2818;
+    --green-s1: #143520;
+    --green-s2: #1C442B;
+}
+
 @layer base {
-    html { font-family: var(--font-sans); }
-    button, input, optgroup, select, textarea { font-family: inherit; }
+    html {
+        font-family: var(--font-sans);
+        color: var(--cream);
+        background-color: var(--green-s0);
+        scroll-behavior: smooth;
+    }
+    body {
+        font-family: var(--font-sans);
+        color: var(--cream);
+        background-color: var(--green-s0);
+        min-height: 100vh;
+        overflow-x: hidden;
+        position: relative;
+    }
+    button, input, optgroup, select, textarea {
+        font-family: inherit;
+    }
+    h1, h2, h3, .font-display {
+        font-family: var(--font-display);
+        font-optical-sizing: auto;
+    }
 }
 
 /* =========================================================================
-   GLOBAL TSAQIB BACKGROUND (applied once on <body>, site-wide)
-   --------------------------------------------------------------------
-   Layer 1 (top):  Islamic girih star pattern — inline SVG, 48x48 tile,
-                   stroke #5DCAA5 @ ~0.14 opacity (texture, not distraction).
-   Layer 2 (base): flat #1E4536 green.
-   Inline SVG => no external request, no PNG load/memory issues. Painted on
-   <body>, so it sits behind every page's content. Per-page bg utilities
-   (bg-[#10140F]) were removed from <body> tags so nothing competes with this.
+   1. GLOBAL BACKGROUND & PATTERNS
    ========================================================================= */
-body{
-    background-color:#1E4536;                 /* fallback base while images paint */
+body {
     background-image:
-        url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2748%27%20height%3D%2748%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%235DCAA5%27%20stroke-width%3D%271%27%20opacity%3D%270.14%27%3E%3Cpath%20d%3D%27M24%2C2%20L34%2C12%20L24%2C22%20L14%2C12%20Z%27%2F%3E%3Cpath%20d%3D%27M24%2C26%20L34%2C36%20L24%2C46%20L14%2C36%20Z%27%2F%3E%3Cpath%20d%3D%27M0%2C12%20L10%2C2%20L10%2C22%20Z%27%20opacity%3D%270.6%27%2F%3E%3Cpath%20d%3D%27M48%2C12%20L38%2C2%20L38%2C22%20Z%27%20opacity%3D%270.6%27%2F%3E%3Cpath%20d%3D%27M0%2C36%20L10%2C26%20L10%2C46%20Z%27%20opacity%3D%270.6%27%2F%3E%3Cpath%20d%3D%27M48%2C36%20L38%2C26%20L38%2C46%20Z%27%20opacity%3D%270.6%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
-    background-repeat:repeat;                  /* tile the girih */
-    background-size:48px 48px;
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cg fill='none' stroke='%235DCAA5' stroke-width='1' opacity='0.08'%3E%3Cpath d='M24,2 L34,12 L24,22 L14,12 Z'/%3E%3Cpath d='M24,26 L34,36 L24,46 L14,36 Z'/%3E%3Cpath d='M0,12 L10,2 L10,22 Z' opacity='0.5'/%3E%3Cpath d='M48,12 L38,2 L38,22 Z' opacity='0.5'/%3E%3Cpath d='M0,36 L10,26 L10,46 Z' opacity='0.5'/%3E%3Cpath d='M48,36 L38,26 L38,46 Z' opacity='0.5'/%3E%3C/g%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 48px 48px;
+}
+
+.pat-islami {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cg fill='none' stroke='%235DCAA5' stroke-width='1' opacity='0.08'%3E%3Cpath d='M24,2 L34,12 L24,22 L14,12 Z'/%3E%3Cpath d='M24,26 L34,36 L24,46 L14,36 Z'/%3E%3Cpath d='M0,12 L10,2 L10,22 Z' opacity='0.5'/%3E%3Cpath d='M48,12 L38,2 L38,22 Z' opacity='0.5'/%3E%3Cpath d='M0,36 L10,26 L10,46 Z' opacity='0.5'/%3E%3Cpath d='M48,36 L38,26 L38,46 Z' opacity='0.5'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 48px 48px;
+}
+.pat-islami.is-large {
+    background-size: 80px 80px;
+    opacity: 0.6;
+}
+
+.section-glow {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(800px circle at var(--glow-x, 20%) var(--glow-y, 0%), rgba(201, 166, 107, 0.12), transparent 60%);
+}
+
+/* =========================================================================
+   2. UNIFIED CARD SYSTEM (UIVERSE SPOTLIGHT HOVER)
+   ========================================================================= */
+.tsaqib-card, .tsaqib-card-interactive, .card-spotlight {
+    position: relative;
+    background: rgba(247, 245, 239, 0.04);
+    border: 1px solid rgba(247, 245, 239, 0.10);
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+}
+
+/* Mouse-following Spotlight Glow */
+.tsaqib-card::before, .tsaqib-card-interactive::before, .card-spotlight::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+        380px circle at var(--mouse-x, -999px) var(--mouse-y, -999px),
+        rgba(201, 166, 107, 0.10),
+        transparent 65%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.tsaqib-card:hover::before, .tsaqib-card-interactive:hover::before, .card-spotlight:hover::before {
+    opacity: 1;
+}
+
+.tsaqib-card:hover {
+    background: rgba(247, 245, 239, 0.065);
+    border-color: rgba(201, 166, 107, 0.38);
+}
+
+.tsaqib-card-flat {
+    background: rgba(247, 245, 239, 0.04);
+    border: 1px solid rgba(247, 245, 239, 0.10);
+    border-radius: 1rem;
+}
+
+.tsaqib-card-interactive:hover {
+    transform: translateY(-4px);
+    border-color: rgba(201, 166, 107, 0.48);
+    background: rgba(247, 245, 239, 0.075);
+    box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.65), 0 0 20px -5px rgba(201, 166, 107, 0.15);
+}
+
+/* =========================================================================
+   3. UNIFIED BUTTON SYSTEM (UIVERSE TACTILE & SHIMMER SWEEP)
+   ========================================================================= */
+.btn-primary, .cta-primary, .btn-gold, .btn-outline, .btn-gold-outline {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Tactile Active Press */
+.btn-primary:active, .cta-primary:active, .btn-gold:active, .btn-outline:active, .btn-gold-outline:active {
+    transform: scale(0.96) !important;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Shimmer Sweep Animation on Hover */
+.btn-primary::before, .cta-primary::before, .btn-gold::before, .btn-gold-outline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -140%;
+    width: 75%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.28) 50%,
+        transparent 100%
+    );
+    transform: skewX(-25deg);
+    transition: left 0.65s cubic-bezier(0.19, 1, 0.22, 1);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.btn-primary:hover::before, .cta-primary:hover::before, .btn-gold:hover::before, .btn-gold-outline:hover::before {
+    left: 160%;
+}
+
+/* Subtle icon forward nudge on hover */
+.btn-primary i, .cta-primary i, .btn-gold i, .btn-outline i, .btn-gold-outline i {
+    transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.btn-primary:hover i.fa-arrow-right, .btn-primary:hover i.fa-chevron-right, .btn-primary:hover i.fa-arrow-up-right-from-square,
+.cta-primary:hover i.fa-arrow-right, .cta-primary:hover i.fa-chevron-right,
+.btn-gold:hover i.fa-arrow-right, .btn-gold:hover i.fa-chevron-right, .btn-gold:hover i.fa-arrow-up-right-from-square,
+.btn-outline:hover i.fa-arrow-right, .btn-outline:hover i.fa-chevron-right, .btn-outline:hover i.fa-arrow-up-right-from-square {
+    transform: translateX(3px);
+}
+
+.btn-primary, .cta-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: var(--green);
+    color: #ffffff;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 0.8125rem;
+    padding: 0.75rem 1.35rem;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    box-shadow: 0 8px 24px -6px rgba(1, 121, 95, 0.55);
+}
+.btn-primary:hover, .cta-primary:hover {
+    background: var(--green-dark);
+    transform: translateY(-1px);
+    filter: brightness(1.06);
+}
+
+.btn-gold {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: var(--gold);
+    color: var(--green-s0);
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+    padding: 0.75rem 1.35rem;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    transition: filter 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 8px 24px -6px rgba(201, 166, 107, 0.45);
+}
+.btn-gold:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+}
+
+.btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: transparent;
+    color: var(--cream);
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 0.8125rem;
+    padding: 0.75rem 1.35rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(247, 245, 239, 0.25);
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+.btn-outline:hover {
+    background: rgba(247, 245, 239, 0.08);
+    border-color: rgba(201, 166, 107, 0.5);
+    color: var(--gold);
+    transform: translateY(-1px);
+}
+
+.btn-gold-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: rgba(201, 166, 107, 0.08);
+    color: var(--gold);
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 0.8125rem;
+    padding: 0.75rem 1.35rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(201, 166, 107, 0.45);
+    transition: all 0.2s ease;
+}
+.btn-gold-outline:hover {
+    background: var(--gold);
+    color: var(--green-s0);
+    transform: translateY(-1px);
+}
+
+/* =========================================================================
+   4. UNIFIED BADGE & PILL SYSTEM
+   ========================================================================= */
+.eyebrow-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    border-radius: 999px;
+    background: rgba(247, 245, 239, 0.08);
+    border: 1px solid rgba(247, 245, 239, 0.16);
+    color: var(--cream);
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+.eyebrow-pill-gold {
+    background: rgba(201, 166, 107, 0.12);
+    border-color: rgba(201, 166, 107, 0.35);
+    color: var(--gold);
+}
+.eyebrow-pill-green {
+    background: rgba(1, 121, 95, 0.16);
+    border-color: rgba(1, 121, 95, 0.35);
+    color: #5fd3b0;
+}
+
+.ed-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-family: var(--font-sans);
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+}
+.ed-eyebrow::before {
+    content: '';
+    width: 22px;
+    height: 1px;
+    background: var(--gold);
+    flex-shrink: 0;
+}
+
+.vpoint {
+    border-left: 2px solid rgba(201, 166, 107, 0.55);
+    padding-left: 1rem;
+}
+.vpoint h4 {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--cream);
+    font-weight: 800;
+    text-transform: uppercase;
+}
+.vpoint p {
+    color: rgba(247, 245, 239, 0.7);
+    font-size: 0.875rem;
+}
+
+/* =========================================================================
+   5. UNIFIED INPUT SYSTEM (UIVERSE INTERACTIVE GLOW)
+   ========================================================================= */
+.tsaqib-input, .input-glow {
+    background: rgba(247, 245, 239, 0.04);
+    border: 1px solid rgba(247, 245, 239, 0.14);
+    color: var(--cream);
+    border-radius: 0.75rem;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease, transform 0.2s ease;
+}
+.tsaqib-input::placeholder, .input-glow::placeholder {
+    color: rgba(247, 245, 239, 0.4);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.tsaqib-input:focus, .input-glow:focus {
+    outline: none;
+    background: rgba(247, 245, 239, 0.07);
+    border-color: var(--gold);
+    box-shadow: 0 0 0 2px rgba(201, 166, 107, 0.35), 0 8px 24px -4px rgba(201, 166, 107, 0.2);
+}
+.tsaqib-input:focus::placeholder, .input-glow:focus::placeholder {
+    opacity: 0.55;
+    transform: translateX(4px);
+}
+
+.input-glow-group {
+    position: relative;
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.input-glow-group:focus-within {
+    transform: translateY(-1px);
+}
+.input-glow-group:focus-within .input-icon {
+    color: var(--gold) !important;
+    transform: translateY(-50%) scale(1.15) rotate(6deg);
+}
+.input-glow-group .input-icon {
+    transition: color 0.25s ease, transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+select.tsaqib-input option {
+    background: #143520;
+    color: var(--cream);
+}
+
+/* =========================================================================
+   6. DELIBERATE PLACEHOLDERS & FRAMES
+   ========================================================================= */
+.ph {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(201, 166, 107, 0.35);
+    background: linear-gradient(155deg, var(--green-s2), var(--green-s0));
+}
+.ph::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(13, 40, 24, 0.15) 0%, rgba(13, 40, 24, 0.45) 100%);
+}
+.ph-todo {
+    position: absolute;
+    z-index: 2;
+    top: 0.75rem;
+    right: 0.75rem;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: rgba(13, 40, 24, 0.85);
+    border: 1px dashed rgba(201, 166, 107, 0.7);
+    padding: 4px 10px;
+    border-radius: 999px;
+    backdrop-filter: blur(4px);
+}
+
+/* =========================================================================
+   7. COMMUNITY CARDS (13 CIRCLES HARMONIZATION)
+   ========================================================================= */
+.community-card {
+    position: relative;
+    background: rgba(247, 245, 239, 0.04);
+    border: 1px solid rgba(247, 245, 239, 0.10);
+    border-radius: 1rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.community-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(201, 166, 107, 0.4);
+    box-shadow: 0 16px 32px -10px rgba(0, 0, 0, 0.55);
+}
+.community-logo-container {
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    background: rgba(247, 245, 239, 0.06);
+    border: 1px solid rgba(201, 166, 107, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.community-logo-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.community-media-banner {
+    position: relative;
+    height: 160px;
+    overflow: hidden;
+    background: linear-gradient(155deg, var(--green-s2), var(--green-s0));
+}
+.community-media-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+.community-card:hover .community-media-banner img {
+    transform: scale(1.05);
+}
+.community-media-banner::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(13, 40, 24, 0.9) 0%, rgba(13, 40, 24, 0.2) 60%, transparent 100%);
+}
+
+/* =========================================================================
+   8. MEDIA & GALLERY LIGHTBOX
+   ========================================================================= */
+#lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: rgba(0, 0, 0, 0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s;
+}
+#lightbox.open {
+    opacity: 1;
+    visibility: visible;
+}
+#lb-item {
+    transition: opacity 0.18s ease, transform 0.18s ease;
+}
+#lb-item.fade {
+    opacity: 0;
+}
+#lb-item img, #lb-item video {
+    max-width: 100%;
+    max-height: 80vh;
+    border-radius: 0.5rem;
+    display: block;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+.lb-stage {
+    position: relative;
+    max-width: 100%;
+    max-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.lb-btn {
+    position: absolute;
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    background: rgba(247, 245, 239, 0.1);
+    color: rgba(247, 245, 239, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: background 0.15s, color 0.15s;
+}
+.lb-btn:hover {
+    background: rgba(247, 245, 239, 0.2);
+    color: var(--gold);
+}
+.lb-prev { left: 0.5rem; top: 50%; transform: translateY(-50%); }
+.lb-next { right: 0.5rem; top: 50%; transform: translateY(-50%); }
+.lb-close { top: 1rem; right: 1rem; }
+.lb-counter {
+    position: absolute;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(16, 20, 15, 0.7);
+    color: var(--cream);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 999px;
+}
+
+/* =========================================================================
+   8. COMPETITION-GRADE MICRO-INTERACTIONS & POLISH
+   ========================================================================= */
+
+/* 1) Scroll-driven Reading Progress Bar (Clean & Subtle) */
+.reading-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    width: 0%;
+    background: var(--gold);
+    z-index: 100;
+    pointer-events: none;
+    transition: width 0.08s linear;
+}
+
+/* 2) Daily Hadits Floating Notification Card */
+#daily-notification {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 40;
+    max-width: min(92vw, 420px);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+}
+#daily-notification.is-hidden {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+    pointer-events: none;
+}
+
+/* 5) Custom Toast Notification System */
+#toast-container {
+    position: fixed;
+    top: 1.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    pointer-events: none;
+}
+.tsaqib-toast {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.65rem 1.25rem;
+    border-radius: 9999px;
+    background: rgba(16, 20, 15, 0.92);
+    border: 1px solid rgba(201, 166, 107, 0.4);
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.7), 0 0 15px rgba(201, 166, 107, 0.25);
+    backdrop-filter: blur(12px);
+    color: var(--cream);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.tsaqib-toast.fade-out {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+}
+@keyframes toastIn {
+    from { opacity: 0; transform: translateY(-12px) scale(0.94); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* 6) Command Palette & Shortcuts Modal */
+.cmd-kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.5rem;
+    height: 1.35rem;
+    padding: 0 0.35rem;
+    font-size: 0.6875rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: 700;
+    color: rgba(247, 245, 239, 0.75);
+    background: rgba(247, 245, 239, 0.08);
+    border: 1px solid rgba(247, 245, 239, 0.18);
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+}
+
+/* 7) Upvote Micro-Interaction (Spring Bounce, Glow & Particle Burst) */
+@keyframes voteSpring {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.26) rotate(-5deg); }
+    60% { transform: scale(0.92) rotate(2deg); }
+    80% { transform: scale(1.05) rotate(0); }
+    100% { transform: scale(1); }
+}
+
+.vote-btn {
+    position: relative;
+    overflow: visible;
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    user-select: none;
+}
+
+.vote-btn:active {
+    transform: scale(0.92);
+}
+
+.vote-btn.vote-pop {
+    animation: voteSpring 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.vote-btn.is-up {
+    background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 15px -3px rgba(1, 121, 95, 0.6), 0 0 12px rgba(63, 214, 176, 0.35) !important;
+}
+
+.vote-btn.is-down {
+    background: rgba(239, 68, 68, 0.22) !important;
+    color: #fca5a5 !important;
+    border-color: rgba(239, 68, 68, 0.4) !important;
+}
+
+.vote-particle {
+    position: absolute;
+    pointer-events: none;
+    width: 5px;
+    height: 5px;
+    border-radius: 999px;
+    background: var(--gold);
+    box-shadow: 0 0 6px var(--gold);
+    animation: voteParticleFloat 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    z-index: 50;
+}
+
+@keyframes voteParticleFloat {
+    0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(var(--vx, 0px), var(--vy, -28px)) scale(0.3);
+    }
+}
+
+/* 8) Fluid Pill Tab Switchers (Uiverse Style) */
+.u-tab, .doc-tab, .dn-tab {
+    position: relative;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+    user-select: none;
+}
+
+.doc-tab.is-active {
+    background: linear-gradient(135deg, rgba(201, 166, 107, 0.22), rgba(201, 166, 107, 0.08)) !important;
+    border-color: rgba(201, 166, 107, 0.45) !important;
+    color: var(--gold) !important;
+    box-shadow: 0 4px 16px -4px rgba(201, 166, 107, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+    transform: translateY(-1px);
+}
+
+.u-tab {
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    color: rgba(247, 245, 239, 0.6);
+    border: 1px solid transparent;
+}
+
+.u-tab:hover {
+    color: var(--cream);
+    background: rgba(247, 245, 239, 0.06);
+}
+
+.u-tab.is-active {
+    color: var(--gold);
+    background: rgba(201, 166, 107, 0.16);
+    border-color: rgba(201, 166, 107, 0.35);
+    font-weight: 700;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+    transform: translateY(-1px);
+}
+
+/* 9) Floating Notification Dock & Active Prayer Beacon */
+.dn-prayer-box {
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+}
+
+.dn-prayer-box.is-active {
+    background: rgba(1, 121, 95, 0.3) !important;
+    border-color: #3fd6b0 !important;
+    box-shadow: 0 0 14px rgba(63, 214, 176, 0.35);
+}
+
+.dn-beacon-dot {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: #3fd6b0;
+}
+
+.dn-beacon-dot::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 999px;
+    background: #3fd6b0;
+    animation: beaconRadar 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes beaconRadar {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(3); opacity: 0; }
+}
+
+/* Minimized Dock Pill */
+#daily-notification.is-minimized #dn-full-card {
+    display: none;
+}
+#daily-notification.is-minimized #dn-mini-pill {
+    display: flex;
+}
+#dn-mini-pill {
+    display: none;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    background: rgba(13, 38, 23, 0.95);
+    border: 1px solid rgba(201, 166, 107, 0.45);
+    box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.65), 0 0 18px rgba(201, 166, 107, 0.25);
+    backdrop-filter: blur(12px);
+    color: var(--cream);
+    cursor: pointer;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+}
+#dn-mini-pill:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 16px 36px -5px rgba(0, 0, 0, 0.75), 0 0 24px rgba(201, 166, 107, 0.35);
+}
+
+/* =========================================================================
+   9. ACCESSIBILITY & MOTION PREFERENCES
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }

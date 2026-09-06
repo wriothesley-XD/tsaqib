@@ -1,720 +1,456 @@
-<!-- resources/views/landing.blade.php -->
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}?v=2">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TSAQIB - Forum Studi Islam SMAN 1 Bukittinggi</title>
-    @vite('resources/css/app.css')
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&display=swap" rel="stylesheet">
+    <meta name="description" content="TSAQIB - Forum Studi Islam SMAN 1 Bukittinggi. Pusat kegiatan dakwah, Laboratorium PAI, Perpustakaan Digital, dan komunitas minat & bakat siswa.">
+    <title>TSAQIB — Forum Studi Islam SMAN 1 Bukittinggi</title>
+    @include('partials.theme-head')
 
     <style>
-        :root{
-            --cream:#F7F5EF;
-            --ink:#10140F;
-            --green:#01795F;
-            --green-dark:#3F704D;
-            --gold:#C9A66B;
-            /* Tangga hijau satu keluarga — variasi antar section HANYA level gelap */
-            --green-s0:#0D2818;   /* paling gelap: Hero overlay, Lab, Komunitas, Kabar, Footer */
-            --green-s1:#143520;   /* 1 step terang: Perpustakaan */
-            --green-s2:#1C442B;   /* 2 step: frame gambar / panel */
-        }
-
-        /* ===== Grain halus di seluruh halaman — mengikat semua section jadi satu
-           tekstur "kertas dicetak", bukan gradient digital yang licin-datar. ===== */
-        body{ position:relative; }
-        body::after{
-            content:'';
-            position:fixed;inset:0;z-index:999;pointer-events:none;
-            opacity:.05;
-            mix-blend-mode:overlay;
-            background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27160%27%20height%3D%27160%27%3E%3Cfilter%20id%3D%27n%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%270.85%27%20numOctaves%3D%272%27%20stitchTiles%3D%27stitch%27%2F%3E%3CfeColorMatrix%20type%3D%27saturate%27%20values%3D%270%27%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20filter%3D%27url%28%23n%29%27%2F%3E%3C%2Fsvg%3E");
-        }
-
-        /* ===== Identitas tipografi: serif editorial utk display, sans utk label/body.
-           Fraunces punya karakter "buku tua" — cocok utk nuansa naratif/immersive
-           tanpa mengubah satu pun token warna. Override .font-display Tailwind
-           lewat urutan source (file ini dimuat setelah app.css). ===== */
-        .font-display{
-            font-family:'Fraunces','Plus Jakarta Sans',serif !important;
-            font-optical-sizing:auto;
-            letter-spacing:-0.01em;
-        }
-
-        /* ===== Background hero: foto fsi.jpg cover/fixed + overlay obsidian.
-           Stop terakhir gradient = #0D2818 (--green-s0) agar fade menyatu
-           mulus dgn seksi Laboratorium di bawahnya. ===== */
-        .hero-bg{
-            background-color:#0D2818;
+        /* Section specific subtle ambient lights */
+        .hero-section {
+            background-color: var(--green-s0);
             background-image:
-                url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2748%27%20height%3D%2748%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%235DCAA5%27%20stroke-width%3D%271%27%20opacity%3D%270.10%27%3E%3Cpath%20d%3D%27M24%2C2%20L34%2C12%20L24%2C22%20L14%2C12%20Z%27%2F%3E%3Cpath%20d%3D%27M24%2C26%20L34%2C36%20L24%2C46%20L14%2C36%20Z%27%2F%3E%3Cpath%20d%3D%27M0%2C12%20L10%2C2%20L10%2C22%20Z%27%20opacity%3D%270.6%27%2F%3E%3Cpath%20d%3D%27M48%2C12%20L38%2C2%20L38%2C22%20Z%27%20opacity%3D%270.6%27%2F%3E%3Cpath%20d%3D%27M0%2C36%20L10%2C26%20L10%2C46%20Z%27%20opacity%3D%270.6%27%2F%3E%3Cpath%20d%3D%27M48%2C36%20L38%2C26%20L38%2C46%20Z%27%20opacity%3D%270.6%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E"),
-                linear-gradient(155deg, var(--green-s0) 15%, var(--gold) 145%),
-                url('{{ asset('assets/landing/fsi.jpg') }}');
-            background-blend-mode:normal, color, normal;
-            background-size:48px 48px, cover, cover;
-            background-position:center, center, center;
-            background-repeat:repeat, no-repeat, no-repeat;
-            background-attachment:fixed, fixed, fixed;
-        }
-        .hero-overlay{
-            position:absolute;inset:0;z-index:0;pointer-events:none;
-            background:linear-gradient(165deg, rgba(13,40,24,.88) 0%, rgba(13,40,24,.55) 45%, rgba(13,40,24,.9) 78%, #0D2818 100%);
-        }
-        .eyebrow-pill{
-            display:inline-flex;align-items:center;gap:8px;
-            padding-bottom:7px;
-            border-bottom:1px solid rgba(201,166,107,.5);
-            color:var(--gold);
-            font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;
-            font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+                radial-gradient(1200px circle at 80% 20%, rgba(1, 121, 95, 0.15), transparent 70%),
+                radial-gradient(800px circle at 15% 90%, rgba(201, 166, 107, 0.10), transparent 60%);
         }
 
-        .cta-primary{
-            background:#01795F;
-            border-radius:6px !important;
-            transition:filter .2s ease, transform .2s ease; /* hanya properti compositor */
-            box-shadow:0 10px 30px -8px rgba(1,121,95,.55); /* statis — tak dianimasikan */
+        /* Carousel cards */
+        .carousel-viewport { overflow: hidden; scrollbar-width: none; }
+        .carousel-viewport::-webkit-scrollbar { display: none; }
+        .carousel-track {
+            display: flex;
+            width: max-content;
+            will-change: transform;
+            cursor: grab;
+            touch-action: pan-y;
+            user-select: none;
         }
-        .cta-primary:hover{ filter:brightness(1.1); transform:translateY(-1px); }
+        .carousel-track:active { cursor: grabbing; }
+        .carousel-set { display: flex; }
+        .carousel-set > * { margin-right: 1.25rem; }
 
-        /* ===== Gaya editorial gelap — hijau tua + emas + teks krem =====
-           Satu keluarga warna dari Hero sampai Footer; variasi antar section
-           hanya dari level gelap-terang hijau (--green-s0/s1/s2). */
-        .ed-eyebrow{
-            display:flex;align-items:center;gap:.65rem;
-            font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:11px;
-            letter-spacing:.22em;text-transform:uppercase;color:var(--gold);
+        .card-program {
+            width: 205px;
+            aspect-ratio: 4/5;
+            border-radius: 1rem;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 1.25rem;
+            color: var(--cream);
+            background: var(--green-s2);
+            border: 1px solid rgba(201, 166, 107, 0.25);
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+            flex-shrink: 0;
         }
-        .ed-eyebrow::before{ content:'';width:22px;height:1px;background:var(--gold);flex-shrink:0; }
-        /* Tombol solid emas di atas hijau tua — teks hijau paling gelap */
-        .btn-gold{
-            display:inline-flex;align-items:center;gap:.5rem;
-            background:var(--gold);color:var(--green-s0);border-radius:6px;
-            font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;
-            font-size:12px;letter-spacing:.02em;padding:.875rem 1.5rem;white-space:nowrap;
-            transition:filter .15s ease,transform .15s ease;
+        @media (min-width: 1024px) {
+            .card-program { width: 225px; }
         }
-        .btn-gold:hover{ filter:brightness(1.08);transform:translateY(-1px); }
-
-        /* Poin dgn garis vertikal emas di kiri (bukan ikon kotak) */
-        .vpoint{ border-left:2px solid rgba(201,166,107,.55); padding-left:1rem; }
-        .vpoint h4{ font-size:11px;letter-spacing:.14em;color:var(--cream); }
-        .vpoint p{ color:rgba(247,245,239,.7); }
-
-        /* Frame gambar/placeholder: border emas + overlay hijau semi-transparan
-           supaya foto apa pun (termasuk placeholder) tetap menyatu dlm keluarga warna */
-        .ph{
-            position:relative;overflow:hidden;border-radius:.5rem;
-            border:1px solid rgba(201,166,107,.4);
-            outline:1px solid rgba(201,166,107,.18);
-            outline-offset:5px;
-            background:linear-gradient(155deg,var(--green-s2),var(--green-s0));
+        .card-program:hover {
+            transform: translateY(-6px);
+            border-color: rgba(201, 166, 107, 0.6);
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.7);
         }
-        .ph::after{
-            content:'';position:absolute;inset:0;pointer-events:none;
-            background:linear-gradient(180deg, rgba(13,40,24,.12) 0%, rgba(13,40,24,.42) 100%);
+        .card-program .card-photo {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
         }
-
-        /* Pola girih islami — SVG sama dgn pattern global situs (app.css),
-           dipakai sebagai overlay samar di seksi Laboratorium. */
-        .pat-islami{
-            position:absolute;inset:0;pointer-events:none;z-index:-1;
-            background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2748%27%20height%3D%2748%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%235DCAA5%27%20stroke-width%3D%271%27%20opacity%3D%270.14%27%3E%3Cpath%20d%3D%27M24%2C2%20L34%2C12%20L24%2C22%20L14%2C12%20Z%27%2F%3E%3Cpath%20d%3D%27M24%2C26%20L34%2C36%20L24%2C46%20L14%2C36%20Z%27%2F%3E%3Cpath%20d%3D%27M0%2C12%20L10%2C2%20L10%2C22%20Z%27%20opacity%3D%270.6%27%2F%3E%3Cpath%20d%3D%27M48%2C12%20L38%2C2%20L38%2C22%20Z%27%20opacity%3D%270.6%27%2F%3E%3Cpath%20d%3D%27M0%2C36%20L10%2C26%20L10%2C46%20Z%27%20opacity%3D%270.6%27%2F%3E%3Cpath%20d%3D%27M48%2C36%20L38%2C26%20L38%2C46%20Z%27%20opacity%3D%270.6%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
-            background-size:48px 48px;
+        .card-program:hover .card-photo {
+            transform: scale(1.08);
         }
-        .pat-islami.is-large{ background-size:88px 88px; opacity:.7; }
-        .pat-islami.is-faint{ opacity:.45; }
-
-        /* Cahaya hangat asimetris per section — kesan "ada sumber cahaya", bukan
-           blok warna rata. Posisi (--glow-x/--glow-y) diset per section lewat style. */
-        .section-glow{
-            position:absolute;inset:0;pointer-events:none;z-index:-1;
-            background:radial-gradient(900px circle at var(--glow-x,20%) var(--glow-y,0%), rgba(201,166,107,.14), transparent 62%);
+        .card-program::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: radial-gradient(
+                320px circle at var(--mouse-x, -999px) var(--mouse-y, -999px),
+                rgba(201, 166, 107, 0.22),
+                transparent 65%
+            );
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 3;
         }
-
-        /* Lapisan foto latar opsional (duotone hijau-emas) — aman kalau file belum
-           ada (url() yang gagal dimuat cukup diam, tak ada ikon rusak). Taruh foto
-           di public/assets/landing/ dengan nama yang dipakai tiap section. */
-        .section-photo{
-            position:absolute;inset:0;pointer-events:none;z-index:-1;overflow:hidden;
-            background-size:cover;background-position:center;background-repeat:no-repeat;
+        .card-program:hover::before {
+            opacity: 1;
         }
-        /* Fade pelindung — foto apa pun tetap terbaca di bawah teks/kartu,
-           sekaligus mendorong kegelapan foto ke arah tepi (bukan tengah). */
-        .section-photo::after{
-            content:'';position:absolute;inset:0;
-            background:radial-gradient(120% 100% at 50% 40%, transparent 25%, var(--green-s0) 90%);
+        .card-program::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(13, 40, 24, 0.95) 0%, rgba(13, 40, 24, 0.5) 45%, transparent 100%);
         }
-
-        /* Carousel foto Laboratorium PAI: cross-fade opacity murni ~1s, tanpa geser layout
-           (semua slide absolute+stacked, tinggi frame ditentukan aspect-[9/10] di .ph). */
-        .lab-slide{
-            position:absolute;inset:0;width:100%;height:100%;
-            object-fit:cover;opacity:0;pointer-events:none;
-            transition:opacity 1s ease-in-out;
-        }
-        .lab-slide.is-active{ opacity:1; }
-
-        /* Dot indicator — aktif = emas + sedikit lebih besar (scale, tanpa reflow) */
-        .lab-dots{
-            position:absolute;z-index:2;left:0;right:0;bottom:14px;
-            display:flex;align-items:center;justify-content:center;gap:8px;
-        }
-        .lab-dot{
-            width:8px;height:8px;border-radius:999px;
-            background:rgba(247,245,239,.35);
-            border:1px solid rgba(247,245,239,.3);
-            padding:0;cursor:pointer;
-            transition:background-color .3s ease,border-color .3s ease,transform .3s ease;
-        }
-        .lab-dot:hover{ background:rgba(247,245,239,.6); }
-        .lab-dot.is-active{ background:var(--gold);border-color:var(--gold);transform:scale(1.35); }
-
-        /* ===== Interaksi "list berganti" (swap): list kiri + preview kanan =====
-           Animasi HANYA opacity + translateY kecil. Cross-fade 250ms. */
-        .swap-slide{
-            position:absolute;inset:0;
-            opacity:0;transform:translateY(8px);pointer-events:none;
-            transition:opacity .25s ease-out,transform .25s ease-out; /* 250ms — dalam rentang 200-300ms */
-            will-change:opacity,transform; /* layer cross-fade interaktif */
-        }
-        .swap-slide.is-active{ opacity:1;transform:none;pointer-events:auto; }
-        /* Baris list: bar emas kiri dgn scaleY (tanpa reflow saat aktif) */
-        .swap-item{ position:relative;transition:background .2s ease; }
-        .swap-item .swap-bar{
-            position:absolute;left:0;top:14%;bottom:14%;width:3px;
-            background:#C9A66B;opacity:.3;transform:scaleY(.6);
-            transition:opacity .2s ease,transform .2s ease;
-        }
-        .swap-item.is-active{ background:rgba(201,166,107,.10); }
-        .swap-item.is-active .swap-bar{ opacity:1;transform:scaleY(1); }
-
-        /* Callout "Info Pengumpulan Tugas" — panel emas di atas hijau tua */
-        .callout-tugas{
-            background:linear-gradient(135deg, rgba(201,166,107,.16), rgba(201,166,107,.06));
-            border:1px solid rgba(201,166,107,.45);
+        .card-program-content {
+            position: relative;
+            z-index: 2;
         }
 
-        /* ===== Carousel hero: seamless loop + interactive ===== */
-        .carousel-viewport{ overflow:hidden; scrollbar-width:none; }
-        .carousel-viewport::-webkit-scrollbar{ display:none; }
-        .carousel-track{
-            display:flex;
-            width:max-content;
-            will-change:transform;
-            cursor:grab;
-            touch-action:pan-y;
-            user-select:none;
+        /* Swap slide for interactive lists */
+        .swap-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transform: translateY(8px);
+            pointer-events: none;
+            transition: opacity 0.25s ease-out, transform 0.25s ease-out;
         }
-        .carousel-track:active{ cursor:grabbing; }
-        .carousel-set{ display:flex; }
-        .carousel-set > *{ margin-right:1.5rem; }
-        .carousel-card{ flex:0 0 auto; touch-action:pan-y; }
-        @media (prefers-reduced-motion: reduce){
-            .carousel-viewport{ overflow-x:auto; }
-            .carousel-set[aria-hidden="true"]{ display:none; }
+        .swap-slide.is-active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
         }
-        .carousel-nav-btn{
-            width:38px;height:38px;border-radius:999px;
-            display:flex;align-items:center;justify-content:center;
-            background:rgba(247,245,239,.1);
-            border:1px solid rgba(247,245,239,.25);
-            color:var(--cream);
-            transition:background .2s ease, transform .15s ease;
+        .swap-item {
+            position: relative;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
         }
-        .carousel-nav-btn:hover{ background:rgba(1,121,95,.9); }
-        .carousel-nav-btn:active{ transform:scale(.94); }
-
-        /* Kartu carousel: bidang berbingkai, lebar tetap (pitch loop mengandalkannya) */
-        .card-face{
-            width:198px;
-            border-radius:6px;position:relative;overflow:hidden;
-            display:flex;flex-direction:column;justify-content:flex-end;
-            aspect-ratio:4/5;
-            padding:24px;
-            color:var(--cream); /* judul card mewarisi krem — tanpa ini default-nya hitam */
-            transition:transform .45s cubic-bezier(.22,1,.36,1); /* shadow hover instan — tanpa repaint kontinu */
-            background:var(--green-s0);
-            border:1px solid rgba(201,166,107,.25);
+        .swap-item .swap-bar {
+            position: absolute;
+            left: 0;
+            top: 20%;
+            bottom: 20%;
+            width: 3px;
+            background: var(--gold);
+            opacity: 0.2;
+            border-radius: 999px;
+            transition: opacity 0.2s ease, transform 0.2s ease;
         }
-        @media (min-width:1024px){ .card-face{ width:220px; } }
-        .card-face:hover{ transform:translateY(-6px); box-shadow:0 24px 48px -14px rgba(0,0,0,.55); }
-
-        /* TSAQIB signature: sudut bingkai emas yang muncul saat hover — statis,
-           bukan gradient berputar (lebih tenang, terasa dicetak/dibingkai). */
-        .card-face::before{
-            content:'';
-            position:absolute;inset:8px;z-index:3;pointer-events:none;
-            border-radius:2px;
-            background-image:
-                linear-gradient(var(--gold),var(--gold)), linear-gradient(var(--gold),var(--gold)),
-                linear-gradient(var(--gold),var(--gold)), linear-gradient(var(--gold),var(--gold));
-            background-repeat:no-repeat;
-            background-size:14px 2px, 2px 14px, 14px 2px, 2px 14px;
-            background-position:top left, top left, bottom right, bottom right;
-            opacity:0;
-            transition:opacity .3s ease;
+        .swap-item.is-active {
+            background: rgba(201, 166, 107, 0.08);
         }
-        .card-face:hover::before{ opacity:1; }
-        .card-face::after{
-            content:'';position:absolute;inset:0;z-index:1;
-            /* Overlay bawah hijau tua pekat — teks card terbaca di atas foto apa pun */
-            background:linear-gradient(to top, rgba(13,40,24,.92) 0%, rgba(13,40,24,.45) 50%, transparent 100%);
-        }
-        .card-face .card-icon,
-        .card-face .card-label,
-        .card-face .card-desc,
-        .card-face .card-arrow{ position:relative; z-index:2; }
-
-        .card-face .card-photo{
-            position:absolute;inset:0;z-index:0;
-            width:100%;height:100%;object-fit:cover;object-position:center;
-            transform:scale(1);
-            transition:transform .6s cubic-bezier(.22,1,.36,1);
-        }
-        .card-face:hover .card-photo{ transform:scale(1.08); }
-
-        .card-face .card-icon{ transition:transform .4s cubic-bezier(.22,1,.36,1); }
-        .card-face:hover .card-icon{ transform:scale(1.15) rotate(-4deg); }
-        .card-face .card-arrow i{ display:inline-block; transition:transform .3s cubic-bezier(.22,1,.36,1); }
-        .card-face:hover .card-arrow i{ transform:translateX(5px); }
-
-        @keyframes cardEnter{
-            from{ opacity:0; transform:translateY(28px) scale(.96); }
-            to{ opacity:1; transform:translateY(0) scale(1); }
-        }
-        .card-face{ animation:cardEnter .7s cubic-bezier(.22,1,.36,1) both; }
-        .card-face:nth-child(1){ animation-delay:.05s; }
-        .card-face:nth-child(2){ animation-delay:.15s; }
-        .card-face:nth-child(3){ animation-delay:.25s; }
-        .card-face:nth-child(4){ animation-delay:.35s; }
-
-        /* ===== Reveal on scroll: fade-up sekali per elemen =====
-           Hidden-state HANYA saat <html> ber-class .js-reveal (dipasang JS
-           berkemampuan IntersectionObserver) → tanpa JS semua tetap terlihat.
-           Hidden-state memakai :not(.is-visible), BUKAN menimpa transform
-           di .is-visible — dulu .is-visible{transform:none} (spesifisitas
-           0,3,0) mengalahkan hover-lift social-card/cta-card selamanya.
-           Setelah transisi selesai JS melepas class reveal (lihat IO di bawah)
-           → transisi hover komponen (250ms) kembali normal. */
-        .js-reveal .reveal:not(.is-visible){
-            opacity:0;
-            transform:translateY(24px);
-        }
-        .js-reveal .reveal{
-            will-change:opacity,transform; /* dilepas JS setelah animasi selesai */
-            transition:opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1);
-            transition-delay:calc(var(--reveal-i,0) * 90ms);
+        .swap-item.is-active .swap-bar {
+            opacity: 1;
+            transform: scaleY(1.1);
         }
 
-        /* Anchor in-page tidak tertelan sticky navbar (h-16/20) */
-        section[id]{ scroll-margin-top:5.5rem; }
-
-        /* Chip TODO pada foto placeholder — terlihat jelas sebagai NON-FINAL */
-        .ph-todo{
-            position:absolute;z-index:2;top:.75rem;right:.75rem;
-            font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;
-            font-size:9px;letter-spacing:.12em;text-transform:uppercase;
-            color:var(--gold);background:rgba(13,40,24,.78);
-            border:1px dashed rgba(201,166,107,.75);
-            padding:4px 10px;border-radius:999px;
+        /* Dots indicator */
+        .slider-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: rgba(247, 245, 239, 0.3);
+            border: 1px solid rgba(247, 245, 239, 0.2);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .slider-dot.is-active {
+            background: var(--gold);
+            border-color: var(--gold);
+            transform: scale(1.3);
         }
 
-        /* Tombol kembali ke atas — muncul setelah hero keluar viewport.
-           Animasi hanya opacity+transform. */
-        #to-top{
-            opacity:0;transform:translateY(10px);pointer-events:none;
-            transition:opacity .25s ease,transform .25s ease;
+        /* Lab photo carousel cross-fade */
+        .lab-photo-slide {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
         }
-        #to-top.is-show{ opacity:1;transform:none;pointer-events:auto; }
-
-        /* Dot indicator rotator Berita — aktif = emas + scale (tanpa reflow) */
-        .berita-dot{
-            width:10px;height:10px;border-radius:999px;
-            background:rgba(247,245,239,.28);
-            border:1px solid rgba(247,245,239,.25);
-            transition:background-color .2s ease,transform .2s ease;
-        }
-        .berita-dot:hover{ background:rgba(247,245,239,.55); }
-        .berita-dot.is-active{ background:var(--gold);border-color:var(--gold);transform:scale(1.3); }
-
-        @media (prefers-reduced-motion: reduce){
-            /* Matikan SEMUA gerak: durasi & delay dibuang, smooth-scroll dipatkan */
-            *{ transition-duration:.01ms !important; animation-duration:.01ms !important;
-               transition-delay:0ms !important; animation-delay:0ms !important; }
-            html{ scroll-behavior:auto !important; } /* override class scroll-smooth */
+        .lab-photo-slide.is-active {
+            opacity: 1;
         }
 
-        /* ===== Mobile <768px: kurangi beban animasi (resource terbatas) ===== */
-        @media (max-width:767px){
-            /* background-attachment:fixed = repaint tiap scroll di low-end → pakai scroll biasa */
-            .hero-bg{ background-attachment:scroll; }
-            /* 8 layer blur backdrop = biaya komposit terbesar di HP; bg card sudah rgba(.8) tetap terbaca */
-            .card-face{ backdrop-filter:none; -webkit-backdrop-filter:none; }
-            /* Stagger dipendekkan & dicap 4 langkah — antrean reveal tidak menumpuk */
-            .js-reveal .reveal{ transition-delay:calc(min(var(--reveal-i,0), 3) * 60ms); }
+        /* Scroll reveal */
+        .js-reveal .reveal:not(.is-visible) {
+            opacity: 0;
+            transform: translateY(18px);
+        }
+        .js-reveal .reveal {
+            transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            transition-delay: calc(var(--reveal-i, 0) * 80ms);
         }
 
-        /* ===== Counter hero: reserve lebar angka final SEBELUM count-up (anti-CLS)
-           — lebar persisnya di-set JS dari data-target; tabular-nums cegah goyang digit ===== */
-        .counter{
-            display:inline-block;min-width:2ch;text-align:center;
-            font-variant-numeric:tabular-nums;
+        /* Back to top button */
+        #to-top {
+            opacity: 0;
+            transform: translateY(10px);
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease;
         }
-
-        /* Hero entrance */
-        .hero-entrance{
-            opacity:0;
-            transform:translateY(20px);
-            animation:heroFadeUp .8s cubic-bezier(.22,1,.36,1) forwards;
-        }
-        @keyframes heroFadeUp{
-            to{ opacity:1; transform:translateY(0); }
-        }
-        .hero-entrance:nth-child(1){ animation-delay:.1s; }
-        .hero-entrance:nth-child(2){ animation-delay:.2s; }
-        .hero-entrance:nth-child(3){ animation-delay:.3s; }
-        .hero-entrance:nth-child(4){ animation-delay:.4s; } /* paragraf deskripsi — sebelumnya tanpa delay */
-
-        /* Social media style community cards — gelap, satu keluarga hijau */
-        .social-card{
-            background:rgba(247,245,239,.04);
-            border:1px solid rgba(247,245,239,.10);
-            border-radius:8px;
-            overflow:hidden;
-            transition:transform .25s cubic-bezier(.22,1,.36,1), border-color .25s ease; /* shadow instan */
-        }
-        .social-card:hover{
-            transform:translateY(-6px);
-            border-color:rgba(201,166,107,.4);
-            box-shadow:0 16px 32px -12px rgba(0,0,0,.5);
-        }
-        .social-card-header{
-            display:flex;
-            align-items:center;
-            gap:.75rem;
-            padding:.75rem 1rem;
-            border-bottom:1px solid rgba(247,245,239,.08);
-        }
-        .social-card-avatar{
-            width:2.5rem;height:2.5rem;
-            border-radius:50%;
-            object-fit:cover;
-            background:rgba(247,245,239,.08);
-        }
-        .social-card-image{
-            width:100%;
-            height:200px;
-            object-fit:cover;
-        }
-        .social-card-caption{
-            padding:1rem;
-        }
-        .social-card-footer{
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            padding:.5rem 1rem 1rem;
-            font-size:.75rem;
-            color:rgba(247,245,239,.6);
-        }
-        .badge-default{
-            background:rgba(201,166,107,.14);
-            color:var(--gold);
-            border-color:rgba(201,166,107,.35);
-        }
-
-        .scrollbar-hide{
-            -ms-overflow-style:none;
-            scrollbar-width:none;
-        }
-        .scrollbar-hide::-webkit-scrollbar{
-            display:none;
+        #to-top.is-show {
+            opacity: 1;
+            transform: none;
+            pointer-events: auto;
         }
     </style>
 </head>
-<body class="antialiased">
+<body class="antialiased text-[var(--cream)] overflow-x-hidden">
 
-<div class="relative min-h-screen hero-bg overflow-hidden flex flex-col">
-    <div class="hero-overlay"></div>
-
-    {{-- ================= NAVBAR (shared partial) ================= --}}
+    {{-- Global Unified Navbar --}}
     @include('partials.navbar')
 
-    {{-- ================= HERO (dipertahankan) ================= --}}
-    <main class="relative z-10 flex-1 max-w-7xl w-full mx-auto px-5 sm:px-8 flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-16 py-16 lg:py-24">
-
-        <div class="lg:w-[46%] pt-4 lg:pt-0">
-            <span class="eyebrow-pill hero-entrance">
-                <i class="fa-solid fa-mosque text-[10px]"></i>
-                Forum Studi Islam &middot; SMAN 1 Bukittinggi
-            </span>
-
-            <h1 class="font-display font-extrabold text-[var(--cream)] leading-[1.05] mt-5 text-5xl sm:text-6xl lg:text-7xl tracking-tight hero-entrance">
-                TSAQIB
-            </h1>
-            <p class="font-display font-bold text-[var(--gold)] text-lg sm:text-xl mt-1 tracking-tight hero-entrance">
-                Cerdas, Unggul, dan Berakhlak Mulia
-            </p>
-
-            <p class="text-white text-sm sm:text-[15px] leading-relaxed mt-5 max-w-md hero-entrance">
-                Wadah kaderisasi dan pengembangan diri siswa/i SMAN 1 Bukittinggi berbasis nilai-nilai
-                keislaman &mdash; menghubungkan Laboratorium PAI, Perpustakaan Digital, dan komunitas
-                minat &amp; bakat dalam satu ekosistem.
-            </p>
-
-            <div class="flex flex-wrap items-center gap-6 mt-6 text-white/70 text-xs sm:text-sm">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-book text-[var(--gold)] text-sm"></i>
-                    <span class="counter" data-target="{{ $totalModul ?? 0 }}">0</span>
-                    <span>Modul</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-users text-[var(--gold)] text-sm"></i>
-                    <span class="counter" data-target="{{ $totalAnggota ?? 0 }}">0</span>
-                    <span>Anggota</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-people-group text-[var(--gold)] text-sm"></i>
-                    <span class="counter" data-target="{{ $totalKomunitas ?? 0 }}">0</span>
-                    <span>Circle Tersedia</span>
-                </div>
-            </div>
-
-            <div class="flex flex-wrap items-center gap-4 mt-8">
-                <a href="{{ route('register') }}" class="cta-primary inline-flex items-center gap-2.5 text-white font-label font-bold text-xs sm:text-sm px-6 py-3.5 rounded-md">
-                    <i class="fa-solid fa-user-plus text-xs"></i>
-                    <span>Yuk, Gabung TSAQIB!</span>
-                </a>
-                <a href="{{ route('open.recruitment') }}" class="inline-flex items-center gap-2.5 text-white font-label font-bold text-xs sm:text-sm px-6 py-3.5 rounded-md border border-white/20 hover:bg-white/5 hover:border-white/30 transition">
-                    <i class="fa-solid fa-users text-xs"></i>
-                    <span>Daftar Jadi Anggota FSI</span>
-                </a>
-            </div>
+    {{-- =========================================================================
+       HERO SECTION — Modern, Bersih, Above-The-Fold
+       ========================================================================= --}}
+    <header class="relative hero-section py-12 lg:py-20 border-b border-white/10 overflow-hidden">
+        {{-- Real FSI SMAN 1 Bukittinggi Monument Background Layer --}}
+        <div class="absolute inset-0 z-0 pointer-events-none select-none">
+            <picture>
+                <source srcset="{{ asset('assets/landing/fsi.webp') }}" type="image/webp">
+                <img src="{{ asset('assets/landing/fsi.jpg') }}" alt="Gerbang FSI SMAN 1 Bukittinggi"
+                     class="w-full h-full object-cover object-[center_35%] transform scale-105 filter brightness-[0.70] contrast-105">
+            </picture>
+            {{-- Deep Luxurious Emerald Gradients (Assures 100% WCAG AAA Text Contrast) --}}
+            <div class="absolute inset-0 bg-gradient-to-r from-[#07170E]/95 via-[#0D2818]/85 to-[#07170E]/95"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-[#07170E]/90 via-[#0D2818]/70 to-[#07170E]"></div>
+            <div class="pat-islami opacity-10"></div>
         </div>
 
-        {{-- Kanan: bento grid 2x2 statis — sengaja digeser turun dari rata atas kiri --}}
-        <div class="lg:w-[54%] lg:translate-y-6">
-            <div class="flex items-center justify-between mb-4 lg:mb-5">
-                <h2 class="font-label text-white text-[11px] font-bold uppercase tracking-widest">
-                    Jelajahi Program TSAQIB
-                </h2>
-                <div class="hidden sm:flex items-center gap-2">
-                    <button type="button" id="carousel-prev" class="carousel-nav-btn" aria-label="Sebelumnya">
-                        <i class="fa-solid fa-chevron-left text-xs"></i>
-                    </button>
-                    <button type="button" id="carousel-next" class="carousel-nav-btn" aria-label="Berikutnya">
-                        <i class="fa-solid fa-chevron-right text-xs"></i>
-                    </button>
-                </div>
-            </div>
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row lg:items-center justify-between gap-10 lg:gap-14">
 
-            <div class="relative carousel-viewport py-4 px-2">
-                <div id="carousel-track" class="carousel-track">
-
-                    {{-- Set 1: originals --}}
-                    <div class="carousel-set">
-
-                        <a href="{{ route('laboratorium.pai') }}" class="carousel-card card-face">
-                            <img src="{{ asset('assets/landing/card-labor.jpg') }}" alt="" class="card-photo" loading="lazy" onerror="this.remove()">
-                            <svg class="card-icon w-8 h-8 text-white/90 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M12 2L2 7v10c0 5.55 3.84 10.5 9 12 5.16-1.5 9-6.45 9-12V7l-10-5z"/>
-                                <path d="M8 10h8"/>
-                                <path d="M8 14h8"/>
-                                <path d="M12 18v-3"/>
-                            </svg>
-                            <span class="card-label block font-bold text-lg leading-tight">Laboratorium<br>PAI</span>
-                            <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">Materi, riset, dan simulasi ibadah</span>
-                            <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
-                                Buka <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                            </span>
-                        </a>
-
-                        <a href="{{ route('perpustakaan') }}" class="carousel-card card-face">
-                            <img src="{{ asset('assets/landing/card-perpus.jpg') }}" alt="" class="card-photo" loading="lazy" onerror="this.remove()">
-                            <svg class="card-icon w-8 h-8 text-white/90 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M12 2L2 7v10c0 5.55 3.84 10.5 9 12 5.16-1.5 9-6.45 9-12V7l-10-5z"/>
-                                <path d="M12 2v10m0 0l-3-3m3 3l3-3"/>
-                                <path d="M9 12l3 3 3-3"/>
-                                <circle cx="12" cy="8" r="1.5"/>
-                            </svg>
-                            <span class="card-label block font-bold text-lg leading-tight">Perpustakaan<br>Digital</span>
-                            <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">Koleksi buku &amp; referensi FSI</span>
-                            <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
-                                Buka <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                            </span>
-                        </a>
-
-                        <button type="button" onclick="handleKomunitasClick()" class="carousel-card card-face text-left">
-                            <img src="{{ asset('assets/landing/card-komunitas.jpg') }}" alt="" class="card-photo" loading="lazy" onerror="this.remove()">
-                            <svg class="card-icon w-8 h-8 text-white/90 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <circle cx="12" cy="12" r="3"/>
-                                <path d="M12 2v4m0 12v4m8-12h-4m-8 0H4"/>
-                                <circle cx="7" cy="7" r="1.5"/>
-                                <circle cx="17" cy="7" r="1.5"/>
-                                <circle cx="7" cy="17" r="1.5"/>
-                                <circle cx="17" cy="17" r="1.5"/>
-                            </svg>
-                            <span class="card-label block font-bold text-lg leading-tight">Komunitas<br>TSAQIB</span>
-                            <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">7 komunitas minat &amp; bakat</span>
-                            <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
-                                Buka <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                            </span>
-                        </button>
-
-                        <a href="https://www.figma.com/proto/1Azmk9c0fapjsTICrk7hU6/Tsaqib-Adv?node-id=5-4&t=O3fg7rE3EBm3cqZ7-0&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=1%3A2"
-                           target="_blank" rel="noopener noreferrer" class="carousel-card card-face">
-                            <img src="{{ asset('assets/landing/card-figma.jpg') }}" alt="" class="card-photo" loading="lazy" onerror="this.remove()">
-                            <svg class="card-icon w-8 h-8 text-white/90 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M12 2l3 6-5 4 5 4-3 6-3-6 5-4-5-4 3-6z"/>
-                                <path d="M12 12l4 2m-4-2l-4 2"/>
-                                <circle cx="12" cy="12" r="1.5"/>
-                            </svg>
-                            <span class="card-label block font-bold text-lg leading-tight">Prototype<br>TSAQIB</span>
-                            <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">Desain awal di Figma</span>
-                            <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
-                                Lihat <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-                            </span>
-                        </a>
-                    </div>
-
-                    {{-- Set 2: duplikat identik (dekoratif) utk loop mulus --}}
-                    <div class="carousel-set" aria-hidden="true">
-
-                        <a href="{{ route('laboratorium.pai') }}" class="carousel-card card-face" tabindex="-1">
-                            <img src="{{ asset('assets/landing/card-labor.jpg') }}" alt="" class="card-photo" loading="lazy" onerror="this.remove()">
-                            <svg class="card-icon w-8 h-8 text-white/90 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M12 2L2 7v10c0 5.55 3.84 10.5 9 12 5.16-1.5 9-6.45 9-12V7l-10-5z"/>
-                                <path d="M8 10h8"/>
-                                <path d="M8 14h8"/>
-                                <path d="M12 18v-3"/>
-                            </svg>
-                            <span class="card-label block font-bold text-lg leading-tight">Laboratorium<br>PAI</span>
-                            <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">Materi, riset, dan simulasi ibadah</span>
-                            <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
-                                Buka <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                            </span>
-                        </a>
-
-                        <a href="{{ route('perpustakaan') }}" class="carousel-card card-face" tabindex="-1">
-                            <img src="{{ asset('assets/landing/card-perpus.jpg') }}" alt="" class="card-photo" loading="lazy" onerror="this.remove()">
-                            <svg class="card-icon w-8 h-8 text-white/90 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M12 2L2 7v10c0 5.55 3.84 10.5 9 12 5.16-1.5 9-6.45 9-12V7l-10-5z"/>
-                                <path d="M12 2v10m0 0l-3-3m3 3l3-3"/>
-                                <path d="M9 12l3 3 3-3"/>
-                                <circle cx="12" cy="8" r="1.5"/>
-                            </svg>
-                            <span class="card-label block font-bold text-lg leading-tight">Perpustakaan<br>Digital</span>
-                            <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">Koleksi buku &amp; referensi FSI</span>
-                            <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
-                                Buka <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                            </span>
-                        </a>
-
-                        <button type="button" onclick="handleKomunitasClick()" class="carousel-card card-face text-left" tabindex="-1">
-                            <img src="{{ asset('assets/landing/card-komunitas.jpg') }}" alt="" class="card-photo" loading="lazy" onerror="this.remove()">
-                            <svg class="card-icon w-8 h-8 text-white/90 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <circle cx="12" cy="12" r="3"/>
-                                <path d="M12 2v4m0 12v4m8-12h-4m-8 0H4"/>
-                                <circle cx="7" cy="7" r="1.5"/>
-                                <circle cx="17" cy="7" r="1.5"/>
-                                <circle cx="7" cy="17" r="1.5"/>
-                                <circle cx="17" cy="17" r="1.5"/>
-                            </svg>
-                            <span class="card-label block font-bold text-lg leading-tight">Komunitas<br>TSAQIB</span>
-                            <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">7 komunitas minat &amp; bakat</span>
-                            <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
-                                Buka <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                            </span>
-                        </button>
-
-                        <a href="https://www.figma.com/proto/1Azmk9c0fapjsTICrk7hU6/Tsaqib-Adv?node-id=5-4&t=O3fg7rE3EBm3cqZ7-0&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=1%3A2"
-                           target="_blank" rel="noopener noreferrer" class="carousel-card card-face" tabindex="-1">
-                            <img src="{{ asset('assets/landing/card-figma.jpg') }}" alt="" class="card-photo" loading="lazy" onerror="this.remove()">
-                            <svg class="card-icon w-8 h-8 text-white/90 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M12 2l3 6-5 4 5 4-3 6-3-6 5-4-5-4 3-6z"/>
-                                <path d="M12 12l4 2m-4-2l-4 2"/>
-                                <circle cx="12" cy="12" r="1.5"/>
-                            </svg>
-                            <span class="card-label block font-bold text-lg leading-tight">Prototype<br>TSAQIB</span>
-                            <span class="card-desc block text-white/70 text-[11px] mt-1.5 leading-snug">Desain awal di Figma</span>
-                            <span class="card-arrow flex items-center gap-1.5 text-white text-[11px] font-bold mt-3">
-                                Lihat <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-                            </span>
-                        </a>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </main>
-
-    {{-- ================= SECTION 1: KABAR TERBARU — 2 blok asimetris (di bawah hero) =================
-         Blok A (±2/3): BERITA — rotator cross-fade 250ms, auto 4.5s, pause saat
-         hover/focus, dot indicator clickable. Blok B (±1/3): BULETIN list ringkas.
-         Badge satu keluarga: Berita = emas, Buletin = hijau sage. --}}
-    @if($beritaTerbaru->isNotEmpty() || $buletinTerbaru->isNotEmpty())
-    <section id="kabar" class="relative z-10 w-full" style="background:var(--green-s0);border-top:1px solid rgba(247,245,239,.06);">
-        <div class="section-glow" style="--glow-x:88%;--glow-y:0%;"></div>
-        {{-- Foto latar opsional — taruh di public/assets/landing/bg-kabar.jpg (aman jika belum ada) --}}
-        <div class="section-photo" style="background-image:linear-gradient(rgba(13,40,24,.82),rgba(13,40,24,.82)), linear-gradient(160deg, var(--green-s0) 20%, var(--gold) 150%), url('{{ asset('assets/landing/bg-kabar.jpg') }}'); background-blend-mode:normal, color, normal;"></div>
-        {{-- Pola garis islami ditaruh SETELAH section-photo supaya tetap terlihat
-             di atas lapisan gelap foto (sama seperti seksi Laboratorium). --}}
-        <div class="pat-islami is-large"></div>
-        <div class="max-w-7xl mx-auto px-5 sm:px-8 py-16 sm:py-24">
-
-            <div class="flex items-end justify-between gap-6 mb-8 reveal" style="--reveal-i:0;">
+            {{-- Kolom Kiri: Value Proposition Utama --}}
+            <div class="lg:w-1/2 space-y-6">
                 <div>
-                    <p class="ed-eyebrow">Kabar &amp; Kegiatan FSI</p>
-                    <h2 class="font-display font-extrabold text-[var(--cream)] text-3xl sm:text-4xl leading-[1.08] tracking-tight mt-3">
-                        KABAR TERBARU
+                    <span class="eyebrow-pill eyebrow-pill-green">
+                        <i class="fa-solid fa-mosque text-[10px]"></i>
+                        Forum Studi Islam &middot; SMAN 1 Bukittinggi
+                    </span>
+                </div>
+
+                <div class="space-y-2">
+                    <h1 class="font-display font-extrabold text-4xl sm:text-5xl lg:text-6xl text-[var(--cream)] tracking-tight leading-[1.08]">
+                        TSAQIB
+                    </h1>
+                    <p class="font-display font-semibold text-lg sm:text-xl text-[var(--gold)] tracking-tight">
+                        Cerdas, Unggul, dan Berakhlak Mulia
+                    </p>
+                </div>
+
+                <p class="text-white/75 text-sm sm:text-base leading-relaxed max-w-xl">
+                    Ekosistem digital dan wadah pembinaan generasi muda Islam SMAN 1 Bukittinggi. Mengintegrasikan riset
+                    Laboratorium PAI, koleksi Perpustakaan Digital, serta 13 komunitas minat &amp; bakat dalam satu ikatan ukhuwah.
+                </p>
+
+                {{-- Call To Action Buttons --}}
+                <div class="flex flex-wrap items-center gap-3.5 pt-2">
+                    <a href="{{ route('register') }}" class="btn-gold">
+                        <i class="fa-solid fa-user-plus text-xs"></i>
+                        <span>Yuk, Gabung TSAQIB!</span>
+                    </a>
+                    <a href="{{ route('open.recruitment') }}" class="btn-outline">
+                        <i class="fa-solid fa-users text-xs"></i>
+                        <span>Daftar Jadi Anggota FSI</span>
+                    </a>
+                </div>
+            </div>
+
+            {{-- Kolom Kanan: Program Showcase Carousel --}}
+            <div class="lg:w-1/2">
+                <div class="flex items-center justify-between mb-3 px-1">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-white/50">
+                        Jelajahi Program Unggulan
+                    </span>
+                    <div class="flex items-center gap-1.5">
+                        <button type="button" id="carousel-prev" class="w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:border-[var(--gold)]/40 flex items-center justify-center text-xs text-white/70 hover:text-white transition" aria-label="Program Sebelumnya">
+                            <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                        </button>
+                        <button type="button" id="carousel-next" class="w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:border-[var(--gold)]/40 flex items-center justify-center text-xs text-white/70 hover:text-white transition" aria-label="Program Berikutnya">
+                            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="relative carousel-viewport py-2">
+                    <div id="carousel-track" class="carousel-track">
+                        {{-- Set 1: Kartu Program Utama --}}
+                        <div class="carousel-set">
+                            {{-- Card 1: Laboratorium PAI --}}
+                            <a href="{{ route('laboratorium.pai') }}" class="card-program group">
+                                <picture>
+                                    <source srcset="{{ asset('assets/landing/card-labor.webp') }}" type="image/webp">
+                                    <img src="{{ asset('assets/landing/card-labor.jpg') }}" alt="Laboratorium PAI" class="card-photo" loading="lazy" onerror="this.remove()">
+                                </picture>
+                                <div class="card-program-content">
+                                    <span class="w-7 h-7 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center text-[var(--gold)] text-xs mb-2">
+                                        <i class="fa-solid fa-flask"></i>
+                                    </span>
+                                    <h3 class="font-display font-bold text-base text-[var(--cream)] leading-tight">Laboratorium PAI</h3>
+                                    <p class="text-[11px] text-white/65 mt-1 leading-snug">Riset ibadah, modul PDF &amp; tugas siswa</p>
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-bold text-[var(--gold)] mt-2.5">
+                                        Buka Portal <i class="fa-solid fa-arrow-right text-[8px] transition-transform group-hover:translate-x-1"></i>
+                                    </span>
+                                </div>
+                            </a>
+
+                            {{-- Card 2: Perpustakaan Digital --}}
+                            <a href="{{ route('perpustakaan') }}" class="card-program group">
+                                <picture>
+                                    <source srcset="{{ asset('assets/landing/card-perpus.webp') }}" type="image/webp">
+                                    <img src="{{ asset('assets/landing/card-perpus.jpg') }}" alt="Perpustakaan Digital" class="card-photo" loading="lazy" onerror="this.remove()">
+                                </picture>
+                                <div class="card-program-content">
+                                    <span class="w-7 h-7 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center text-[var(--gold)] text-xs mb-2">
+                                        <i class="fa-solid fa-book-open"></i>
+                                    </span>
+                                    <h3 class="font-display font-bold text-base text-[var(--cream)] leading-tight">Perpustakaan Digital</h3>
+                                    <p class="text-[11px] text-white/65 mt-1 leading-snug">Koleksi kitab, buletin &amp; e-book Islami</p>
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-bold text-[var(--gold)] mt-2.5">
+                                        Buka Koleksi <i class="fa-solid fa-arrow-right text-[8px] transition-transform group-hover:translate-x-1"></i>
+                                    </span>
+                                </div>
+                            </a>
+
+                            {{-- Card 3: Komunitas TSAQIB --}}
+                            <a href="{{ route('komunitas', 'semua') }}" class="card-program group">
+                                <picture>
+                                    <source srcset="{{ asset('assets/landing/card-komunitas.webp') }}" type="image/webp">
+                                    <img src="{{ asset('assets/landing/card-komunitas.jpg') }}" alt="Komunitas TSAQIB" class="card-photo" loading="lazy" onerror="this.remove()">
+                                </picture>
+                                <div class="card-program-content">
+                                    <span class="w-7 h-7 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center text-[var(--gold)] text-xs mb-2">
+                                        <i class="fa-solid fa-users"></i>
+                                    </span>
+                                    <h3 class="font-display font-bold text-base text-[var(--cream)] leading-tight">Komunitas TSAQIB</h3>
+                                    <p class="text-[11px] text-white/65 mt-1 leading-snug">Wadah minat, bakat &amp; mentoring circle</p>
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-bold text-[var(--gold)] mt-2.5">
+                                        Lihat Circle <i class="fa-solid fa-arrow-right text-[8px] transition-transform group-hover:translate-x-1"></i>
+                                    </span>
+                                </div>
+                            </a>
+
+                            {{-- Card 4: Prototype Figma --}}
+                            <a href="https://www.figma.com/proto/1Azmk9c0fapjsTICrk7hU6/Tsaqib-Adv?node-id=5-4&t=O3fg7rE3EBm3cqZ7-0&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=1%3A2" target="_blank" rel="noopener noreferrer" class="card-program group">
+                                <picture>
+                                    <source srcset="{{ asset('assets/landing/card-figma.webp') }}" type="image/webp">
+                                    <img src="{{ asset('assets/landing/card-figma.jpg') }}" alt="Prototype Figma" class="card-photo" loading="lazy" onerror="this.remove()">
+                                </picture>
+                                <div class="card-program-content">
+                                    <span class="w-7 h-7 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center text-[var(--gold)] text-xs mb-2">
+                                        <i class="fa-brands fa-figma"></i>
+                                    </span>
+                                    <h3 class="font-display font-bold text-base text-[var(--cream)] leading-tight">Prototype TSAQIB</h3>
+                                    <p class="text-[11px] text-white/65 mt-1 leading-snug">Eksplorasi rancangan UI/UX di Figma</p>
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-bold text-[var(--gold)] mt-2.5">
+                                        Buka Desain <i class="fa-solid fa-arrow-up-right-from-square text-[8px]"></i>
+                                    </span>
+                                </div>
+                            </a>
+                        </div>
+
+                        {{-- Set 2: Duplikat Identik untuk Infinite Loop --}}
+                        <div class="carousel-set" aria-hidden="true">
+                            <a href="{{ route('laboratorium.pai') }}" class="card-program group" tabindex="-1">
+                                <picture>
+                                    <source srcset="{{ asset('assets/landing/card-labor.webp') }}" type="image/webp">
+                                    <img src="{{ asset('assets/landing/card-labor.jpg') }}" alt="" class="card-photo" loading="lazy" onerror="this.remove()">
+                                </picture>
+                                <div class="card-program-content">
+                                    <span class="w-7 h-7 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center text-[var(--gold)] text-xs mb-2"><i class="fa-solid fa-flask"></i></span>
+                                    <h3 class="font-display font-bold text-base text-[var(--cream)] leading-tight">Laboratorium PAI</h3>
+                                    <p class="text-[11px] text-white/65 mt-1 leading-snug">Riset ibadah, modul PDF &amp; tugas siswa</p>
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-bold text-[var(--gold)] mt-2.5">Buka Portal <i class="fa-solid fa-arrow-right text-[8px]"></i></span>
+                                </div>
+                            </a>
+                            <a href="{{ route('perpustakaan') }}" class="card-program group" tabindex="-1">
+                                <picture>
+                                    <source srcset="{{ asset('assets/landing/card-perpus.webp') }}" type="image/webp">
+                                    <img src="{{ asset('assets/landing/card-perpus.jpg') }}" alt="" class="card-photo" loading="lazy" onerror="this.remove()">
+                                </picture>
+                                <div class="card-program-content">
+                                    <span class="w-7 h-7 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center text-[var(--gold)] text-xs mb-2"><i class="fa-solid fa-book-open"></i></span>
+                                    <h3 class="font-display font-bold text-base text-[var(--cream)] leading-tight">Perpustakaan Digital</h3>
+                                    <p class="text-[11px] text-white/65 mt-1 leading-snug">Koleksi kitab, buletin &amp; e-book Islami</p>
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-bold text-[var(--gold)] mt-2.5">Buka Koleksi <i class="fa-solid fa-arrow-right text-[8px]"></i></span>
+                                </div>
+                            </a>
+                            <a href="{{ route('komunitas', 'semua') }}" class="card-program group" tabindex="-1">
+                                <picture>
+                                    <source srcset="{{ asset('assets/landing/card-komunitas.webp') }}" type="image/webp">
+                                    <img src="{{ asset('assets/landing/card-komunitas.jpg') }}" alt="" class="card-photo" loading="lazy" onerror="this.remove()">
+                                </picture>
+                                <div class="card-program-content">
+                                    <span class="w-7 h-7 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center text-[var(--gold)] text-xs mb-2"><i class="fa-solid fa-users"></i></span>
+                                    <h3 class="font-display font-bold text-base text-[var(--cream)] leading-tight">Komunitas TSAQIB</h3>
+                                    <p class="text-[11px] text-white/65 mt-1 leading-snug">Wadah minat, bakat &amp; mentoring circle</p>
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-bold text-[var(--gold)] mt-2.5">Lihat Circle <i class="fa-solid fa-arrow-right text-[8px]"></i></span>
+                                </div>
+                            </a>
+                            <a href="https://www.figma.com/proto/1Azmk9c0fapjsTICrk7hU6/Tsaqib-Adv?node-id=5-4&t=O3fg7rE3EBm3cqZ7-0&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=1%3A2" target="_blank" rel="noopener noreferrer" class="card-program group" tabindex="-1">
+                                <picture>
+                                    <source srcset="{{ asset('assets/landing/card-figma.webp') }}" type="image/webp">
+                                    <img src="{{ asset('assets/landing/card-figma.jpg') }}" alt="" class="card-photo" loading="lazy" onerror="this.remove()">
+                                </picture>
+                                <div class="card-program-content">
+                                    <span class="w-7 h-7 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center text-[var(--gold)] text-xs mb-2"><i class="fa-brands fa-figma"></i></span>
+                                    <h3 class="font-display font-bold text-base text-[var(--cream)] leading-tight">Prototype TSAQIB</h3>
+                                    <p class="text-[11px] text-white/65 mt-1 leading-snug">Eksplorasi rancangan UI/UX di Figma</p>
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-bold text-[var(--gold)] mt-2.5">Buka Desain <i class="fa-solid fa-arrow-up-right-from-square text-[8px]"></i></span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+    {{-- =========================================================================
+       SECTION 1: KABAR TERBARU (2 Blok Asimetris: Berita & Buletin)
+       ========================================================================= --}}
+    @if($beritaTerbaru->isNotEmpty() || $buletinTerbaru->isNotEmpty())
+    <section id="kabar" class="relative py-16 sm:py-20 border-b border-white/10" style="background-color: var(--green-s0);">
+        <div class="section-glow" style="--glow-x: 90%; --glow-y: 10%;"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="flex items-end justify-between gap-4 mb-8">
+                <div>
+                    <p class="ed-eyebrow">Warta &amp; Terbitan</p>
+                    <h2 class="font-display font-extrabold text-2xl sm:text-3xl lg:text-4xl text-[var(--cream)] tracking-tight mt-2">
+                        KABAR TERBARU FSI
                     </h2>
                 </div>
-                <a href="{{ route('info') }}" class="hidden sm:inline-flex items-center gap-1.5 text-sm font-bold text-[var(--gold)] hover:text-[#DCC9A0] whitespace-nowrap transition shrink-0 pb-1">
-                    Semua Kabar <i class="fa-solid fa-arrow-right text-xs"></i>
+                <a href="{{ route('info') }}" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-[var(--gold)] hover:underline">
+                    Semua Kabar <i class="fa-solid fa-arrow-right text-[10px]"></i>
                 </a>
             </div>
 
-            <div class="grid lg:grid-cols-3 gap-5 sm:gap-6 items-stretch">
-
-                {{-- ===== BLOK A — BERITA (dominan, ±2/3): rotator cross-fade ===== --}}
+            <div class="grid lg:grid-cols-3 gap-6 items-stretch">
+                {{-- Blok A: Rotator Berita (2 Kolom) --}}
                 @if($beritaTerbaru->isNotEmpty())
-                <div class="lg:col-span-2 reveal" style="--reveal-i:1;" data-berita-rotator>
-                    <div class="relative aspect-[16/12] sm:aspect-[16/9] rounded-2xl overflow-hidden border border-white/10" style="background:linear-gradient(155deg,#1C442B,#0D2818);">
+                <div class="lg:col-span-2 flex flex-col" data-berita-rotator>
+                    <div class="relative aspect-[16/9] rounded-2xl overflow-hidden border border-white/10 bg-black/40 shadow-xl">
                         @foreach($beritaTerbaru as $item)
                             <a href="{{ $item['url'] }}" @if($item['target'] === '_blank') target="_blank" rel="noopener" @endif
                                class="swap-slide {{ $loop->first ? 'is-active' : '' }} group block"
                                data-berita-slide @unless($loop->first) inert @endunless>
                                 @if($item['image'])
                                     <img src="{{ asset('storage/' . $item['image']) }}" alt="{{ $item['title'] }}"
-                                         class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                                         class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                          loading="lazy" onerror="this.remove()">
                                 @else
-                                    <div class="absolute inset-0 flex items-center justify-center">
+                                    <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1C442B] to-[#0D2818]">
                                         <i class="fa-solid fa-newspaper text-5xl text-white/10"></i>
                                     </div>
                                 @endif
-                                {{-- Overlay gelap keemasan di bawah — judul tetap terbaca di atas foto apa pun --}}
-                                <span class="absolute inset-0 pointer-events-none" style="background:linear-gradient(180deg, rgba(13,40,24,0) 30%, rgba(13,40,24,.55) 68%, rgba(13,40,24,.94) 100%);"></span>
+                                <span class="absolute inset-0 bg-gradient-to-t from-[#0D2818] via-[#0D2818]/50 to-transparent"></span>
 
-                                <span class="absolute left-4 top-4 sm:left-5 sm:top-5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-md" style="background:#C9A66B;color:#0D2818;">
-                                    Berita
+                                <span class="absolute top-4 left-4 sm:top-5 sm:left-5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[var(--gold)] text-[var(--green-s0)] shadow">
+                                    Warta Utama
                                 </span>
 
-                                <span class="absolute inset-x-0 bottom-0 p-5 sm:p-7 block">
-                                    <span class="block font-display font-extrabold text-[var(--cream)] text-lg sm:text-2xl leading-snug line-clamp-2 group-hover:text-[var(--gold)] transition-colors">
+                                <span class="absolute inset-x-0 bottom-0 p-5 sm:p-7">
+                                    <span class="block font-display font-bold text-lg sm:text-2xl text-[var(--cream)] leading-snug line-clamp-2 group-hover:text-[var(--gold)] transition-colors">
                                         {{ $item['title'] }}
                                     </span>
-                                    <span class="flex items-center gap-2 text-[11px] sm:text-xs text-white/60 mt-2.5">
-                                        <i class="fa-regular fa-calendar text-[var(--gold)]/80 text-[10px]"></i>
+                                    <span class="flex items-center gap-2 text-xs text-white/60 mt-2 font-sans">
+                                        <i class="fa-regular fa-calendar text-[var(--gold)] text-[11px]"></i>
                                         {{ $item['date']?->locale('id')->translatedFormat('d F Y') }}
                                         @if($item['author'])
-                                            <span class="text-white/35">&middot;</span> {{ $item['author'] }}
+                                            <span class="text-white/30">&middot;</span> {{ $item['author'] }}
                                         @endif
                                     </span>
                                 </span>
@@ -722,51 +458,52 @@
                         @endforeach
                     </div>
 
-                    {{-- Dot indicator: jumlah = jumlah berita; klik = lompat ke slide tsb --}}
                     @if($beritaTerbaru->count() > 1)
-                    <div class="flex items-center justify-center gap-2.5 mt-4" data-berita-dots role="group" aria-label="Pilih berita">
+                    <div class="flex items-center justify-center gap-2 mt-4" data-berita-dots role="group" aria-label="Navigasi Berita">
                         @foreach($beritaTerbaru as $item)
-                            <button type="button" data-berita-dot aria-label="Berita {{ $loop->iteration }}: {{ $item['title'] }}"
-                                    aria-pressed="{{ $loop->first ? 'true' : 'false' }}"
-                                    class="berita-dot {{ $loop->first ? 'is-active' : '' }}"></button>
+                            <button type="button" data-berita-dot aria-label="Berita ke-{{ $loop->iteration }}"
+                                    class="slider-dot {{ $loop->first ? 'is-active' : '' }}"></button>
                         @endforeach
                     </div>
                     @endif
                 </div>
                 @endif
 
-                {{-- ===== BLOK B — BULETIN (ringkas, ±1/3): list statis ===== --}}
+                {{-- Blok B: List Buletin Ringkas (1 Kolom) --}}
                 @if($buletinTerbaru->isNotEmpty())
-                <div class="reveal {{ $beritaTerbaru->isNotEmpty() ? '' : 'lg:col-span-3' }}" style="--reveal-i:2;">
-                    <div class="social-card h-full flex flex-col">
-                        <div class="social-card-header">
-                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider" style="background:#3F704D;color:#F7F5EF;">Buletin</span>
-                            <span class="text-[11px] text-white/50">Terbitan terbaru</span>
-                        </div>
-                        <div class="flex-1 flex flex-col">
-                            @foreach($buletinTerbaru as $b)
-                                <a href="{{ $b['url'] }}" @if($b['target'] === '_blank') target="_blank" rel="noopener" @endif
-                                   class="group flex items-center gap-3.5 px-4 py-3.5 border-b border-white/[.07] hover:bg-white/[.04] transition-colors {{ $loop->last ? 'border-b-0' : '' }}">
-                                    @if($loop->first)
-                                        <span class="w-12 h-16 shrink-0 rounded-md overflow-hidden border border-[rgba(201,166,107,.35)]" style="background:linear-gradient(155deg,#1C442B,#0D2818);">
-                                            @if($b['image'])
-                                                <img src="{{ asset('storage/' . $b['image']) }}" alt="" class="w-full h-full object-cover" loading="lazy" onerror="this.remove()">
-                                            @endif
-                                        </span>
-                                    @endif
-                                    <span class="flex-1 min-w-0">
-                                        <span class="block font-bold text-sm text-[var(--cream)] leading-snug line-clamp-2 group-hover:text-[var(--gold)] transition-colors">{{ $b['title'] }}</span>
-                                        <span class="block text-[11px] text-white/50 mt-1">
-                                            {{ $b['date']?->locale('id')->translatedFormat('d M Y') }}@if($b['author']) &middot; {{ $b['author'] }} @endif
-                                        </span>
-                                    </span>
-                                    <i class="fa-solid {{ $b['target'] === '_blank' ? 'fa-file-pdf' : 'fa-arrow-right' }} text-xs text-[var(--gold)]/80 shrink-0"></i>
-                                </a>
-                            @endforeach
-                        </div>
-                        <a href="{{ route('info', ['tab' => 'buletin']) }}" class="flex items-center gap-1.5 px-4 py-3.5 text-xs font-bold text-[var(--gold)] border-t border-white/[.07] hover:bg-white/[.04] transition-colors">
-                            Semua Buletin <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                <div class="tsaqib-card p-5 sm:p-6 flex flex-col {{ $beritaTerbaru->isNotEmpty() ? '' : 'lg:col-span-3' }}">
+                    <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
+                        <span class="eyebrow-pill eyebrow-pill-gold">
+                            <i class="fa-solid fa-book-open text-[9px]"></i> Buletin Terkini
+                        </span>
+                        <a href="{{ route('info', ['tab' => 'buletin']) }}" class="text-[11px] font-bold text-[var(--gold)] hover:underline">
+                            Semua <i class="fa-solid fa-arrow-right text-[9px]"></i>
                         </a>
+                    </div>
+
+                    <div class="space-y-4 flex-1">
+                        @foreach($buletinTerbaru as $b)
+                            <a href="{{ $b['url'] }}" @if($b['target'] === '_blank') target="_blank" rel="noopener" @endif
+                               class="group flex items-center gap-3.5 pb-3 border-b border-white/5 last:border-0 hover:bg-white/[0.03] p-1.5 rounded-lg transition-colors">
+                                @if($b['image'])
+                                    <img src="{{ asset('storage/' . $b['image']) }}" alt="" class="w-11 h-14 object-cover rounded border border-white/15 shrink-0" loading="lazy" onerror="this.remove()">
+                                @else
+                                    <span class="w-11 h-14 rounded bg-white/5 border border-white/10 flex items-center justify-center text-[var(--gold)] text-sm shrink-0">
+                                        <i class="fa-solid fa-file-pdf"></i>
+                                    </span>
+                                @endif
+                                <div class="min-w-0 flex-1">
+                                    <h3 class="font-bold text-xs sm:text-sm text-[var(--cream)] line-clamp-2 leading-snug group-hover:text-[var(--gold)] transition-colors">
+                                        {{ $b['title'] }}
+                                    </h3>
+                                    <p class="text-[10px] text-white/50 mt-1">
+                                        {{ $b['date']?->locale('id')->translatedFormat('d M Y') }}
+                                        @if($b['author']) &middot; {{ $b['author'] }} @endif
+                                    </p>
+                                </div>
+                                <i class="fa-solid fa-angle-right text-xs text-white/30 group-hover:text-[var(--gold)] group-hover:translate-x-0.5 transition"></i>
+                            </a>
+                        @endforeach
                     </div>
                 </div>
                 @endif
@@ -775,342 +512,374 @@
     </section>
     @endif
 
-    {{-- ================= SECTION 2: SPOTLIGHT LABORATORIUM PAI =================
-         Gaya editorial, bg HIJAU PALING GELAP (--green-s0). Split 50:50 + garis
-         vertikal emas, list modul interaktif (cross-fade preview), callout tugas. --}}
+    {{-- =========================================================================
+       SECTION 2: SPOTLIGHT LABORATORIUM PAI (Bina Karakter, Modul & Tugas)
+       ========================================================================= --}}
     @php
         $modulKelas = [
             'x' => [
-                ['judul' => 'Fikih: Thaharah & Shalat Fardhu',            'guru' => 'Ust. Fauzi, S.Pd.',    'ikon' => 'fa-hands-bubbles'],
-                ['judul' => 'Akidah Akhlak: Makna Rukun Iman',            'guru' => 'Usth. Rahma, S.Pd.I',  'ikon' => 'fa-heart'],
-                ['judul' => 'SKI: Dakwah Nabi Muhammad ﷺ',                 'guru' => 'Ust. Yusuf, S.Ag.',    'ikon' => 'fa-landmark'],
-                ['judul' => "Al-Qur'an & Hadits: Tilawah & Tajwid Dasar", 'guru' => 'Usth. Aini, S.Pd.I',   'ikon' => 'fa-book-quran'],
+                ['judul' => 'Fikih: Thaharah & Shalat Fardhu', 'guru' => 'Ust. Fauzi, S.Pd.'],
+                ['judul' => 'Akidah Akhlak: Makna Rukun Iman', 'guru' => 'Usth. Rahma, S.Pd.I'],
+                ['judul' => 'SKI: Dakwah Nabi Muhammad ﷺ', 'guru' => 'Ust. Yusuf, S.Ag.'],
+                ['judul' => "Al-Qur'an & Hadits: Tilawah & Tajwid Dasar", 'guru' => 'Usth. Aini, S.Pd.I'],
             ],
             'xi' => [
-                ['judul' => 'Fikih: Zakat, Infak & Sedekah',              'guru' => 'Ust. Fauzi, S.Pd.',    'ikon' => 'fa-hand-holding-heart'],
-                ['judul' => 'Akidah Akhlak: Akhlak kepada Sesama',        'guru' => 'Usth. Rahma, S.Pd.I',  'ikon' => 'fa-people-arrows'],
-                ['judul' => 'SKI: Islam di Nusantara',                    'guru' => 'Ust. Yusuf, S.Ag.',    'ikon' => 'fa-map-location-dot'],
-                ['judul' => "Al-Qur'an & Hadits: Kaidah Tafsir Dasar",    'guru' => 'Usth. Aini, S.Pd.I',   'ikon' => 'fa-book-open'],
+                ['judul' => 'Fikih: Zakat, Infak & Sedekah', 'guru' => 'Ust. Fauzi, S.Pd.'],
+                ['judul' => 'Akidah Akhlak: Akhlak kepada Sesama', 'guru' => 'Usth. Rahma, S.Pd.I'],
+                ['judul' => 'SKI: Islam di Nusantara', 'guru' => 'Ust. Yusuf, S.Ag.'],
+                ['judul' => "Al-Qur'an & Hadits: Kaidah Tafsir Dasar", 'guru' => 'Usth. Aini, S.Pd.I'],
             ],
             'xii' => [
-                ['judul' => 'Fikih: Muamalah & Jual Beli',                'guru' => 'Ust. Fauzi, S.Pd.',    'ikon' => 'fa-scale-balanced'],
-                ['judul' => 'Akidah Akhlak: Meneladani Para Ulama',       'guru' => 'Usth. Rahma, S.Pd.I',  'ikon' => 'fa-user-graduate'],
-                ['judul' => 'SKI: Islam Modern & Pembaruan',              'guru' => 'Ust. Yusuf, S.Ag.',    'ikon' => 'fa-lightbulb'],
-                ['judul' => "Al-Qur'an & Hadits: Hadits Tematik Pilihan", 'guru' => 'Usth. Aini, S.Pd.I',   'ikon' => 'fa-quote-right'],
+                ['judul' => 'Fikih: Muamalah & Jual Beli', 'guru' => 'Ust. Fauzi, S.Pd.'],
+                ['judul' => 'Akidah Akhlak: Meneladani Para Ulama', 'guru' => 'Usth. Rahma, S.Pd.I'],
+                ['judul' => 'SKI: Islam Modern & Pembaruan', 'guru' => 'Ust. Yusuf, S.Ag.'],
+                ['judul' => "Al-Qur'an & Hadits: Hadits Tematik Pilihan", 'guru' => 'Usth. Aini, S.Pd.I'],
             ],
         ];
         $kelasLabel = ['x' => 'Kelas X', 'xi' => 'Kelas XI', 'xii' => 'Kelas XII'];
     @endphp
-    <section id="labor" class="relative z-10 w-full" style="background:var(--green-s0);border-top:1px solid rgba(247,245,239,.06);">
-        <div class="section-glow" style="--glow-x:8%;--glow-y:100%;"></div>
-        <div class="pat-islami is-large"></div>
-        <div class="max-w-7xl mx-auto px-5 sm:px-8 py-16 sm:py-24 relative">
 
-            {{-- ===== A. Split 50:50 — teks (kiri) + foto (kanan) ===== --}}
-            <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-                <div class="reveal" style="--reveal-i:0;">
-                    <p class="ed-eyebrow">Dari Ruang Laboratorium PAI</p>
-                    <h2 class="font-display font-extrabold text-[var(--cream)] text-3xl sm:text-5xl leading-[1.08] tracking-tight mt-4">
+    <section id="labor" class="relative py-16 sm:py-24 border-b border-white/10" style="background-color: var(--green-s1);">
+        <div class="section-glow" style="--glow-x: 10%; --glow-y: 80%;"></div>
+        <div class="pat-islami is-large"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-16 sm:space-y-20">
+
+            {{-- 1. Split 50:50: Penjelasan & Carousel Foto Laboratorium --}}
+            <div class="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+                <div class="space-y-6">
+                    <p class="ed-eyebrow">Laboratorium Pendidikan Agama Islam</p>
+                    <h2 class="font-display font-extrabold text-2xl sm:text-4xl lg:text-5xl text-[var(--cream)] tracking-tight leading-[1.1]">
                         KAMI BINA KARAKTER, BUKAN SEKADAR HAFALAN
                     </h2>
-                    <p class="text-white/75 text-base sm:text-lg leading-relaxed mt-5 max-w-xl">
-                        Laboratorium PAI adalah pusat praktikum keilmuan Islam &amp; laboratorium karakter —
-                        tempat nilai keislaman dipraktikkan, bukan cuma dihafal.
+                    <p class="text-white/75 text-sm sm:text-base leading-relaxed">
+                        Laboratorium PAI adalah ruang perpaduan antara keilmuan Islam, pembinaan akhlak mulia, serta praktikum ibadah
+                        yang kontekstual bagi seluruh siswa/i SMAN 1 Bukittinggi.
                     </p>
 
-                    <div class="space-y-5 mt-8">
+                    <div class="space-y-4 pt-2">
                         <div class="vpoint">
-                            <h4 class="font-display font-extrabold uppercase">Sejarah Singkat</h4>
-                            <p class="text-sm mt-1">Bukan sekadar ruang fisik — pusat pembinaan karakter siswa/i SMAN 1 Bukittinggi.</p>
+                            <h4>Pusat Bina Karakter</h4>
+                            <p class="mt-0.5">Praktikum ibadah, kepemimpinan Islam, dan pembiasaan adab harian.</p>
                         </div>
                         <div class="vpoint">
-                            <h4 class="font-display font-extrabold uppercase">Visi Rabbani</h4>
-                            <p class="text-sm mt-1">Unggul, beriman, berakhlak mulia — kepemimpinan yang hidup dalam keseharian.</p>
+                            <h4>Modul Digital Terpadu</h4>
+                            <p class="mt-0.5">Silabus dan materi pembelajaran kurikulum PAI yang mudah diakses.</p>
                         </div>
                         <div class="vpoint">
-                            <h4 class="font-display font-extrabold uppercase">Digital &amp; Kolaboratif</h4>
-                            <p class="text-sm mt-1">Sumber belajar digital &amp; modul praktikum bagi siswa dan guru PAI.</p>
+                            <h4>Kolaborasi Guru &amp; Siswa</h4>
+                            <p class="mt-0.5">Penugasan tersistematisasi langsung melalui Google Classroom.</p>
                         </div>
                     </div>
 
-                    <a href="{{ route('laboratorium.pai') }}#profil" class="btn-gold mt-9">
-                        Profil Laboratorium <i class="fa-solid fa-arrow-right text-xs"></i>
-                    </a>
+                    <div class="pt-2">
+                        <a href="{{ route('laboratorium.pai') }}#profil" class="btn-gold">
+                            <span>Profil Lengkap Laboratorium</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
                 </div>
 
-                <div class="reveal relative" style="--reveal-i:1;">
-                    {{-- Carousel foto Laboratorium PAI: 3 foto, auto cross-fade + dot indicator.
-                         Taruh file foto di public/assets/images/laboratorium/foto-1.jpg, foto-2.jpg, foto-3.jpg --}}
-                    <div class="ph aspect-[9/10]" data-lab-rotator>
-                        <img src="{{ asset('assets/images/laboratorium/foto-1.jpg') }}" alt="Suasana Laboratorium PAI — foto 1"
-                             class="lab-slide is-active" data-lab-slide loading="lazy" onerror="this.remove()">
-                        <img src="{{ asset('assets/images/laboratorium/foto-2.jpg') }}" alt="Suasana Laboratorium PAI — foto 2"
-                             class="lab-slide" data-lab-slide loading="lazy" onerror="this.remove()">
-                        <img src="{{ asset('assets/images/laboratorium/foto-3.jpg') }}" alt="Suasana Laboratorium PAI — foto 3"
-                             class="lab-slide" data-lab-slide loading="lazy" onerror="this.remove()">
+                {{-- Carousel Foto Laboratorium PAI --}}
+                <div class="relative">
+                    <div class="ph aspect-[4/3] sm:aspect-[16/11] rounded-2xl shadow-2xl overflow-hidden border border-[var(--gold)]/30" data-lab-rotator>
+                        <picture>
+                            <source srcset="{{ asset('assets/images/laboratorium/foto-1.webp') }}" type="image/webp">
+                            <img src="{{ asset('assets/images/laboratorium/foto-1.jpg') }}" alt="Suasana Laboratorium PAI - 1" class="lab-photo-slide is-active" data-lab-slide loading="lazy" onerror="this.remove()">
+                        </picture>
+                        <picture>
+                            <source srcset="{{ asset('assets/images/laboratorium/foto-2.webp') }}" type="image/webp">
+                            <img src="{{ asset('assets/images/laboratorium/foto-2.jpg') }}" alt="Suasana Laboratorium PAI - 2" class="lab-photo-slide" data-lab-slide loading="lazy" onerror="this.remove()">
+                        </picture>
+                        <picture>
+                            <source srcset="{{ asset('assets/images/laboratorium/foto-3.webp') }}" type="image/webp">
+                            <img src="{{ asset('assets/images/laboratorium/foto-3.jpg') }}" alt="Suasana Laboratorium PAI - 3" class="lab-photo-slide" data-lab-slide loading="lazy" onerror="this.remove()">
+                        </picture>
 
-                        {{-- Dot indicator: klik = lompat langsung ke foto tsb --}}
-                        <div class="lab-dots" data-lab-dots role="group" aria-label="Pilih foto Laboratorium PAI">
-                            <button type="button" data-lab-dot aria-label="Foto 1" aria-pressed="true"  class="lab-dot is-active"></button>
-                            <button type="button" data-lab-dot aria-label="Foto 2" aria-pressed="false" class="lab-dot"></button>
-                            <button type="button" data-lab-dot aria-label="Foto 3" aria-pressed="false" class="lab-dot"></button>
+                        {{-- Dots --}}
+                        <div class="absolute bottom-3 inset-x-0 flex items-center justify-center gap-2 z-10" data-lab-dots role="group" aria-label="Pilih foto laboratorium">
+                            <button type="button" data-lab-dot aria-label="Foto 1" class="slider-dot is-active"></button>
+                            <button type="button" data-lab-dot aria-label="Foto 2" class="slider-dot"></button>
+                            <button type="button" data-lab-dot aria-label="Foto 3" class="slider-dot"></button>
                         </div>
                     </div>
-                    {{-- Aksen emas offset di pojok — depth ala editorial --}}
-                    <span class="absolute -bottom-3 -left-3 w-24 h-24 rounded-2xl pointer-events-none" style="border:2px solid rgba(201,166,107,.6);"></span>
                 </div>
             </div>
 
-            {{-- ===== B. List kelas interaktif + preview berganti (cross-fade 250ms) ===== --}}
-            <div class="mt-20 sm:mt-28">
-                <div class="reveal" style="--reveal-i:0;">
-                    <p class="ed-eyebrow">Modul Pembelajaran</p>
-                    <h3 class="font-display font-extrabold text-[var(--cream)] text-2xl sm:text-4xl leading-[1.08] tracking-tight mt-4">
-                        3 TINGKATAN, PULUHAN MODUL
-                    </h3>
+            {{-- 2. Modul Pembelajaran Interaktif (Swap per Tingkatan Kelas) --}}
+            <div class="pt-4" data-swap="modul">
+                <div class="flex items-end justify-between gap-4 mb-6">
+                    <div>
+                        <p class="ed-eyebrow">Khazanah Modul PAI</p>
+                        <h3 class="font-display font-bold text-xl sm:text-3xl text-[var(--cream)] tracking-tight mt-2">
+                            3 TINGKATAN, PULUHAN MODUL
+                        </h3>
+                    </div>
+                    <a href="{{ route('laboratorium.pai') }}#modul" class="text-xs font-bold text-[var(--gold)] hover:underline">
+                        Lihat Semua Modul <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </a>
                 </div>
 
-                {{-- Pola "ganti-ganti": list kiri (hover/klik) → preview kanan cross-fade.
-                    Auto-rotate 4.5s, berhenti permanen saat user berinteraksi. --}}
-                <div class="grid lg:grid-cols-2 gap-8 lg:gap-14 items-stretch mt-10" data-swap="modul">
-                    <div class="reveal flex flex-col" style="--reveal-i:1;" role="tablist" aria-label="Modul per tingkatan kelas">
+                <div class="grid lg:grid-cols-2 gap-6 lg:gap-10 items-stretch">
+                    {{-- List Kiri: Tombol Tingkatan Kelas --}}
+                    <div class="space-y-2 flex flex-col justify-center" role="tablist" aria-label="Tingkatan Kelas">
                         @foreach($modulKelas as $kelasKey => $moduls)
                             <button type="button" role="tab" aria-selected="{{ $loop->first ? 'true' : 'false' }}"
-                                    class="swap-item w-full text-left px-5 py-6 flex items-center gap-5 border-b border-white/10 {{ $loop->first ? 'is-active' : '' }}"
+                                    class="swap-item w-full text-left p-4 sm:p-5 rounded-xl border border-white/10 flex items-center gap-4 {{ $loop->first ? 'is-active' : '' }}"
                                     data-swap-item data-index="{{ $loop->index }}">
                                 <span class="swap-bar"></span>
-                                <span class="font-display font-extrabold text-[var(--gold)] text-sm tracking-[0.12em] uppercase w-24 shrink-0">{{ $kelasLabel[$kelasKey] }}</span>
-                                <span class="flex-1 min-w-0">
-                                    <span class="block font-bold text-sm text-[var(--cream)] truncate">{{ $moduls[0]['judul'] }}</span>
-                                    <span class="block text-xs text-white/60 mt-1">4 mapel — Fikih, Akidah Akhlak, SKI, Al-Qur'an &amp; Hadits</span>
+                                <span class="font-display font-extrabold text-[var(--gold)] text-sm tracking-wider uppercase w-20 shrink-0">
+                                    {{ $kelasLabel[$kelasKey] }}
                                 </span>
+                                <div class="min-w-0 flex-1">
+                                    <span class="block font-bold text-xs sm:text-sm text-[var(--cream)] truncate">
+                                        {{ $moduls[0]['judul'] }}
+                                    </span>
+                                    <span class="block text-[11px] text-white/50 mt-0.5">
+                                        4 Mapel: Fikih, Akidah Akhlak, SKI, Al-Qur'an &amp; Hadits
+                                    </span>
+                                </div>
                                 <i class="fa-solid fa-arrow-right text-xs text-[var(--gold)]"></i>
                             </button>
                         @endforeach
-                        <a href="{{ route('laboratorium.pai') }}#modul" class="group inline-flex items-center gap-1.5 mt-5 text-[var(--gold)] text-sm font-bold px-5">
-                            {{-- Panah bergeser via transform, bukan animasi gap (gap = layout reflow) --}}
-                            Lihat semua modul <i class="fa-solid fa-arrow-right text-xs transition-transform group-hover:translate-x-1"></i>
-                        </a>
                     </div>
 
-                    {{-- Preview: slide bertumpuk, cross-fade 250ms + caption ikut berganti --}}
-                    <div class="reveal relative aspect-[4/5] sm:aspect-[5/4] lg:aspect-auto" style="--reveal-i:2;" data-swap-preview>
+                    {{-- Preview Kanan: Card Preview Modul --}}
+                    <div class="relative aspect-[16/10] sm:aspect-[16/9] lg:aspect-auto min-h-[220px]">
                         @foreach($modulKelas as $kelasKey => $moduls)
-                            <figure class="swap-slide flex flex-col {{ $loop->first ? 'is-active' : '' }}" data-swap-slide data-index="{{ $loop->index }}">
-                                <div class="ph flex-1 min-h-0">
-                                    <img src="{{ asset('images/placeholders/placeholder-kelas-' . $kelasKey . '.png') }}"
-                                         alt="Praktikum {{ $kelasLabel[$kelasKey] }}" class="w-full h-full object-cover" loading="lazy"
-                                         onerror="this.remove()">
-                                    <span class="ph-todo">TODO: Foto asli menyusul</span>
+                            <div class="swap-slide h-full flex flex-col {{ $loop->first ? 'is-active' : '' }}" data-swap-slide data-index="{{ $loop->index }}">
+                                <div class="ph flex-1 flex flex-col justify-between p-6">
+                                    <div class="flex items-center justify-between">
+                                        <span class="eyebrow-pill eyebrow-pill-green">
+                                            Kurikulum {{ $kelasLabel[$kelasKey] }}
+                                        </span>
+                                        <span class="ph-todo">Dokumentasi Resmi</span>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <h4 class="font-display font-bold text-lg sm:text-xl text-[var(--cream)]">
+                                            Materi Praktikum &amp; Silabus {{ $kelasLabel[$kelasKey] }}
+                                        </h4>
+                                        <p class="text-xs text-white/70 line-clamp-2">
+                                            {{ collect($moduls)->pluck('judul')->implode(' · ') }}
+                                        </p>
+                                    </div>
+                                    <div class="pt-2 flex items-center gap-3">
+                                        <a href="{{ route('laboratorium.pai') }}#modul" class="btn-gold py-2 px-4 text-xs">
+                                            Unduh Silabus PDF
+                                        </a>
+                                    </div>
                                 </div>
-                                <figcaption class="shrink-0 pt-4">
-                                    <p class="font-display font-extrabold text-[var(--cream)] text-sm">{{ $kelasLabel[$kelasKey] }} — 4 modul contoh</p>
-                                    <p class="text-xs text-white/60 mt-1 line-clamp-2">{{ collect($moduls)->pluck('judul')->implode(' · ') }}</p>
-                                </figcaption>
-                            </figure>
+                            </div>
                         @endforeach
                     </div>
                 </div>
             </div>
 
-            {{-- ===== C. Info Pengumpulan Tugas (callout emas di atas hijau tua) ===== --}}
-            <div class="callout-tugas rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-5 sm:gap-7 mt-20 sm:mt-28 reveal" style="--reveal-i:0;">
-                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full shrink-0 flex items-center justify-center" style="background:rgba(201,166,107,.16);border:1px solid rgba(201,166,107,.5);">
-                    <i class="fa-brands fa-google text-2xl sm:text-3xl text-[var(--gold)]"></i>
+            {{-- 3. Callout Google Classroom (Tugas Siswa) --}}
+            <div class="tsaqib-card p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6 border-[var(--gold)]/30 bg-gradient-to-r from-[rgba(201,166,107,0.1)] to-transparent">
+                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[var(--gold)]/15 border border-[var(--gold)]/40 flex items-center justify-center text-[var(--gold)] text-2xl shrink-0">
+                    <i class="fa-solid fa-graduation-cap"></i>
                 </div>
-                <div class="flex-1 text-center sm:text-left">
-                    <h3 class="font-display font-extrabold text-[var(--cream)] text-lg sm:text-xl">Info Pengumpulan Tugas</h3>
-                    <p class="text-white/70 text-sm mt-1.5 leading-relaxed">
-                        Kumpulkan tugasmu langsung ke <strong class="text-[var(--gold)]">Google Classroom</strong> guru mapel masing-masing — cek kode kelas di guru pengampumu.
+                <div class="flex-1 text-center sm:text-left space-y-1">
+                    <h4 class="font-display font-bold text-lg text-[var(--cream)]">Info Pengumpulan Tugas Siswa</h4>
+                    <p class="text-xs sm:text-sm text-white/70 leading-relaxed">
+                        Tugas praktikum dan portofolio keislaman dikumpulkan terpusat melalui <strong class="text-[var(--gold)]">Google Classroom</strong> masing-masing guru pengampu PAI.
                     </p>
                 </div>
                 <a href="{{ route('laboratorium.pai') }}#tugas" class="btn-gold shrink-0">
-                    Lihat Semua Tugas <i class="fa-solid fa-arrow-right text-xs"></i>
+                    <span>Lihat Rincian Tugas</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
                 </a>
             </div>
+
         </div>
     </section>
 
-    {{-- ================= SECTION 3: PERPUSTAKAAN DIGITAL =================
-         Satu step LEBIH TERANG (--green-s1) — ritme visual, tetap satu keluarga.
-         Zig-zag: preview cover di KIRI, list interaktif di KANAN. --}}
-    <section id="perpus" class="relative z-10 w-full" style="background:var(--green-s1);border-top:1px solid rgba(247,245,239,.06);">
-        <div class="section-glow" style="--glow-x:80%;--glow-y:100%;"></div>
-        <div class="pat-islami is-large"></div>
-        <div class="max-w-7xl mx-auto px-5 sm:px-8 py-16 sm:py-24">
-            <div class="grid lg:grid-cols-2 gap-8 lg:gap-14 items-stretch" data-swap="perpus">
+    {{-- =========================================================================
+       SECTION 3: PERPUSTAKAAN DIGITAL (Preview Koleksi & Buku Terbaru)
+       ========================================================================= --}}
+    <section id="perpus" class="relative py-16 sm:py-24 border-b border-white/10" style="background-color: var(--green-s0);">
+        <div class="section-glow" style="--glow-x: 85%; --glow-y: 90%;"></div>
 
-                {{-- Preview (kiri): slide cover bertumpuk + caption & tombol ikut cross-fade --}}
-                <div class="reveal relative order-2 lg:order-1" style="--reveal-i:1;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10" data-swap="perpus">
+            <div class="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+
+                {{-- Preview Cover Kiri --}}
+                <div class="order-2 lg:order-1 relative aspect-[4/5] max-w-sm mx-auto w-full">
                     @if($katalogPerpus->isNotEmpty())
-                        <div class="relative aspect-[4/5]">
-                            @foreach($katalogPerpus->take(5) as $b)
-                                <figure class="swap-slide flex flex-col {{ $loop->first ? 'is-active' : '' }}" data-swap-slide data-index="{{ $loop->index }}">
-                                    <div class="ph flex-1 min-h-0">
-                                        <img src="{{ $b['image'] ? asset('storage/' . $b['image']) : asset('images/placeholders/placeholder-perpustakaan.png') }}"
-                                             alt="Cover {{ $b['title'] }}" class="w-full h-full object-cover" loading="lazy"
-                                             onerror="this.remove()">
-                                        @if(empty($b['image']))
-                                            <span class="ph-todo">TODO: Cover menyusul</span>
-                                        @endif
-                                    </div>
-                                    <figcaption class="shrink-0 pt-4">
-                                        <p class="ed-eyebrow">{{ ucfirst($b['category']) }}</p>
-                                        <p class="font-display font-extrabold text-[var(--cream)] text-lg leading-snug mt-1 line-clamp-1">{{ $b['title'] }}</p>
-                                        <div class="flex gap-2 mt-3">
-                                            <a href="{{ $b['pdf'] ?? route('perpustakaan') }}" target="_blank" rel="noopener" class="btn-gold">
-                                                <i class="fa-solid fa-book-open-reader text-[10px]"></i> Baca Online
+                        @foreach($katalogPerpus->take(5) as $b)
+                            <div class="swap-slide h-full flex flex-col {{ $loop->first ? 'is-active' : '' }}" data-swap-slide data-index="{{ $loop->index }}">
+                                <div class="ph flex-1 overflow-hidden flex flex-col justify-end p-5 shadow-2xl">
+                                    @if($b['image'])
+                                        <img src="{{ asset('storage/' . $b['image']) }}" alt="{{ $b['title'] }}" class="absolute inset-0 w-full h-full object-cover" loading="lazy" onerror="this.remove()">
+                                    @else
+                                        <div class="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#1C442B] to-[#0D2818]">
+                                            <i class="fa-solid fa-book-bookmark text-5xl text-[var(--gold)]/30"></i>
+                                            <span class="text-xs font-display font-bold uppercase tracking-wider text-white/40">Katalog PAI</span>
+                                        </div>
+                                    @endif
+                                    <span class="absolute inset-0 bg-gradient-to-t from-[#0D2818] via-[#0D2818]/60 to-transparent pointer-events-none"></span>
+
+                                    <div class="relative z-10 space-y-2">
+                                        <span class="eyebrow-pill eyebrow-pill-gold text-[10px]">
+                                            {{ ucfirst($b['category']) }}
+                                        </span>
+                                        <h4 class="font-display font-bold text-base sm:text-lg text-[var(--cream)] leading-snug line-clamp-2">
+                                            {{ $b['title'] }}
+                                        </h4>
+                                        <div class="flex items-center gap-2 pt-1">
+                                            <a href="{{ $b['pdf'] ?? route('perpustakaan') }}" target="_blank" rel="noopener" class="btn-gold py-1.5 px-3.5 text-xs">
+                                                <i class="fa-solid fa-book-open text-[10px]"></i> Baca Online
                                             </a>
                                             @if($b['pdf'])
-                                                <a href="{{ $b['pdf'] }}" download
-                                                   class="inline-flex items-center gap-1.5 font-bold text-[11px] px-4 py-2.5 rounded-md transition hover:bg-white/5 border border-white/25 text-[var(--cream)]">
-                                                    <i class="fa-solid fa-download text-[10px]"></i> Unduh PDF
+                                                <a href="{{ $b['pdf'] }}" download class="btn-outline py-1.5 px-3 text-xs">
+                                                    <i class="fa-solid fa-download text-[10px]"></i>
                                                 </a>
                                             @endif
                                         </div>
-                                    </figcaption>
-                                </figure>
-                            @endforeach
-                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
                     @else
-                        <div class="ph">
-                            <img src="{{ asset('images/placeholders/placeholder-perpustakaan.png') }}"
-                                 alt="Perpustakaan Digital TSAQIB" class="w-full aspect-[4/5] object-cover" loading="lazy"
-                                 onerror="this.remove()">
-                            <span class="ph-todo">TODO: Foto asli menyusul</span>
+                        <div class="ph h-full flex flex-col items-center justify-center p-6 text-center">
+                            <i class="fa-solid fa-book-bookmark text-4xl text-white/20 mb-3"></i>
+                            <p class="text-xs text-white/50">Koleksi digital sedang disinkronisasi.</p>
                         </div>
                     @endif
                 </div>
 
-                {{-- List (kanan): judul koleksi, hover/klik → preview kiri berganti --}}
-                <div class="order-1 lg:order-2 flex flex-col justify-center">
-                    <div class="reveal" style="--reveal-i:0;">
-                        <p class="ed-eyebrow">Rak Baca Digital</p>
-                        <h2 class="font-display font-extrabold text-[var(--cream)] text-3xl sm:text-5xl leading-[1.08] tracking-tight mt-4">
+                {{-- List Interaktif Kanan --}}
+                <div class="order-1 lg:order-2 space-y-6">
+                    <div>
+                        <p class="ed-eyebrow">Maktabah Digital Publik</p>
+                        <h2 class="font-display font-extrabold text-2xl sm:text-4xl lg:text-5xl text-[var(--cream)] tracking-tight leading-[1.1] mt-2">
                             BACA DI MANA SAJA, UNDUH KAPAN SAJA
                         </h2>
-                        <p class="text-white/75 text-base sm:text-lg leading-relaxed mt-5 max-w-xl">
-                            Buletin, e-book, dan risalah islamiyah koleksi FSI. Arahkan kursor ke judul untuk mengintip cover-nya.
+                        <p class="text-white/75 text-sm sm:text-base leading-relaxed mt-4">
+                            Koleksi buku digital, risalah Fikih, modul PAI, dan buletin dakwah yang dapat diakses publik tanpa hambatan login.
                         </p>
                     </div>
 
                     @if($katalogPerpus->isNotEmpty())
-                        <div class="mt-8 reveal" style="--reveal-i:2;" role="tablist" aria-label="Daftar koleksi perpustakaan">
+                        <div class="space-y-2 pt-2" role="tablist" aria-label="Daftar Buku">
                             @foreach($katalogPerpus->take(5) as $b)
                                 <button type="button" role="tab" aria-selected="{{ $loop->first ? 'true' : 'false' }}"
-                                        class="swap-item w-full text-left px-5 py-4 flex items-center gap-4 border-b border-white/10 {{ $loop->first ? 'is-active' : '' }}"
+                                        class="swap-item w-full text-left p-3.5 sm:p-4 rounded-xl border border-white/10 flex items-center gap-3.5 {{ $loop->first ? 'is-active' : '' }}"
                                         data-swap-item data-index="{{ $loop->index }}">
                                     <span class="swap-bar"></span>
-                                    <span class="flex-1 min-w-0">
-                                        <span class="block font-bold text-sm text-[var(--cream)] truncate">{{ $b['title'] }}</span>
-                                        <span class="block text-xs text-white/60 mt-0.5">{{ ucfirst($b['category']) }}@if($b['author']) &middot; {{ $b['author'] }} @endif</span>
-                                    </span>
-                                    <i class="fa-solid fa-arrow-right text-xs text-[var(--gold)]"></i>
+                                    <div class="min-w-0 flex-1">
+                                        <h3 class="font-bold text-xs sm:text-sm text-[var(--cream)] truncate">
+                                            {{ $b['title'] }}
+                                        </h3>
+                                        <p class="text-[11px] text-white/50 mt-0.5">
+                                            {{ ucfirst($b['category']) }} @if($b['author']) &middot; {{ $b['author'] }} @endif
+                                        </p>
+                                    </div>
+                                    <i class="fa-solid fa-angle-right text-xs text-[var(--gold)]"></i>
                                 </button>
                             @endforeach
                         </div>
-                        <a href="{{ route('perpustakaan') }}" class="group inline-flex items-center gap-1.5 mt-6 text-[var(--gold)] text-sm font-bold px-5 reveal" style="--reveal-i:3;">
-                            Kunjungi Perpustakaan <i class="fa-solid fa-arrow-right text-xs transition-transform group-hover:translate-x-1"></i>
-                        </a>
-                    @else
-                        <p class="text-white/70 text-sm mt-8 px-5 reveal" style="--reveal-i:2;">
-                            Belum ada koleksi — nantikan buletin &amp; e-book terbaru dari kami.
-                        </p>
+
+                        <div class="pt-2">
+                            <a href="{{ route('perpustakaan') }}" class="btn-gold">
+                                <span>Kunjungi Perpustakaan Penuh</span>
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
+                            </a>
+                        </div>
                     @endif
                 </div>
+
             </div>
         </div>
     </section>
 
-    {{-- ================= SECTION 4: KOMUNITAS & KADERISASI FSI =================
-         Kembali ke --green-s0. Card feed ala sosial media, staggered slide-in,
-         2 CTA terpisah (anggota FSI ≠ akun platform). --}}
+    {{-- =========================================================================
+       SECTION 4: 13 KOMUNITAS & KADERISASI FSI
+       ========================================================================= --}}
     @if(!empty($daftarKomunitas))
-    <section id="komunitas-preview" class="relative z-10 w-full" style="background:var(--green-s0);border-top:1px solid rgba(247,245,239,.06);">
-        <div class="section-glow" style="--glow-x:15%;--glow-y:0%;"></div>
-        <div class="pat-islami is-faint"></div>
-        {{-- Foto latar opsional — taruh di public/assets/landing/bg-komunitas.jpg (aman jika belum ada) --}}
-        <div class="section-photo" style="background-image:linear-gradient(rgba(13,40,24,.82),rgba(13,40,24,.82)), linear-gradient(160deg, var(--green-s0) 20%, var(--gold) 150%), url('{{ asset('assets/landing/bg-komunitas.jpg') }}'); background-blend-mode:normal, color, normal;"></div>
-        <div class="max-w-7xl mx-auto px-5 sm:px-8 py-16 sm:py-24 relative">
+    <section id="komunitas-preview" class="relative py-16 sm:py-24 border-b border-white/10" style="background-color: var(--green-s1);">
+        <div class="section-glow" style="--glow-x: 20%; --glow-y: 20%;"></div>
+        <div class="pat-islami"></div>
 
-            <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-10 reveal" style="--reveal-i:0;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-10">
+
+            <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                 <div>
-                    <p class="ed-eyebrow">Sapa Circle-nya — {{ count($daftarKomunitas) }} Komunitas Minat &amp; Bakat</p>
-                    <h2 class="font-display font-extrabold text-[var(--cream)] text-3xl sm:text-5xl leading-[1.08] tracking-tight mt-4">
-                        AYO IKUT KOMUNITAS!
+                    <p class="ed-eyebrow">Keluarga Besar FSI &middot; Circle Minat &amp; Bakat</p>
+                    <h2 class="font-display font-extrabold text-2xl sm:text-4xl text-[var(--cream)] tracking-tight mt-2">
+                        13 CIRCLE KOMUNITAS TSAQIB
                     </h2>
-                    <p class="text-white/75 text-sm sm:text-base mt-3 max-w-xl">
-                        Tiap komunitas punya karakter sendiri. Intip dari dekat, lalu pilih yang paling cocok dengan minatmu.
+                    <p class="text-white/70 text-xs sm:text-sm mt-2 max-w-xl">
+                        Setiap minat memiliki tempat untuk bertumbuh. Temukan circle yang selaras dengan passion-mu dan kuatkan ukhuwah bersama.
                     </p>
                 </div>
                 <a href="{{ route('komunitas', 'semua') }}" class="btn-gold shrink-0 self-start sm:self-auto">
-                    Lihat Semua Komunitas <i class="fa-solid fa-arrow-right text-xs"></i>
+                    <span>Semua Komunitas</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
                 </a>
             </div>
 
-            {{-- Mobile: horizontal scroll carousel; Desktop: grid 3-kolom.
-                 Stagger via --reveal-i (0.09s/kartu). --}}
-            <div class="flex lg:grid lg:grid-cols-3 gap-4 overflow-x-auto pb-4 lg:pb-0 scrollbar-hide snap-x snap-mandatory">
+            {{-- Grid Kartu Komunitas Seragam & Harmonis --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
                 @foreach($daftarKomunitas as $k)
-                    <a href="{{ route('komunitas', $k['slug']) }}"
-                       class="social-card reveal flex-shrink-0 w-full max-w-[320px] lg:max-w-none snap-center"
-                       style="--reveal-i:{{ $loop->index + 1 }};">
-                        <div class="social-card-header">
-                            <img src="{{ asset($k['image']) }}" alt="{{ $k['nama'] }}"
-                                 class="social-card-avatar"
-                                 loading="lazy" onerror="this.remove()">
-                            <div class="min-w-0">
-                                <h4 class="font-display font-bold text-sm text-[var(--cream)] truncate">{{ $k['nama'] }}</h4>
-                                <p class="text-[10px] text-white/50">Komunitas TSAQIB</p>
+                    <div class="community-card p-5 space-y-4">
+                        <div class="flex items-center gap-3.5">
+                            <div class="community-logo-container">
+                                <img src="{{ asset($k['image']) }}" alt="{{ $k['nama'] }}" loading="lazy" onerror="this.remove()">
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <h3 class="font-display font-bold text-sm sm:text-base text-[var(--cream)] truncate">
+                                    {{ $k['nama'] }}
+                                </h3>
+                                <p class="text-[10px] text-[var(--gold)] font-semibold uppercase tracking-wider mt-0.5">
+                                    {{ $k['peran'] ?? 'Community Circle' }}
+                                </p>
                             </div>
                         </div>
 
-                        <div class="relative h-48" style="background:linear-gradient(155deg,#1C442B,#0D2818);">
-                            <img src="{{ asset($k['image']) }}" alt="Aktivitas {{ $k['nama'] }}"
-                                 class="social-card-image"
-                                 loading="lazy" onerror="this.remove()">
-                        </div>
+                        <p class="text-xs text-white/70 leading-relaxed line-clamp-3">
+                            {{ $k['deskripsi_singkat'] }}
+                        </p>
 
-                        <div class="social-card-caption">
-                            <p class="text-white/75 text-sm leading-relaxed line-clamp-3">
-                                {{ $k['deskripsi_singkat'] }}
-                            </p>
-                        </div>
-
-                        <div class="social-card-footer">
-                            <span class="badge-default text-[10px] font-semibold px-2 py-0.5 rounded-full border">Siap Gabung</span>
-                            <span class="flex items-center gap-1.5 font-semibold text-[var(--gold)]">
-                                Lihat Feed <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        <div class="pt-2 border-t border-white/10 flex items-center justify-between">
+                            <span class="eyebrow-pill eyebrow-pill-green text-[9px] py-0.5 px-2">
+                                Aktif
                             </span>
+                            <a href="{{ route('komunitas', $k['slug']) }}" class="text-xs font-bold text-[var(--gold)] hover:underline inline-flex items-center gap-1">
+                                Buka Feed <i class="fa-solid fa-arrow-right text-[9px]"></i>
+                            </a>
                         </div>
-                    </a>
+                    </div>
                 @endforeach
             </div>
 
-            {{-- ===== 2 CTA terpisah: pendaftaran organisasi vs akun platform ===== --}}
-            <div class="grid sm:grid-cols-2 gap-5 mt-12 relative z-10">
-                <a href="{{ route('open.recruitment') }}" class="reveal flex items-start gap-4 rounded-2xl p-6 transition-transform hover:-translate-y-1.5 hover:shadow-xl hover:shadow-black/30"
-                   style="background:rgba(247,245,239,.04);border:1px solid rgba(201,166,107,.3); --reveal-i:1;">
-                    <span class="w-11 h-11 rounded-full shrink-0 flex items-center justify-center" style="background:rgba(201,166,107,.14);border:1px solid rgba(201,166,107,.4);">
-                        <i class="fa-solid fa-users text-[var(--gold)]"></i>
+            {{-- Dua Jalur Masuk yang Jelas: Oprec vs Akun LMS --}}
+            <div class="grid sm:grid-cols-2 gap-5 pt-4">
+                <a href="{{ route('open.recruitment') }}" class="tsaqib-card-interactive p-6 flex items-start gap-4">
+                    <span class="w-12 h-12 rounded-2xl bg-[var(--gold)]/15 border border-[var(--gold)]/35 flex items-center justify-center text-[var(--gold)] text-xl shrink-0">
+                        <i class="fa-solid fa-id-card-clip"></i>
                     </span>
-                    <span class="flex-1">
-                        <span class="block font-display font-extrabold text-[var(--cream)] text-base">Daftar Anggota FSI</span>
-                        <span class="block text-white/70 text-sm mt-1 leading-relaxed">Ikuti kaderisasi &amp; jadi bagian organisasi FSI.</span>
-                    </span>
-                    <i class="fa-solid fa-arrow-right text-[var(--gold)] mt-1.5"></i>
+                    <div class="min-w-0 flex-1">
+                        <h3 class="font-display font-bold text-base text-[var(--cream)]">Daftar Anggota FSI (Kelas X)</h3>
+                        <p class="text-xs text-white/65 mt-1 leading-relaxed">
+                            Pendaftaran kaderisasi resmi untuk bergabung dalam kepengurusan dan kegiatan FSI SMAN 1 Bukittinggi.
+                        </p>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-[var(--gold)] mt-2"></i>
                 </a>
 
-                <a href="{{ route('register') }}" class="reveal flex items-start gap-4 rounded-2xl p-6 transition-transform hover:-translate-y-1.5 hover:shadow-xl hover:shadow-black/30"
-                   style="background:rgba(247,245,239,.04);border:1px solid rgba(1,121,95,.4); --reveal-i:2;">
-                    <span class="w-11 h-11 rounded-full shrink-0 flex items-center justify-center" style="background:rgba(1,121,95,.16);border:1px solid rgba(1,121,95,.45);">
-                        <i class="fa-solid fa-user-plus text-[#3DBD98]"></i>
+                <a href="{{ route('register') }}" class="tsaqib-card-interactive p-6 flex items-start gap-4">
+                    <span class="w-12 h-12 rounded-2xl bg-[#01795F]/20 border border-[#01795F]/40 flex items-center justify-center text-[#3fd6b0] text-xl shrink-0">
+                        <i class="fa-solid fa-laptop-code"></i>
                     </span>
-                    <span class="flex-1">
-                        <span class="block font-display font-extrabold text-[var(--cream)] text-base">Buat Akun Tsaqib</span>
-                        <span class="block text-white/70 text-sm mt-1 leading-relaxed">Akses portal belajar &amp; modul (Portal LMS).</span>
-                    </span>
-                    <i class="fa-solid fa-arrow-right text-[#3DBD98] mt-1.5"></i>
+                    <div class="min-w-0 flex-1">
+                        <h3 class="font-display font-bold text-base text-[var(--cream)]">Buat Akun Portal TSAQIB</h3>
+                        <p class="text-xs text-white/65 mt-1 leading-relaxed">
+                            Akses modul pembelajaran, kumpulkan tugas PAI, dan ikuti linimasa interaktif komunitas digital.
+                        </p>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-[#3fd6b0] mt-2"></i>
                 </a>
             </div>
 
@@ -1118,350 +887,209 @@
     </section>
     @endif
 
-    {{-- ================= FOOTER — logo institusi berlabel di baris paling bawah ================= --}}
-    <footer class="relative z-10 border-t border-white/10 mt-auto" style="background:var(--green-s0);">
-        <div class="section-glow" style="--glow-x:50%;--glow-y:120%;"></div>
-        <div class="max-w-7xl w-full mx-auto px-5 sm:px-8 py-6 flex flex-col lg:flex-row items-center justify-between gap-5">
+    {{-- Global Site Footer --}}
+    @include('partials.site-footer')
 
-            <p class="text-white text-[11px] font-label text-center lg:text-left order-2 lg:order-1">
-                &copy; {{ date('Y') }} TSAQIB &middot; Forum Studi Islam SMAN 1 Bukittinggi
-            </p>
-
-            <div class="flex items-start gap-4 sm:gap-6 order-1 lg:order-2 bg-white/[.05] border border-white/10 rounded-2xl px-5 py-3 sm:px-6 sm:py-3.5">
-                {{-- Logo + label kecil di bawah tiap logo. File belum ada → img hilang (onerror), label tetap. --}}
-                <div class="flex flex-col items-center gap-1.5 w-16">
-                    <img src="{{ asset('assets/logo-instansi/kemenag.webp') }}" alt="Kementerian Agama" title="Kementerian Agama" class="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-90 hover:opacity-100 transition" loading="lazy" onerror="this.remove()">
-                    <span class="text-[9px] text-white/60 text-center leading-tight">Kemenag</span>
-                </div>
-                <div class="flex flex-col items-center gap-1.5 w-16">
-                    <img src="{{ asset('assets/logo-instansi/pendidikan.webp') }}" alt="Tut Wuri Handayani" title="Tut Wuri Handayani" class="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-90 hover:opacity-100 transition" loading="lazy" onerror="this.remove()">
-                    <span class="text-[9px] text-white/60 text-center leading-tight">Tut Wuri Handayani</span>
-                </div>
-                <div class="flex flex-col items-center gap-1.5 w-16">
-                    <img src="{{ asset('assets/logo-instansi/sumbar.webp') }}" alt="Pemerintah Provinsi Sumatera Barat" title="Pemerintah Provinsi Sumatera Barat" class="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-90 hover:opacity-100 transition" loading="lazy" onerror="this.remove()">
-                    <span class="text-[9px] text-white/60 text-center leading-tight">Pemprov Sumbar</span>
-                </div>
-                <div class="flex flex-col items-center gap-1.5 w-16">
-                    <img src="{{ asset('assets/logo-instansi/smansa.webp') }}" alt="SMAN 1 Bukittinggi" title="SMAN 1 Bukittinggi" class="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-90 hover:opacity-100 transition" loading="lazy" onerror="this.remove()">
-                    <span class="text-[9px] text-white/60 text-center leading-tight">SMAN 1 Bukittinggi</span>
-                </div>
-                <div class="flex flex-col items-center gap-1.5 w-16">
-                    <img src="{{ asset('assets/logo-instansi/fsi.webp') }}" alt="Forum Studi Islam" title="Forum Studi Islam" class="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-90 hover:opacity-100 transition" loading="lazy" onerror="this.remove()">
-                    <span class="text-[9px] text-white/60 text-center leading-tight">Forum Studi Islam</span>
-                </div>
-            </div>
-
-        </div>
-    </footer>
-
-    {{-- Kembali ke atas — muncul setelah hero keluar viewport (JS di bawah) --}}
-    <button id="to-top" type="button" inert aria-label="Kembali ke atas"
-            class="fixed bottom-5 right-5 z-[80] w-11 h-11 rounded-full flex items-center justify-center text-[var(--cream)] border border-[rgba(201,166,107,.5)] shadow-lg"
-            style="background:rgba(13,40,24,.85);backdrop-filter:blur(6px);">
-        <i class="fa-solid fa-arrow-up text-sm"></i>
+    {{-- Floating Back to Top Button --}}
+    <button id="to-top" type="button" aria-label="Kembali ke atas"
+            class="fixed bottom-6 right-6 z-[80] w-11 h-11 rounded-full flex items-center justify-center text-[var(--cream)] bg-[#0D2818]/90 border border-[var(--gold)]/50 shadow-2xl backdrop-blur-md hover:border-[var(--gold)] hover:scale-105 transition-all">
+        <i class="fa-solid fa-arrow-up text-xs"></i>
     </button>
-</div>
 
-<script>
-    // ===== Gerbang auth Komunitas =====
-    function handleKomunitasClick() {
-        @auth
-            @if(Auth::user()->selected_community)
-                window.location.href = "{{ route('komunitas') }}";
-            @else
-                window.location.href = "{{ route('select-role') }}";
-            @endif
-        @else
-            // Guest boleh membaca feed komunitas (read-only) — tanpa paksa login.
-            window.location.href = "{{ route('komunitas') }}";
-        @endauth
-    }
+    {{-- =========================================================================
+       CLIENT-SIDE SCRIPTS (Carousel, Counter, Swap Interactivity)
+       ========================================================================= --}}
+    <script>
+        // 1. Program Carousel Infinite Loop + Drag
+        (function () {
+            const viewport = document.querySelector('.carousel-viewport');
+            const track    = document.getElementById('carousel-track');
+            if (!viewport || !track) return;
 
-    // ===== Program carousel: seamless loop + arrows + drag (auto-scroll resumes) =====
-    (function () {
-        const viewport = document.querySelector('.carousel-viewport');
-        const track    = document.getElementById('carousel-track');
-        if (!viewport || !track) return;
+            const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (prefersReduced) return;
 
-        const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (prefersReduced) return;               // CSS media query gives a static scrollable list
+            const AUTO_SPEED   = 0.5;
+            const RESUME_DELAY = 1500;
+            const SNAP_EASE    = 0.25;
+            const CARD_GAP     = 20;
 
-        const AUTO_SPEED   = 0.5;   // px / frame
-        const RESUME_DELAY = 1500;  // ms idle before auto-scroll resumes
-        const SNAP_EASE    = 0.25;  // convergence per frame for arrow/release snap
-        const CARD_GAP     = 24;    // px, = .carousel-set > * margin-right
+            const pitch = () => {
+                const c = track.querySelector('.card-program');
+                return c ? c.offsetWidth + CARD_GAP : 240;
+            };
+            let setWidth = 0;
+            const measure = () => {
+                const set = track.querySelector('.carousel-set');
+                setWidth = set ? set.children.length * pitch() : 0;
+            };
+            measure();
 
-        const pitch = () => {
-            const c = track.querySelector('.carousel-card');
-            return c ? c.offsetWidth + CARD_GAP : 244;
-        };
-        let setWidth = 0;
-        const measure = () => {
-            const set = track.querySelector('.carousel-set');
-            setWidth = set ? set.children.length * pitch() : 0;
-        };
-        measure();
+            let pos = 0, mode = 'auto', target = 0, resumeAt = 0;
+            const wrap = () => ((pos % setWidth) + setWidth) % setWidth;
+            const apply = () => { track.style.transform = 'translate3d(' + (-wrap()) + 'px,0,0)'; };
 
-        let pos = 0;          // unbounded scroll position — only the render wraps it
-        let mode = 'auto';    // 'auto' | 'drag' | 'snap'
-        let target = 0;
-        let resumeAt = 0;
-
-        const wrap = () => ((pos % setWidth) + setWidth) % setWidth;
-        const apply = () => { track.style.transform = 'translate3d(' + (-wrap()) + 'px,0,0)'; };
-
-        let last = performance.now();
-        function tick(now) {
-            const dt = Math.min(now - last, 100); // cap: tab idle tidak membuat lompatan
-            last = now;
-            if (mode === 'snap') {
-                pos += (target - pos) * SNAP_EASE;
-                if (Math.abs(target - pos) < 0.5) {
-                    pos = target;
-                    mode = 'auto';
-                    resumeAt = now + RESUME_DELAY;
+            let last = performance.now();
+            function tick(now) {
+                const dt = Math.min(now - last, 100);
+                last = now;
+                if (mode === 'snap') {
+                    pos += (target - pos) * SNAP_EASE;
+                    if (Math.abs(target - pos) < 0.5) {
+                        pos = target;
+                        mode = 'auto';
+                        resumeAt = now + RESUME_DELAY;
+                    }
+                } else if (mode === 'auto' && now >= resumeAt) {
+                    pos += AUTO_SPEED * (dt / 16.7);
                 }
-            } else if (mode === 'auto' && now >= resumeAt) {
-                pos += AUTO_SPEED * (dt / 16.7); // dikalibrasi 60fps → kecepatan konsisten di layar 120Hz
+                apply();
+                requestAnimationFrame(tick);
             }
-            apply();
+
+            const snapBy = (dir) => {
+                target = Math.round(pos / pitch()) * pitch() + dir * pitch();
+                mode = 'snap';
+                resumeAt = performance.now() + RESUME_DELAY;
+            };
+            const prev = document.getElementById('carousel-prev');
+            const next = document.getElementById('carousel-next');
+            if (prev) prev.addEventListener('click', () => snapBy(-1));
+            if (next) next.addEventListener('click', () => snapBy(1));
+
+            window.addEventListener('resize', measure, { passive: true });
             requestAnimationFrame(tick);
-        }
+        })();
 
-        const snapBy = (dir) => {
-            target = Math.round(pos / pitch()) * pitch() + dir * pitch();
-            mode = 'snap';
-            resumeAt = performance.now() + RESUME_DELAY;
-        };
-        const prev = document.getElementById('carousel-prev');
-        const next = document.getElementById('carousel-next');
-        if (prev) prev.addEventListener('click', () => snapBy(-1));
-        if (next) next.addEventListener('click', () => snapBy(1));
+        // 2. Live Number Counters Animation
+        (function () {
+            const counters = document.querySelectorAll('.counter');
+            if (!counters.length) return;
 
-        // Drag via Pointer Events. move/up di window (bukan setPointerCapture) agar
-        // click tetap jatuh ke <a> card — bukan ke track.
-        let dragging = false, activeId = null, startX = 0, startPos = 0, moved = false;
+            const targets = Array.from(counters).map(c => parseInt(c.dataset.target, 10) || 0);
+            const DURATION = 1600;
+            const t0 = performance.now();
 
-        const onMove = (e) => {
-            if (!dragging || e.pointerId !== activeId) return;
-            const dx = e.clientX - startX;
-            if (!moved && Math.abs(dx) > 8) moved = true;
-            if (moved) { mode = 'drag'; pos = startPos - dx; }
-        };
-        const onUp = (e) => {
-            if (!dragging || e.pointerId !== activeId) return;
-            dragging = false; activeId = null;
-            window.removeEventListener('pointermove', onMove);
-            window.removeEventListener('pointerup', onUp);
-            window.removeEventListener('pointercancel', onUp);
-            if (!moved) { resumeAt = performance.now(); return; } // klik bersih -> biarkan navigasi
-            track.addEventListener('click', (ev) => ev.preventDefault(), { capture: true, once: true });
-            target = Math.round(pos / pitch()) * pitch();
-            mode = 'snap';
-            resumeAt = performance.now() + RESUME_DELAY;
-        };
-        const onDown = (e) => {
-            dragging = true; moved = false; activeId = e.pointerId;
-            startX = e.clientX; startPos = pos;
-            resumeAt = Infinity;
-            window.addEventListener('pointermove', onMove);
-            window.addEventListener('pointerup', onUp);
-            window.addEventListener('pointercancel', onUp);
-        };
-        track.addEventListener('pointerdown', onDown);
+            function frame(now) {
+                const t = Math.min((now - t0) / DURATION, 1);
+                const ease = 1 - (1 - t) * (1 - t);
+                counters.forEach((c, i) => {
+                    c.textContent = Math.round(targets[i] * ease);
+                });
+                if (t < 1) requestAnimationFrame(frame);
+            }
+            requestAnimationFrame(frame);
+        })();
 
-        viewport.addEventListener('mouseenter', () => { if (mode === 'auto') resumeAt = Infinity; });
-        viewport.addEventListener('mouseleave', () => { if (mode === 'auto') resumeAt = 0; });
+        // 3. Tab Swap Interactivity (Modul & Perpustakaan)
+        (function () {
+            const AUTO_MS = 4500;
+            document.querySelectorAll('[data-swap]').forEach(group => {
+                const items  = group.querySelectorAll('[data-swap-item]');
+                const slides = group.querySelectorAll('[data-swap-slide]');
+                if (!items.length || !slides.length) return;
 
-        window.addEventListener('resize', measure, { passive: true });
-
-        requestAnimationFrame(tick);
-    })();
-
-    // ===== Reveal on scroll (IntersectionObserver): fade-up sekali per elemen =====
-    (function () {
-        var items = document.querySelectorAll('.reveal');
-        if (!items.length) return;
-        if (!('IntersectionObserver' in window)) return;
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-        document.documentElement.classList.add('js-reveal');
-        var io = new IntersectionObserver(function (entries) {
-            entries.forEach(function (entry) {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    io.unobserve(entry.target); // sekali reveal — tidak replay saat scroll ulang
-                    // Animasi selesai → lepas class reveal: will-change turun dari memori
-                    // dan transisi hover komponen (250ms) kembali aktif menggantikan
-                    // transisi reveal (700ms).
-                    entry.target.addEventListener('transitionend', function () {
-                        entry.target.classList.remove('reveal', 'is-visible');
-                    }, { once: true });
+                let current = 0, timer = null;
+                function show(idx) {
+                    current = idx;
+                    items.forEach((el, k) => {
+                        el.classList.toggle('is-active', k === idx);
+                        el.setAttribute('aria-selected', k === idx ? 'true' : 'false');
+                    });
+                    slides.forEach((el, k) => {
+                        el.classList.toggle('is-active', k === idx);
+                    });
                 }
-            });
-        }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
-        items.forEach(function (el) { io.observe(el); });
-    })();
+                function stop() { if (timer) { clearInterval(timer); timer = null; } }
+                function start() {
+                    timer = setInterval(() => show((current + 1) % items.length), AUTO_MS);
+                }
 
-    // ===== Hero counter: count-up 0 → angka asli saat load =====
-    (function () {
-        var counters = document.querySelectorAll('.counter');
-        if (!counters.length) return;
-        var targets = Array.prototype.map.call(counters, function (c) {
-            return parseInt(c.dataset.target, 10) || 0;
-        });
-        // Reserve lebar angka final SEBELUM count-up → label di sebelahnya tidak
-        // terdorong bergeser selama angka bertambah (anti layout-shift).
-        counters.forEach(function (c, i) {
-            c.style.minWidth = Math.max(2, String(targets[i]).length) + 'ch';
-        });
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            counters.forEach(function (c, i) { c.textContent = targets[i]; });
-            return;
-        }
-
-        var DURATION = 1800;
-        var t0 = performance.now();
-        function frame(now) {
-            var t = Math.min((now - t0) / DURATION, 1);
-            var ease = 1 - (1 - t) * (1 - t);   // ease-out quad
-            counters.forEach(function (c, i) { c.textContent = Math.round(targets[i] * ease); });
-            if (t < 1) requestAnimationFrame(frame);
-        }
-        requestAnimationFrame(frame);
-    })();
-
-    // ===== Pola "list berganti" (Modul & Perpustakaan) =====================
-    // Hover/klik/focus item → slide ber-index sama cross-fade 250ms.
-    // Auto-rotate 4.5s; berhenti PERMANEN saat user berinteraksi.
-    (function () {
-        var AUTO_MS = 4500;
-        var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-        document.querySelectorAll('[data-swap]').forEach(function (group) {
-            var items  = group.querySelectorAll('[data-swap-item]');
-            var slides = group.querySelectorAll('[data-swap-slide]');
-            if (!items.length || !slides.length) return;
-
-            var current = 0, timer = null;
-
-            function show(i) {
-                current = i;
-                items.forEach(function (el, k) {
-                    el.classList.toggle('is-active', k === i);
-                    el.setAttribute('aria-selected', k === i ? 'true' : 'false');
+                items.forEach((item, i) => {
+                    item.addEventListener('mouseenter', () => { stop(); show(i); });
+                    item.addEventListener('click',      () => { stop(); show(i); });
                 });
-                slides.forEach(function (el, k) {
-                    el.classList.toggle('is-active', k === i);
-                    el.toggleAttribute('inert', k !== i);
-                });
+                start();
+            });
+        })();
+
+        // 4. Lab Photos Carousel Cross-Fade
+        (function () {
+            const root = document.querySelector('[data-lab-rotator]');
+            if (!root) return;
+            const slides = root.querySelectorAll('[data-lab-slide]');
+            const dots   = root.querySelectorAll('[data-lab-dot]');
+            if (slides.length < 2) return;
+
+            let current = 0, timer = null;
+            function show(idx) {
+                current = (idx + slides.length) % slides.length;
+                slides.forEach((s, k) => s.classList.toggle('is-active', k === current));
+                dots.forEach((d, k) => d.classList.toggle('is-active', k === current));
             }
-            function stopAuto() { if (timer) { clearInterval(timer); timer = null; } }
-            function startAuto() {
-                if (reduced || timer) return;
-                timer = setInterval(function () { show((current + 1) % items.length); }, AUTO_MS);
+            function start() { timer = setInterval(() => show(current + 1), 4000); }
+            function stop()  { if (timer) clearInterval(timer); }
+
+            dots.forEach((dot, k) => {
+                dot.addEventListener('click', () => { stop(); show(k); start(); });
+            });
+            start();
+        })();
+
+        // 5. Berita Rotator (Blok A)
+        (function () {
+            const root = document.querySelector('[data-berita-rotator]');
+            if (!root) return;
+            const slides = root.querySelectorAll('[data-berita-slide]');
+            const dots   = root.querySelectorAll('[data-berita-dot]');
+            if (slides.length < 2) return;
+
+            let current = 0, timer = null;
+            function show(idx) {
+                current = (idx + slides.length) % slides.length;
+                slides.forEach((s, k) => s.classList.toggle('is-active', k === current));
+                dots.forEach((d, k) => d.classList.toggle('is-active', k === current));
             }
+            function start() { timer = setInterval(() => show(current + 1), 4500); }
+            function stop()  { if (timer) clearInterval(timer); }
 
-            items.forEach(function (item, i) {
-                item.addEventListener('mouseenter', function () { stopAuto(); show(i); });
-                item.addEventListener('focus',       function () { stopAuto(); show(i); });
-                item.addEventListener('click',       function () { stopAuto(); show(i); });
+            dots.forEach((dot, k) => {
+                dot.addEventListener('click', () => { stop(); show(k); start(); });
             });
+            root.addEventListener('mouseenter', stop);
+            root.addEventListener('mouseleave', start);
+            start();
+        })();
 
-            startAuto();
-        });
-    })();
-
-    // ===== Kembali ke atas: tampil saat hero keluar viewport =====
-    (function () {
-        var btn  = document.getElementById('to-top');
-        var hero = document.querySelector('main');
-        if (!btn || !hero || !('IntersectionObserver' in window)) return;
-        var io = new IntersectionObserver(function (entries) {
-            var show = !entries[0].isIntersecting;
-            btn.classList.toggle('is-show', show);
-            btn.toggleAttribute('inert', !show);
-        }, { threshold: 0 });
-        io.observe(hero);
-        btn.addEventListener('click', function () {
-            var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
-        });
-    })();
-
-    // ===== Rotator Berita (Blok A Kabar): cross-fade 250ms + auto 4.5s =====
-    // Hover/focus = pause SEMENTARA, keluar = lanjut. Dot clickable = lompat.
-    (function () {
-        var root   = document.querySelector('[data-berita-rotator]');
-        if (!root) return;
-        var slides = root.querySelectorAll('[data-berita-slide]');
-        var dots   = root.querySelectorAll('[data-berita-dot]');
-        if (slides.length < 2) return;   // 1 berita → statis, tanpa rotator
-
-        var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        var AUTO_MS = 4500, i = 0, timer = null;
-
-        function show(n) {
-            i = (n + slides.length) % slides.length;
-            slides.forEach(function (el, k) {
-                el.classList.toggle('is-active', k === i);
-                el.toggleAttribute('inert', k !== i);
+        // 6. Back to Top Button
+        (function () {
+            const btn = document.getElementById('to-top');
+            if (!btn) return;
+            window.addEventListener('scroll', () => {
+                btn.classList.toggle('is-show', window.scrollY > 400);
+            }, { passive: true });
+            btn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             });
-            dots.forEach(function (el, k) {
-                el.classList.toggle('is-active', k === i);
-                el.setAttribute('aria-pressed', k === i ? 'true' : 'false');
+        })();
+
+        // 7. Copy Hikmah Hadits
+        window.copyHikmah = function (btn) {
+            const text = btn.getAttribute('data-quote');
+            if (!navigator.clipboard) {
+                if (window.showToast) window.showToast('Kutipan hadits: ' + text, 'info');
+                return;
+            }
+            navigator.clipboard.writeText(text).then(() => {
+                if (window.showToast) {
+                    window.showToast('Mutiara hadits berhasil disalin ke clipboard!', 'gold');
+                } else {
+                    alert('Mutiara hadits berhasil disalin!');
+                }
+            }).catch(() => {
+                if (window.showToast) window.showToast('Gagal menyalin kutipan.', 'warning');
             });
-        }
-        function stop()  { if (timer) { clearInterval(timer); timer = null; } }
-        function start() { if (!reduced && !timer) timer = setInterval(function () { show(i + 1); }, AUTO_MS); }
-
-        dots.forEach(function (d, k) {
-            d.addEventListener('click', function () { show(k); start(); });
-        });
-        root.addEventListener('mouseenter', stop);
-        root.addEventListener('mouseleave', start);
-        root.addEventListener('focusin',    stop);
-        root.addEventListener('focusout',   start);
-
-        show(0);
-        start();
-    })();
-
-    // ===== Carousel foto Laboratorium PAI: cross-fade 1s + auto-loop 4s + dots =====
-    // Hover/focus = pause sementara, keluar = lanjut. Dot clickable = lompat langsung.
-    (function () {
-        var root   = document.querySelector('[data-lab-rotator]');
-        if (!root) return;
-        var slides = root.querySelectorAll('[data-lab-slide]');
-        var dots   = root.querySelectorAll('[data-lab-dot]');
-        if (slides.length < 2) return;   // 1 foto (atau kurang) → statis, tanpa rotator
-
-        var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        var AUTO_MS = 4000, i = 0, timer = null;
-
-        function show(n) {
-            i = (n + slides.length) % slides.length;
-            slides.forEach(function (el, k) { el.classList.toggle('is-active', k === i); });
-            dots.forEach(function (el, k) {
-                el.classList.toggle('is-active', k === i);
-                el.setAttribute('aria-pressed', k === i ? 'true' : 'false');
-            });
-        }
-        function stop()  { if (timer) { clearInterval(timer); timer = null; } }
-        function start() { if (!reduced && !timer) timer = setInterval(function () { show(i + 1); }, AUTO_MS); }
-
-        dots.forEach(function (d, k) {
-            d.addEventListener('click', function () { show(k); start(); });
-        });
-        root.addEventListener('mouseenter', stop);
-        root.addEventListener('mouseleave', start);
-        root.addEventListener('focusin',    stop);
-        root.addEventListener('focusout',   start);
-
-        show(0);
-        start();
-    })();
-</script>
-
+        };
+    </script>
 </body>
 </html>

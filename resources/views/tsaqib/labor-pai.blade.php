@@ -1,18 +1,19 @@
-{{-- resources/views/tsaqib/labor-pai.blade.php --}}
-@php($pageTitle = 'Laboratorium PAI - FSI SMAN 1 Bukittinggi')
+@php
+    $pageTitle = 'Laboratorium PAI - FSI SMAN 1 Bukittinggi';
+    $monevUrl = !empty($monevPdf) ? asset('storage/' . $monevPdf) : asset('assets/documents/monev-internal-pemerintah-daerah.pdf');
+    $profilBukuFileUrl = !empty($profilBukuPdf) ? asset('storage/' . $profilBukuPdf) : null;
+    $pembinaImgSrc = !empty($strukturPembinaImg) ? asset('storage/' . $strukturPembinaImg) : asset('images/struktur.webp');
+    $siswaImgSrc = !empty($strukturSiswaImg) ? asset('storage/' . $strukturSiswaImg) : asset('images/kepengurusan.webp');
+@endphp
 
 @push('styles')
     /* ===== Laboratorium PAI: aksen kartu + carousel horizontal (mobile) ===== */
 
-    /* 1) Aksen border kiri selang-seling hijau/emas — mobile only */
     @media (max-width: 1023px){
         .lp-cards > .tsaqib-card:nth-child(odd)  { border-left: 3px solid var(--green); }
         .lp-cards > .tsaqib-card:nth-child(even) { border-left: 3px solid var(--gold); }
     }
 
-    /* 2) Carousel infinite-loop (CSS keyframes) + drag Pointer Events — mobile only.
-          Track = 2 set kartu (original + clone via JS). translateX 0 → -50% loop
-          seamless karena set ke-2 identik. Desktop (≥1024px) → grid 3-kolom. */
     .lp-carousel{
         position:relative;
         overflow:hidden;
@@ -26,7 +27,7 @@
         width:max-content;
         --lp-duration:40s;
         animation:lp-loop var(--lp-duration) linear infinite;
-        touch-action:pan-y;        /* horizontal → drag kita; vertikal → scroll halaman */
+        touch-action:pan-y;
         user-select:none;
         cursor:grab;
     }
@@ -34,15 +35,13 @@
     .lp-track > .lp-card{
         flex:0 0 auto;
         width:min(80vw, 300px);
-        margin-right:1rem;         /* margin (bukan flex gap) supaya -50% = persis 1 set → seamless */
+        margin-right:1rem;
     }
     @keyframes lp-loop{
         from{ transform:translateX(0); }
         to  { transform:translateX(-50%); }
     }
 
-    /* 4) Redesign kartu — badge solid pojok kiri, ikon deco faint pojok kanan,
-          judul tebal, body pendek dgn keyword bold. */
     .lp-card{
         position:relative; overflow:hidden; padding:1.75rem;
         background:linear-gradient(160deg, rgba(247,245,239,.06), rgba(247,245,239,.02));
@@ -70,7 +69,6 @@
     .lp-checklist li{ display:flex; align-items:flex-start; gap:.5rem; font-size:.78rem; color:rgba(247,245,239,.62); }
     .lp-checklist i{ color:#3fd6b0; font-size:.85rem; margin-top:.1rem; }
 
-    /* Desktop: grid 3-kolom; animasi & clone dimatikan */
     @media (min-width:1024px){
         .lp-carousel{ overflow:visible; -webkit-mask-image:none; mask-image:none; padding:0; }
         .lp-track{
@@ -79,7 +77,7 @@
             gap:1.5rem;
             width:auto;
             animation:none;
-            transform:none !important;   /* hapus inline transform sisa drag */
+            transform:none !important;
             touch-action:auto;
             cursor:default;
         }
@@ -87,52 +85,19 @@
         .lp-track > .lp-card.is-clone{ display:none; }
     }
 
-    /* ===== Section Profil TSAQIB (flipbook embed) =====
-       Header dgn ikon emas bulat (float + ring pulse, 2.4s ease-in-out infinite),
-       diikuti iframe flipbook Heyzine. URL iframe di-set admin via tabel settings. */
-    .lp-profil{ padding:2rem; }
-    .lp-profil-head{
-        display:flex; align-items:center; gap:1.5rem; margin-bottom:1.5rem;
-    }
-    .lp-profil-icon{
-        position:relative; z-index:1;
-        flex:0 0 auto;
-        display:flex; align-items:center; justify-content:center;
-        width:4.5rem; height:4.5rem; border-radius:999px;
-        background:linear-gradient(140deg, var(--gold), #a9893f);
-        color:var(--ink); font-size:1.6rem;
-        box-shadow:0 8px 22px -8px rgba(201,166,107,.7);
-        animation:lp-float 2.4s ease-in-out infinite;
-    }
-    /* ring pulse — mengembang & memudar, durasi sama dgn float agar ritmenya selaras */
-    .lp-profil-icon::before{
-        content:''; position:absolute; inset:-6px; border-radius:inherit;
-        background:rgba(201,166,107,.45);
-        animation:lp-ring 2.4s ease-in-out infinite;
-        z-index:-1;
-    }
-    .lp-profil-head:hover .lp-profil-icon{ transform:scale(1.08); }
-    .lp-profil-icon{ transition:transform .25s ease; }
-
-    /* wrapper iframe — responsive + rounded; override tinggi tetap mobile → desktop */
+    /* Flipbook Facade & Reader Styles */
     .lp-flipbook-wrap{
         position:relative; width:100%;
         border-radius:.85rem; overflow:hidden;
-        background:#fff;
+        background:#10140f;
         box-shadow:0 12px 30px -12px rgba(0,0,0,.6);
     }
     .lp-flipbook-wrap iframe{
         display:block; width:100%;
-        height:clamp(380px, 56vw, 520px);   /* menimpa inline height via !important saat responsif */
+        height:clamp(420px, 58vw, 560px);
     }
-
-    /* ===== Fake iframe: thumbnail statis klik-untuk-muat (web perf) =====
-       Lazy-facade: alih-alih memuat iframe Heyzine saat halaman dibuka (berat),
-       tampilkan thumbnail 400px + overlay gelap + ikon Book. Iframe asli baru
-       di-inject (Alpine) saat thumbnail diklik. Tata letak tetap di bawah
-       .lp-flipbook-wrap agar hierarki CSS tidak berubah. */
     .lp-flipbook-facade{
-        position:relative; width:100%; height:400px;
+        position:relative; width:100%; height:420px;
         cursor:pointer; overflow:hidden;
         background:
             radial-gradient(circle at 30% 20%, rgba(1,121,95,.35), transparent 60%),
@@ -140,7 +105,6 @@
         display:flex; align-items:center; justify-content:center;
     }
     .lp-flipbook-facade::after{
-        /* tekstur halaman tipis biar nggak terlihat sebagai flat hitam */
         content:''; position:absolute; inset:0;
         background-image:repeating-linear-gradient(90deg, rgba(247,245,239,.04) 0 2px, transparent 2px 44px);
         pointer-events:none;
@@ -161,49 +125,37 @@
         position:absolute; bottom:1rem; left:0; right:0; z-index:2;
         text-align:center; font-size:11px; color:rgba(247,245,239,.6); font-weight:600;
     }
-
-    /* ===== Cover asli flipbook (menggantikan ikon buku generik) =====
-       .lp-facade-cover = gambar cover object-cover penuh; overlay gelap di atasnya
-       menjaga tombol Buka & hint tetap terbaca. Bingkai emas + bayangan "halaman
-       tersusun" muncul saat ada cover (.has-cover) untuk kesan kartu buku. */
     .lp-facade-cover{
         position:absolute; inset:0; width:100%; height:100%;
         object-fit:cover; object-position:center;
         z-index:0;
     }
-    /* Overlay gelap di atas cover agar teks & tombol kontras.
-       z-index di-ATAS cover (z:0) tapi di bawah tombol Buka (z:2). */
     .lp-flipbook-facade.has-cover::before{
         content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
         background:
             linear-gradient(180deg, rgba(16,20,15,.15) 0%, rgba(16,20,15,.55) 70%, rgba(16,20,15,.78) 100%);
     }
-    /* has-cover: sembunyikan tekstur halaman default (konflik dgn foto). */
     .lp-flipbook-facade.has-cover::after{ display:none; }
-    /* Bingkai emas tipis di tepi facade (frame kartu buku). */
     .lp-flipbook-facade.has-cover{
         border:2px solid color-mix(in srgb, var(--gold) 65%, transparent);
         background:#10140f;
-        /* Bayangan halaman tersusun: dua "stack" di belakang kartu utama. */
         box-shadow:
             0 2px 0 rgba(247,245,239,.06),
             0 4px 0 rgba(247,245,239,.04),
             0 12px 30px -12px rgba(0,0,0,.6);
     }
-    @media (prefers-reduced-motion: reduce){ .lp-flipbook-facade:hover .lp-facade-play{ transform:none; } }
 
-    @keyframes lp-float{
-        0%,100%{ transform:translateY(0); }
-        50%   { transform:translateY(-8px); }
+    /* Tab switcher document active states */
+    .doc-tab.is-active{
+        background:rgba(201,166,107,.15);
+        border-color:var(--gold);
+        color:var(--gold);
     }
-    @keyframes lp-ring{
-        0%   { transform:scale(1);   opacity:.55; }
-        100% { transform:scale(1.9); opacity:0; }
-    }
-    @media (prefers-reduced-motion: reduce){
-        .lp-profil-icon, .lp-profil-icon::before{ animation:none; }
+    .doc-tab.is-active .doc-tab-indicator{
+        background:var(--gold);
     }
 @endpush
+
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
 <head>
@@ -223,99 +175,210 @@
             title="Laboratorium PAI <span class='text-[var(--gold)]'>SMAN 1 Bukittinggi</span>"
             subtitle="Pusat riset, praktikum ibadah, dan pembinaan karakter Pendidikan Agama Islam SMAN 1 Bukittinggi." />
 
-        <!-- 1. SEJARAH SINGKAT, VISI, & MISI -->
+        <!-- Sub-navigation -->
+        @include('tsaqib._labor-subnav', ['active' => 'ikhtisar'])
+
+        <!-- 1. SEJARAH SINGKAT, VISI, & 6 PILAR PENGELOLAAN -->
         <div id="profil" class="lp-carousel">
             <div class="lp-track lp-cards">
 
-            <!-- Sejarah Singkat -->
-            <div class="tsaqib-card lp-card">
-                <i class="fa-solid fa-clock-rotate-left lp-card-deco" aria-hidden="true"></i>
-                <div class="lp-badge lp-badge-green"><i class="fa-solid fa-clock-rotate-left"></i></div>
-                <h3 class="lp-card-title">Sejarah Singkat</h3>
-                <p class="lp-card-body">Bukan sekadar ruang fisik, Labor PAI adalah pusat <strong>pembinaan karakter</strong>, penguatan akhlak mulia, serta pembiasaan nilai-nilai keislaman dalam kehidupan sehari-hari peserta didik.</p>
-            </div>
-
-            <!-- Visi dan Misi -->
-            <div class="tsaqib-card lp-card">
-                <i class="fa-solid fa-eye lp-card-deco" aria-hidden="true"></i>
-                <div class="lp-badge lp-badge-gold"><i class="fa-solid fa-eye"></i></div>
-                <h3 class="lp-card-title">Visi dan Misi</h3>
-                <p class="lp-card-body">Menjadi pusat <strong>praktikum keilmuan Islam</strong> dan laboratorium karakter siswa yang unggul, beriman, dan berakhlak mulia.</p>
-                <ul class="lp-checklist">
-                    <li><i class="fa-solid fa-square-check"></i><span>Memfasilitasi modul praktikum ibadah siswa.</span></li>
-                    <li><i class="fa-solid fa-square-check"></i><span>Mengembangkan media syiar &amp; keilmuan Islam.</span></li>
-                    <li><i class="fa-solid fa-square-check"></i><span>Membangun ukhuwah &amp; kepemimpinan Rabbani.</span></li>
-                </ul>
-            </div>
-            <!-- Legalitas & Struktur Organisasi -->
-            <div class="tsaqib-card lp-card">
-                <i class="fa-solid fa-file-contract lp-card-deco" aria-hidden="true"></i>
-                <div class="lp-badge lp-badge-green"><i class="fa-solid fa-file-contract"></i></div>
-                <h3 class="lp-card-title">Legalitas &amp; Struktur Organisasi</h3>
-                <p class="lp-card-body">Dasar <strong>Surat Keputusan (SK)</strong> yang mengatur pembagian tugas, tanggung jawab, dan wewenang setiap personel agar bekerja secara efektif, terukur, dan sesuai ketentuan.</p>
-            </div>
-            <!-- Perencanaan & Regulasi Operasional -->
-            <div class="tsaqib-card lp-card">
-                <i class="fa-solid fa-clipboard-list lp-card-deco" aria-hidden="true"></i>
-                <div class="lp-badge lp-badge-gold"><i class="fa-solid fa-clipboard-list"></i></div>
-                <h3 class="lp-card-title">Perencanaan &amp; Regulasi Operasional</h3>
-                <p class="lp-card-body">Mencakup penyusunan <strong>kebijakan</strong>, <strong>SOP</strong>, tata kelola layanan, pemanfaatan teknologi, dan mekanisme evaluasi untuk operasional yang aman dan berkelanjutan.</p>
-            </div>
-            <!-- Pelaksanaan Pemanfaatan -->
-            <div class="tsaqib-card lp-card">
-                <i class="fa-solid fa-laptop lp-card-deco" aria-hidden="true"></i>
-                <div class="lp-badge lp-badge-green"><i class="fa-solid fa-laptop"></i></div>
-                <h3 class="lp-card-title">Pelaksanaan Pemanfaatan</h3>
-                <p class="lp-card-body">Pusat <strong>pembelajaran</strong> dan pengembangan kompetensi bagi siswa, guru PAI, KKG, serta MGMP PAI melalui sumber belajar digital dan kolaborasi berbasis teknologi.</p>
-            </div>
-            <!-- Sarana Prasarana & Inventaris -->
-            <div class="tsaqib-card lp-card">
-                <i class="fa-solid fa-boxes-stacked lp-card-deco" aria-hidden="true"></i>
-                <div class="lp-badge lp-badge-gold"><i class="fa-solid fa-boxes-stacked"></i></div>
-                <h3 class="lp-card-title">Sarana Prasarana &amp; Inventaris</h3>
-                <p class="lp-card-body">Inventaris <strong>aset</strong>, perangkat keras, dan sarana prasarana penunjang kegiatan Laboratorium PAI Digital.</p>
-            </div>
-
-            </div>
-        </div>
-
-        {{-- Profil TSAQIB — flipbook embed. Ikon emas (float + ring pulse) sebagai header,
-            iframe Heyzine di bawahnya. URL iframe dari DB (default Heyzine). --}}
-        <div class="tsaqib-card lp-profil">
-            <div class="lp-profil-head">
-                <div class="lp-profil-icon"><i class="ti ti-book-2"></i></div>
-                <div class="flex-1">
-                    <h3 class="lp-card-title">Profil TSAQIB</h3>
-                    <p class="lp-card-body">Kenali lebih dekat <strong>Profil TSAQIB FSI</strong> — sejarah, program kerja, dan kepengurusan dalam satu dokumen interaktif.</p>
+                <!-- Sejarah Singkat -->
+                <div class="tsaqib-card lp-card">
+                    <i class="fa-solid fa-clock-rotate-left lp-card-deco" aria-hidden="true"></i>
+                    <div class="lp-badge lp-badge-green"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                    <h3 class="lp-card-title">Sejarah Singkat</h3>
+                    <p class="lp-card-body">Bukan sekadar ruang fisik, Labor PAI adalah pusat <strong>pembinaan karakter</strong>, penguatan akhlak mulia, serta pembiasaan nilai-nilai keislaman dalam kehidupan sehari-hari peserta didik.</p>
                 </div>
-                <a href="{{ $profilTsaqibUrl }}" target="_blank" rel="noopener"
-                   class="flex items-center gap-1.5 text-[var(--gold)] hover:text-[var(--cream)] text-xs font-semibold transition-colors flex-shrink-0">
-                    Buka penuh <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                </a>
-            </div>
 
-            <div class="lp-flipbook-wrap" id="lp-flipbook">
-                {{-- Fake iframe (klik-untuk-muat): cover flipbook asli (object-cover) +
-                     overlay gelap + tombol Buka. Iframe Heyzine asli baru di-inject saat
-                     diklik, agar halaman tidak memuat embed berat saat pertama dibuka.
-                     URL iframe di data-src (tidak dimuat sampai klik). Cover image dari
-                     thumbnail Heyzine (diturunkan di controller); bila null → ikon buku. --}}
-                <button type="button" class="lp-flipbook-facade {{ $coverUrl ? 'has-cover' : '' }}"
-                        data-src="{{ $profilTsaqibUrl }}"
-                        aria-label="Buka flipbook Profil TSAQIB">
-                    @if($coverUrl)
-                        <img src="{{ $coverUrl }}" alt="Cover Profil TSAQIB" width="267" height="400" class="lp-facade-cover" loading="lazy">
-                    @endif
-                    <span class="lp-facade-play">
-                        <i class="fa-solid fa-book-open"></i>
-                        <span>Buka</span>
-                    </span>
-                    <span class="lp-facade-hint">Klik untuk memuat flipbook interaktif</span>
-                </button>
+                <!-- Visi dan Misi -->
+                <div class="tsaqib-card lp-card">
+                    <i class="fa-solid fa-eye lp-card-deco" aria-hidden="true"></i>
+                    <div class="lp-badge lp-badge-gold"><i class="fa-solid fa-eye"></i></div>
+                    <h3 class="lp-card-title">Visi dan Misi</h3>
+                    <p class="lp-card-body">Menjadi pusat <strong>praktikum keilmuan Islam</strong> dan laboratorium karakter siswa yang unggul, beriman, dan berakhlak mulia.</p>
+                    <ul class="lp-checklist">
+                        <li><i class="fa-solid fa-square-check"></i><span>Memfasilitasi modul praktikum ibadah siswa.</span></li>
+                        <li><i class="fa-solid fa-square-check"></i><span>Mengembangkan media syiar &amp; keilmuan Islam.</span></li>
+                        <li><i class="fa-solid fa-square-check"></i><span>Membangun ukhuwah &amp; kepemimpinan Rabbani.</span></li>
+                    </ul>
+                </div>
+
+                <!-- Legalitas & Struktur Organisasi -->
+                <div class="tsaqib-card lp-card">
+                    <i class="fa-solid fa-file-contract lp-card-deco" aria-hidden="true"></i>
+                    <div class="lp-badge lp-badge-green"><i class="fa-solid fa-file-contract"></i></div>
+                    <h3 class="lp-card-title">Legalitas &amp; Struktur Organisasi</h3>
+                    <p class="lp-card-body">Dasar <strong>Surat Keputusan (SK)</strong> yang mengatur pembagian tugas, tanggung jawab, dan wewenang setiap personel agar bekerja secara efektif, terukur, dan sesuai ketentuan.</p>
+                </div>
+
+                <!-- Perencanaan & Regulasi Operasional -->
+                <div class="tsaqib-card lp-card">
+                    <i class="fa-solid fa-clipboard-list lp-card-deco" aria-hidden="true"></i>
+                    <div class="lp-badge lp-badge-gold"><i class="fa-solid fa-clipboard-list"></i></div>
+                    <h3 class="lp-card-title">Perencanaan &amp; Regulasi Operasional</h3>
+                    <p class="lp-card-body">Mencakup penyusunan <strong>kebijakan</strong>, <strong>SOP</strong>, tata kelola layanan, pemanfaatan teknologi, dan mekanisme evaluasi untuk operasional yang aman dan berkelanjutan.</p>
+                </div>
+
+                <!-- Pelaksanaan Pemanfaatan -->
+                <div class="tsaqib-card lp-card">
+                    <i class="fa-solid fa-laptop lp-card-deco" aria-hidden="true"></i>
+                    <div class="lp-badge lp-badge-green"><i class="fa-solid fa-laptop"></i></div>
+                    <h3 class="lp-card-title">Pelaksanaan Pemanfaatan</h3>
+                    <p class="lp-card-body">Pusat <strong>pembelajaran</strong> dan pengembangan kompetensi bagi siswa, guru PAI, KKG, serta MGMP PAI melalui sumber belajar digital dan kolaborasi berbasis teknologi.</p>
+                </div>
+
+                <!-- Sarana Prasarana & Inventaris -->
+                <div class="tsaqib-card lp-card">
+                    <i class="fa-solid fa-boxes-stacked lp-card-deco" aria-hidden="true"></i>
+                    <div class="lp-badge lp-badge-gold"><i class="fa-solid fa-boxes-stacked"></i></div>
+                    <h3 class="lp-card-title">Sarana Prasarana &amp; Inventaris</h3>
+                    <p class="lp-card-body">Inventaris <strong>aset</strong>, perangkat keras, dan sarana prasarana penunjang kegiatan Laboratorium PAI Digital.</p>
+                </div>
+
             </div>
         </div>
 
-        <!-- 2. INFOGRAFIS STRUKTUR ORGANISASI -->
+        <!-- 2. KHAZANAH DIGITAL LABORATORIUM (DUAL DOCUMENT READER) -->
+        <section id="ruang-baca" class="space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+                <div>
+                    <span class="eyebrow-pill eyebrow-pill-gold mb-2 inline-flex items-center gap-1.5">
+                        <i class="fa-solid fa-book-bookmark text-[10px]"></i>
+                        Arsip &amp; Publikasi Resmi
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-display font-bold text-[var(--cream)]">
+                        <span class="text-[var(--gold)]">Khazanah Digital Laboratorium</span>
+                    </h2>
+                    <p class="text-white/60 text-xs sm:text-sm mt-1 max-w-xl">
+                        Akses literatur resmi, profil kelembagaan, serta laporan monev internal Laboratorium PAI dalam format digital interaktif.
+                    </p>
+                </div>
+
+                <!-- Document Switcher Pills -->
+                <div class="flex items-center gap-2 p-1.5 rounded-2xl bg-black/40 border border-white/10 shrink-0 self-start sm:self-auto" role="tablist" aria-label="Pilih Dokumen">
+                    <button type="button" id="tab-btn-flipbook" onclick="switchDoc('flipbook')"
+                            class="doc-tab is-active flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold border border-transparent transition-all cursor-pointer">
+                        <span class="doc-tab-indicator w-2 h-2 rounded-full bg-[var(--gold)]"></span>
+                        <span>Profil TSAQIB</span>
+                    </button>
+                    <button type="button" id="tab-btn-pdf" onclick="switchDoc('pdf')"
+                            class="doc-tab flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-white/60 border border-transparent hover:text-white transition-all cursor-pointer">
+                        <span class="doc-tab-indicator w-2 h-2 rounded-full bg-transparent"></span>
+                        <span>Monev Internal Pemerintah Daerah</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Unified Reader Box -->
+            <div id="lp-reader-box" class="tsaqib-card p-4 sm:p-6 lg:p-8">
+
+                <!-- PANE 1: PROFIL TSAQIB (FLIPBOOK / DOKUMEN BUKU) -->
+                <div id="pane-flipbook" class="space-y-5">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+                        <div class="flex items-center gap-3.5">
+                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[var(--gold)] to-[#a9893f] text-[#10140F] flex items-center justify-center text-xl shadow-lg shadow-[var(--gold)]/20 shrink-0">
+                                <i class="fa-solid fa-book-open"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-lg font-display font-bold text-[var(--cream)]">Profil TSAQIB</h3>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[var(--gold)]/15 text-[var(--gold)] border border-[var(--gold)]/30">
+                                        {{ $profilBukuFileUrl ? 'Dokumen & Flipbook' : 'Flipbook Interaktif' }}
+                                    </span>
+                                </div>
+                                <p class="text-white/55 text-xs mt-0.5">
+                                    Kenali profil lengkap TSAQIB FSI — visi, program kerja tahunan, dan sejarah kepengurusan.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 shrink-0 self-start sm:self-auto flex-wrap">
+                            @if($profilBukuFileUrl)
+                                <a href="{{ $profilBukuFileUrl }}" target="_blank" rel="noopener"
+                                   class="btn-gold text-xs px-4 py-2">
+                                    <i class="fa-solid fa-file-pdf text-[11px]"></i>
+                                    <span>Buka PDF Buku</span>
+                                </a>
+                            @endif
+                            <a href="{{ $profilTsaqibUrl }}" target="_blank" rel="noopener"
+                               class="btn-outline text-xs px-4 py-2">
+                                <span>Buka Layar Penuh</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Flipbook Embed / Facade -->
+                    <div class="lp-flipbook-wrap" id="lp-flipbook">
+                        <button type="button" class="lp-flipbook-facade {{ $coverUrl ? 'has-cover' : '' }}"
+                                data-src="{{ $profilTsaqibUrl }}"
+                                aria-label="Buka flipbook Profil TSAQIB">
+                            @if($coverUrl)
+                                <img src="{{ $coverUrl }}" alt="Cover Profil TSAQIB" width="267" height="400" class="lp-facade-cover" loading="lazy">
+                            @endif
+                            <span class="lp-facade-play">
+                                <i class="fa-solid fa-book-open"></i>
+                                <span>Buka</span>
+                            </span>
+                            <span class="lp-facade-hint">Klik untuk memuat flipbook interaktif</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PANE 2: MONEV INTERNAL PEMERINTAH DAERAH (PDF) -->
+                <div id="pane-pdf" class="hidden space-y-5">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+                        <div class="flex items-center gap-3.5">
+                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#01795F] to-[#3F704D] text-white flex items-center justify-center text-xl shadow-lg shadow-[#01795F]/20 shrink-0">
+                                <i class="fa-solid fa-file-pdf"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-lg font-display font-bold text-[var(--cream)]">Monev Internal Pemerintah Daerah</h3>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#01795F]/15 text-[#3fd6b0] border border-[#01795F]/30">
+                                        Dokumen Resmi PDF
+                                    </span>
+                                </div>
+                                <p class="text-white/55 text-xs mt-0.5">
+                                    Dokumen evaluasi berkala, akuntabilitas sarana, dan standar mutu Laboratorium PAI di lingkungan SMAN 1 Bukittinggi.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 shrink-0 self-start sm:self-auto">
+                            <a href="{{ $monevUrl }}" target="_blank" rel="noopener"
+                               class="btn-outline text-xs px-4 py-2">
+                                <span>Buka di Tab Baru</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i>
+                            </a>
+                            <a href="{{ $monevUrl }}" download
+                               class="btn-gold text-xs px-4 py-2">
+                                <i class="fa-solid fa-download text-[11px]"></i>
+                                <span>Unduh PDF</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- PDF Viewer Container -->
+                    <div class="rounded-xl overflow-hidden border border-white/15 bg-white shadow-2xl">
+                        <iframe src="{{ $monevUrl }}#toolbar=1&navpanes=0"
+                                title="Dokumen Monev Internal Pemerintah Daerah"
+                                class="w-full h-[520px] sm:h-[600px] bg-[#525659]"
+                                loading="lazy"></iframe>
+                    </div>
+
+                    <div class="flex items-center justify-between text-xs text-white/50 pt-1">
+                        <span><i class="fa-solid fa-shield-halved text-[var(--gold)] mr-1.5"></i>Dokumen Terverifikasi FSI TSAQIB &amp; Sekolah</span>
+                        <a href="{{ $monevUrl }}" download class="text-[var(--gold)] hover:underline">
+                            Simpan salinan (PDF)
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 3. INFOGRAFIS STRUKTUR ORGANISASI -->
         <div id="struktur" class="tsaqib-card p-6 sm:p-8">
             <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-white/10">
                 <div class="w-10 h-10 rounded-xl bg-[#01795F] text-white flex items-center justify-center text-lg shadow-sm">
@@ -323,14 +386,24 @@
                 </div>
                 <div>
                     <h2 class="text-xl font-display font-bold text-[var(--cream)]">Infografis Struktur Organisasi</h2>
-                    <p class="text-white/50 text-xs">Struktur Pembina Guru & Pengurus Siswa Laboratorium PAI & TSAQIB</p>
+                    <p class="text-white/50 text-xs">Struktur Pembina Guru &amp; Pengurus Siswa Laboratorium PAI &amp; TSAQIB</p>
                 </div>
             </div>
 
-            <!-- INFOGRAPHIC TREE NODES -->
+            <!-- Infographic nodes -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <img src="{{ asset('images/struktur.webp') }}" alt="Struktur FSI TSAQIB" width="800" height="600" class="w-full h-full rounded-xl border border-white/10 bg-white p-2 object-contain" loading="lazy" onerror="this.remove()">
-                <img src="{{ asset('images/kepengurusan.webp') }}" alt="Kepengurusan FSI TSAQIB" width="800" height="600" class="w-full h-full rounded-xl border border-white/10 bg-white p-2 object-contain" loading="lazy" onerror="this.remove()">
+                <div class="group relative rounded-xl overflow-hidden border border-white/10 bg-white p-3 shadow-lg">
+                    <img src="{{ $pembinaImgSrc }}" alt="Struktur Pembina &amp; Laboratorium PAI" width="800" height="600"
+                         class="w-full h-auto rounded-lg object-contain transition-transform duration-300 group-hover:scale-[1.01]"
+                         loading="lazy" onerror="this.remove()">
+                    <span class="block text-center text-xs font-semibold text-[#10140F]/70 mt-2">Bagan Struktur Pembina &amp; Laboratorium PAI</span>
+                </div>
+                <div class="group relative rounded-xl overflow-hidden border border-white/10 bg-white p-3 shadow-lg">
+                    <img src="{{ $siswaImgSrc }}" alt="Kepengurusan Siswa TSAQIB FSI" width="800" height="600"
+                         class="w-full h-auto rounded-lg object-contain transition-transform duration-300 group-hover:scale-[1.01]"
+                         loading="lazy" onerror="this.remove()">
+                    <span class="block text-center text-xs font-semibold text-[#10140F]/70 mt-2">Bagan Kepengurusan Siswa TSAQIB FSI</span>
+                </div>
             </div>
         </div>
 
@@ -339,13 +412,39 @@
     <!-- Footer -->
     @include('partials.site-footer')
 
-    {{-- Carousel infinite-loop + drag (Pointer Events: mouse + touch unified) --}}
+    {{-- Script Document Switcher & Carousel --}}
     <script>
+    function switchDoc(type) {
+        var paneFlipbook = document.getElementById('pane-flipbook');
+        var panePdf = document.getElementById('pane-pdf');
+        var tabFlipbook = document.getElementById('tab-btn-flipbook');
+        var tabPdf = document.getElementById('tab-btn-pdf');
+
+        if (type === 'flipbook') {
+            paneFlipbook.classList.remove('hidden');
+            panePdf.classList.add('hidden');
+            tabFlipbook.classList.add('is-active');
+            tabFlipbook.classList.remove('text-white/60');
+            tabFlipbook.querySelector('.doc-tab-indicator').classList.replace('bg-transparent', 'bg-[var(--gold)]');
+            tabPdf.classList.remove('is-active');
+            tabPdf.classList.add('text-white/60');
+            tabPdf.querySelector('.doc-tab-indicator').classList.replace('bg-[var(--gold)]', 'bg-transparent');
+        } else {
+            panePdf.classList.remove('hidden');
+            paneFlipbook.classList.add('hidden');
+            tabPdf.classList.add('is-active');
+            tabPdf.classList.remove('text-white/60');
+            tabPdf.querySelector('.doc-tab-indicator').classList.replace('bg-transparent', 'bg-[var(--gold)]');
+            tabFlipbook.classList.remove('is-active');
+            tabFlipbook.classList.add('text-white/60');
+            tabFlipbook.querySelector('.doc-tab-indicator').classList.replace('bg-[var(--gold)]', 'bg-transparent');
+        }
+    }
+
     (function () {
         var track = document.querySelector('.lp-track');
         if (!track) return;
 
-        // 1) Duplikat kartu sekali → loop seamless (translateX 0 → -50%)
         var originals = Array.prototype.slice.call(track.children);
         originals.forEach(function (node) {
             var clone = node.cloneNode(true);
@@ -354,28 +453,28 @@
             track.appendChild(clone);
         });
 
-        var cards = Array.prototype.slice.call(track.children); // 12 setelah clone
+        var cards = Array.prototype.slice.call(track.children);
         var step = 0, half = 0;
         function measure() {
             step = cards.length > 1 ? (cards[1].offsetLeft - cards[0].offsetLeft) : cards[0].offsetWidth;
-            half = cards[6] ? cards[6].offsetLeft : step * 6;   // lebar 1 set = clone pertama
+            half = cards[6] ? cards[6].offsetLeft : step * 6;
         }
         measure();
         window.addEventListener('resize', measure);
 
         var D = parseFloat(getComputedStyle(track).getPropertyValue('--lp-duration') || '40s') * 1000;
 
-        function wrap(v) { v = v % half; if (v > 0) v -= half; return v; } // → (-half, 0]
+        function wrap(v) { v = v % half; if (v > 0) v -= half; return v; }
         function matrixX(el) {
             var m = getComputedStyle(el).transform;
             if (!m || m === 'none') return 0;
             var a = m.match(/matrix[^(]*\(([^)]+)\)/);
             if (!a) return 0;
             var v = a[1].split(',');
-            return parseFloat(v.length === 6 ? v[4] : v[12]); // matrix(...) vs matrix3d(...)
+            return parseFloat(v.length === 6 ? v[4] : v[12]);
         }
         function pauseAnim() { track.style.animation = 'none'; void track.offsetWidth; }
-        function resumeAnim(fromTx) {                                  // lanjut loop dari posisi `fromTx`
+        function resumeAnim(fromTx) {
             var p = half ? (-wrap(fromTx) / half) : 0;
             if (p < 0) p = 0; if (p >= 1) p = 0;
             track.style.transition = 'none';
@@ -388,12 +487,12 @@
         var armed = false, dragging = false, startX = 0, startY = 0, baseTx = 0, cur = 0;
 
         function onDown(e) {
-            if (window.matchMedia('(min-width:1024px)').matches) return; // desktop = grid
+            if (window.matchMedia('(min-width:1024px)').matches) return;
             armed = true; dragging = false;
             startX = e.clientX; startY = e.clientY;
-            baseTx = matrixX(track); cur = baseTx;                        // kunci posisi animasi saat ini
+            baseTx = matrixX(track); cur = baseTx;
             pauseAnim();
-            track.style.transform = 'translateX(' + baseTx + 'px)';       // bridge tanpa lompat
+            track.style.transform = 'translateX(' + baseTx + 'px)';
             window.addEventListener('pointermove', onMove);
             window.addEventListener('pointerup', onUp);
             window.addEventListener('pointercancel', onUp);
@@ -402,11 +501,11 @@
             if (!armed) return;
             var dx = e.clientX - startX, dy = e.clientY - startY;
             if (!dragging) {
-                if (Math.abs(dx) < 5) return;                            // tunggu gerakan jelas
-                if (Math.abs(dy) > Math.abs(dx)) { resumeAnim(baseTx); armed = false; cleanup(); return; } // vertikal → browser scroll
+                if (Math.abs(dx) < 5) return;
+                if (Math.abs(dy) > Math.abs(dx)) { resumeAnim(baseTx); armed = false; cleanup(); return; }
                 dragging = true; track.classList.add('is-dragging');
             }
-            cur = wrap(baseTx + dx);                                     // instant reset di batas duplikat
+            cur = wrap(baseTx + dx);
             track.style.transform = 'translateX(' + cur + 'px)';
             e.preventDefault();
         }
@@ -414,9 +513,9 @@
             if (!armed) return;
             if (dragging) {
                 track.classList.remove('is-dragging');
-                resumeAnim(wrap(Math.round(cur / step) * step));         // snap ke kartu terdekat + resume
+                resumeAnim(wrap(Math.round(cur / step) * step));
             } else {
-                resumeAnim(baseTx);                                      // tap biasa → lanjut loop
+                resumeAnim(baseTx);
             }
             armed = false; dragging = false; cleanup();
         }
@@ -429,10 +528,6 @@
         track.addEventListener('pointerdown', onDown);
     })();
 
-    /* ===== Fake iframe → muat iframe Heyzine sungguhan saat diklik =====
-       Thumbnail (.lp-flipbook-facade) membawa URL di data-src. Klik mengganti
-       seluruh isinya dengan <iframe> responsif (aturan .lp-flipbook-wrap iframe
-       di <style> sudah mengatur tinggi). URL belum pernah dimuat sebelum klik. */
     (function () {
         var wrap = document.getElementById('lp-flipbook');
         var facade = wrap ? wrap.querySelector('.lp-flipbook-facade') : null;
@@ -450,7 +545,7 @@
             iframe.setAttribute('src', src);
             iframe.setAttribute('title', 'Flipbook Profil TSAQIB');
             iframe.setAttribute('loading', 'lazy');
-            iframe.style.cssText = 'border:1px solid lightgray; width:100%; height:400px;';
+            iframe.style.cssText = 'border:1px solid lightgray; width:100%; height:500px;';
             wrap.innerHTML = '';
             wrap.appendChild(iframe);
         }

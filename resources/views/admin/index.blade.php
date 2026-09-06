@@ -1,10 +1,12 @@
 {{-- resources/views/admin/index.blade.php — shell: sidebar nav + tab content --}}
 @php($pageTitle = 'Admin Panel - TSAQIB SMAN 1 Bukittinggi')
-@php($tab = in_array(request('tab'), ['dashboard','laporan','posts','users','books','news','documentations','recruitment','nisn']) ? request('tab') : 'dashboard')
+@php($tab = in_array(request('tab'), ['dashboard','laporan','posts','moduls','labor_docs','news','documentations','users','books','nisn','recruitment']) ? request('tab') : 'dashboard')
 @php($adminTabs = [
     'dashboard'   => ['Dashboard', 'fa-gauge-high'],
     'laporan'     => ['Laporan', 'fa-flag'],
     'posts'       => ['Kelola Postingan', 'fa-newspaper'],
+    'moduls'      => ['Silabus & Modul PAI', 'fa-book-open'],
+    'labor_docs'  => ['Dokumen & Struktur Labor', 'fa-sitemap'],
     'news'        => ['Kelola Berita', 'fa-bullhorn'],
     'documentations' => ['Dokumentasi', 'fa-images'],
     'users'       => ['Pengguna & Role', 'fa-users-gear'],
@@ -148,6 +150,8 @@
                 <section data-tab="dashboard"   class="{{ $tab === 'dashboard' ? '' : 'hidden' }}">@include('admin._tab_dashboard')</section>
                 <section data-tab="laporan"     class="{{ $tab === 'laporan' ? '' : 'hidden' }}">@include('admin._tab_laporan')</section>
                 <section data-tab="posts"       class="{{ $tab === 'posts' ? '' : 'hidden' }}">@include('admin._tab_posts')</section>
+                <section data-tab="moduls"      class="{{ $tab === 'moduls' ? '' : 'hidden' }}">@include('admin._tab_moduls')</section>
+                <section data-tab="labor_docs"  class="{{ $tab === 'labor_docs' ? '' : 'hidden' }}">@include('admin._tab_labor_docs')</section>
                 <section data-tab="users"       class="{{ $tab === 'users' ? '' : 'hidden' }}">@include('admin._tab_users')</section>
                 <section data-tab="books"       class="{{ $tab === 'books' ? '' : 'hidden' }}">@include('admin._tab_books')</section>
                 <section data-tab="news"        class="{{ $tab === 'news' ? '' : 'hidden' }}">@include('admin._tab_news')</section>

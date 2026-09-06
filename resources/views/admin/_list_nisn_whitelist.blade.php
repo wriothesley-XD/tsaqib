@@ -3,8 +3,9 @@
     <tr class="hover:bg-white/5">
         <td data-label="#" class="p-3 font-bold">{{ $startIndex + $index }}</td>
         <td data-label="NISN" class="p-3 font-semibold text-[var(--cream)]">{{ $w->nisn }}</td>
+        <td data-label="NIS" class="p-3 font-mono text-[var(--gold)]">{{ $w->nis ?: '—' }}</td>
         <td data-label="Nama" class="p-3">{{ $w->nama ?: '—' }}</td>
-        <td data-label="Kelas" class="p-3 font-bold text-[var(--gold)]">{{ $w->kelas ?: '—' }}</td>
+        <td data-label="Kelas" class="p-3 font-bold text-white/70">{{ $w->kelas ?: '—' }}</td>
         <td data-label="Ditambahkan" class="p-3 text-white/40">{{ $w->created_at->format('d M Y, H:i') }}</td>
         <td data-label="Aksi" class="p-3">
             <form action="{{ route('admin.nisn-whitelist.destroy', $w) }}" method="POST"

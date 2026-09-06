@@ -1,16 +1,7 @@
 {{--
     resources/views/components/book-card.blade.php
     ==================================================
-    Kartu buka reusable untuk Perpustakaan. Lebar dikendalikan parent
-    (carousel: w-40 shrink-0; grid: w-full). Cover selalu rasio 2:3.
-
-    Props:
-      book          -> model Book
-      collectionIds -> array id buku yang sudah ada di "My Collection" user
-      savedIds      -> array id buku yang sudah ada di "Saved" user
-
-    Aksi Read PDF / Download memakai route yang SAMA dengan versi lama:
-    asset('storage/'.$book->pdf_path) — dibuka new tab / atribut download.
+    Kartu buku terpadu untuk Perpustakaan Digital TSAQIB.
 --}}
 @props([
     'book',
@@ -28,32 +19,32 @@
 <div class="book-card group" data-book-id="{{ $book->id }}">
 
     {{-- Cover rasio 2:3 --}}
-    <div class="relative aspect-[2/3] rounded-xl overflow-hidden bg-[#11161f] border border-[rgba(201,169,77,.14)] transition duration-200 group-hover:border-[#e8cd85]">
+    <div class="relative aspect-[2/3] rounded-xl overflow-hidden bg-[#143520] border border-white/10 transition duration-300 group-hover:border-[var(--gold)]/60 group-hover:shadow-xl group-hover:shadow-black/50">
 
         @if($coverUrl)
             <img src="{{ $coverUrl }}" alt="{{ $book->title }}"
                  loading="lazy"
-                 class="w-full h-full object-cover transition duration-300 group-hover:scale-[1.04]">
+                 class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
         @else
-            <div class="absolute inset-0 flex flex-col items-center justify-center p-3 text-center bg-[#11161f]">
-                <div class="w-11 h-11 rounded-xl bg-[rgba(201,169,77,.1)] border border-[rgba(201,169,77,.2)] text-[#c9a94d] flex items-center justify-center mb-2">
-                    <i class="fa-solid fa-file-pdf text-lg"></i>
+            <div class="absolute inset-0 flex flex-col items-center justify-center p-3 text-center bg-gradient-to-br from-[#1C442B] to-[#0D2818]">
+                <div class="w-11 h-11 rounded-xl bg-[var(--gold)]/10 border border-[var(--gold)]/30 text-[var(--gold)] flex items-center justify-center mb-2">
+                    <i class="fa-solid fa-book-bookmark text-lg"></i>
                 </div>
-                <span class="text-[9px] font-bold text-[#e8cd85] uppercase tracking-wider">Modul Digital</span>
+                <span class="text-[9px] font-bold text-[var(--gold)] uppercase tracking-wider">Modul Digital</span>
             </div>
         @endif
 
-        {{-- Tombol bookmark (hanya login) — state awal dari server, lalu di-toggle JS --}}
+        {{-- Tombol bookmark (hanya login) --}}
         @auth
-            <div class="absolute top-2 right-2 flex gap-1.5">
+            <div class="absolute top-2 right-2 flex gap-1.5 z-10">
                 <button type="button"
-                        class="bookmark-btn is-collection w-8 h-8 rounded-full backdrop-blur-sm flex items-center justify-center text-xs transition {{ $inCollection ? 'is-on' : 'is-off' }}"
+                        class="bookmark-btn is-collection w-7 h-7 rounded-full backdrop-blur-md flex items-center justify-center text-[10px] transition {{ $inCollection ? 'is-on bg-[var(--gold)] text-[var(--green-s0)]' : 'is-off bg-black/60 text-white/80 hover:bg-black/80' }}"
                         data-toggle="collection" data-book-id="{{ $book->id }}"
                         aria-label="Tambah ke Koleksi" title="Koleksi Saya">
                     <i class="fa-solid fa-bookmark"></i>
                 </button>
                 <button type="button"
-                        class="bookmark-btn is-saved w-8 h-8 rounded-full backdrop-blur-sm flex items-center justify-center text-xs transition {{ $inSaved ? 'is-on' : 'is-off' }}"
+                        class="bookmark-btn is-saved w-7 h-7 rounded-full backdrop-blur-md flex items-center justify-center text-[10px] transition {{ $inSaved ? 'is-on bg-[#01795F] text-white' : 'is-off bg-black/60 text-white/80 hover:bg-black/80' }}"
                         data-toggle="saved" data-book-id="{{ $book->id }}"
                         aria-label="Simpan buku" title="Tersimpan">
                     <i class="fa-solid fa-heart"></i>
@@ -61,38 +52,36 @@
             </div>
         @endauth
 
-        {{-- Overlay Read / Download — hover-reveal di desktop (perangkat dg hover),
-             SELALU tampil di touchscreen via [@media(hover:none)] (tanpa itu tombol
-             tak pernah terungkap di mobile karena tidak ada :hover). --}}
+        {{-- Overlay Read / Download --}}
         @if($pdfUrl)
-            <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/90 via-black/55 to-transparent flex items-center gap-2 opacity-0 translate-y-2 pointer-events-none transition duration-200 group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto [@media(hover:none)]:opacity-100 [@media(hover:none)]:translate-y-0 [@media(hover:none)]:pointer-events-auto">
+            <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/90 via-black/60 to-transparent flex items-center gap-1.5 opacity-0 translate-y-2 pointer-events-none transition duration-200 group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto [@media(hover:none)]:opacity-100 [@media(hover:none)]:translate-y-0 [@media(hover:none)]:pointer-events-auto">
                 <a href="{{ $pdfUrl }}" target="_blank" rel="noopener"
-                   class="flex-1 py-1.5 rounded-lg border border-[rgba(201,169,77,.4)] bg-[rgba(201,169,77,.1)] hover:bg-[rgba(201,169,77,.2)] text-[#e8cd85] text-center font-semibold text-[11px] flex items-center justify-center gap-1.5 transition">
-                    <i class="fa-solid fa-eye text-[10px]"></i> Baca PDF
+                   class="flex-1 py-1.5 rounded-lg bg-[var(--gold)] hover:brightness-110 text-[var(--green-s0)] text-center font-bold text-[10px] flex items-center justify-center gap-1 transition shadow">
+                    <i class="fa-solid fa-book-open text-[9px]"></i> Baca
                 </a>
                 <a href="{{ $pdfUrl }}" download
-                   class="w-[30px] h-[30px] shrink-0 rounded-lg bg-[rgba(245,245,244,.08)] hover:bg-[rgba(245,245,244,.16)] border border-[rgba(201,169,77,.2)] text-stone-200 flex items-center justify-center transition"
+                   class="w-7 h-7 shrink-0 rounded-lg bg-white/15 hover:bg-white/25 text-[var(--cream)] flex items-center justify-center transition"
                    title="Unduh File" aria-label="Unduh PDF">
-                    <i class="fa-solid fa-download text-[11px]"></i>
+                    <i class="fa-solid fa-download text-[10px]"></i>
                 </a>
             </div>
         @else
-            <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/85 to-transparent opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition">
-                <span class="block w-full py-1.5 rounded-lg bg-white/10 text-white/55 text-center text-[10px] font-semibold">
-                    PDF Belum Tersedia
+            <div class="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition">
+                <span class="block w-full py-1 rounded bg-white/10 text-white/60 text-center text-[9px] font-semibold">
+                    PDF Menyusul
                 </span>
             </div>
         @endif
     </div>
 
-    {{-- Meta --}}
-    <div class="mt-2">
-        <span class="text-[9px] font-bold text-[#c9a94d] uppercase tracking-wider">
+    {{-- Meta Teks --}}
+    <div class="mt-2 space-y-0.5">
+        <span class="text-[9px] font-bold text-[var(--gold)] uppercase tracking-wider block truncate">
             {{ $book->category ?? 'Modul PAI' }}
         </span>
-        <h3 class="font-bold text-[13px] leading-snug text-stone-100 group-hover:text-[#e8cd85] transition line-clamp-2 mt-0.5">
+        <h3 class="font-bold text-xs sm:text-[13px] leading-snug text-[var(--cream)] group-hover:text-[var(--gold)] transition line-clamp-2">
             {{ $book->title }}
         </h3>
-        <p class="text-[11px] text-stone-500 mt-0.5 line-clamp-1">{{ $book->author ?? 'Tim PAI SMAN 1 Bukittinggi' }}</p>
+        <p class="text-[10px] text-white/50 truncate">{{ $book->author ?? 'Tim PAI SMAN 1 Bukittinggi' }}</p>
     </div>
 </div>

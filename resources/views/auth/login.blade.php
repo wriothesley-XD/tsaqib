@@ -12,12 +12,12 @@
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
-        <!-- Email Address -->
+        <!-- Email or NISN / NIS -->
         <div>
-            <x-input-label for="email" :value="__('Email')" />
+            <x-input-label for="email" value="Email atau NISN / NIS" />
             <div class="relative mt-1">
-                <i class="fa-solid fa-envelope pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[#8A9B7A]" aria-hidden="true"></i>
-                <x-text-input id="email" class="block w-full text-xs pl-10" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
+                <i class="fa-solid fa-id-card pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[#8A9B7A]" aria-hidden="true"></i>
+                <x-text-input id="email" class="block w-full text-xs pl-10" type="text" name="email" :value="old('email')" placeholder="nama@email.com atau nomor NISN/NIS" required autofocus autocomplete="username" />
             </div>
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>

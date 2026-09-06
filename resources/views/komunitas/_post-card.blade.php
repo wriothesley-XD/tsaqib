@@ -42,6 +42,15 @@
             {{ $komunitasKartu['nama'] ?? 'umum' }}
         </a>
         <span class="text-white/30 text-xs shrink-0" aria-hidden="true">•</span>
+        <span class="text-[11px] text-white/60 font-medium shrink-0">
+            {{ $post->user->name ?? 'Anggota TSAQIB' }}
+        </span>
+        @if ($post->user?->is_verified_student)
+            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#01795F]/25 border border-[#01795F]/50 text-[#3fd6b0] text-[9px] font-bold shrink-0" title="Siswa Terverifikasi SMAN 1 Bukittinggi">
+                <i class="fa-solid fa-circle-check text-[8px]"></i> Siswa SMAN 1
+            </span>
+        @endif
+        <span class="text-white/30 text-xs shrink-0" aria-hidden="true">•</span>
         <span class="text-[11px] text-white/40 shrink-0">{{ $post->created_at->diffForHumans() }}</span>
 
         @if ($canManage)
@@ -90,7 +99,7 @@
                 <div class="shrink-0"><x-community-avatar :user="$post->user" :slug="$post->community_slug" size="md" /></div>
             @endif
             <div>
-                <h4 class="font-bold text-xs text-[var(--cream)]">
+                <h4 class="font-bold text-xs text-[var(--cream)] flex items-center gap-1.5 flex-wrap">
                     @if ($penulisLink)
                         <a href="{{ route('profile.show', $post->user->id) }}" data-no-nav
                            class="hover:underline decoration-[var(--gold)]/60 underline-offset-2">
@@ -98,6 +107,11 @@
                         </a>
                     @else
                         {{ $post->user->name ?? 'Anggota TSAQIB' }}
+                    @endif
+                    @if ($post->user?->is_verified_student)
+                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#01795F]/25 border border-[#01795F]/50 text-[#3fd6b0] text-[9px] font-bold" title="Siswa Terverifikasi SMAN 1 Bukittinggi">
+                            <i class="fa-solid fa-circle-check text-[8px]"></i> Siswa SMAN 1
+                        </span>
                     @endif
                 </h4>
                 <span class="text-[10px] text-white/40">

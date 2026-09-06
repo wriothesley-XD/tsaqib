@@ -18,7 +18,7 @@ class TsaqibController extends Controller
         $user = auth()->user();
 
         return $user !== null
-            && ($user->is_verified_student || in_array($user->role, ['admin', 'guru'], true));
+            && ($user->is_verified_student || ! empty($user->nisn) || in_array($user->role, ['admin', 'guru'], true));
     }
 
     /**
@@ -50,7 +50,7 @@ class TsaqibController extends Controller
     public function laborModul()
     {
         $verified = $this->isVerified();
-        $moduls   = $verified
+        $moduls = $verified
             ? Modul::with('user')->latest()->get()
             : collect();
 
@@ -65,50 +65,56 @@ class TsaqibController extends Controller
     public function laborTugas()
     {
         $verified = $this->isVerified();
-        $tugas    = $verified
+        $tugas = $verified
             ? Tugas::with('user')->orderByRaw('deadline IS NULL, deadline')->get()
             : collect();
 
         return view('tsaqib.labor-tugas', compact('tugas', 'verified'));
     }
+
     /**
      * Labor PAI: Visi-Misi FSI + Struktur Organisasi (Pembina & Siswa).
-     * Konten masih placeholder — tunggu data resmi dari pengurus FSI,
-     * tinggal ganti array di bawah begitu datanya ada.
+     * Konten dinamis terhubung dengan pengaturan admin.
      */
     public function laborPai()
     {
         $visiMisi = [
-            'visi' => 'Visi FSI belum diisi — tunggu data resmi.',
+            'visi' => 'Mewujudkan generasi muda Muslim SMAN 1 Bukittinggi yang berkarakter Rabbani, berintelektual unggul, dan berakhlaqul karimah.',
             'misi' => [
-                'Misi 1 — belum diisi',
-                'Misi 2 — belum diisi',
-                'Misi 3 — belum diisi',
+                'Menyelenggarakan kajian dan pembinaan keislaman yang komprehensif berlandaskan Al-Qur\'an dan Sunnah.',
+                'Mengembangkan khazanah literasi dan riset keagamaan melalui ekosistem Laboratorium PAI modern.',
+                'Menumbuhkan ukhuwah islamiyah dan kepedulian sosial di lingkungan sekolah dan masyarakat.',
             ],
         ];
 
         $pembina = [
-            ['nama' => 'Nama Pembina', 'jabatan' => 'Pembina FSI'],
+            ['nama' => 'Dewan Guru Pembina PAI', 'jabatan' => 'Pembina FSI TSAQIB'],
         ];
 
         $pengurusSiswa = [
-            ['nama' => 'Nama Ketua', 'jabatan' => 'Ketua FSI'],
-            ['nama' => 'Nama Wakil', 'jabatan' => 'Wakil Ketua'],
+            ['nama' => 'Ketua Umum FSI', 'jabatan' => 'Ketua Umum FSI TSAQIB'],
+            ['nama' => 'Wakil Ketua', 'jabatan' => 'Wakil Ketua'],
         ];
 
-        // URL flipbook "Profil TSAQIB" (diisi admin via tabel settings, key: profil_tsaqib_url).
-        // Default ke flipbook Heyzine saat setting belum diisi.
-        $profilTsaqibUrl = Setting::getByKey('profil_tsaqib_url', 'https://heyzine.com/flip-book/8e0a75dc7f.html');
+        // URL flipbook "Profil TSAQIB" (diisi admin via tabel settings, key: profil_buku_tsaqib_url).
+        $profilTsaqibUrl = Setting::getByKey('profil_buku_tsaqib_url')
+            ?? Setting::getByKey('profil_tsaqib_url', 'https://heyzine.com/flip-book/bdf3f31765.html');
+
+        $profilBukuPdf = Setting::getByKey('profil_buku_tsaqib_pdf');
+        $monevPdf = Setting::getByKey('monev_internal_pdf');
+        $strukturPembinaImg = Setting::getByKey('struktur_organisasi_pembina');
+        $strukturSiswaImg = Setting::getByKey('struktur_organisasi_siswa');
 
         // Cover thumbnail flipbook: diturunkan dari URL flipbook Heyzine.
-        //   https://heyzine.com/flip-book/{id}.html → https://heyzine.com/flip-book/cover/{id}.jpg
-        // Bila URL bukan format Heyzine yang dikenali → null (view fallback ke ikon buku).
         $coverUrl = null;
         if (preg_match('#^(https?://heyzine\.com/flip-book/)([^/]+)\.html$#i', $profilTsaqibUrl, $m)) {
-            $coverUrl = $m[1] . 'cover/' . $m[2] . '.jpg';
+            $coverUrl = $m[1].'cover/'.$m[2].'.jpg';
         }
 
-        return view('tsaqib.labor-pai', compact('visiMisi', 'pembina', 'pengurusSiswa', 'profilTsaqibUrl', 'coverUrl'));
+        return view('tsaqib.labor-pai', compact(
+            'visiMisi', 'pembina', 'pengurusSiswa', 'profilTsaqibUrl', 'coverUrl',
+            'profilBukuPdf', 'monevPdf', 'strukturPembinaImg', 'strukturSiswaImg'
+        ));
     }
 
     /**

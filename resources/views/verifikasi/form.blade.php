@@ -30,9 +30,10 @@
                 <form action="{{ route('verifikasi.siswa') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                     @csrf
                     <div>
-                        <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">NISN *</label>
-                        <input type="text" name="nisn" required inputmode="numeric" pattern="[0-9]{8,15}"
-                               class="tsaqib-input w-full px-3 py-2 text-xs" placeholder="mis. 0059123456">
+                        <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">NISN atau Nomor Induk Siswa (NIS) *</label>
+                        <input type="text" name="nisn" required inputmode="numeric" pattern="[0-9]{4,20}"
+                               class="tsaqib-input w-full px-3 py-2 text-xs" placeholder="Contoh: 0118703733 atau 22455">
+                        <p class="text-[10px] text-white/40 mt-1">Cukup masukkan salah satu (NISN atau NIS buku induk sekolah).</p>
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Kelas</label>

@@ -8,8 +8,8 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\TsaqibController;
+use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
 
 // ==========================================================
@@ -57,10 +57,6 @@ Route::get('/open-recruitment/terima-kasih', [OpenRecruitmentController::class, 
 Route::get('/komunitas/post/{post}', [PostController::class, 'show'])->name('komunitas.post.show');
 Route::get('/komunitas/{slug?}', [PageController::class, 'komunitasIndex'])->name('komunitas');
 Route::get('/komunitas-show/{slug}', [PageController::class, 'komunitasShow'])->name('komunitas.show');
-
-// Credits (halaman tim pembuat) — UNLISTED: tidak ada di navbar/menu, hanya
-// dicapai via logo FSI di footer. Publik (tanpa login).
-Route::get('/credits', [PageController::class, 'credits'])->name('credits');
 
 // Profil publik (read-only) — tamu (guest) BOLEH melihat profil user mana pun.
 // Aksi tulis (edit/delete/follow) + tab/list "See All" tetap di balik auth di
@@ -161,6 +157,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/verifications/{verification}/resolve', [VerificationController::class, 'resolve'])->name('verifications.resolve');
         Route::post('/moduls', [AdminController::class, 'storeModul'])->name('moduls.store');
         Route::delete('/moduls/{modul}', [AdminController::class, 'destroyModul'])->name('moduls.destroy');
+        Route::post('/labor-documents', [AdminController::class, 'updateLaborDocuments'])->name('labor-documents.update');
+        Route::delete('/labor-documents/{type}', [AdminController::class, 'deleteLaborDocument'])->name('labor-documents.destroy');
         Route::post('/tugas', [AdminController::class, 'storeTugas'])->name('tugas.store');
         Route::delete('/tugas/{tugas}', [AdminController::class, 'destroyTugas'])->name('tugas.destroy');
         Route::post('/gurus', [AdminController::class, 'storeGuru'])->name('gurus.store');

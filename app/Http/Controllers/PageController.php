@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\News;
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -23,13 +25,13 @@ class PageController extends Controller
         $daftarKomunitas = Config::get('komunitas.daftar', []);
 
         // Counter hero — angka asli dari DB (bukan placeholder 0).
-        $totalModul     = Book::visible()->where('category', 'modul')->count();
-        $totalAnggota   = \App\Models\User::count();
+        $totalModul = Book::visible()->where('category', 'modul')->count();
+        $totalAnggota = User::count();
         $totalKomunitas = count($daftarKomunitas);
 
         // Section "KABAR TERBARU" (2 blok asimetris): berita untuk rotator Blok A,
         // buletin untuk list ringkas Blok B — dipisah, tidak lagi di-merge.
-        $beritaTerbaru  = $this->beritaGrid();
+        $beritaTerbaru = $this->beritaGrid();
         $buletinTerbaru = $this->buletinTerbaru(3);
 
         // Section "Perpustakaan Digital": 6 koleksi terbaru lintas kategori.
@@ -38,11 +40,11 @@ class PageController extends Controller
             ->limit(6)
             ->get()
             ->map(fn (Book $b) => [
-                'title'    => $b->title,
+                'title' => $b->title,
                 'category' => $b->category,
-                'author'   => $b->author,
-                'image'    => $b->cover_image,
-                'pdf'      => $b->pdf_path ? asset('storage/' . $b->pdf_path) : null,
+                'author' => $b->author,
+                'image' => $b->cover_image,
+                'pdf' => $b->pdf_path ? asset('storage/'.$b->pdf_path) : null,
             ]);
 
         return view('landing', compact(
@@ -55,7 +57,7 @@ class PageController extends Controller
      * 3 berita terpublikasi terbaru untuk grid "Kabar Terbaru" di Beranda
      * (bentuk array sama dengan buletinTerbaru → bisa di-merge & diurut bareng).
      */
-    protected function beritaGrid(): \Illuminate\Support\Collection
+    protected function beritaGrid(): Collection
     {
         return News::published()
             ->with('user')
@@ -63,14 +65,14 @@ class PageController extends Controller
             ->limit(3)
             ->get()
             ->map(fn (News $n) => [
-                'type'    => 'berita',
-                'title'   => $n->title,
+                'type' => 'berita',
+                'title' => $n->title,
                 'excerpt' => $n->excerpt,
-                'image'   => $n->thumbnail,
-                'date'    => $n->published_at,
-                'author'  => $n->user?->name,
-                'url'     => route('berita.show', $n->slug),
-                'target'  => '_self',
+                'image' => $n->thumbnail,
+                'date' => $n->published_at,
+                'author' => $n->user?->name,
+                'url' => route('berita.show', $n->slug),
+                'target' => '_self',
             ]);
     }
 
@@ -80,7 +82,7 @@ class PageController extends Controller
      *
      * URL: PDF langsung (dibuka tab baru) atau fallback ke tab buletin /info.
      */
-    protected function buletinTerbaru(int $limit = 3): \Illuminate\Support\Collection
+    protected function buletinTerbaru(int $limit = 3): Collection
     {
         return Book::visible()
             ->where('category', 'buletin')
@@ -88,16 +90,17 @@ class PageController extends Controller
             ->limit($limit)
             ->get()
             ->map(function (Book $b) {
-                $pdf = $b->pdf_path ? asset('storage/' . $b->pdf_path) : route('info', ['tab' => 'buletin']);
+                $pdf = $b->pdf_path ? asset('storage/'.$b->pdf_path) : route('info', ['tab' => 'buletin']);
+
                 return [
-                    'type'    => 'buletin',
-                    'title'   => $b->title,
+                    'type' => 'buletin',
+                    'title' => $b->title,
                     'excerpt' => $b->description,
-                    'image'   => $b->cover_image,
-                    'date'    => $b->created_at,
-                    'author'  => $b->author,
-                    'url'     => $pdf,
-                    'target'  => $b->pdf_path ? '_blank' : '_self',
+                    'image' => $b->cover_image,
+                    'date' => $b->created_at,
+                    'author' => $b->author,
+                    'url' => $pdf,
+                    'target' => $b->pdf_path ? '_blank' : '_self',
                 ];
             });
     }
@@ -177,9 +180,14 @@ class PageController extends Controller
             $with['savedBy'] = fn ($q) => $q->where('user_id', $user->id)->select(['post_id']);
         }
 
-        // Feed selalu Terbaru (latest-first). Toggle Terbaru/Terpopuler sudah
-        // dihapus dari UI; sort tidak lagi diturunkan dari ?sort=.
-        $query = Post::with($with)->withCount(['comments'])->latest();
+        // Sort: terbaru (default) atau terpopuler (berdasarkan jumlah upvotes / likes).
+        $sort = request('sort', 'recent');
+        $query = Post::with($with)->withCount(['comments']);
+        if ($sort === 'popular' || $sort === 'terpopuler') {
+            $query->orderByDesc('upvotes')->latest();
+        } else {
+            $query->latest();
+        }
 
         if ($currentSlug && $currentSlug !== 'semua') {
             $query->where('community_slug', $currentSlug);
@@ -192,7 +200,7 @@ class PageController extends Controller
         if ($q !== '') {
             $query->where(function ($qq) use ($q) {
                 $qq->where('title', 'like', "%{$q}%")
-                   ->orWhere('content', 'like', "%{$q}%");
+                    ->orWhere('content', 'like', "%{$q}%");
             });
         }
 
@@ -217,7 +225,9 @@ class PageController extends Controller
 
         // Sidebar kanan: 5 postingan terbaru lintas komunitas (site-wide), untuk
         // panel "Postingan Terbaru". Eager-load media (thumbnail) + comments_count.
-        $recentPosts = Post::with(['media' => function ($q) { $q->orderBy('order')->limit(1); }])
+        $recentPosts = Post::with(['media' => function ($q) {
+            $q->orderBy('order')->limit(1);
+        }])
             ->withCount(['comments'])
             ->latest()
             ->limit(5)
@@ -231,137 +241,12 @@ class PageController extends Controller
             'komunitasAktif' => $komunitasAktif,
             'currentSlug' => $currentSlug,
             'posts' => $posts,
+            'sort' => $sort,
         ]);
     }
 
     public function komunitasShow(string $slug)
     {
         return $this->komunitasIndex($slug);
-    }
-
-    /**
-     * Halaman Credits (tim pembuat situs). UNLISTED — tidak ada di navbar/menu;
-     * hanya dicapai via logo Liivo di footer. Publik (tanpa login).
-     *
-     * $tim: tim pembuat. Tiap baris =
-     *   ['nama', 'peran', 'accent', 'tagline', 'socials', 'avatar'].
-     *  - nama/peran/tagline/accent wajib. accent = HEX untuk cincin/avatar/tag kartu.
-     *  - tagline (string HTML): boleh memuat satu kata <em>…</em> yang diberi
-     *    warna accent di view.
-     *  - socials: [['icon'=>'fa-brands …','url'=>'…','label'=>'…'], …] (boleh kosong).
-     *  - avatar: path relatif public/ (mis. 'assets/team/fulan-rahman.jpg').
-     *    Swap placeholder → foto asli = UBAH path ini (atau drop file dgn nama sama).
-     *    Bila file BELUM ada di disk → view merender ikon orang di lingkaran accent
-     *    (placeholder jelas "foto belum diunggah"), bukan gambar pecah.
-     *
-     * Route: GET /credits
-     */
-    public function credits()
-    {
-        $tim = [
-            // ── Tim inti (4) ──
-            [
-                'nama'    => 'Galang Putra Bayu Pratama',
-                'peran'   => 'Lead Developer',
-                'accent'  => '#C9A66B',
-                'tagline' => 'Menjaga arah tim dan memastikan semua bagian saling terhubung dengan baik.',
-                'socials' => [
-                    ['icon' => 'fa-brands fa-github',    'url' => 'https://github.com/pejalan214', 'label' => 'GitHub'],
-                    ['icon' => 'fa-brands fa-instagram', 'url' => 'https://www.instagram.com/11putrabayu1?igsh=MTUxOXJ4ZmpjNTRjcw==&igsi=MTUxOXJ4ZmpjNTRjcw==', 'label' => 'Instagram'],
-                ],
-                'avatar'  => 'assets/team/galang.jpg',
-            ],
-            [
-                'nama'    => 'K',
-                'peran'   => 'Frontend Developer',
-                'accent'  => '#34C9A0',
-                'tagline' => 'Menerjemahkan desain jadi antarmuka yang rapi dan enak dipakai.',
-                'socials' => [
-                    ['icon' => 'fa-brands fa-github',    'url' => 'https://github.com/wriothesley-XD', 'label' => 'GitHub'],
-                    ['icon' => 'fa-brands fa-instagram', 'url' => 'https://www.instagram.com/kiranax_lestari?utm_source=ig_web_button_share_sheet&igsi=ZDNlZDc0MzIxNw==', 'label' => 'Instagram'],
-                ],
-                'avatar'  => 'assets/team/bren.jpg',
-            ],
-            [
-                'nama'    => 'Khairunnisa Zahira',
-                'peran'   => 'Frontend Developer',
-                'accent'  => '#5BAFC4',
-                'tagline' => 'Fokus pada detail tampilan, dari layout sampai hal-hal kecil yang sering luput dilihat.',
-                'socials' => [
-                    ['icon' => 'fa-brands fa-github',    'url' => 'https://github.com/khaiz-F', 'label' => 'GitHub'],
-                    ['icon' => 'fa-brands fa-instagram', 'url' => 'https://www.instagram.com/mrs.zahira?igsh=anBqaXR5OW0xeDlu&igsi=anBqaXR5OW0xeDlu', 'label' => 'Instagram'],
-                ],
-                'avatar'  => 'assets/team/kesa.jpg',
-            ],
-            [
-                'nama'    => 'Rifki Abdillah Muis',
-                'peran'   => 'Backend Developer',
-                'accent'  => '#C9904E',
-                'tagline' => 'Membangun fondasi sistem yang bekerja diam-diam di balik layar.',
-                'socials' => [
-                    ['icon' => 'fa-brands fa-github',    'url' => 'https://github.com/rifkiabdillahmuis-sawit-enjoyer', 'label' => 'GitHub'],
-                    ['icon' => 'fa-brands fa-instagram', 'url' => 'https://www.instagram.com/rifki_abdillah_muis?igsh=c2pwMDN4bGhjbzc0', 'label' => 'Instagram'],
-                ],
-                'avatar'  => 'assets/team/muis.jpg',
-            ],
-            // ── Anggota baru (3) — nama/foto masih placeholder; peran/tagline final. ──
-            [
-                'nama'    => 'Dytha Aisha Qamara',
-                'peran'   => 'Digital Artist',
-                'accent'  => '#E07A9B',
-                'tagline' => 'Menerjemahkan konsep visual menjadi karya yang punya karakter.',
-                'socials' => [
-                    ['icon' => 'fa-brands fa-instagram', 'url' => 'https://www.instagram.com/aisha_qamara?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==&igsi=ZDNlZDc0MzIxNw==', 'label' => 'Instagram'],
-                ],
-                'avatar'  => 'assets/team/dhyta.jpg',
-            ],
-            [
-                'nama'    => 'Heykal Fadhila Mudzaki',
-                'peran'   => 'Digital Artist',
-                'accent'  => '#9B7EBD',
-                'tagline' => 'Mengeksekusi ide visual dengan perhatian pada detail dan komposisi.',
-                'socials' => [
-                    ['icon' => 'fa-brands fa-instagram', 'url' => 'https://www.instagram.com/kellz.fm/?utm_source=ig_web_button_share_sheet', 'label' => 'Instagram'],
-                ],
-                'avatar'  => 'assets/team/heykal.jpg',
-            ],
-            [
-                'nama'    => 'Bintang Fachria Luckyano',
-                'peran'   => 'Content Manager',
-                'accent'  => '#D9A441',
-                'tagline' => 'Menyusun narasi dan memastikan setiap konten tersampaikan dengan jelas.',
-                'socials' => [
-                    ['icon' => 'fa-brands fa-instagram', 'url' => 'https://www.instagram.com/arthfiscl?igsh=azRqb3Bnbjg2dHNo&igsi=azRqb3Bnbjg2dHNo', 'label' => 'Instagram'],
-                ],
-                'avatar'  => 'assets/team/bintang.jpg',
-            ],
-        ];
-
-        // Prakomputasi per anggota agar view bebas logika PHP/closure.
-        //  - tag:       label pill — kata pertama 'peran', upper-case (LEAD/FRONTEND/…/MEMBER).
-        //  - initials:  huruf depan 2 kata pertama nama.
-        //  - has_img:   TRUE hanya bila 'avatar' terisi DAN file benar-benar ada di disk
-        //               (public_path()). Kalau belum di-upload → placeholder ikon orang.
-        //  - avatar_url: URL foto asli (asset()) bila has_img; null bila belum ada.
-        $tim = collect($tim)->map(function (array $m) {
-            // tag = kata pertama peran, upper-case.
-            $peranKata = array_values(array_filter(explode(' ', trim($m['peran'] ?? ''))));
-            $m['tag'] = mb_strtoupper($peranKata[0] ?? 'TEAM');
-
-            $kata = array_values(array_filter(explode(' ', trim($m['nama'] ?? ''))));
-            $initials = '';
-            for ($i = 0, $n = min(2, count($kata)); $i < $n; $i++) {
-                $initials .= mb_strtoupper(mb_substr($kata[$i], 0, 1));
-            }
-            $m['initials'] = $initials !== '' ? $initials : '?';
-
-            // Foto asli hanya bila path terisi & file ada di disk.
-            $m['has_img'] = ! empty($m['avatar']) && file_exists(public_path($m['avatar']));
-            $m['avatar_url'] = $m['has_img'] ? asset($m['avatar']) : null;
-
-            return $m;
-        })->all();
-
-        return view('credits', compact('tim'));
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\StudentVerification;
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -28,7 +30,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            'email' => ['required', 'string'],
             'password' => ['required', 'string'],
         ];
     }
@@ -42,7 +44,36 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        $login = trim((string) $this->input('email'));
+        $password = (string) $this->input('password');
+        $remember = $this->boolean('remember');
+
+        $credentials = ['email' => $login, 'password' => $password];
+
+        // Jika bukan format email (mis. angka NISN / NIS), cari akun terkait
+        if (! filter_var($login, FILTER_VALIDATE_EMAIL)) {
+            $cleanDigits = preg_replace('/\D/', '', $login);
+            $user = User::where('nisn', $cleanDigits)
+                ->orWhere('nis', $cleanDigits)
+                ->orWhere('nisn', 'NIS-'.$cleanDigits)
+                ->first();
+
+            // Bila tidak ditemukan langsung di users, cari di student_verifications approved
+            if (! $user && $cleanDigits !== '') {
+                $verif = StudentVerification::where('nisn', $cleanDigits)
+                    ->where('status', 'approved')
+                    ->first();
+                if ($verif) {
+                    $user = $verif->user;
+                }
+            }
+
+            if ($user) {
+                $credentials = ['email' => $user->email, 'password' => $password];
+            }
+        }
+
+        if (! Auth::attempt($credentials, $remember)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([

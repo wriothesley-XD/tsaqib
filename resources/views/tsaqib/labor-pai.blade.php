@@ -352,7 +352,7 @@
                                 <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i>
                             </a>
                             <a href="{{ $monevUrl }}" download
-                               class="btn-gold text-xs px-4 py-2">
+                               class="btn-gold btn-download text-xs px-4 py-2">
                                 <i class="fa-solid fa-download text-[11px]"></i>
                                 <span>Unduh PDF</span>
                             </a>

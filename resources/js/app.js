@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initCommandPalette();
     initKeyboardShortcuts();
     initCardSpotlights();
+    initInkRipple();
 });
 
 /* =========================================================================
@@ -313,7 +314,8 @@ function initCustomToast() {
         if (type === 'info') icon = '<i class="fa-solid fa-circle-info text-sky-400 text-sm"></i>';
         if (type === 'warning') icon = '<i class="fa-solid fa-triangle-exclamation text-amber-400 text-sm"></i>';
 
-        toast.innerHTML = `${icon}<span>${message}</span>`;
+        toast.style.setProperty('--toast-duration', `${duration}ms`);
+        toast.innerHTML = `${icon}<span>${message}</span><span class="toast-progress"></span>`;
         container.appendChild(toast);
 
         setTimeout(() => {
@@ -676,3 +678,26 @@ window.triggerUpvoteAnimation = function (btn, isUp) {
         }
     }
 };
+
+/* =========================================================================
+   10. INK RIPPLE TOUCH/CLICK ENGINE
+   ========================================================================= */
+function initInkRipple() {
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-primary, .cta-primary, .btn-gold, .btn-outline, .btn-gold-outline, .btn-download, [data-ripple]');
+        if (!btn) return;
+
+        const rect = btn.getBoundingClientRect();
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple-ink';
+        const diameter = Math.max(rect.width, rect.height);
+        const radius = diameter / 2;
+
+        ripple.style.width = ripple.style.height = `${diameter}px`;
+        ripple.style.left = `${e.clientX - rect.left - radius}px`;
+        ripple.style.top = `${e.clientY - rect.top - radius}px`;
+
+        btn.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 600);
+    });
+}

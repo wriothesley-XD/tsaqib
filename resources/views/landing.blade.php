@@ -224,7 +224,7 @@
                     <h1 class="font-display font-extrabold text-4xl sm:text-5xl lg:text-6xl text-[var(--cream)] tracking-tight leading-[1.08]">
                         TSAQIB
                     </h1>
-                    <p class="font-display font-semibold text-lg sm:text-xl text-[var(--gold)] tracking-tight">
+                    <p class="font-display font-semibold text-lg sm:text-xl text-shimmer tracking-tight">
                         Cerdas, Unggul, dan Berakhlak Mulia
                     </p>
                 </div>

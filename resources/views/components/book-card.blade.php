@@ -16,10 +16,10 @@
     $pdfUrl = $book->pdf_path ? asset('storage/' . $book->pdf_path) : null;
 @endphp
 
-<div class="book-card group" data-book-id="{{ $book->id }}">
+<div class="book-card group book-3d-wrap" data-book-id="{{ $book->id }}">
 
-    {{-- Cover rasio 2:3 --}}
-    <div class="relative aspect-[2/3] rounded-xl overflow-hidden bg-[#143520] border border-white/10 transition duration-300 group-hover:border-[var(--gold)]/60 group-hover:shadow-xl group-hover:shadow-black/50">
+    {{-- Cover rasio 2:3 dengan 3D Book Spine Perspective --}}
+    <div class="book-3d relative aspect-[2/3] rounded-xl overflow-hidden bg-[#143520] border border-white/10 transition duration-300 group-hover:border-[var(--gold)]/60">
 
         @if($coverUrl)
             <img src="{{ $coverUrl }}" alt="{{ $book->title }}"

@@ -62,6 +62,7 @@
                     <a href="{{ $item['href'] }}" class="{{ $navLinkClass }} {{ $link($item['active']) }}">
                         {{ $item['label'] }}
                         <span class="{{ $underline($item['active']) }}"></span>
+                        @if($item['active']) <span class="nav-bead"></span> @endif
                     </a>
                 @endforeach
 
@@ -73,6 +74,7 @@
                         <span>Laboratorium PAI</span>
                         <i class="fa-solid fa-chevron-down text-[8px] leading-none opacity-70 transition-transform duration-200"></i>
                         <span class="{{ $underline($isLaborZone) }}"></span>
+                        @if($isLaborZone) <span class="nav-bead"></span> @endif
                     </button>
                     <div id="labor-menu" class="absolute left-0 top-full pt-2.5 opacity-0 invisible z-[60] transition-all duration-200">
                         <div class="min-w-[220px] rounded-xl border border-white/10 bg-[#143520] shadow-2xl overflow-hidden py-2 backdrop-blur-md">
@@ -99,17 +101,20 @@
                 <a href="{{ route('perpustakaan') }}" class="{{ $navLinkClass }} {{ $link($currentRoute === 'perpustakaan') }}">
                     Perpustakaan
                     <span class="{{ $underline($currentRoute === 'perpustakaan') }}"></span>
+                    @if($currentRoute === 'perpustakaan') <span class="nav-bead"></span> @endif
                 </a>
 
                 <a href="{{ route('komunitas', 'semua') }}" class="{{ $navLinkClass }} {{ $link($isKomunitasZone) }}">
                     Komunitas
                     <span class="{{ $underline($isKomunitasZone) }}"></span>
+                    @if($isKomunitasZone) <span class="nav-bead"></span> @endif
                 </a>
 
                 @foreach($navAfter as $item)
                     <a href="{{ $item['href'] }}" class="{{ $navLinkClass }} {{ $link($item['active']) }}">
                         {{ $item['label'] }}
                         <span class="{{ $underline($item['active']) }}"></span>
+                        @if($item['active']) <span class="nav-bead"></span> @endif
                     </a>
                 @endforeach
 

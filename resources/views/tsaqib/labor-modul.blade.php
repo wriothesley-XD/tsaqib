@@ -181,7 +181,7 @@
             </div>
             <div class="flex items-center gap-3 shrink-0">
                 <a id="pdf-modal-download" href="#" download
-                   class="btn-gold text-xs px-3.5 py-1.5">
+                   class="btn-gold btn-download text-xs px-3.5 py-1.5">
                     <i class="fa-solid fa-download text-[11px]"></i>
                     <span>Unduh PDF</span>
                 </a>

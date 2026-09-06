@@ -808,7 +808,183 @@ select.tsaqib-input option {
 }
 
 /* =========================================================================
-   9. ACCESSIBILITY & MOTION PREFERENCES
+   10. SIMPLE MODERN MICRO-ANIMATIONS (COMPETITION MAGNUM OPUS)
+   ========================================================================= */
+
+/* 1) Metallic Text Shimmer (Slow, Majestic Heading Sweep) */
+.text-shimmer {
+    background: linear-gradient(
+        120deg,
+        #C9A66B 0%,
+        #F7F5EF 35%,
+        #C9A66B 50%,
+        #E0C58E 70%,
+        #C9A66B 100%
+    );
+    background-size: 200% auto;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: textShimmerSweep 5s linear infinite;
+}
+@keyframes textShimmerSweep {
+    to { background-position: 200% center; }
+}
+
+/* 2) Animated Border Beam (Laser Orbit on Special Cards) */
+.border-beam-wrap {
+    position: relative;
+    border-radius: inherit;
+    overflow: hidden;
+}
+.border-beam {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 10;
+}
+.border-beam::after {
+    content: '';
+    position: absolute;
+    inset: -100%;
+    background: conic-gradient(
+        from 0deg at 50% 50%,
+        transparent 0deg,
+        rgba(201, 166, 107, 0.8) 60deg,
+        transparent 120deg
+    );
+    animation: borderBeamRotate 6s linear infinite;
+}
+@keyframes borderBeamRotate {
+    to { transform: rotate(360deg); }
+}
+
+/* 3) 3D Book Spine Perspective Tilt (Hardcover Realism) */
+.book-3d-wrap {
+    perspective: 900px;
+}
+.book-3d {
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
+    transform-style: preserve-3d;
+    transform: rotateY(0deg) rotateX(0deg);
+    position: relative;
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+.book-3d-wrap:hover .book-3d {
+    transform: rotateY(-12deg) rotateX(4deg) translateY(-6px);
+    box-shadow: -14px 18px 30px -6px rgba(0, 0, 0, 0.7), -4px 0 10px rgba(0, 0, 0, 0.4), 0 0 20px rgba(201, 166, 107, 0.2);
+}
+.book-3d::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 14px;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.45) 0%, rgba(255, 255, 255, 0.15) 60%, transparent 100%);
+    pointer-events: none;
+    z-index: 5;
+    border-top-left-radius: inherit;
+    border-bottom-left-radius: inherit;
+    opacity: 0.85;
+}
+
+/* 4) Tsaqib Click Ink Ripple */
+.ripple-ink {
+    position: absolute;
+    border-radius: 999px;
+    transform: scale(0);
+    background: rgba(201, 166, 107, 0.35);
+    pointer-events: none;
+    animation: inkRipple 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    z-index: 30;
+}
+@keyframes inkRipple {
+    to {
+        transform: scale(3.5);
+        opacity: 0;
+    }
+}
+
+/* 5) Pulsing Portal Ring for Flipbook Play Button */
+.lp-facade-play {
+    position: relative;
+}
+.lp-facade-play::before, .lp-facade-play::after {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: 999px;
+    border: 1.5px solid var(--gold);
+    opacity: 0.6;
+    animation: portalRing 2.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+    pointer-events: none;
+}
+.lp-facade-play::after {
+    inset: -18px;
+    animation-delay: 0.8s;
+    opacity: 0.35;
+}
+@keyframes portalRing {
+    0% { transform: scale(0.85); opacity: 0.8; }
+    100% { transform: scale(1.4); opacity: 0; }
+}
+
+/* 6) Navbar Golden Glowing Route Bead */
+.nav-bead {
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--gold);
+    box-shadow: 0 0 8px var(--gold), 0 0 14px rgba(201, 166, 107, 0.6);
+    animation: beadPulse 2s ease-in-out infinite;
+}
+@keyframes beadPulse {
+    0%, 100% { opacity: 0.9; transform: translateX(-50%) scale(1); }
+    50% { opacity: 0.5; transform: translateX(-50%) scale(1.3); }
+}
+
+/* 7) Interactive Toast Countdown Bar */
+.tsaqib-toast {
+    position: relative;
+    overflow: hidden;
+}
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background: var(--gold);
+    border-radius: 999px;
+    width: 100%;
+    animation: toastCountdown var(--toast-duration, 3.5s) linear forwards;
+}
+@keyframes toastCountdown {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+
+/* 8) Interactive Download Bounce on Download Buttons */
+.btn-download:hover i.fa-download, .btn-download:hover i.fa-arrow-down {
+    animation: downloadBounce 0.6s ease infinite alternate;
+}
+@keyframes downloadBounce {
+    from { transform: translateY(0); }
+    to { transform: translateY(4px); }
+}
+
+/* =========================================================================
+   11. ACCESSIBILITY & MOTION PREFERENCES
    ========================================================================= */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {

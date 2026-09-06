@@ -840,7 +840,7 @@
                         Kumpulkan tugasmu langsung ke <strong class="text-[var(--gold)]">Google Classroom</strong> guru mapel masing-masing — cek kode kelas di guru pengampumu.
                     </p>
                 </div>
-                <a href="{{ route('laboratorium.pai') }}#tugas" class="btn-gold shrink-0">
+            <a href="{{ route('laboratorium.~pai') }}#tugas" class="btn-gold shrink-0">
                     Lihat Semua Tugas <i class="fa-solid fa-arrow-right text-xs"></i>
                 </a>
             </div>

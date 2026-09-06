@@ -102,6 +102,10 @@ class TsaqibController extends Controller
 
         $profilBukuPdf = Setting::getByKey('profil_buku_tsaqib_pdf');
         $monevPdf = Setting::getByKey('monev_internal_pdf');
+        // Tautan eksternal opsional untuk Monev (Heyzine/Google Drive/dst), sama
+        // seperti pola profil_buku_tsaqib_url. Kalau diisi, ini yang diprioritaskan
+        // di atas PDF upload (lihat $monevUrl di labor-pai.blade.php).
+        $monevUrlSetting = Setting::getByKey('monev_internal_url');
         $strukturPembinaImg = Setting::getByKey('struktur_organisasi_pembina');
         $strukturSiswaImg = Setting::getByKey('struktur_organisasi_siswa');
 
@@ -113,7 +117,7 @@ class TsaqibController extends Controller
 
         return view('tsaqib.labor-pai', compact(
             'visiMisi', 'pembina', 'pengurusSiswa', 'profilTsaqibUrl', 'coverUrl',
-            'profilBukuPdf', 'monevPdf', 'strukturPembinaImg', 'strukturSiswaImg'
+            'profilBukuPdf', 'monevPdf', 'monevUrlSetting', 'strukturPembinaImg', 'strukturSiswaImg'
         ));
     }
 

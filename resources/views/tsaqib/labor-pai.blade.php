@@ -1,6 +1,10 @@
 @php
     $pageTitle = 'Laboratorium PAI - FSI SMAN 1 Bukittinggi';
-    $monevUrl = !empty($monevPdf) ? asset('storage/' . $monevPdf) : asset('assets/documents/monev-internal-pemerintah-daerah.pdf');
+    // Prioritas: tautan eksternal (Heyzine/Google Drive/dst) > PDF yang diupload > file default.
+    $monevIsExternalLink = !empty($monevUrlSetting);
+    $monevUrl = $monevIsExternalLink
+        ? $monevUrlSetting
+        : (!empty($monevPdf) ? asset('storage/' . $monevPdf) : asset('assets/documents/monev-internal-pemerintah-daerah.pdf'));
     $profilBukuFileUrl = !empty($profilBukuPdf) ? asset('storage/' . $profilBukuPdf) : null;
     $pembinaImgSrc = !empty($strukturPembinaImg) ? asset('storage/' . $strukturPembinaImg) : asset('images/struktur.webp');
     $siswaImgSrc = !empty($strukturSiswaImg) ? asset('storage/' . $strukturSiswaImg) : asset('images/kepengurusan.webp');
@@ -336,7 +340,7 @@
                                 <div class="flex items-center gap-2">
                                     <h3 class="text-lg font-display font-bold text-[var(--cream)]">Monev Internal Pemerintah Daerah</h3>
                                     <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#01795F]/15 text-[#3fd6b0] border border-[#01795F]/30">
-                                        Dokumen Resmi PDF
+                                        {{ $monevIsExternalLink ? 'Tautan Eksternal' : 'Dokumen Resmi PDF' }}
                                     </span>
                                 </div>
                                 <p class="text-white/55 text-xs mt-0.5">
@@ -351,17 +355,19 @@
                                 <span>Buka di Tab Baru</span>
                                 <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i>
                             </a>
-                            <a href="{{ $monevUrl }}" download
-                               class="btn-gold btn-download text-xs px-4 py-2">
-                                <i class="fa-solid fa-download text-[11px]"></i>
-                                <span>Unduh PDF</span>
-                            </a>
+                            @unless($monevIsExternalLink)
+                                <a href="{{ $monevUrl }}" download
+                                   class="btn-gold btn-download text-xs px-4 py-2">
+                                    <i class="fa-solid fa-download text-[11px]"></i>
+                                    <span>Unduh PDF</span>
+                                </a>
+                            @endunless
                         </div>
                     </div>
 
-                    <!-- PDF Viewer Container -->
+                    <!-- PDF/Link Viewer Container -->
                     <div class="rounded-xl overflow-hidden border border-white/15 bg-white shadow-2xl">
-                        <iframe src="{{ $monevUrl }}#toolbar=1&navpanes=0"
+                        <iframe src="{{ $monevUrl }}{{ $monevIsExternalLink ? '' : '#toolbar=1&navpanes=0' }}"
                                 title="Dokumen Monev Internal Pemerintah Daerah"
                                 class="w-full h-[520px] sm:h-[600px] bg-[#525659]"
                                 loading="lazy"></iframe>
@@ -369,9 +375,11 @@
 
                     <div class="flex items-center justify-between text-xs text-white/50 pt-1">
                         <span><i class="fa-solid fa-shield-halved text-[var(--gold)] mr-1.5"></i>Dokumen Terverifikasi FSI TSAQIB &amp; Sekolah</span>
-                        <a href="{{ $monevUrl }}" download class="text-[var(--gold)] hover:underline">
-                            Simpan salinan (PDF)
-                        </a>
+                        @unless($monevIsExternalLink)
+                            <a href="{{ $monevUrl }}" download class="text-[var(--gold)] hover:underline">
+                                Simpan salinan (PDF)
+                            </a>
+                        @endunless
                     </div>
                 </div>
 

@@ -146,10 +146,29 @@
                     </span>
 
                     <div>
-                        <label class="block text-xs font-semibold text-white/75 mb-1">Unggah Berkas PDF Monev Resmi (Maks 30MB)</label>
+                        <label class="block text-xs font-semibold text-white/75 mb-1">Tautan Dokumen (Heyzine/Google Drive/dst — opsional)</label>
+                        <input type="url" name="monev_internal_url"
+                               value="{{ $laborSettings['monev_internal_url'] ?? '' }}"
+                               placeholder="https://heyzine.com/flip-book/... atau link Google Drive"
+                               class="tsaqib-input w-full px-3 py-2 text-xs">
+                        <p class="text-[11px] text-white/45 mt-1">Kalau diisi, tautan ini yang ditampilkan (bukan file PDF di bawah). Kosongkan untuk pakai PDF upload.</p>
+                        @if(!empty($laborSettings['monev_internal_url']))
+                            <div class="mt-2 flex items-center justify-between text-xs">
+                                <a href="{{ $laborSettings['monev_internal_url'] }}" target="_blank" class="text-[var(--gold)] hover:underline inline-flex items-center gap-1">
+                                    <i class="fa-solid fa-link"></i> Buka Tautan Tersimpan
+                                </a>
+                                <button type="button" onclick="if(confirm('Hapus tautan ini?')) { document.getElementById('del-monev-url-form').submit(); }" class="text-red-400 hover:text-red-300 font-semibold cursor-pointer">
+                                    <i class="fa-solid fa-trash"></i> Hapus
+                                </button>
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="pt-3 border-t border-white/10">
+                        <label class="block text-xs font-semibold text-white/75 mb-1">Atau Unggah Berkas PDF Monev Resmi (Maks 30MB)</label>
                         <input type="file" name="monev_internal_pdf" accept=".pdf"
                                class="tsaqib-input w-full px-3 py-1.5 text-xs text-white/70 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[var(--gold)]/20 file:text-[var(--gold)]">
-                        <p class="text-[11px] text-white/45 mt-1">Jika belum diupload, sistem akan menampilkan dokumen monev resmi default.</p>
+                        <p class="text-[11px] text-white/45 mt-1">Jika tautan di atas kosong dan PDF belum diupload, sistem akan menampilkan dokumen monev resmi default.</p>
                         @if(!empty($laborSettings['monev_internal_pdf']))
                             <div class="mt-2 flex items-center justify-between text-xs">
                                 <a href="{{ asset('storage/' . $laborSettings['monev_internal_pdf']) }}" target="_blank" class="text-[var(--gold)] hover:underline inline-flex items-center gap-1">
@@ -188,6 +207,10 @@
     @method('DELETE')
 </form>
 <form id="del-monev-form" action="{{ route('admin.labor-documents.destroy', 'monev_internal_pdf') }}" method="POST" class="hidden">
+    @csrf
+    @method('DELETE')
+</form>
+<form id="del-monev-url-form" action="{{ route('admin.labor-documents.destroy', 'monev_internal_url') }}" method="POST" class="hidden">
     @csrf
     @method('DELETE')
 </form>

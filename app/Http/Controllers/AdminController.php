@@ -85,6 +85,7 @@ class AdminController extends Controller
             'profil_buku_tsaqib_url' => Setting::getByKey('profil_buku_tsaqib_url', 'https://heyzine.com/flip-book/bdf3f31765.html'),
             'profil_buku_tsaqib_pdf' => Setting::getByKey('profil_buku_tsaqib_pdf'),
             'monev_internal_pdf' => Setting::getByKey('monev_internal_pdf'),
+            'monev_internal_url' => Setting::getByKey('monev_internal_url'),
         ];
 
         // Laporan konten pending (untuk badge + Perlu Perhatian + tab Laporan).
@@ -518,6 +519,7 @@ class AdminController extends Controller
         $request->validate([
             'profil_buku_tsaqib_url' => 'nullable|url|max:500',
             'profil_buku_tsaqib_pdf' => 'nullable|file|mimes:pdf|max:30720',
+            'monev_internal_url' => 'nullable|url|max:500',
             'monev_internal_pdf' => 'nullable|file|mimes:pdf|max:30720',
             'struktur_organisasi_pembina' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:10240',
             'struktur_organisasi_siswa' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:10240',
@@ -534,6 +536,10 @@ class AdminController extends Controller
             }
             $path = $request->file('profil_buku_tsaqib_pdf')->store('labor-docs', 'public');
             Setting::setByKey('profil_buku_tsaqib_pdf', $path);
+        }
+
+        if ($request->filled('monev_internal_url')) {
+            Setting::setByKey('monev_internal_url', $request->input('monev_internal_url'));
         }
 
         if ($request->hasFile('monev_internal_pdf')) {
@@ -579,6 +585,7 @@ class AdminController extends Controller
             'struktur_organisasi_siswa',
             'profil_buku_tsaqib_pdf',
             'monev_internal_pdf',
+            'monev_internal_url',
         ];
 
         if (! in_array($type, $allowed, true)) {

@@ -51,26 +51,6 @@
                     <span class="sfx-status">SFX Hening</span>
                 </button>
             </div>
-
-            <div class="flex items-center gap-2">
-                {{-- Keyboard shortcuts helper button --}}
-                <button type="button" onclick="toggleShortcutsHelp()"
-                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[var(--gold)]/40 text-white/60 hover:text-white transition cursor-pointer"
-                        title="Tampilkan daftar tombol pintas keyboard">
-                    <i class="fa-solid fa-keyboard text-[10px] text-[var(--gold)]"></i>
-                    <span>Pintasan</span>
-                    <span class="cmd-kbd text-[9px] py-0 px-1 h-3.5">?</span>
-                </button>
-
-                {{-- Command Palette quick trigger --}}
-                <button type="button" data-open-cmd
-                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[var(--gold)]/40 text-white/60 hover:text-white transition cursor-pointer"
-                        title="Buka Command Palette">
-                    <i class="fa-solid fa-magnifying-glass text-[10px] text-[var(--gold)]"></i>
-                    <span>Cari</span>
-                    <span class="cmd-kbd text-[9px] py-0 px-1 h-3.5">⌘K</span>
-                </button>
-            </div>
         </div>
 
     </div>

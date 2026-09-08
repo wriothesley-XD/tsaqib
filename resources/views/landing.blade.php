@@ -204,8 +204,8 @@
                      class="w-full h-full object-cover object-[center_35%] transform scale-105 filter brightness-[0.70] contrast-105">
             </picture>
             {{-- Deep Luxurious Emerald Gradients (Assures 100% WCAG AAA Text Contrast) --}}
-            <div class="absolute inset-0 bg-gradient-to-r from-[#07170E]/95 via-[#0D2818]/85 to-[#07170E]/95"></div>
-            <div class="absolute inset-0 bg-gradient-to-b from-[#07170E]/90 via-[#0D2818]/70 to-[#07170E]"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-[#07170E]/60 via-[#0D2818]/85 to-[#07170E]/95"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-[#07170E]/50 via-[#0D2818]/70 to-[#07170E]"></div>
             <div class="pat-islami opacity-10"></div>
         </div>
 
@@ -653,7 +653,6 @@
                                         <span class="eyebrow-pill eyebrow-pill-green">
                                             Kurikulum {{ $kelasLabel[$kelasKey] }}
                                         </span>
-                                        <span class="ph-todo">Dokumentasi Resmi</span>
                                     </div>
                                     <div class="space-y-2">
                                         <h4 class="font-display font-bold text-lg sm:text-xl text-[var(--cream)]">

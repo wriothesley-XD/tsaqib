@@ -22,6 +22,12 @@ class SecurityHeaders
     "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; ".
     "img-src 'self' data: https:; ".
     "connect-src 'self'; ".
+    // frame-src: domain yang BOLEH kita embed lewat <iframe> (beda dari
+    // frame-ancestors di bawah, yang ngatur siapa boleh embed KITA).
+    // Tanpa ini, frame-src ikut default-src 'self' → semua iframe ke Heyzine/
+    // Google Drive diblokir browser sendiri (bukan diblokir Heyzine/Edge).
+    // Tambah domain lain di sini kalau nanti pakai provider flipbook/PDF lain.
+    "frame-src 'self' https://heyzine.com https://*.heyzine.com https://drive.google.com https://docs.google.com; ".
     "frame-ancestors 'self';"
 );
 

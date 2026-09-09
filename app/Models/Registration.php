@@ -47,4 +47,29 @@ class Registration extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function getNamaLengkapAttribute(): ?string
+    {
+        return $this->full_name;
+    }
+
+    public function getNamaPanggilanAttribute(): ?string
+    {
+        return $this->nickname;
+    }
+
+    public function getKelasAttribute(): ?string
+    {
+        return $this->class;
+    }
+
+    public function getInstagramUsernameAttribute(): ?string
+    {
+        return $this->username_ig;
+    }
+
+    public function getAlasanBergabungAttribute(): ?string
+    {
+        return $this->reason;
+    }
 }

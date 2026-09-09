@@ -29,6 +29,22 @@
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
+        <!-- NISN / NIS Siswa SMAN 1 Bukittinggi (Opsional) -->
+        <div class="mt-4">
+            <div class="flex items-center justify-between">
+                <x-input-label for="nisn" :value="__('NISN / NIS (Siswa SMAN 1)')" />
+                <span class="text-[10px] text-[var(--gold)] font-bold uppercase tracking-wider">Opsional</span>
+            </div>
+            <div class="relative mt-1">
+                <i class="fa-solid fa-id-card pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[#8A9B7A]" aria-hidden="true"></i>
+                <x-text-input id="nisn" class="block w-full text-xs pl-10" type="text" name="nisn" :value="old('nisn')" placeholder="Contoh: 0118703733 atau 22455" />
+            </div>
+            <p class="text-[10px] text-white/40 mt-1 leading-snug">
+                Masukkan NISN atau NIS kamu agar otomatis memperoleh lencana <strong>Siswa SMAN 1 Terverifikasi</strong>.
+            </p>
+            <x-input-error :messages="$errors->get('nisn')" class="mt-2" />
+        </div>
+
         {{-- Password + Konfirmasi: stacked on mobile, side-by-side on ≥sm --}}
         <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
 

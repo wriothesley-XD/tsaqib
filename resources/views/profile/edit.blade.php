@@ -64,6 +64,11 @@
                 <h1 class="pr-display font-extrabold text-3xl text-[var(--cream)] mt-3">{{ $user->name }}</h1>
 
                 <div class="mt-2.5 flex items-center justify-center gap-2 flex-wrap">
+                    @if($user->is_verified_student)
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#01795F]/25 border border-[#01795F]/50 text-[#3fd6b0] text-xs font-bold" title="Siswa Terverifikasi SMAN 1 Bukittinggi">
+                            <i class="fa-solid fa-circle-check text-xs"></i> Siswa SMAN 1
+                        </span>
+                    @endif
                     <span class="pr-role-pill"><i class="fa-solid {{ $roleIcon }} text-[10px]"></i> {{ $roleLabel }}</span>
                     @if($komunitasNama)
                         <a href="{{ route('komunitas', $user->selected_community) }}"
@@ -181,6 +186,11 @@
                 @endif
 
                 <div class="mt-1.5 flex items-center justify-center gap-1.5 flex-wrap">
+                    @if($user->is_verified_student)
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#01795F]/25 border border-[#01795F]/50 text-[#3fd6b0] text-[10px] font-bold" title="Siswa Terverifikasi SMAN 1 Bukittinggi">
+                            <i class="fa-solid fa-circle-check text-[9px]"></i> Siswa SMAN 1
+                        </span>
+                    @endif
                     <span class="pr-role-pill text-[10px]"><i class="fa-solid {{ $roleIcon }} text-[9px]"></i> {{ $roleLabel }}</span>
                     @if($komunitasNama)
                         <a href="{{ route('komunitas', $user->selected_community) }}"

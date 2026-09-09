@@ -22,6 +22,11 @@
             @else
                 <span class="font-bold text-xs text-[var(--cream)]">{{ $c->user->name ?? 'Anggota TSAQIB' }}</span>
             @endif
+            @if ($c->user?->is_verified_student)
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#01795F]/25 border border-[#01795F]/50 text-[#3fd6b0] text-[9px] font-bold shrink-0" title="Siswa Terverifikasi SMAN 1 Bukittinggi">
+                    <i class="fa-solid fa-circle-check text-[8px]"></i> Siswa SMAN 1
+                </span>
+            @endif
             <span class="text-[10px] text-white/40">{{ $c->created_at->diffForHumans() }}</span>
             @auth
                 <button type="button" class="report-btn ml-auto text-[10px] text-white/40 hover:text-[var(--gold)] font-semibold"

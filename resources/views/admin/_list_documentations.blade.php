@@ -24,7 +24,10 @@
             @endif
         </td>
         <td data-label="Tanggal" class="p-3 text-white/60">{{ $doc->event_date?->format('d M Y') ?? '—' }}</td>
-        <td data-label="Foto" class="p-3 text-white/60">{{ $doc->photos->count() }} foto@if($doc->video_path) · <span class="text-[var(--gold)]">1 video</span>@endif</td>
+        <td data-label="Foto" class="p-3 text-white/60">{{ $doc->photos->count() }} foto
+@if($doc->video_path)
+    <span class="text-[var(--gold)]"> + Video</span>
+@endif
         <td data-label="Aksi" class="p-3">
             <div class="flex items-center gap-2 flex-wrap">
                 <a href="{{ route('info.dokumentasi.show', $doc->slug) }}" target="_blank" class="text-xs text-[var(--gold)] hover:underline font-bold">

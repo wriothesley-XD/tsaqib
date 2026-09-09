@@ -10,16 +10,16 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::table('books', function (Blueprint $table) {
-        $table->string('pdf_path')->nullable()->after('cover_image');
-    });
-}
+    {
+        Schema::table('books', function (Blueprint $table) {
+            $table->string('pdf_path')->nullable()->after('cover_image');
+        });
+    }
 
-public function down(): void
-{
-    Schema::table('books', function (Blueprint $table) {
-        $table->dropColumn('pdf_path');
-    });
-}
+    public function down(): void
+    {
+        Schema::table('books', function (Blueprint $table) {
+            $table->dropColumn('pdf_path');
+        });
+    }
 };

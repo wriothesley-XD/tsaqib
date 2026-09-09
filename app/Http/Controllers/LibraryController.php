@@ -14,11 +14,11 @@ class LibraryController extends Controller
      * terdaftar tetap muncul otomatis dari DB — di-title-case sebagai fallback.
      */
     private const GENRE_LABELS = [
-        'fiqih'  => 'Fiqih',
+        'fiqih' => 'Fiqih',
         'aqidah' => 'Aqidah',
-        'ski'    => 'SKI',
+        'ski' => 'SKI',
         'hadits' => 'Hadits & Tafsir',
-        'modul'  => 'Modul PAI',
+        'modul' => 'Modul PAI',
     ];
 
     /**
@@ -96,7 +96,7 @@ class LibraryController extends Controller
             ->when($q !== '', function ($query) use ($q) {
                 $query->where(function ($query) use ($q) {
                     $query->where('title', 'like', "%{$q}%")
-                          ->orWhere('author', 'like', "%{$q}%");
+                        ->orWhere('author', 'like', "%{$q}%");
                 });
             })
             ->latest()
@@ -120,7 +120,7 @@ class LibraryController extends Controller
         $books = Book::visible()
             ->where(function ($query) use ($q) {
                 $query->where('title', 'like', "%{$q}%")
-                      ->orWhere('author', 'like', "%{$q}%");
+                    ->orWhere('author', 'like', "%{$q}%");
             })
             ->latest()
             ->paginate(12)
@@ -145,7 +145,7 @@ class LibraryController extends Controller
             ->when($q !== '', function ($query) use ($q) {
                 $query->where(function ($query) use ($q) {
                     $query->where('title', 'like', "%{$q}%")
-                          ->orWhere('author', 'like', "%{$q}%");
+                        ->orWhere('author', 'like', "%{$q}%");
                 });
             })
             ->orderByPivot('created_at', 'desc')

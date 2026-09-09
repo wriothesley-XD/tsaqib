@@ -50,6 +50,14 @@
                     <i class="fa-solid fa-volume-xmark text-white/40 sfx-icon text-[10px]"></i>
                     <span class="sfx-status">SFX Hening</span>
                 </button>
+                <span class="text-white/20">&bull;</span>
+                {{-- Cinematic Intro Replay Trigger --}}
+                <a href="{{ route('landing') }}?intro=1"
+                   class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[var(--gold)]/40 text-white/60 hover:text-white transition cursor-pointer"
+                   title="Tonton Kembali Pengantar Sinematik TSAQIB">
+                    <i class="fa-solid fa-film text-[10px] text-[var(--gold)]"></i>
+                    <span>Sinematik</span>
+                </a>
             </div>
         </div>
 

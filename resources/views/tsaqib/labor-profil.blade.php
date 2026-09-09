@@ -1,6 +1,213 @@
 {{-- Sub-halaman Laboratorium PAI: Profil Laboratorium & Guru (publik, read-only) --}}
 @php($pageTitle = 'Profil & Guru - Laboratorium PAI')
-@push('styles')@include('tsaqib._labor-styles')@endpush
+@push('styles')
+    @include('tsaqib._labor-styles')
+    <style>
+    /* Card Profil Guru Pengampu (Adapted from Uiverse.io by Smit-Prajapati) */
+    .guru-card {
+      width: 280px;
+      height: 280px;
+      background: #01795F;
+      border-radius: 32px;
+      padding: 3px;
+      position: relative;
+      box-shadow: #01795f55 0px 70px 30px -50px;
+      transition: all 0.5s ease-in-out;
+    }
+
+    .guru-card .mail {
+      position: absolute;
+      right: 1.5rem;
+      top: 1.2rem;
+      background: transparent;
+      border: none;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .guru-card .mail svg {
+      stroke: #3fd6b0;
+      stroke-width: 3px;
+      transition: stroke 0.3s ease;
+    }
+
+    .guru-card .mail:hover svg {
+      stroke: #a8f0dc;
+    }
+
+    .guru-card .profile-pic {
+      position: absolute;
+      width: calc(100% - 6px);
+      height: calc(100% - 6px);
+      top: 3px;
+      left: 3px;
+      border-radius: 29px;
+      z-index: 1;
+      border: 0px solid #3fd6b0;
+      overflow: hidden;
+      transition: all 0.5s ease-in-out 0.2s, z-index 0.5s ease-in-out 0.2s;
+      background: #e8f5f1;
+    }
+
+    .guru-card .profile-pic img {
+      -o-object-fit: cover;
+      object-fit: cover;
+      width: 100%;
+      height: 100%;
+      object-position: center center;
+      transition: all 0.5s ease-in-out 0s;
+    }
+
+    .guru-card .profile-pic svg {
+      width: 100%;
+      height: 100%;
+      -o-object-fit: cover;
+      object-fit: cover;
+      object-position: center center;
+      transition: all 0.5s ease-in-out 0s;
+    }
+
+    .guru-card .bottom {
+      position: absolute;
+      bottom: 3px;
+      left: 3px;
+      right: 3px;
+      background: #01795F;
+      top: 80%;
+      border-radius: 29px;
+      z-index: 2;
+      box-shadow: rgba(1, 121, 95, 0.25) 0px 5px 5px 0px inset;
+      overflow: hidden;
+      transition: all 0.5s cubic-bezier(0.645, 0.045, 0.355, 1) 0s;
+    }
+
+    .guru-card .bottom .content {
+      position: absolute;
+      bottom: 0;
+      left: 1.25rem;
+      right: 1.25rem;
+      height: 160px;
+    }
+
+    .guru-card .bottom .content .name {
+      display: block;
+      font-size: 1.05rem;
+      color: white;
+      font-weight: bold;
+      line-height: 1.25;
+    }
+
+    .guru-card .bottom .content .about-me {
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      font-size: 0.78rem;
+      color: rgba(255, 255, 255, 0.85);
+      margin-top: 0.5rem;
+      line-height: 1.35;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    }
+
+    .guru-card .bottom .bottom-bottom {
+      position: absolute;
+      bottom: 0.85rem;
+      left: 1.25rem;
+      right: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .guru-card .bottom .bottom-bottom .social-links-container {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .guru-card .bottom .bottom-bottom .social-links-container a,
+    .guru-card .bottom .bottom-bottom .social-links-container span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+
+    .guru-card .bottom .bottom-bottom .social-links-container svg {
+      height: 18px;
+      width: 18px;
+      fill: white;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+      transition: all 0.3s ease;
+    }
+
+    .guru-card .bottom .bottom-bottom .social-links-container svg:hover {
+      fill: #a8f0dc;
+      transform: scale(1.25);
+    }
+
+    .guru-card .bottom .bottom-bottom .button {
+      background: white;
+      color: #01795F;
+      border: none;
+      border-radius: 20px;
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 0.38rem 0.75rem;
+      box-shadow: rgba(1, 121, 95, 0.2) 0px 5px 5px 0px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .guru-card .bottom .bottom-bottom .button:hover {
+      background: #3fd6b0;
+      color: #01412f;
+    }
+
+    .guru-card:hover {
+      border-top-left-radius: 55px;
+    }
+
+    .guru-card:hover .bottom {
+      top: 20%;
+      border-radius: 80px 29px 29px 29px;
+      transition: all 0.5s cubic-bezier(0.645, 0.045, 0.355, 1) 0.2s;
+    }
+
+    .guru-card:hover .profile-pic {
+      width: 100px;
+      height: 100px;
+      aspect-ratio: 1;
+      top: 10px;
+      left: 10px;
+      border-radius: 50%;
+      z-index: 3;
+      border: 4px solid #3fd6b0;
+      box-shadow: rgba(1, 121, 95, 0.35) 0px 5px 12px 0px;
+      transition: all 0.5s ease-in-out, z-index 0.5s ease-in-out 0.1s;
+    }
+
+    .guru-card:hover .profile-pic img {
+      transform: scale(1);
+      object-fit: cover;
+      object-position: center center;
+      transition: all 0.5s ease-in-out 0.3s;
+    }
+
+    .guru-card:hover .profile-pic svg {
+      transform: scale(1);
+      transition: all 0.5s ease-in-out 0.3s;
+    }
+    </style>
+@endpush
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
 <head>
@@ -93,59 +300,79 @@
             </div>
 
             @if($gurus->isNotEmpty())
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div class="flex flex-wrap items-center justify-center gap-8 py-4">
                     @foreach($gurus as $guru)
-                        @php($kelasDiampu = $guru->kelas_diampu ?? [])
-                        <article class="reveal tsaqib-card p-6 flex flex-col justify-between group hover:border-[var(--gold)]/40 transition-all duration-300" style="--reveal-i:{{ $loop->index % 6 }};">
-                            <div>
-                                <div class="flex items-start gap-4">
-                                    @if($guru->foto_path)
-                                        <img src="{{ asset('storage/' . $guru->foto_path) }}" alt="{{ $guru->user?->name }}"
-                                             class="w-16 h-16 rounded-2xl object-cover border-2 border-[var(--gold)]/40 shadow-md shrink-0 group-hover:scale-105 transition-transform duration-300">
-                                    @else
-                                        <span class="inline-flex items-center justify-center w-16 h-16 rounded-2xl shrink-0 border-2 border-[var(--gold)]/40 bg-[rgba(201,166,107,0.12)] text-[var(--gold)] shadow-md group-hover:scale-105 transition-transform duration-300">
-                                            <i class="fa-solid fa-user text-xl"></i>
+                        <div class="guru-card reveal" style="--reveal-i:{{ $loop->index % 6 }};">
+                            <a href="{{ $guru->email ? 'mailto:' . $guru->email : '#' }}" class="mail" title="{{ $guru->email ? 'Email: ' . $guru->email : 'Email belum diisi' }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+                                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                                </svg>
+                            </a>
+                            <div class="profile-pic">
+                                @if($guru->foto_path)
+                                    <img src="{{ asset('storage/' . $guru->foto_path) }}" alt="{{ $guru->nama }}">
+                                @else
+                                    @include('tsaqib.partials.guru-avatar-svg')
+                                @endif
+                            </div>
+                            <div class="bottom">
+                                <div class="content">
+                                    <span class="name truncate" title="{{ $guru->nama }}">{{ $guru->nama }}</span>
+                                    @if($guru->mapel_pengampu)
+                                        <span class="block text-[10px] font-bold text-white/90 uppercase tracking-wider mt-0.5">{{ $guru->mapel_pengampu }}</span>
+                                    @endif
+                                    @if(!empty($guru->kelas_diampu))
+                                        <span class="block text-[9px] text-white/75 font-semibold mt-0.5">
+                                            Kelas: {{ implode(', ', $guru->kelas_diampu) }}
                                         </span>
                                     @endif
-                                    <div class="min-w-0 flex-1">
-                                        <h3 class="font-display font-bold text-[15px] text-[var(--cream)] leading-snug truncate group-hover:text-[var(--gold)] transition-colors">
-                                            {{ $guru->user?->name ?? 'Guru PAI' }}
-                                        </h3>
-                                        @if($guru->nip)
-                                            <p class="text-[10px] text-white/45 mt-0.5 font-mono">NIP. {{ $guru->nip }}</p>
-                                        @endif
-                                        @if($guru->mapel_pengampu)
-                                            <span class="inline-flex items-center mt-2 px-2.5 py-0.5 rounded-full border text-[9px] font-bold uppercase tracking-wider bg-[rgba(201,166,107,0.14)] text-[var(--gold)] border-[rgba(201,166,107,0.28)]">
-                                                {{ $guru->mapel_pengampu }}
-                                            </span>
-                                        @endif
-                                    </div>
+                                    <span class="about-me" title="{{ $guru->deskripsi }}">
+                                        {{ $guru->deskripsi ?: 'Guru Pengampu Pendidikan Agama Islam SMAN 1 Bukittinggi.' }}
+                                    </span>
                                 </div>
-
-                                @if(!empty($kelasDiampu))
-                                    <div class="flex flex-wrap gap-1.5 mt-4 pt-3 border-t border-white/5">
-                                        @foreach($kelasDiampu as $kelas)
-                                            <span class="px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-[#01795F]/15 text-[#3fd6b0] border border-[#01795F]/25">
-                                                Kelas {{ $kelas }}
+                                <div class="bottom-bottom">
+                                    <div class="social-links-container">
+                                        @if($guru->facebook_url)
+                                            <a href="{{ $guru->facebook_url }}" target="_blank" rel="noopener noreferrer" title="Facebook: {{ $guru->nama }}">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+                                                    <path d="M80 299.3V512H196V299.3h86.5l18-97.8H196V136.9c0-26.6 13.1-52.4 54.7-52.4H296V.8S255.4 0 216.7 0C136.2 0 80 49.3 80 137.9v63.6H0v97.8h80z"/>
+                                                </svg>
+                                            </a>
+                                        @else
+                                            <span title="Facebook belum tersedia" class="opacity-40 cursor-not-allowed">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+                                                    <path d="M80 299.3V512H196V299.3h86.5l18-97.8H196V136.9c0-26.6 13.1-52.4 54.7-52.4H296V.8S255.4 0 216.7 0C136.2 0 80 49.3 80 137.9v63.6H0v97.8h80z"/>
+                                                </svg>
                                             </span>
-                                        @endforeach
-                                    </div>
-                                @endif
-                            </div>
+                                        @endif
 
-                            <div class="mt-5 pt-4 border-t border-white/10 flex items-center justify-between">
-                                @if($guru->wa_number)
-                                    <a href="https://wa.me/{{ preg_replace('/\D/', '', $guru->wa_number) }}" target="_blank" rel="noopener"
-                                       class="inline-flex items-center gap-2 text-xs font-bold text-[#3fd6b0] hover:text-[var(--gold)] transition cursor-pointer">
-                                        <i class="fa-brands fa-whatsapp text-sm"></i>
-                                        <span>Hubungi WhatsApp</span>
-                                    </a>
-                                @else
-                                    <span class="text-[10px] text-white/35 italic">Kontak privat</span>
-                                @endif
-                                <span class="w-2 h-2 rounded-full bg-[#01795F]/40"></span>
+                                        @if($guru->instagram_url)
+                                            @php($igLink = str_starts_with($guru->instagram_url, 'http') ? $guru->instagram_url : 'https://instagram.com/' . ltrim($guru->instagram_url, '@'))
+                                            <a href="{{ $igLink }}" target="_blank" rel="noopener noreferrer" title="Instagram: {{ $guru->nama }}">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                                    <path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1z"/>
+                                                </svg>
+                                            </a>
+                                        @else
+                                            <span title="Instagram belum tersedia" class="opacity-40 cursor-not-allowed">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                                    <path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1z"/>
+                                                </svg>
+                                            </span>
+                                        @endif
+                                    </div>
+
+                                    @if($guru->wa_number)
+                                        <a href="https://wa.me/{{ preg_replace('/\D/', '', $guru->wa_number) }}" target="_blank" rel="noopener noreferrer" class="button">Hubungi</a>
+                                    @elseif($guru->email)
+                                        <a href="mailto:{{ $guru->email }}" class="button">Hubungi</a>
+                                    @else
+                                        <span class="button">Hubungi</span>
+                                    @endif
+                                </div>
                             </div>
-                        </article>
+                        </div>
                     @endforeach
                 </div>
             @else

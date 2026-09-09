@@ -173,21 +173,19 @@
             transition-delay: calc(var(--reveal-i, 0) * 80ms);
         }
 
-        /* Back to top button */
-        #to-top {
-            opacity: 0;
-            transform: translateY(10px);
-            pointer-events: none;
-            transition: opacity 0.25s ease, transform 0.25s ease;
+        /* Section Highlight on Role Selector Jump */
+        .target-section-highlight {
+            animation: pulse-border 1.8s cubic-bezier(0.22, 1, 0.36, 1);
         }
-        #to-top.is-show {
-            opacity: 1;
-            transform: none;
-            pointer-events: auto;
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 0 0 rgba(201, 166, 107, 0.7); }
+            50% { box-shadow: 0 0 0 16px rgba(201, 166, 107, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(201, 166, 107, 0); }
         }
     </style>
 </head>
 <body class="antialiased text-[var(--cream)] overflow-x-hidden">
+
 
     {{-- Global Unified Navbar --}}
     @include('partials.navbar')
@@ -204,8 +202,13 @@
                      class="w-full h-full object-cover object-[center_35%] transform scale-105 filter brightness-[0.70] contrast-105">
             </picture>
             {{-- Deep Luxurious Emerald Gradients (Assures 100% WCAG AAA Text Contrast) --}}
+<<<<<<< HEAD
+            <div class="absolute inset-0 bg-gradient-to-r from-[#07170E]/60 via-[#0D2818]/60 to-[#07170E]/95"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-[#07170E]/50 via-[#0D2818]/50 to-[#07170E]"></div>
+=======
             <div class="absolute inset-0 bg-gradient-to-r from-[#07170E]/60 via-[#0D2818]/85 to-[#07170E]/95"></div>
             <div class="absolute inset-0 bg-gradient-to-b from-[#07170E]/50 via-[#0D2818]/70 to-[#07170E]"></div>
+>>>>>>> 9f6d7de8dfe726dd05de684c6378a7847d269419
             <div class="pat-islami opacity-10"></div>
         </div>
 
@@ -227,11 +230,14 @@
                     <p class="font-display font-semibold text-lg sm:text-xl text-shimmer tracking-tight">
                         Cerdas, Unggul, dan Berakhlak Mulia
                     </p>
+                    <p class="text-xs sm:text-sm font-semibold tracking-wider text-[var(--gold)]">
+                        Pusat Belajar PAI &middot; Ruang Tumbuh Siswa SMAN 1 Bukittinggi
+                    </p>
                 </div>
 
-                <p class="text-white/75 text-sm sm:text-base leading-relaxed max-w-xl">
-                    Ekosistem digital dan wadah pembinaan generasi muda Islam SMAN 1 Bukittinggi. Mengintegrasikan riset
-                    Laboratorium PAI, koleksi Perpustakaan Digital, serta 13 komunitas minat &amp; bakat dalam satu ikatan ukhuwah.
+                <p class="text-white/80 text-sm sm:text-base leading-relaxed max-w-xl">
+                    Platform digital resmi Forum Studi Islam (FSI) SMAN 1 Bukittinggi. Menghadirkan silabus riset
+                    <strong class="text-[var(--cream)]">Laboratorium PAI</strong>, ratusan koleksi <strong class="text-[var(--cream)]">Perpustakaan Digital</strong>, serta ruang ukhuwah <strong class="text-[var(--cream)]">13 circle komunitas</strong> mandiri karya siswa.
                 </p>
 
                 {{-- Call To Action Buttons --}}
@@ -397,6 +403,221 @@
 
         </div>
     </header>
+
+    {{-- =========================================================================
+       SCENE 03: "JADI, TSAQIB ITU APA?" (The Clarity Anchor / 5-Second Rule)
+       ========================================================================= --}}
+    <section id="tentang-tsaqib" class="relative py-14 sm:py-20 border-b border-white/10" style="background-color: var(--green-s1);">
+        <div class="section-glow" style="--glow-x: 50%; --glow-y: 20%;"></div>
+        <div class="pat-islami opacity-15"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center max-w-3xl mx-auto space-y-4">
+                <span class="eyebrow-pill eyebrow-pill-gold">
+                    <i class="fa-solid fa-compass text-[10px]"></i>
+                    Orientasi Singkat &middot; 5 Detik Paham
+                </span>
+                <h2 class="font-display font-extrabold text-2xl sm:text-4xl lg:text-5xl text-[var(--cream)] tracking-tight">
+                    Jadi, TSAQIB itu apa?
+                </h2>
+                <p class="text-base sm:text-2xl font-display text-shimmer leading-relaxed">
+                    TSAQIB adalah <strong class="text-[var(--cream)] font-bold">ruang tumbuh siswa</strong> SMAN 1 Bukittinggi.
+                </p>
+                <p class="text-white/70 text-xs sm:text-sm leading-relaxed max-w-2xl mx-auto">
+                    Bukan sekadar website profil sekolah biasa. Ini adalah ruang digital terpadu di mana siswa dibina karakternya, diasah potensinya, dan dihubungkan dalam ukhuwah yang nyata.
+                </p>
+            </div>
+
+            {{-- Triad: BELAJAR -> BERKARYA -> BERKOMUNITAS --}}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+                {{-- Pilar 1: BELAJAR --}}
+                <div class="tsaqib-card p-6 sm:p-7 flex flex-col justify-between group hover:border-[#01795F] transition relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-28 h-28 bg-[#01795F]/10 rounded-full blur-2xl pointer-events-none"></div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="w-12 h-12 rounded-2xl bg-[#01795F]/20 border border-[#01795F]/35 flex items-center justify-center text-[#3fd6b0] text-xl font-bold">
+                                <i class="fa-solid fa-flask"></i>
+                            </span>
+                            <span class="font-display font-black text-2xl sm:text-3xl text-white/10 group-hover:text-[#3fd6b0]/30 transition">01</span>
+                        </div>
+                        <span class="eyebrow-pill eyebrow-pill-green text-[10px] mb-2">Pilar Pertama</span>
+                        <h3 class="font-display font-extrabold text-xl sm:text-2xl text-[var(--cream)] tracking-tight mt-2">
+                            BELAJAR.
+                        </h3>
+                        <p class="text-xs sm:text-sm text-white/70 mt-2 leading-relaxed">
+                            Melalui <strong class="text-white">Laboratorium PAI</strong>, siswa mempraktikkan ibadah, mengakses modul kurikulum resmi kelas X-XII, dan menyelesaikan penugasan terstruktur.
+                        </p>
+                    </div>
+                    <div class="pt-5 mt-4 border-t border-white/10 flex items-center justify-between">
+                        <a href="#labor" class="text-xs font-bold text-[#3fd6b0] hover:underline inline-flex items-center gap-1.5">
+                            Jelajahi Laboratorium <i class="fa-solid fa-arrow-down text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+
+                {{-- Pilar 2: BERKARYA --}}
+                <div class="tsaqib-card p-6 sm:p-7 flex flex-col justify-between group hover:border-[var(--gold)] transition relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-28 h-28 bg-[var(--gold)]/10 rounded-full blur-2xl pointer-events-none"></div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="w-12 h-12 rounded-2xl bg-[var(--gold)]/20 border border-[var(--gold)]/35 flex items-center justify-center text-[var(--gold)] text-xl font-bold">
+                                <i class="fa-solid fa-book-open"></i>
+                            </span>
+                            <span class="font-display font-black text-2xl sm:text-3xl text-white/10 group-hover:text-[var(--gold)]/30 transition">02</span>
+                        </div>
+                        <span class="eyebrow-pill eyebrow-pill-gold text-[10px] mb-2">Pilar Kedua</span>
+                        <h3 class="font-display font-extrabold text-xl sm:text-2xl text-[var(--cream)] tracking-tight mt-2">
+                            BERKARYA.
+                        </h3>
+                        <p class="text-xs sm:text-sm text-white/70 mt-2 leading-relaxed">
+                            Melalui <strong class="text-white">Perpustakaan Digital</strong>, siswa membaca ratusan buku islami, buletin dakwah gratis, serta menerbitkan risalah dan karya tulis mandiri.
+                        </p>
+                    </div>
+                    <div class="pt-5 mt-4 border-t border-white/10 flex items-center justify-between">
+                        <a href="#perpus" class="text-xs font-bold text-[var(--gold)] hover:underline inline-flex items-center gap-1.5">
+                            Buka Perpustakaan <i class="fa-solid fa-arrow-down text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+
+                {{-- Pilar 3: BERKOMUNITAS --}}
+                <div class="tsaqib-card p-6 sm:p-7 flex flex-col justify-between group hover:border-[#3fd6b0] transition relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-28 h-28 bg-[#3fd6b0]/10 rounded-full blur-2xl pointer-events-none"></div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="w-12 h-12 rounded-2xl bg-[#01795F]/20 border border-[#01795F]/35 flex items-center justify-center text-[#3fd6b0] text-xl font-bold">
+                                <i class="fa-solid fa-users"></i>
+                            </span>
+                            <span class="font-display font-black text-2xl sm:text-3xl text-white/10 group-hover:text-[#3fd6b0]/30 transition">03</span>
+                        </div>
+                        <span class="eyebrow-pill eyebrow-pill-green text-[10px] mb-2">Pilar Ketiga</span>
+                        <h3 class="font-display font-extrabold text-xl sm:text-2xl text-[var(--cream)] tracking-tight mt-2">
+                            BERKOMUNITAS.
+                        </h3>
+                        <p class="text-xs sm:text-sm text-white/70 mt-2 leading-relaxed">
+                            Melalui <strong class="text-white">13 Circle Komunitas</strong>, setiap siswa menyalurkan minat &amp; bakat positif—dari hafalan Al-Qur'an, sains OSN, olahraga, hingga kreasi digital.
+                        </p>
+                    </div>
+                    <div class="pt-5 mt-4 border-t border-white/10 flex items-center justify-between">
+                        <a href="#komunitas-preview" class="text-xs font-bold text-[#3fd6b0] hover:underline inline-flex items-center gap-1.5">
+                            Lihat 13 Circle <i class="fa-solid fa-arrow-down text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- =========================================================================
+       SCENE 04: "PROVE IT: MEREKA ADALAH TSAQIB" (Visual Storytelling)
+       ========================================================================= --}}
+    <section id="prove-it" class="relative py-16 sm:py-24 border-b border-white/10 overflow-hidden" style="background-color: var(--green-s0);">
+        <div class="section-glow" style="--glow-x: 90%; --glow-y: 50%;"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-12">
+            <div class="text-center max-w-2xl mx-auto">
+                <span class="eyebrow-pill eyebrow-pill-gold">
+                    <i class="fa-solid fa-camera text-[10px]"></i>
+                    Kiprah Nyata Siswa SMAN 1 Bukittinggi
+                </span>
+                <h2 class="font-display font-extrabold text-2xl sm:text-4xl lg:text-5xl text-[var(--cream)] tracking-tight mt-3">
+                    BUKTI BUKAN SEKADAR KATA.
+                </h2>
+                <p class="text-white/65 text-xs sm:text-sm mt-2">
+                    Setiap hari di SMAN 1 Bukittinggi, mereka tidak hanya hadir untuk belajar—mereka berkarya dan membangun masa depan.
+                </p>
+            </div>
+
+            {{-- 4 Story Beats Grid --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                {{-- Beat 1 --}}
+                <div class="group relative rounded-2xl overflow-hidden border border-white/10 aspect-[3/4] shadow-xl">
+                    <picture>
+                        <source srcset="{{ asset('assets/images/laboratorium/foto-1.webp') }}" type="image/webp">
+                        <img src="{{ asset('assets/images/laboratorium/foto-1.jpg') }}" alt="MEREKA BELAJAR"
+                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 filter brightness-[0.75] contrast-105" loading="lazy">
+                    </picture>
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#07170E] via-[#07170E]/40 to-transparent"></div>
+                    <div class="absolute inset-x-0 bottom-0 p-5 flex flex-col justify-end">
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-[#3fd6b0] mb-1">Fokus &middot; Keilmuan</span>
+                        <h3 class="font-display font-black text-xl sm:text-2xl text-[var(--cream)] tracking-tight leading-none">
+                            MEREKA BELAJAR.
+                        </h3>
+                        <p class="text-[11px] text-white/70 mt-2 leading-snug">
+                            Mendalami esensi syariat, akidah, dan risalah PAI di Laboratorium.
+                        </p>
+                    </div>
+                </div>
+
+                {{-- Beat 2 --}}
+                <div class="group relative rounded-2xl overflow-hidden border border-white/10 aspect-[3/4] shadow-xl">
+                    <picture>
+                        <source srcset="{{ asset('assets/landing/fsi.webp') }}" type="image/webp">
+                        <img src="{{ asset('assets/landing/fsi.jpg') }}" alt="MEREKA BERKARYA"
+                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 filter brightness-[0.75] contrast-105" loading="lazy">
+                    </picture>
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#07170E] via-[#07170E]/40 to-transparent"></div>
+                    <div class="absolute inset-x-0 bottom-0 p-5 flex flex-col justify-end">
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-[var(--gold)] mb-1">Dedikasi &middot; Dakwah</span>
+                        <h3 class="font-display font-black text-xl sm:text-2xl text-[var(--cream)] tracking-tight leading-none">
+                            MEREKA BERKARYA.
+                        </h3>
+                        <p class="text-[11px] text-white/70 mt-2 leading-snug">
+                            Menulis buletin warta, riset keilmuan, dan menyebarkan syiar kebaikan.
+                        </p>
+                    </div>
+                </div>
+
+                {{-- Beat 3 --}}
+                <div class="group relative rounded-2xl overflow-hidden border border-white/10 aspect-[3/4] shadow-xl">
+                    <picture>
+                        <source srcset="{{ asset('assets/images/laboratorium/foto-2.webp') }}" type="image/webp">
+                        <img src="{{ asset('assets/images/laboratorium/foto-2.jpg') }}" alt="MEREKA BERKOMUNITAS"
+                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 filter brightness-[0.75] contrast-105" loading="lazy">
+                    </picture>
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#07170E] via-[#07170E]/40 to-transparent"></div>
+                    <div class="absolute inset-x-0 bottom-0 p-5 flex flex-col justify-end">
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-[#5fd3b0] mb-1">Ukhuwah &middot; Sinergi</span>
+                        <h3 class="font-display font-black text-xl sm:text-2xl text-[var(--cream)] tracking-tight leading-none">
+                            MEREKA BERKOMUNITAS.
+                        </h3>
+                        <p class="text-[11px] text-white/70 mt-2 leading-snug">
+                            Saling menguatkan dalam 13 circle minat &amp; bakat yang penuh berkah.
+                        </p>
+                    </div>
+                </div>
+
+                {{-- Beat 4 --}}
+                <div class="group relative rounded-2xl overflow-hidden border border-white/10 aspect-[3/4] shadow-xl">
+                    <picture>
+                        <source srcset="{{ asset('assets/landing/2.webp') }}" type="image/webp">
+                        <img src="{{ asset('assets/landing/2.jpg') }}" alt="MEREKA MEMBANGUN SESUATU"
+                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 filter brightness-[0.75] contrast-105" loading="lazy">
+                    </picture>
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#07170E] via-[#07170E]/40 to-transparent"></div>
+                    <div class="absolute inset-x-0 bottom-0 p-5 flex flex-col justify-end">
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-amber-300 mb-1">Kreasi Digital</span>
+                        <h3 class="font-display font-black text-xl sm:text-2xl text-[var(--cream)] tracking-tight leading-none">
+                            MEREKA MEMBANGUN SESUATU.
+                        </h3>
+                        <p class="text-[11px] text-white/70 mt-2 leading-snug">
+                            Menciptakan sistem platform mandiri yang digunakan bersama di sekolah.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Climax Quote Callout --}}
+            <div class="p-6 sm:p-8 rounded-2xl border border-[var(--gold)]/30 bg-gradient-to-r from-[rgba(201,166,107,0.12)] via-transparent to-[rgba(1,121,95,0.15)] text-center max-w-4xl mx-auto">
+                <h3 class="font-display font-black text-2xl sm:text-4xl text-[var(--cream)] tracking-tight">
+                    MEREKA ADALAH <span class="text-[var(--gold)]">TSAQIB</span>.
+                </h3>
+                <p class="text-xs sm:text-sm text-white/80 mt-2 max-w-2xl mx-auto leading-relaxed">
+                    Generasi muda yang cerdas, unggul, dan berakhlak mulia. Bukan hanya penikmat perubahan, melainkan penggerak nyata di SMAN 1 Bukittinggi.
+                </p>
+            </div>
+        </div>
+    </section>
 
     {{-- =========================================================================
        SECTION 1: KABAR TERBARU (2 Blok Asimetris: Berita & Buletin)
@@ -804,13 +1025,16 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-10">
 
             <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-                <div>
+                <div class="max-w-2xl">
                     <p class="ed-eyebrow">Keluarga Besar FSI &middot; Circle Minat &amp; Bakat</p>
                     <h2 class="font-display font-extrabold text-2xl sm:text-4xl text-[var(--cream)] tracking-tight mt-2">
-                        13 CIRCLE KOMUNITAS TSAQIB
+                        7 CIRCLE KOMUNITAS TSAQIB
                     </h2>
-                    <p class="text-white/70 text-xs sm:text-sm mt-2 max-w-xl">
-                        Setiap minat memiliki tempat untuk bertumbuh. Temukan circle yang selaras dengan passion-mu dan kuatkan ukhuwah bersama.
+                    <p class="text-[var(--gold)] font-display text-sm sm:text-base font-semibold mt-2">
+                        Kenapa komunitas? Karena berkembang tidak harus sendirian.
+                    </p>
+                    <p class="text-white/70 text-xs sm:text-sm mt-1 leading-relaxed">
+                        Setiap minat memiliki tempat untuk bertumbuh. Dari tahfidz Al-Qur'an, sains OSN, olahraga, hingga gaming santai dan bahasa—temukan circle yang selaras dengan passion-mu dalam naungan ukhuwah.
                     </p>
                 </div>
                 <a href="{{ route('komunitas', 'semua') }}" class="btn-gold shrink-0 self-start sm:self-auto">
@@ -837,9 +1061,12 @@
                             </div>
                         </div>
 
-                        <p class="text-xs text-white/70 leading-relaxed line-clamp-3">
-                            {{ $k['deskripsi_singkat'] }}
-                        </p>
+                        <div class="space-y-1">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-[var(--gold)]/80 block">Aktivitas Circle:</span>
+                            <p class="text-xs text-white/70 leading-relaxed line-clamp-3">
+                                {{ $k['deskripsi_singkat'] }}
+                            </p>
+                        </div>
 
                         <div class="pt-2 border-t border-white/10 flex items-center justify-between">
                             <span class="eyebrow-pill eyebrow-pill-green text-[9px] py-0.5 px-2">
@@ -885,6 +1112,7 @@
         </div>
     </section>
     @endif
+    </section>
 
     {{-- Global Site Footer --}}
     @include('partials.site-footer')
@@ -1089,6 +1317,38 @@
                 if (window.showToast) window.showToast('Gagal menyalin kutipan.', 'warning');
             });
         };
+
+        // 8. Role Orientation Navigation Controller (Scene 02)
+        (function () {
+            const roleButtons = document.querySelectorAll('.role-btn[data-role-target]');
+            if (!roleButtons.length) return;
+
+            roleButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetSelector = btn.getAttribute('data-role-target');
+                    if (!targetSelector) return;
+                    const targetEl = document.querySelector(targetSelector);
+                    if (!targetEl) return;
+
+                    const navbar = document.querySelector('header.sticky');
+                    const navOffset = navbar ? navbar.offsetHeight + 10 : 80;
+                    const elPos = targetEl.getBoundingClientRect().top + window.pageYOffset - navOffset;
+
+                    window.scrollTo({
+                        top: elPos,
+                        behavior: 'smooth'
+                    });
+
+                    // Add visual highlight pulse
+                    targetEl.classList.remove('target-section-highlight');
+                    void targetEl.offsetWidth; // Force reflow
+                    targetEl.classList.add('target-section-highlight');
+                    setTimeout(() => {
+                        targetEl.classList.remove('target-section-highlight');
+                    }, 2000);
+                });
+            });
+        })();
     </script>
     {{-- Modal onboarding "Panduan TSAQIB" — auto-sekali + buka ulang via navbar. --}}
     @include('partials.intro-modal')

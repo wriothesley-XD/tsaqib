@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\ActivityDocumentation;
 use App\Models\Book;
 use App\Models\News;
-use Illuminate\Http\Request;
 
 class NewsController extends Controller
 {

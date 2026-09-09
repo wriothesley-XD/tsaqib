@@ -1,0 +1,191 @@
+diff --git a/app/Http/Controllers/AdminController.php b/app/Http/Controllers/AdminController.php
+index 40d9738..901faa8 100644
+--- a/app/Http/Controllers/AdminController.php
++++ b/app/Http/Controllers/AdminController.php
+@@ -85,6 +85,7 @@ public function index(Request $request)
+             'profil_buku_tsaqib_url' => Setting::getByKey('profil_buku_tsaqib_url', 'https://heyzine.com/flip-book/bdf3f31765.html'),
+             'profil_buku_tsaqib_pdf' => Setting::getByKey('profil_buku_tsaqib_pdf'),
+             'monev_internal_pdf' => Setting::getByKey('monev_internal_pdf'),
++            'monev_internal_url' => Setting::getByKey('monev_internal_url'),
+         ];
+ 
+         // Laporan konten pending (untuk badge + Perlu Perhatian + tab Laporan).
+@@ -518,6 +519,7 @@ public function updateLaborDocuments(Request $request): RedirectResponse
+         $request->validate([
+             'profil_buku_tsaqib_url' => 'nullable|url|max:500',
+             'profil_buku_tsaqib_pdf' => 'nullable|file|mimes:pdf|max:30720',
++            'monev_internal_url' => 'nullable|url|max:500',
+             'monev_internal_pdf' => 'nullable|file|mimes:pdf|max:30720',
+             'struktur_organisasi_pembina' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:10240',
+             'struktur_organisasi_siswa' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:10240',
+@@ -536,6 +538,10 @@ public function updateLaborDocuments(Request $request): RedirectResponse
+             Setting::setByKey('profil_buku_tsaqib_pdf', $path);
+         }
+ 
++        if ($request->filled('monev_internal_url')) {
++            Setting::setByKey('monev_internal_url', $request->input('monev_internal_url'));
++        }
++
+         if ($request->hasFile('monev_internal_pdf')) {
+             $oldPath = Setting::getByKey('monev_internal_pdf');
+             if ($oldPath && Storage::disk('public')->exists($oldPath)) {
+@@ -579,6 +585,7 @@ public function deleteLaborDocument(string $type): RedirectResponse
+             'struktur_organisasi_siswa',
+             'profil_buku_tsaqib_pdf',
+             'monev_internal_pdf',
++            'monev_internal_url',
+         ];
+ 
+         if (! in_array($type, $allowed, true)) {
+diff --git a/app/Http/Controllers/TsaqibController.php b/app/Http/Controllers/TsaqibController.php
+index 618bb0f..1dbac37 100644
+--- a/app/Http/Controllers/TsaqibController.php
++++ b/app/Http/Controllers/TsaqibController.php
+@@ -102,6 +102,10 @@ public function laborPai()
+ 
+         $profilBukuPdf = Setting::getByKey('profil_buku_tsaqib_pdf');
+         $monevPdf = Setting::getByKey('monev_internal_pdf');
++        // Tautan eksternal opsional untuk Monev (Heyzine/Google Drive/dst), sama
++        // seperti pola profil_buku_tsaqib_url. Kalau diisi, ini yang diprioritaskan
++        // di atas PDF upload (lihat $monevUrl di labor-pai.blade.php).
++        $monevUrlSetting = Setting::getByKey('monev_internal_url');
+         $strukturPembinaImg = Setting::getByKey('struktur_organisasi_pembina');
+         $strukturSiswaImg = Setting::getByKey('struktur_organisasi_siswa');
+ 
+@@ -113,7 +117,7 @@ public function laborPai()
+ 
+         return view('tsaqib.labor-pai', compact(
+             'visiMisi', 'pembina', 'pengurusSiswa', 'profilTsaqibUrl', 'coverUrl',
+-            'profilBukuPdf', 'monevPdf', 'strukturPembinaImg', 'strukturSiswaImg'
++            'profilBukuPdf', 'monevPdf', 'monevUrlSetting', 'strukturPembinaImg', 'strukturSiswaImg'
+         ));
+     }
+ 
+diff --git a/app/Http/Middleware/SecurityHeaders.php b/app/Http/Middleware/SecurityHeaders.php
+index 4255e8c..a5bb097 100644
+--- a/app/Http/Middleware/SecurityHeaders.php
++++ b/app/Http/Middleware/SecurityHeaders.php
+@@ -22,6 +22,12 @@ public function handle(Request $request, Closure $next)
+     "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; ".
+     "img-src 'self' data: https:; ".
+     "connect-src 'self'; ".
++    // frame-src: domain yang BOLEH kita embed lewat <iframe> (beda dari
++    // frame-ancestors di bawah, yang ngatur siapa boleh embed KITA).
++    // Tanpa ini, frame-src ikut default-src 'self' → semua iframe ke Heyzine/
++    // Google Drive diblokir browser sendiri (bukan diblokir Heyzine/Edge).
++    // Tambah domain lain di sini kalau nanti pakai provider flipbook/PDF lain.
++    "frame-src 'self' https://heyzine.com https://*.heyzine.com https://drive.google.com https://docs.google.com; ".
+     "frame-ancestors 'self';"
+ );
+ 
+diff --git a/resources/views/admin/_tab_labor_docs.blade.php b/resources/views/admin/_tab_labor_docs.blade.php
+index 28e9cca..3ce09ca 100644
+--- a/resources/views/admin/_tab_labor_docs.blade.php
++++ b/resources/views/admin/_tab_labor_docs.blade.php
+@@ -146,10 +146,29 @@ class="tsaqib-input w-full px-3 py-1.5 text-xs text-white/70 file:mr-3 file:py-1
+                     </span>
+ 
+                     <div>
+-                        <label class="block text-xs font-semibold text-white/75 mb-1">Unggah Berkas PDF Monev Resmi (Maks 30MB)</label>
++                        <label class="block text-xs font-semibold text-white/75 mb-1">Tautan Dokumen (Heyzine/Google Drive/dst — opsional)</label>
++                        <input type="url" name="monev_internal_url"
++                               value="{{ $laborSettings['monev_internal_url'] ?? '' }}"
++                               placeholder="https://heyzine.com/flip-book/... atau link Google Drive"
++                               class="tsaqib-input w-full px-3 py-2 text-xs">
++                        <p class="text-[11px] text-white/45 mt-1">Kalau diisi, tautan ini yang ditampilkan (bukan file PDF di bawah). Kosongkan untuk pakai PDF upload.</p>
++                        @if(!empty($laborSettings['monev_internal_url']))
++                            <div class="mt-2 flex items-center justify-between text-xs">
++                                <a href="{{ $laborSettings['monev_internal_url'] }}" target="_blank" class="text-[var(--gold)] hover:underline inline-flex items-center gap-1">
++                                    <i class="fa-solid fa-link"></i> Buka Tautan Tersimpan
++                                </a>
++                                <button type="button" onclick="if(confirm('Hapus tautan ini?')) { document.getElementById('del-monev-url-form').submit(); }" class="text-red-400 hover:text-red-300 font-semibold cursor-pointer">
++                                    <i class="fa-solid fa-trash"></i> Hapus
++                                </button>
++                            </div>
++                        @endif
++                    </div>
++
++                    <div class="pt-3 border-t border-white/10">
++                        <label class="block text-xs font-semibold text-white/75 mb-1">Atau Unggah Berkas PDF Monev Resmi (Maks 30MB)</label>
+                         <input type="file" name="monev_internal_pdf" accept=".pdf"
+                                class="tsaqib-input w-full px-3 py-1.5 text-xs text-white/70 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[var(--gold)]/20 file:text-[var(--gold)]">
+-                        <p class="text-[11px] text-white/45 mt-1">Jika belum diupload, sistem akan menampilkan dokumen monev resmi default.</p>
++                        <p class="text-[11px] text-white/45 mt-1">Jika tautan di atas kosong dan PDF belum diupload, sistem akan menampilkan dokumen monev resmi default.</p>
+                         @if(!empty($laborSettings['monev_internal_pdf']))
+                             <div class="mt-2 flex items-center justify-between text-xs">
+                                 <a href="{{ asset('storage/' . $laborSettings['monev_internal_pdf']) }}" target="_blank" class="text-[var(--gold)] hover:underline inline-flex items-center gap-1">
+@@ -191,3 +210,7 @@ class="tsaqib-input w-full px-3 py-1.5 text-xs text-white/70 file:mr-3 file:py-1
+     @csrf
+     @method('DELETE')
+ </form>
++<form id="del-monev-url-form" action="{{ route('admin.labor-documents.destroy', 'monev_internal_url') }}" method="POST" class="hidden">
++    @csrf
++    @method('DELETE')
++</form>
+diff --git a/resources/views/tsaqib/labor-pai.blade.php b/resources/views/tsaqib/labor-pai.blade.php
+index b75933f..68c8b4b 100644
+--- a/resources/views/tsaqib/labor-pai.blade.php
++++ b/resources/views/tsaqib/labor-pai.blade.php
+@@ -1,6 +1,10 @@
+ @php
+     $pageTitle = 'Laboratorium PAI - FSI SMAN 1 Bukittinggi';
+-    $monevUrl = !empty($monevPdf) ? asset('storage/' . $monevPdf) : asset('assets/documents/monev-internal-pemerintah-daerah.pdf');
++    // Prioritas: tautan eksternal (Heyzine/Google Drive/dst) > PDF yang diupload > file default.
++    $monevIsExternalLink = !empty($monevUrlSetting);
++    $monevUrl = $monevIsExternalLink
++        ? $monevUrlSetting
++        : (!empty($monevPdf) ? asset('storage/' . $monevPdf) : asset('assets/documents/monev-internal-pemerintah-daerah.pdf'));
+     $profilBukuFileUrl = !empty($profilBukuPdf) ? asset('storage/' . $profilBukuPdf) : null;
+     $pembinaImgSrc = !empty($strukturPembinaImg) ? asset('storage/' . $strukturPembinaImg) : asset('images/struktur.webp');
+     $siswaImgSrc = !empty($strukturSiswaImg) ? asset('storage/' . $strukturSiswaImg) : asset('images/kepengurusan.webp');
+@@ -336,7 +340,7 @@ class="btn-outline text-xs px-4 py-2">
+                                 <div class="flex items-center gap-2">
+                                     <h3 class="text-lg font-display font-bold text-[var(--cream)]">Monev Internal Pemerintah Daerah</h3>
+                                     <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#01795F]/15 text-[#3fd6b0] border border-[#01795F]/30">
+-                                        Dokumen Resmi PDF
++                                        {{ $monevIsExternalLink ? 'Tautan Eksternal' : 'Dokumen Resmi PDF' }}
+                                     </span>
+                                 </div>
+                                 <p class="text-white/55 text-xs mt-0.5">
+@@ -351,17 +355,19 @@ class="btn-outline text-xs px-4 py-2">
+                                 <span>Buka di Tab Baru</span>
+                                 <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i>
+                             </a>
+-                            <a href="{{ $monevUrl }}" download
+-                               class="btn-gold btn-download text-xs px-4 py-2">
+-                                <i class="fa-solid fa-download text-[11px]"></i>
+-                                <span>Unduh PDF</span>
+-                            </a>
++                            @unless($monevIsExternalLink)
++                                <a href="{{ $monevUrl }}" download
++                                   class="btn-gold btn-download text-xs px-4 py-2">
++                                    <i class="fa-solid fa-download text-[11px]"></i>
++                                    <span>Unduh PDF</span>
++                                </a>
++                            @endunless
+                         </div>
+                     </div>
+ 
+-                    <!-- PDF Viewer Container -->
++                    <!-- PDF/Link Viewer Container -->
+                     <div class="rounded-xl overflow-hidden border border-white/15 bg-white shadow-2xl">
+-                        <iframe src="{{ $monevUrl }}#toolbar=1&navpanes=0"
++                        <iframe src="{{ $monevUrl }}{{ $monevIsExternalLink ? '' : '#toolbar=1&navpanes=0' }}"
+                                 title="Dokumen Monev Internal Pemerintah Daerah"
+                                 class="w-full h-[520px] sm:h-[600px] bg-[#525659]"
+                                 loading="lazy"></iframe>
+@@ -369,9 +375,11 @@ class="w-full h-[520px] sm:h-[600px] bg-[#525659]"
+ 
+                     <div class="flex items-center justify-between text-xs text-white/50 pt-1">
+                         <span><i class="fa-solid fa-shield-halved text-[var(--gold)] mr-1.5"></i>Dokumen Terverifikasi FSI TSAQIB &amp; Sekolah</span>
+-                        <a href="{{ $monevUrl }}" download class="text-[var(--gold)] hover:underline">
+-                            Simpan salinan (PDF)
+-                        </a>
++                        @unless($monevIsExternalLink)
++                            <a href="{{ $monevUrl }}" download class="text-[var(--gold)] hover:underline">
++                                Simpan salinan (PDF)
++                            </a>
++                        @endunless
+                     </div>
+                 </div>
+ 

@@ -21,9 +21,9 @@ return new class extends Migration
      * Reverse the migrations.
      */
     public function down(): void
-{
-    Schema::table('books', function (Blueprint $table) {
-        $table->dropColumn('cover_image');
-    });
-}
+    {
+        Schema::table('books', function (Blueprint $table) {
+            $table->dropColumn('cover_image');
+        });
+    }
 };

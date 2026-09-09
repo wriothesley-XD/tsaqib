@@ -222,6 +222,7 @@ function initDailyNotification() {
             e.preventDefault();
             card.classList.add('is-minimized');
             sessionStorage.setItem('tsaqib_hadith_minimized', '1');
+            reflowWidgetPos(); // ukuran berubah → jepit ulang ke dalam viewport
         });
     }
 
@@ -230,6 +231,7 @@ function initDailyNotification() {
             e.preventDefault();
             card.classList.remove('is-minimized');
             sessionStorage.removeItem('tsaqib_hadith_minimized');
+            reflowWidgetPos();
         });
     }
 
@@ -247,6 +249,82 @@ function initDailyNotification() {
             });
         }
     };
+
+    // ===== DRAG (mouse + touch dalam satu jalur Pointer Events) =====
+    // Posisi terakhir disimpan ke localStorage (tsaqib_hadith_pos) sehingga tetap
+    // sama setelah refresh. Klik (expand pill / tombol) vs drag dibedakan lewat
+    // threshold 5px; clamp menjaga widget tidak ter Tarik keluar viewport.
+    const POS_KEY = 'tsaqib_hadith_pos';
+    let dragging = false, moved = false, offX = 0, offY = 0, startX = 0, startY = 0;
+    let dragW = 0, dragH = 0; // ukuran widget, diukur sekali di awal drag
+
+    const placeAt = (x, y, w = card.offsetWidth, h = card.offsetHeight) => {
+        card.style.right = 'auto';
+        card.style.bottom = 'auto';
+        card.style.left = Math.min(Math.max(0, x), Math.max(0, window.innerWidth - w)) + 'px';
+        card.style.top = Math.min(Math.max(0, y), Math.max(0, window.innerHeight - h)) + 'px';
+    };
+
+    // Posisi berubah ukuran kontainer (minimize/expand) atau layar → jepit ulang.
+    const reflowWidgetPos = () => {
+        if (card.style.left) placeAt(card.offsetLeft, card.offsetTop);
+    };
+
+    try {
+        const saved = JSON.parse(localStorage.getItem(POS_KEY));
+        if (saved && Number.isFinite(saved.left) && Number.isFinite(saved.top)) {
+            placeAt(saved.left, saved.top);
+        }
+    } catch (e) { /* localStorage diblokir → pakai posisi default */ }
+
+    window.addEventListener('resize', reflowWidgetPos);
+
+    card.addEventListener('pointerdown', (e) => {
+        if (dragging) return; // abaikan jari/pointer kedua saat sedang drag
+        if (e.button !== undefined && e.button !== 0) return; // hanya tombol kiri / sentuh
+        dragging = true;
+        moved = false;
+        offX = e.clientX - card.offsetLeft;
+        offY = e.clientY - card.offsetTop;
+        startX = e.clientX;
+        startY = e.clientY;
+        card.setPointerCapture(e.pointerId);
+    });
+
+    card.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        // Threshold 5px: belum lolos = masih dianggap klik, jangan pindahkan.
+        if (!moved) {
+            if (Math.hypot(e.clientX - startX, e.clientY - startY) < 5) return;
+            moved = true;
+            card.classList.add('is-dragging');
+        }
+        // Ukuran diukur SEKALI di awal drag (bukan tiap frame) → tanpa reflow, gerak mulus.
+        if (dragW === 0) {
+            dragW = card.offsetWidth;
+            dragH = card.offsetHeight;
+        }
+        placeAt(e.clientX - offX, e.clientY - offY, dragW, dragH);
+    });
+
+    const endDrag = () => {
+        if (!dragging) return;
+        dragging = false;
+        dragW = 0; // reset agar drag berikutnya mengukur ulang (state minimize bisa beda)
+        card.classList.remove('is-dragging');
+        if (moved) {
+            try {
+                localStorage.setItem(POS_KEY, JSON.stringify({ left: card.offsetLeft, top: card.offsetTop }));
+            } catch (e) { /* gagal simpan → posisi saja tidak persisten */ }
+            // Lolos threshold = drag, bukan klik → tekan click agar pill/tombol tak ikut aktif.
+            card.addEventListener('click', (ev) => {
+                ev.preventDefault();
+                ev.stopPropagation();
+            }, { capture: true, once: true });
+        }
+    };
+    card.addEventListener('pointerup', endDrag);
+    card.addEventListener('pointercancel', endDrag);
 }
 
 

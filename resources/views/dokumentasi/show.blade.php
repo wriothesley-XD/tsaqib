@@ -60,6 +60,11 @@
                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold text-white/55">
                     <i class="fa-solid fa-camera text-[9px]"></i>{{ $doc->photos->count() }} Foto
                 </span>
+                @if($doc->video_path)
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold text-white/55">
+                        <i class="fa-solid fa-circle-play text-[9px] text-[var(--gold)]"></i>Video
+                    </span>
+                @endif
             </div>
 
             <h1 class="font-display font-extrabold text-2xl sm:text-3xl text-[var(--cream)] tracking-tight leading-tight mt-4">
@@ -70,6 +75,13 @@
                 <p class="text-white/55 text-sm sm:text-base mt-4 leading-relaxed whitespace-pre-line">{{ $doc->description }}</p>
             @endif
         </article>
+
+        {{-- ===== Video rekaman kegiatan (opsional) =====
+             controls + preload="metadata": tidak autoplay, suara hanya jika user play. --}}
+        @if($doc->video_path)
+            <video src="{{ asset('storage/' . $doc->video_path) }}" controls playsinline preload="metadata"
+                   class="w-full aspect-video rounded-xl border border-white/10 bg-black shadow-[0_24px_60px_-34px_rgba(0,0,0,.75)] mb-8"></video>
+        @endif
 
         {{-- ===== Galeri masonry ===== --}}
         @if($doc->photos->isNotEmpty())
@@ -90,7 +102,7 @@
                     </figure>
                 @endforeach
             </div>
-        @else
+        @elseif(!$doc->video_path)
             <div class="tsaqib-card-flat p-12 text-center">
                 <i class="fa-solid fa-images text-3xl text-white/15 block mb-3"></i>
                 <p class="text-white/45 text-xs">Belum ada foto pada dokumentasi ini.</p>

@@ -435,10 +435,20 @@ class AdminController extends Controller
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string|max:5000',
+<<<<<<< Updated upstream
             'event_date' => 'nullable|date',
             'category' => 'nullable|string|max:50',
             'photos' => 'required|array|min:1',
             'photos.*' => 'file|mimes:jpg,jpeg,png,webp|max:5120',
+=======
+            'event_date'  => 'nullable|date',
+            'category'    => 'nullable|string|max:50',
+            // Video opsional — boleh dokumentasi berisi video saja (foto kosong).
+            // 50MB: sesuaikan juga upload_max_filesize/post_max_size php.ini hosting.
+            'video'       => 'nullable|file|mimes:mp4,webm,mov|max:51200',
+            'photos'      => 'required_without:video|array|min:1',
+            'photos.*'    => 'file|mimes:jpg,jpeg,png,webp|max:5120',
+>>>>>>> Stashed changes
         ]);
 
         // Slug unik dari judul (pola uniqueNewsSlug).
@@ -453,8 +463,16 @@ class AdminController extends Controller
             'title' => $data['title'],
             'slug' => $slug,
             'description' => $data['description'] ?? null,
+<<<<<<< Updated upstream
             'event_date' => $data['event_date'] ?? null,
             'category' => $data['category'] ?? null,
+=======
+            'video_path'  => $request->hasFile('video')
+                ? $request->file('video')->store('documentations', 'public')
+                : null,
+            'event_date'  => $data['event_date'] ?? null,
+            'category'    => $data['category'] ?? null,
+>>>>>>> Stashed changes
         ]);
 
         foreach ($request->file('photos') as $photo) {
@@ -477,6 +495,10 @@ class AdminController extends Controller
         Storage::disk('public')->delete(
             $documentation->photos()->pluck('image_path')->all()
         );
+
+        if ($documentation->video_path && Storage::disk('public')->exists($documentation->video_path)) {
+            Storage::disk('public')->delete($documentation->video_path);
+        }
 
         $documentation->delete();
 

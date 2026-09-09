@@ -13,6 +13,7 @@ class ActivityDocumentation extends Model
         'title',
         'slug',
         'description',
+        'video_path',
         'event_date',
         'category',
     ];

@@ -49,15 +49,32 @@
             </div>
 
             <div>
-                <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Foto Kegiatan * (bisa pilih banyak sekaligus — jpg/png/webp, max 5MB/foto)</label>
-                <input type="file" name="photos[]" multiple required accept=".jpg,.jpeg,.png,.webp"
+                <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Foto Kegiatan (bisa pilih banyak sekaligus — jpg/png/webp, max 5MB/foto. Kosong boleh jika mengunggah video)</label>
+                <input type="file" name="photos[]" multiple accept=".jpg,.jpeg,.png,.webp"
                        class="w-full text-xs text-white/50 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[11px] file:font-semibold file:bg-[#01795F]/20 file:text-[#3fd6b0]">
                 {{-- Preview thumbnail sebelum submit --}}
                 <div id="doc-photo-preview" class="hidden flex-wrap gap-2 mt-3"></div>
             </div>
 
+            <div>
+                <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Video Kegiatan (opsional — mp4/webm/mov, maks 50MB)</label>
+                <input type="file" name="video" accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov"
+                       class="w-full text-xs text-white/50 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[11px] file:font-semibold file:bg-[rgba(201,166,107,.18)] file:text-[var(--gold)]">
+                {{-- Preview player sebelum submit --}}
+                <video id="doc-video-preview" controls playsinline preload="metadata"
+                       class="hidden w-full max-w-xs aspect-video rounded-xl border border-white/10 mt-3 bg-black"></video>
+            </div>
+
+            {{-- Progress bar upload (muncul hanya saat upload video via XHR) --}}
+            <div id="doc-upload-progress" class="hidden items-center gap-3">
+                <div class="flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
+                    <div id="doc-upload-bar" class="h-full w-0 rounded-full bg-[var(--gold)] transition-[width] duration-150"></div>
+                </div>
+                <span id="doc-upload-pct" class="text-[11px] font-bold text-[var(--gold)] tabular-nums w-9 text-right">0%</span>
+            </div>
+
             <div class="flex items-center justify-end pt-2">
-                <button type="submit" class="px-5 py-2 rounded-xl bg-[#01795F] text-white font-bold text-xs shadow-sm">
+                <button type="submit" id="doc-submit-btn" class="px-5 py-2 rounded-xl bg-[#01795F] text-white font-bold text-xs shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
                     Simpan Dokumentasi
                 </button>
             </div>
@@ -97,7 +114,9 @@
     </div>
 </div>
 
-{{-- JS: preview thumbnail foto terpilih (ganti pilihan = preview ikut berganti). --}}
+{{-- JS: preview foto & video terpilih + progress bar upload video.
+     Upload video besar via XHR (fetch tidak punya upload progress);
+     tanpa video → POST biasa, perilaku lama tak berubah. --}}
 <script>
 (function () {
     var input   = document.querySelector('input[name="photos[]"]');
@@ -119,6 +138,72 @@
             preview.appendChild(img);
         });
         preview.classList.remove('hidden');
+    });
+
+    // ===== Video: preview player =====
+    var form      = input.closest('form');
+    var vInput    = form.querySelector('input[name="video"]');
+    var vPreview  = document.getElementById('doc-video-preview');
+    if (!vInput || !vPreview) return;
+
+    vInput.addEventListener('change', function () {
+        if (vPreview.src) URL.revokeObjectURL(vPreview.src);
+        var file = vInput.files && vInput.files[0];
+        if (!file) {
+            vPreview.removeAttribute('src');
+            vPreview.classList.add('hidden');
+            return;
+        }
+        vPreview.src = URL.createObjectURL(file);
+        vPreview.classList.remove('hidden');
+    });
+
+    // ===== Submit dengan progress bar saat ada video =====
+    var box  = document.getElementById('doc-upload-progress');
+    var bar  = document.getElementById('doc-upload-bar');
+    var pct  = document.getElementById('doc-upload-pct');
+    var btn  = document.getElementById('doc-submit-btn');
+
+    form.addEventListener('submit', function (e) {
+        if (!vInput.files || !vInput.files.length) return; // upload ringan → POST biasa
+
+        e.preventDefault();
+        btn.disabled = true;
+        box.classList.remove('hidden');
+        box.classList.add('flex');
+
+        var fd  = new FormData(form);
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', form.action);
+        xhr.setRequestHeader('X-CSRF-TOKEN', form.querySelector('input[name="_token"]').value);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+        xhr.upload.addEventListener('progress', function (ev) {
+            if (!ev.lengthComputable) return;
+            var p = Math.round((ev.loaded / ev.total) * 100);
+            bar.style.width = p + '%';
+            pct.textContent = p + '%';
+        });
+
+        xhr.addEventListener('load', function () {
+            // Sukses: Laravel redirect → ikuti URL final (halaman dengan flash sukses).
+            if (xhr.status >= 200 && xhr.status < 400 && xhr.responseURL) {
+                window.location.href = xhr.responseURL;
+                return;
+            }
+            btn.disabled = false;
+            box.classList.add('hidden');
+            alert(xhr.status === 422
+                ? 'Upload ditolak: periksa format/ukuran file (video mp4/webm/mov maks 50MB, foto max 5MB).'
+                : 'Upload gagal (HTTP ' + xhr.status + '). Coba lagi.');
+        });
+        xhr.addEventListener('error', function () {
+            btn.disabled = false;
+            box.classList.add('hidden');
+            alert('Koneksi terputus saat mengunggah. Coba lagi.');
+        });
+
+        xhr.send(fd);
     });
 })();
 </script>

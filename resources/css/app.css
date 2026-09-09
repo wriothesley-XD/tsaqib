@@ -581,7 +581,8 @@ select.tsaqib-input option {
     position: fixed;
     bottom: 1.5rem;
     right: 1.5rem;
-    z-index: 40;
+    /* 80 = di atas navbar (70) & dropdown; di bawah modal onboarding (90) & toast (9999). */
+    z-index: 80;
     max-width: min(92vw, 420px);
     transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
 }
@@ -589,6 +590,28 @@ select.tsaqib-input option {
     opacity: 0;
     transform: translateY(16px) scale(0.96);
     pointer-events: none;
+}
+
+/* Drag state (lihat initDailyNotification di app.js):
+   - touch-action:none → gestur drag sentuh TIDAK men-scroll halaman.
+   - is-dragging: transisi dimatikan, kursor grabbing, bayangan lebih tebal,
+     z-index dinaikkan agar tidak tenggelam di bawah elemen lain saat digeser. */
+#daily-notification {
+    touch-action: none;
+    cursor: grab;
+}
+#daily-notification.is-dragging {
+    transition: none;
+    z-index: 9999;
+}
+#daily-notification.is-dragging,
+#daily-notification.is-dragging * {
+    cursor: grabbing !important;
+    user-select: none;
+    -webkit-user-select: none;
+}
+#daily-notification.is-dragging #dn-full-card {
+    box-shadow: 0 28px 70px -12px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(201, 166, 107, 0.45);
 }
 
 /* 5) Custom Toast Notification System */

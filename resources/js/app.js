@@ -288,7 +288,6 @@ function initDailyNotification() {
         offY = e.clientY - card.offsetTop;
         startX = e.clientX;
         startY = e.clientY;
-        card.setPointerCapture(e.pointerId);
     });
 
     card.addEventListener('pointermove', (e) => {
@@ -297,6 +296,9 @@ function initDailyNotification() {
         if (!moved) {
             if (Math.hypot(e.clientX - startX, e.clientY - startY) < 5) return;
             moved = true;
+            // Capture HANYA setelah lolos threshold — capture sejak pointerdown
+            // memindahkan event click ke card sehingga semua tombol di dalam mati.
+            card.setPointerCapture(e.pointerId);
             card.classList.add('is-dragging');
         }
         // Ukuran diukur SEKALI di awal drag (bukan tiap frame) → tanpa reflow, gerak mulus.

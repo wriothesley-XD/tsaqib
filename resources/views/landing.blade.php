@@ -202,13 +202,8 @@
                      class="w-full h-full object-cover object-[center_35%] transform scale-105 filter brightness-[0.70] contrast-105">
             </picture>
             {{-- Deep Luxurious Emerald Gradients (Assures 100% WCAG AAA Text Contrast) --}}
-<<<<<<< HEAD
-            <div class="absolute inset-0 bg-gradient-to-r from-[#07170E]/60 via-[#0D2818]/60 to-[#07170E]/95"></div>
-            <div class="absolute inset-0 bg-gradient-to-b from-[#07170E]/50 via-[#0D2818]/50 to-[#07170E]"></div>
-=======
             <div class="absolute inset-0 bg-gradient-to-r from-[#07170E]/60 via-[#0D2818]/85 to-[#07170E]/95"></div>
             <div class="absolute inset-0 bg-gradient-to-b from-[#07170E]/50 via-[#0D2818]/70 to-[#07170E]"></div>
->>>>>>> 9f6d7de8dfe726dd05de684c6378a7847d269419
             <div class="pat-islami opacity-10"></div>
         </div>
 

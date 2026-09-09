@@ -44,7 +44,7 @@
     {{-- Reading progress bar --}}
     <div id="reading-progress" class="reading-progress-bar"></div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         <div class="flex items-center justify-between h-16 xl:h-20">
 
             {{-- ===== BRAND (kiri) ===== --}}
@@ -57,7 +57,7 @@
             </a>
 
             {{-- ===== NAV TENGAH (≥ xl) ===== --}}
-            <nav class="hidden xl:flex items-center gap-7 lg:gap-8 font-label whitespace-nowrap">
+            <nav class="hidden xl:flex items-center gap-4 xl:gap-5 2xl:gap-7.5 font-label whitespace-nowrap text-[13px] 2xl:text-sm">
                 @foreach($navBefore as $item)
                     <a href="{{ $item['href'] }}" class="{{ $navLinkClass }} {{ $link($item['active']) }}">
                         {{ $item['label'] }}
@@ -147,18 +147,20 @@
             </nav>
 
             {{-- ===== KANAN: Search & Auth (≥ xl) & Hamburger (< xl) ===== --}}
-            <div class="flex items-center gap-2.5 sm:gap-4 shrink-0">
+            <div class="flex items-center gap-2 sm:gap-3 2xl:gap-4 shrink-0">
                 {{-- Command Palette Trigger (Desktop/Tablet) --}}
                 <button type="button" data-open-cmd
-                        class="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[var(--gold)]/40 text-white/55 hover:text-white text-xs transition cursor-pointer"
+                        class="hidden sm:inline-flex items-center gap-1.5 2xl:gap-2 px-2.5 2xl:px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[var(--gold)]/40 text-white/55 hover:text-white text-xs transition cursor-pointer"
                         title="Pencarian Cepat (Ctrl+K)">
                     <i class="fa-solid fa-magnifying-glass text-[10px] text-[var(--gold)]"></i>
-                    <span class="text-[11px] font-medium hidden md:inline">Cari fitur...</span>
+                    <span class="text-[11px] font-medium hidden md:inline 2xl:hidden">Cari</span>
+                    <span class="text-[11px] font-medium hidden 2xl:inline">Cari fitur...</span>
                     <span class="cmd-kbd text-[10px] py-0 px-1.5 h-4 ml-0.5">⌘K</span>
                 </button>
 
-                {{-- Desktop auth buttons --}}
-                <div class="hidden xl:flex items-center gap-4">
+                {{-- Desktop social & auth buttons --}}
+                <div class="hidden xl:flex items-center gap-3 2xl:gap-3.5">
+                    @include('partials.social-icons', ['variant' => 'desktop'])
                     <span class="w-px h-5 bg-white/10" aria-hidden="true"></span>
                     @auth
                         @if(Auth::user()->role === 'admin')
@@ -286,17 +288,7 @@
     <div class="pt-3 mt-3 border-t border-white/10 space-y-3">
         <div class="flex items-center justify-between px-1">
             <span class="text-[10px] font-bold uppercase tracking-wider text-white/40">Media Sosial</span>
-            <div class="flex items-center gap-4">
-                <a href="https://www.instagram.com/fsi.smansa_landbouw?igsh=MXVzMzd5Nms0eDZpNQ==" target="_blank" rel="noopener" class="text-white/60 hover:text-[var(--gold)] transition-colors">
-                    <i class="fa-brands fa-instagram text-lg"></i>
-                </a>
-                <a href="https://www.facebook.com/share/1BJMFJvK5k/" target="_blank" rel="noopener" class="text-white/60 hover:text-[var(--gold)] transition-colors">
-                    <i class="fa-brands fa-facebook text-lg"></i>
-                </a>
-                <a href="https://ytfsi.carrd.co" target="_blank" rel="noopener" class="text-white/60 hover:text-[var(--gold)] transition-colors">
-                    <i class="fa-brands fa-youtube text-lg"></i>
-                </a>
-            </div>
+            @include('partials.social-icons', ['variant' => 'mobile'])
         </div>
 
         @auth

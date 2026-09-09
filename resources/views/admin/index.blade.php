@@ -1,10 +1,11 @@
 {{-- resources/views/admin/index.blade.php — shell: sidebar nav + tab content --}}
 @php($pageTitle = 'Admin Panel - TSAQIB SMAN 1 Bukittinggi')
-@php($tab = in_array(request('tab'), ['dashboard','laporan','posts','moduls','labor_docs','news','documentations','users','books','nisn','recruitment']) ? request('tab') : 'dashboard')
+@php($tab = in_array(request('tab'), ['dashboard','laporan','posts','gurus','moduls','labor_docs','news','documentations','users','books','nisn','recruitment']) ? request('tab') : 'dashboard')
 @php($adminTabs = [
     'dashboard'   => ['Dashboard', 'fa-gauge-high'],
     'laporan'     => ['Laporan', 'fa-flag'],
     'posts'       => ['Kelola Postingan', 'fa-newspaper'],
+    'gurus'       => ['Guru Pengampu', 'fa-chalkboard-user'],
     'moduls'      => ['Silabus & Modul PAI', 'fa-book-open'],
     'labor_docs'  => ['Dokumen & Struktur Labor', 'fa-sitemap'],
     'news'        => ['Kelola Berita', 'fa-bullhorn'],
@@ -56,7 +57,7 @@
     /* ===== Tabel admin → kartu berjejak di layar kecil (<sm) =====
        Tujuan: di ponsel, baris tabel jadi kartu "definition list" (label kecil
        di atas, nilai di bawah) supaya TIDAK ada scroll horizontal. data-label
-       di tiap <td> jadi sumber label. Di desktop (≥sm) tabel biasa — tak berubah.
+       di tiap <td> jadi sumber label. desktop (≥sm) tabel biasa — tak berubah.
        Kelas .cell-val (inline-flex) nyatukan konten multi-elemen (mis. avatar+nama). */
     .cell-val{ display:inline-flex; align-items:center; gap:.4rem; min-width:0; }
 
@@ -150,6 +151,7 @@
                 <section data-tab="dashboard"   class="{{ $tab === 'dashboard' ? '' : 'hidden' }}">@include('admin._tab_dashboard')</section>
                 <section data-tab="laporan"     class="{{ $tab === 'laporan' ? '' : 'hidden' }}">@include('admin._tab_laporan')</section>
                 <section data-tab="posts"       class="{{ $tab === 'posts' ? '' : 'hidden' }}">@include('admin._tab_posts')</section>
+                <section data-tab="gurus"       class="{{ $tab === 'gurus' ? '' : 'hidden' }}">@include('admin._tab_gurus')</section>
                 <section data-tab="moduls"      class="{{ $tab === 'moduls' ? '' : 'hidden' }}">@include('admin._tab_moduls')</section>
                 <section data-tab="labor_docs"  class="{{ $tab === 'labor_docs' ? '' : 'hidden' }}">@include('admin._tab_labor_docs')</section>
                 <section data-tab="users"       class="{{ $tab === 'users' ? '' : 'hidden' }}">@include('admin._tab_users')</section>

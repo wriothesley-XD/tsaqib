@@ -76,6 +76,7 @@ class AdminController extends Controller
         $documentations = ActivityDocumentation::with('photos')->latest()->paginate($perPage);
         $nisnWhitelist = NisnWhitelist::latest()->paginate($perPage);
         $moduls = Modul::with('user')->latest()->paginate($perPage);
+        $gurus = GuruProfile::with('user')->latest()->paginate($perPage);
         $isRecruitmentOpen = Setting::getByKey('recruitment_open', '1') === '1';
 
         // Pengaturan Dokumen & Struktur Laboratorium PAI
@@ -102,9 +103,10 @@ class AdminController extends Controller
             'total_registrations' => $registrations->total(),
             'total_news' => $news->total(),
             'total_moduls' => $moduls->total(),
+            'total_gurus' => $gurus->total(),
         ];
 
-        return view('admin.index', compact('users', 'books', 'posts', 'selectedCommunity', 'registrations', 'news', 'documentations', 'nisnWhitelist', 'moduls', 'laborSettings', 'isRecruitmentOpen', 'stats', 'laporan', 'pendingReportCount', 'perluPerhatian'));
+        return view('admin.index', compact('users', 'books', 'posts', 'selectedCommunity', 'registrations', 'news', 'documentations', 'nisnWhitelist', 'moduls', 'gurus', 'laborSettings', 'isRecruitmentOpen', 'stats', 'laporan', 'pendingReportCount', 'perluPerhatian'));
     }
 
     /**
@@ -131,6 +133,7 @@ class AdminController extends Controller
             'laporan' => ['view' => 'admin._list_laporan',       'query' => Report::pending()->with(['reportable.user', 'reporter'])->latest(), 'itemView' => 'admin._laporan_item', 'itemVar' => 'r', 'groupField' => 'reportable_type'],
             'nisn_whitelist' => ['view' => 'admin._list_nisn_whitelist', 'query' => NisnWhitelist::latest(), 'search' => ['nisn', 'nama', 'kelas']],
             'moduls' => ['view' => 'admin._list_moduls', 'query' => Modul::with('user')->latest(), 'search' => ['judul', 'kategori', 'target_kelas', 'deskripsi']],
+            'gurus' => ['view' => 'admin._list_gurus', 'query' => GuruProfile::with('user')->latest(), 'search' => ['nama', 'nip', 'mapel_pengampu', 'deskripsi']],
         ];
 
         if (! isset($map[$resource])) {
@@ -653,7 +656,6 @@ class AdminController extends Controller
 
     /**
      * Simpan profil guru (untuk halaman publik Profil & Guru).
-     * kelas_diampu dikirim sebagai multiple select/checkbox array.
      * Route: POST /admin-panel/gurus
      */
     public function storeGuru(Request $request): RedirectResponse
@@ -661,13 +663,18 @@ class AdminController extends Controller
         $this->checkAdmin();
 
         $data = $request->validate([
-            'user_id' => 'required|exists:users,id|unique:guru_profiles,user_id',
-            'nip' => 'nullable|string|max:30',
+            'nama' => 'required|string|max:150',
+            'nip' => 'nullable|string|max:40',
             'mapel_pengampu' => 'nullable|string|max:100',
             'kelas_diampu' => 'nullable|array',
             'kelas_diampu.*' => 'in:X,XI,XII',
+            'deskripsi' => 'nullable|string|max:2000',
+            'facebook_url' => 'nullable|string|max:255',
+            'instagram_url' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:150',
+            'wa_number' => 'nullable|string|max:30',
             'foto' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
-            'wa_number' => 'nullable|string|max:20',
+            'user_id' => 'nullable|exists:users,id',
         ]);
 
         $data['foto_path'] = $request->hasFile('foto')
@@ -675,9 +682,53 @@ class AdminController extends Controller
             : null;
         unset($data['foto']);
 
+        if (empty($data['mapel_pengampu'])) {
+            $data['mapel_pengampu'] = 'Pendidikan Agama Islam';
+        }
+
         GuruProfile::create($data);
 
-        return redirect()->back()->with('success', 'Profil guru berhasil ditambahkan!');
+        return redirect()->back()->with('success', 'Profil Guru Pengampu berhasil ditambahkan!');
+    }
+
+    /**
+     * Perbarui profil guru pengampu.
+     * Route: PUT /admin-panel/gurus/{guru}
+     */
+    public function updateGuru(Request $request, GuruProfile $guru): RedirectResponse
+    {
+        $this->checkAdmin();
+
+        $data = $request->validate([
+            'nama' => 'required|string|max:150',
+            'nip' => 'nullable|string|max:40',
+            'mapel_pengampu' => 'nullable|string|max:100',
+            'kelas_diampu' => 'nullable|array',
+            'kelas_diampu.*' => 'in:X,XI,XII',
+            'deskripsi' => 'nullable|string|max:2000',
+            'facebook_url' => 'nullable|string|max:255',
+            'instagram_url' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:150',
+            'wa_number' => 'nullable|string|max:30',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'user_id' => 'nullable|exists:users,id',
+        ]);
+
+        if ($request->hasFile('foto')) {
+            if ($guru->foto_path && Storage::disk('public')->exists($guru->foto_path)) {
+                Storage::disk('public')->delete($guru->foto_path);
+            }
+            $data['foto_path'] = $request->file('foto')->store('guru', 'public');
+        }
+        unset($data['foto']);
+
+        if (empty($data['mapel_pengampu'])) {
+            $data['mapel_pengampu'] = 'Pendidikan Agama Islam';
+        }
+
+        $guru->update($data);
+
+        return redirect()->back()->with('success', 'Profil Guru Pengampu berhasil diperbarui!');
     }
 
     /**
@@ -694,7 +745,7 @@ class AdminController extends Controller
 
         $guru->delete();
 
-        return redirect()->back()->with('success', 'Profil guru berhasil dihapus!');
+        return redirect()->back()->with('success', 'Profil Guru Pengampu berhasil dihapus!');
     }
 
     /**

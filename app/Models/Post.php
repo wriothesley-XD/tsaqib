@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
@@ -38,7 +39,7 @@ class Post extends Model
     /**
      * User yang menyimpan/mem-bookmark post ini (tab "Tersimpan" di profil).
      */
-    public function savedBy(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function savedBy(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'post_user')
             ->withTimestamps();

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Book extends Model
 {
@@ -34,9 +35,9 @@ class Book extends Model
     /**
      * User yang menyimpan buku ini ke koleksi/tersimpan (pivot book_user.type).
      */
-    public function savedBy(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function savedBy(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\User::class, 'book_user')
+        return $this->belongsToMany(User::class, 'book_user')
             ->withPivot('type')
             ->withTimestamps();
     }

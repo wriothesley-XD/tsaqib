@@ -63,6 +63,24 @@ test('landing page loads successfully with photo cards and prototype link', func
     $response->assertSee(route('perpustakaan'));
 });
 
+test('navbar renders uiverse social media icons for desktop and mobile', function () {
+    $response = $this->get(route('landing'));
+
+    $response->assertStatus(200);
+
+    // Verify all 3 social media links are present
+    $response->assertSee('https://www.instagram.com/fsi.smansa_landbouw?igsh=MXVzMzd5Nms0eDZpNQ==', false);
+    $response->assertSee('https://www.facebook.com/share/1BJMFJvK5k/', false);
+    $response->assertSee('https://ytfsi.carrd.co', false);
+
+    // Verify icons and security attributes
+    $response->assertSee('fa-brands fa-instagram', false);
+    $response->assertSee('fa-brands fa-facebook', false);
+    $response->assertSee('fa-brands fa-youtube', false);
+    $response->assertSee('target="_blank"', false);
+    $response->assertSee('rel="noopener noreferrer"', false);
+});
+
 test('laboratorium pai page loads with 2 documents: profil flipbook and monev internal pdf', function () {
     $response = $this->get(route('laboratorium.pai'));
 

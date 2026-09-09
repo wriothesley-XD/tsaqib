@@ -162,6 +162,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/tugas', [AdminController::class, 'storeTugas'])->name('tugas.store');
         Route::delete('/tugas/{tugas}', [AdminController::class, 'destroyTugas'])->name('tugas.destroy');
         Route::post('/gurus', [AdminController::class, 'storeGuru'])->name('gurus.store');
+        Route::put('/gurus/{guru}', [AdminController::class, 'updateGuru'])->name('gurus.update');
         Route::delete('/gurus/{guru}', [AdminController::class, 'destroyGuru'])->name('gurus.destroy');
         // Whitelist NISN (Pintu A verifikasi siswa) — tambah manual + import massal CSV/Excel.
         Route::post('/nisn-whitelist', [AdminController::class, 'storeNisnWhitelist'])->name('nisn-whitelist.store');

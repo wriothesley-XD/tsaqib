@@ -92,6 +92,8 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('beranda');
+        // User baru belum punya komunitas/role -> paksa lewat halaman
+        // select-role dulu (dijaga juga oleh middleware EnsureCommunitySelected).
+        return redirect()->route('select-role');
     }
 }

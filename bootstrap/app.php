@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureCommunitySelected;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
@@ -33,6 +34,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // berjalan sebagai defense in depth.
         $middleware->alias([
             'admin' => EnsureUserIsAdmin::class,
+            // Paksa pilih komunitas/role (select-role) sebelum halaman auth lain.
+            'community.selected' => EnsureCommunitySelected::class,
         ]);
 
         // Tempelkan header keamanan (CSP, HSTS, dll) ke setiap response

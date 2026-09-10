@@ -66,7 +66,7 @@ Route::get('/profile/{user}', [ProfileController::class, 'show'])->name('profile
 // ==========================================================
 // 2. TSAQIB MAIN EXPERIENCE (Wajib Login / Check Auth)
 // ==========================================================
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'community.selected'])->group(function () {
 
     // Halaman Pemilihan Role Karakter Komunitas (Slider Carousel & Store ke DB)
     Route::get('/select-role', [PageController::class, 'selectRole'])->name('select-role');

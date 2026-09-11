@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityDocumentation;
 use App\Models\GuruProfile;
 use App\Models\Modul;
 use App\Models\Setting;
@@ -101,6 +102,14 @@ class TsaqibController extends Controller
             ?? Setting::getByKey('profil_tsaqib_url', 'https://heyzine.com/flip-book/bdf3f31765.html');
 
         $profilBukuPdf = Setting::getByKey('profil_buku_tsaqib_pdf');
+        // Video kunjungan/studi tiru terbaru (max 3) untuk section dokumentasi tab Ikhtisar.
+        $kunjunganDocs = ActivityDocumentation::with('photos')
+            ->where('category', 'Kunjungan & Studi Tiru')
+            ->whereNotNull('video_path')
+            ->orderByDesc('event_date')
+            ->orderByDesc('created_at')
+            ->take(3)
+            ->get();
         $monevPdf = Setting::getByKey('monev_internal_pdf');
         // Tautan eksternal opsional untuk Monev (Heyzine/Google Drive/dst), sama
         // seperti pola profil_buku_tsaqib_url. Kalau diisi, ini yang diprioritaskan
@@ -117,7 +126,8 @@ class TsaqibController extends Controller
 
         return view('tsaqib.labor-pai', compact(
             'visiMisi', 'pembina', 'pengurusSiswa', 'profilTsaqibUrl', 'coverUrl',
-            'profilBukuPdf', 'monevPdf', 'monevUrlSetting', 'strukturPembinaImg', 'strukturSiswaImg'
+            'profilBukuPdf', 'monevPdf', 'monevUrlSetting', 'strukturPembinaImg', 'strukturSiswaImg',
+            'kunjunganDocs'
         ));
     }
 

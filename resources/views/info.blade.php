@@ -76,6 +76,7 @@
         box-shadow: 0 6px 18px -6px rgba(1, 121, 95, 0.6);
     }
     .info-pager-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .cat-hidden { display: none !important; } /* filter kategori menimpa display pager */
 </style>
 @endpush
 
@@ -223,9 +224,17 @@
         {{-- ===== Panel: Dokumentasi ===== --}}
         <div data-info-panel="dokumentasi" class="{{ $initialTab === 'dokumentasi' ? '' : 'hidden' }}">
             @if($documentations->isNotEmpty())
+                {{-- Filter kategori (client-side) --}}
+                <div class="flex items-center justify-center gap-2 flex-wrap mb-6" data-doc-filter role="group" aria-label="Filter kategori dokumentasi">
+                    <button type="button" data-cat="*" class="info-tab is-active"><i class="fa-solid fa-border-all text-[11px]"></i><span>Semua</span></button>
+                    @foreach($documentations->pluck('category')->filter()->unique() as $cat)
+                        <button type="button" data-cat="{{ $cat }}" class="info-tab"><i class="fa-solid fa-tag text-[11px]"></i><span>{{ $cat }}</span></button>
+                    @endforeach
+                </div>
+
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 js-pager-grid" data-per-page="8">
                     @foreach($documentations as $doc)
-                        <a href="{{ route('info.dokumentasi.show', $doc->slug) }}"
+                        <a href="{{ route('info.dokumentasi.show', $doc->slug) }}" data-cat="{{ $doc->category }}"
                            class="js-pager-item group tsaqib-card-interactive overflow-hidden flex flex-col">
                             <div class="relative aspect-[16/11] bg-black/40 overflow-hidden">
                                 @if($doc->cover_image)
@@ -237,6 +246,14 @@
                                     </div>
                                 @endif
                                 <span class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></span>
+                                @if($doc->video_path)
+                                    {{-- Badge video: bedakan dari galeri foto biasa --}}
+                                    <span class="absolute inset-0 flex items-center justify-center">
+                                        <span class="w-10 h-10 rounded-full bg-[var(--gold)]/90 text-[#10140F] flex items-center justify-center shadow-lg transition-transform duration-200 group-hover:scale-110">
+                                            <i class="fa-solid fa-play text-xs ml-0.5"></i>
+                                        </span>
+                                    </span>
+                                @endif
                                 @if($doc->event_date)
                                     <span class="absolute bottom-2 left-2 text-[9px] font-bold text-white/80 bg-black/60 px-2 py-0.5 rounded backdrop-blur-sm">
                                         {{ $doc->event_date->format('d M Y') }}
@@ -317,7 +334,38 @@
         }
 
         renderPage(1);
+        grid.__renderPage = renderPage; // dipakai ulang oleh filter kategori
     });
+
+    // Filter kategori dokumentasi (client-side; volume data kecil)
+    var filterBox = document.querySelector('[data-doc-filter]');
+    if (filterBox) {
+        var panel = filterBox.closest('[data-info-panel]');
+        var grid  = panel.querySelector('.js-pager-grid');
+        var nav   = panel.querySelector('.js-pager-nav');
+
+        filterBox.addEventListener('click', function (e) {
+            var chip = e.target.closest('[data-cat]');
+            if (!chip) return;
+            filterBox.querySelectorAll('[data-cat]').forEach(function (c) {
+                c.classList.toggle('is-active', c === chip);
+            });
+
+            if (chip.dataset.cat === '*') {
+                grid.querySelectorAll('.cat-hidden').forEach(function (item) {
+                    item.classList.remove('cat-hidden');
+                });
+                nav.hidden = false;
+                if (grid.__renderPage) grid.__renderPage(1);
+                return;
+            }
+
+            grid.querySelectorAll('.js-pager-item').forEach(function (item) {
+                item.classList.toggle('cat-hidden', item.dataset.cat !== chip.dataset.cat);
+            });
+            nav.hidden = true; // pager hanya untuk tampilan "Semua"
+        });
+    }
 })();
 </script>
 @endpush

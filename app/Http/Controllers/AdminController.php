@@ -443,7 +443,10 @@ class AdminController extends Controller
             // Video opsional — boleh dokumentasi berisi video saja (foto kosong).
             // 50MB: sesuaikan juga upload_max_filesize/post_max_size php.ini hosting.
             'video'       => 'nullable|file|mimes:mp4,webm,mov|max:51200',
-            'photos'      => 'required_without:video|array|min:1',
+            // Atau cukup paste link Google Drive (hemat storage hosting) —
+            // diprioritaskan di atas file upload jika keduanya diisi.
+            'video_drive' => 'nullable|string|max:255',
+            'photos'      => 'required_without_all:video,video_drive|array|min:1',
             'photos.*'    => 'file|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
@@ -459,9 +462,11 @@ class AdminController extends Controller
             'title' => $data['title'],
             'slug' => $slug,
             'description' => $data['description'] ?? null,
-            'video_path'  => $request->hasFile('video')
-                ? $request->file('video')->store('documentations', 'public')
-                : null,
+            'video_path'  => ! empty($data['video_drive'])
+                ? trim($data['video_drive'])
+                : ($request->hasFile('video')
+                    ? $request->file('video')->store('documentations', 'public')
+                    : null),
             'event_date'  => $data['event_date'] ?? null,
             'category'    => $data['category'] ?? null,
         ]);

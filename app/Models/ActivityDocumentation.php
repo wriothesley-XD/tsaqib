@@ -28,6 +28,47 @@ class ActivityDocumentation extends Model
     }
 
     /**
+     * Video bisa lokal (disk 'public', path relatif) atau link Google Drive
+     * (disimpan utuh di video_path). Ekstrak FILE_ID dari bentuk link Drive
+     * mana pun (file/d/, open?id=, uc?id=) — atau ID mentah tanpa URL.
+     */
+    public function driveFileId(): ?string
+    {
+        if (! $this->video_path) {
+            return null;
+        }
+
+        if (preg_match('#drive\.google\.com/(?:file/d/|open\?id=|uc\?.*?[?&]id=)([\w-]{10,})#', $this->video_path, $m)) {
+            return $m[1];
+        }
+
+        // ID mentah tanpa URL (paste langsung FILE_ID).
+        return preg_match('#^[\w-]{20,}$#', $this->video_path) ? $this->video_path : null;
+    }
+
+    /** True jika video di-host Google Drive → render via iframe preview, bukan <video>. */
+    public function isDriveVideo(): bool
+    {
+        return $this->driveFileId() !== null;
+    }
+
+    /** URL iframe embed Drive (hemat storage hosting). Null jika video lokal/tidak ada. */
+    public function videoPreviewUrl(): ?string
+    {
+        $id = $this->driveFileId();
+
+        return $id ? "https://drive.google.com/file/d/{$id}/preview" : null;
+    }
+
+    /** URL tonton di Drive — fallback bila embed gagal dimuat. */
+    public function videoWatchUrl(): ?string
+    {
+        $id = $this->driveFileId();
+
+        return $id ? "https://drive.google.com/file/d/{$id}/view" : null;
+    }
+
+    /**
      * Kelas badge kategori — warna dipilih deterministik dari keluarga
      * hijau-emas-krem tema (hash nama kategori), bukan warna acak.
      */

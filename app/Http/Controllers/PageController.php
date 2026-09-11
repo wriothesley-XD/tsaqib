@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityDocumentation;
 use App\Models\Book;
 use App\Models\News;
 use App\Models\Post;
@@ -47,9 +48,20 @@ class PageController extends Controller
                 'pdf' => $b->pdf_path ? asset('storage/'.$b->pdf_path) : null,
             ]);
 
+        // Highlight "Laboratorium PAI Unggulan": video kunjungan/studi tiru
+        // terbaru + jumlah kunjungan untuk badge kredibilitas.
+        $kunjunganVideo = ActivityDocumentation::with('photos')
+            ->where('category', 'Kunjungan & Studi Tiru')
+            ->whereNotNull('video_path')
+            ->orderByDesc('event_date')
+            ->orderByDesc('created_at')
+            ->first();
+        $kunjunganCount = ActivityDocumentation::where('category', 'Kunjungan & Studi Tiru')->count();
+
         return view('landing', compact(
             'daftarKomunitas', 'totalModul', 'totalAnggota', 'totalKomunitas',
-            'beritaTerbaru', 'buletinTerbaru', 'katalogPerpus'
+            'beritaTerbaru', 'buletinTerbaru', 'katalogPerpus',
+            'kunjunganVideo', 'kunjunganCount'
         ));
     }
 

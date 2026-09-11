@@ -77,8 +77,19 @@
         </article>
 
         {{-- ===== Video rekaman kegiatan (opsional) =====
+             Google Drive → iframe preview (hemat storage); file lokal → <video>.
              controls + preload="metadata": tidak autoplay, suara hanya jika user play. --}}
-        @if($doc->video_path)
+        @if($doc->isDriveVideo())
+            <div class="relative w-full aspect-video rounded-xl overflow-hidden border border-white/10 bg-black shadow-[0_24px_60px_-34px_rgba(0,0,0,.75)] mb-8">
+                <iframe src="{{ $doc->videoPreviewUrl() }}" title="Video {{ $doc->title }}"
+                        class="absolute inset-0 w-full h-full" loading="lazy"
+                        allow="autoplay; fullscreen" allowfullscreen></iframe>
+            </div>
+            <a href="{{ $doc->videoWatchUrl() }}" target="_blank" rel="noopener"
+               class="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--gold)] hover:underline -mt-4 mb-8">
+                Video tidak dapat dimuat? Buka di Google Drive <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+            </a>
+        @elseif($doc->video_path)
             <video src="{{ asset('storage/' . $doc->video_path) }}" controls playsinline preload="metadata"
                    class="w-full aspect-video rounded-xl border border-white/10 bg-black shadow-[0_24px_60px_-34px_rgba(0,0,0,.75)] mb-8"></video>
         @endif

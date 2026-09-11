@@ -40,6 +40,8 @@
                         <option value="Praktikum Lab PAI"></option>
                         <option value="Komunitas"></option>
                         <option value="Peringatan Hari Besar"></option>
+                        <option value="Kunjungan & Studi Tiru"></option>
+                        <option value="Kegiatan Siswa"></option>
                     </datalist>
                 </div>
                 <div>
@@ -54,6 +56,13 @@
                        class="w-full text-xs text-white/50 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[11px] file:font-semibold file:bg-[#01795F]/20 file:text-[#3fd6b0]">
                 {{-- Preview thumbnail sebelum submit --}}
                 <div id="doc-photo-preview" class="hidden flex-wrap gap-2 mt-3"></div>
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Link Google Drive (opsional — diprioritaskan di atas video upload, hemat storage hosting)</label>
+                <input type="url" name="video_drive" placeholder="https://drive.google.com/file/d/FILE_ID/view?usp=sharing"
+                       class="tsaqib-input w-full px-3 py-2 text-xs">
+                <p class="text-[10px] text-white/40 mt-1">Bagikan file Drive sebagai "Siapa saja yang memiliki link", lalu paste link-nya di sini.</p>
             </div>
 
             <div>

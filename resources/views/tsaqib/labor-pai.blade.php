@@ -415,7 +415,92 @@
             </div>
         </div>
 
+        <!-- 4. DOKUMENTASI KUNJUNGAN & STUDI TIRU -->
+        <section id="dokumentasi-kunjungan" class="tsaqib-card p-6 sm:p-8 border-[rgba(201,166,107,0.35)]">
+            <div class="flex items-center space-x-3 mb-2 pb-4 border-b border-white/10">
+                <div class="w-10 h-10 rounded-xl bg-[var(--gold)] text-[#10140F] flex items-center justify-center text-lg shadow-sm">
+                    <i class="fa-solid fa-video"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-display font-bold text-[var(--cream)]">Dokumentasi Kunjungan &amp; Studi Tiru</h2>
+                    <p class="text-white/50 text-xs">Bukti validasi dan transparansi pengelolaan Laboratorium PAI melalui penilaian serta kunjungan studi tiru eksternal</p>
+                </div>
+            </div>
+
+            @if($kunjunganDocs->isNotEmpty())
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
+                    @foreach($kunjunganDocs as $doc)
+                        <button type="button" data-video-card
+                                data-embed="{{ $doc->videoPreviewUrl() }}"
+                                data-watch="{{ $doc->videoWatchUrl() }}"
+                                data-title="{{ $doc->title }}"
+                                class="group text-left rounded-xl overflow-hidden border border-white/10 hover:border-[rgba(201,166,107,0.5)] bg-black/30 transition cursor-pointer">
+                            <span class="relative block aspect-video overflow-hidden">
+                                @if($doc->photos->first())
+                                    <img src="{{ asset('storage/' . $doc->photos->first()->image_path) }}" alt="{{ $doc->title }}"
+                                         class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" onerror="this.remove()">
+                                @else
+                                    <span class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1C442B] to-[#0D2818]">
+                                        <span class="font-display font-extrabold text-2xl tracking-wider text-white/10">TSAQIB</span>
+                                    </span>
+                                @endif
+                                <span class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></span>
+                                <span class="absolute inset-0 flex items-center justify-center">
+                                    <span class="w-12 h-12 rounded-full bg-[var(--gold)]/90 text-[#10140F] flex items-center justify-center shadow-lg transition-transform duration-200 group-hover:scale-110">
+                                        <i class="fa-solid fa-play text-sm ml-0.5"></i>
+                                    </span>
+                                </span>
+                                @if($doc->event_date)
+                                    <span class="absolute bottom-2 left-2 text-[9px] font-bold text-white/80 bg-black/60 px-2 py-0.5 rounded backdrop-blur-sm">
+                                        {{ $doc->event_date->format('d M Y') }}
+                                    </span>
+                                @endif
+                            </span>
+                            <span class="block p-3.5">
+                                <span class="block font-display font-bold text-xs sm:text-sm text-[var(--cream)] leading-snug line-clamp-2 group-hover:text-[var(--gold)] transition-colors">{{ $doc->title }}</span>
+                                <span class="mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-[var(--gold)]">
+                                    <i class="fa-solid fa-circle-play text-[9px]"></i> Tonton Video
+                                </span>
+                            </span>
+                        </button>
+                    @endforeach
+                </div>
+            @else
+                <div class="mt-6 p-10 text-center rounded-xl border border-dashed border-white/15 bg-white/[0.02]">
+                    <i class="fa-solid fa-video text-3xl text-white/15 block mb-2"></i>
+                    <p class="text-white/40 text-xs">Dokumentasi video kunjungan akan segera diunggah.</p>
+                </div>
+            @endif
+
+            <div class="mt-6 text-center">
+                <a href="{{ route('info', ['tab' => 'dokumentasi']) }}" class="btn-outline text-xs px-5 py-2.5">
+                    <span>Lihat Semua Arsip Dokumentasi</span>
+                    <i class="fa-solid fa-arrow-right text-[11px]"></i>
+                </a>
+            </div>
+        </section>
+
     </main>
+
+    {{-- Modal / lightbox video (embed Google Drive) --}}
+    <div id="doc-video-modal" class="fixed inset-0 z-50 hidden bg-black/90 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Pemutar video dokumentasi">
+        <button type="button" data-video-close class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white text-lg cursor-pointer transition" aria-label="Tutup video">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="w-full max-w-3xl space-y-3">
+            <div class="relative w-full aspect-video rounded-xl overflow-hidden border border-[rgba(201,166,107,0.4)] bg-black shadow-2xl">
+                <iframe id="doc-video-frame" src="" title="Video dokumentasi"
+                        class="absolute inset-0 w-full h-full" allow="autoplay; fullscreen" allowfullscreen></iframe>
+            </div>
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-2">
+                <p id="doc-video-title" class="text-xs font-bold text-[var(--cream)] truncate"></p>
+                <a id="doc-video-fallback" href="#" target="_blank" rel="noopener"
+                   class="text-[11px] font-bold text-[var(--gold)] hover:underline shrink-0">
+                    Video tidak dapat dimuat, buka di Google Drive <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+                </a>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     @include('partials.site-footer')
@@ -561,6 +646,37 @@
         facade.addEventListener('click', loadIframe);
         facade.addEventListener('keydown', function (e) {
             if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); loadIframe(); }
+        });
+    })();
+
+    // Modal video kunjungan & studi tiru (embed Google Drive)
+    (function () {
+        var modal   = document.getElementById('doc-video-modal');
+        var frame   = document.getElementById('doc-video-frame');
+        var title   = document.getElementById('doc-video-title');
+        var fallback = document.getElementById('doc-video-fallback');
+        if (!modal || !frame) return;
+
+        function open(btn) {
+            frame.src = btn.dataset.embed || '';
+            title.textContent = btn.dataset.title || '';
+            fallback.href = btn.dataset.watch || '#';
+            modal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+        function close() {
+            frame.src = ''; // hentikan pemutaran
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        document.querySelectorAll('[data-video-card]').forEach(function (btn) {
+            btn.addEventListener('click', function () { open(btn); });
+        });
+        modal.querySelector('[data-video-close]').addEventListener('click', close);
+        modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) close();
         });
     })();
     </script>

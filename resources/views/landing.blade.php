@@ -890,6 +890,56 @@
                 </div>
             </div>
 
+            {{-- 2.5 Highlight: Laboratorium PAI Unggulan (Social Proof) --}}
+            <div class="tsaqib-card p-6 sm:p-8 grid sm:grid-cols-[minmax(0,320px)_1fr] gap-6 items-center border-[var(--gold)]/30 bg-gradient-to-r from-[rgba(1,121,95,0.12)] to-transparent">
+                <a href="{{ $kunjunganVideo ? route('info.dokumentasi.show', $kunjunganVideo->slug) : route('laboratorium.pai') }}"
+                   class="group relative block aspect-video rounded-xl overflow-hidden border border-[rgba(201,166,107,0.4)] bg-gradient-to-br from-[#1C442B] to-[#0D2818] shadow-xl"
+                   aria-label="Tonton video kunjungan Laboratorium PAI">
+                    @if($kunjunganVideo?->photos->first())
+                        <img src="{{ asset('storage/' . $kunjunganVideo->photos->first()->image_path) }}" alt="{{ $kunjunganVideo->title }}"
+                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" onerror="this.remove()">
+                    @endif
+                    <span class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></span>
+                    <span class="absolute inset-0 flex items-center justify-center">
+                        <span class="w-14 h-14 rounded-full bg-[var(--gold)]/90 text-[#10140F] flex items-center justify-center shadow-2xl transition-transform duration-200 group-hover:scale-110">
+                            <i class="fa-solid fa-play text-base ml-0.5"></i>
+                        </span>
+                    </span>
+                    @if($kunjunganVideo)
+                        <span class="absolute bottom-2 left-2 right-2 text-[10px] font-bold text-white/85 truncate">{{ $kunjunganVideo->title }}</span>
+                    @else
+                        {{-- TODO: dummy — muncul otomatis begitu admin upload video kunjungan (kategori "Kunjungan & Studi Tiru") --}}
+                        <span class="absolute bottom-2 left-2 right-2 text-[10px] font-bold text-white/60">Video kunjungan — segera hadir</span>
+                    @endif
+                </a>
+
+                <div class="space-y-3 text-center sm:text-left">
+                    <p class="ed-eyebrow">Laboratorium PAI Unggulan</p>
+                    <h3 class="font-display font-extrabold text-xl sm:text-2xl text-[var(--cream)] tracking-tight leading-snug">
+                        PUSAT INOVASI &amp; RUJUKAN STUDI TIRU
+                    </h3>
+                    <p class="text-white/70 text-xs sm:text-sm leading-relaxed">
+                        Laboratorium PAI SMAN 1 Bukittinggi menjadi pusat inovasi dan rujukan studi tiru berbagai instansi. Terakreditasi serta aktif menerima kunjungan penilaian eksternal.
+                    </p>
+                    <div class="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#01795F]/20 border border-[#01795F]/40 text-[11px] font-bold text-[#3fd6b0]">
+                            <i class="fa-solid fa-circle-check text-[10px]"></i> Terakreditasi
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[rgba(201,166,107,0.14)] border border-[rgba(201,166,107,0.35)] text-[11px] font-bold text-[var(--gold)]">
+                            <i class="fa-solid fa-video text-[10px]"></i>
+                            {{-- TODO: fallback "4+" dummy — otomatis angka asli saat data kunjungan terisi --}}
+                            {{ $kunjunganCount > 0 ? $kunjunganCount.'+ Kunjungan Studi Tiru' : '4+ Kunjungan Studi Tiru' }}
+                        </span>
+                    </div>
+                    <div class="pt-1">
+                        <a href="{{ route('laboratorium.pai') }}" class="btn-gold">
+                            <span>Jelajahi Profil &amp; Dokumentasi Lab PAI</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
             {{-- 3. Callout Google Classroom (Tugas Siswa) --}}
             <div class="tsaqib-card p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6 border-[var(--gold)]/30 bg-gradient-to-r from-[rgba(201,166,107,0.1)] to-transparent">
                 <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[var(--gold)]/15 border border-[var(--gold)]/40 flex items-center justify-center text-[var(--gold)] text-2xl shrink-0">

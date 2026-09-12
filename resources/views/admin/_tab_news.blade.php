@@ -15,7 +15,7 @@
     </div>
 
     <!-- FORM TULIS/EDIT BERITA (HIDDEN BY DEFAULT) -->
-    <div id="add-news-form" class="hidden mb-6 p-5 rounded-xl bg-white/5 border border-white/10 space-y-4">
+    <div id="add-news-form" class="{{ $errors->hasAny(['title', 'slug', 'excerpt', 'content', 'thumbnail', 'published_at']) ? '' : 'hidden' }} mb-6 p-5 rounded-xl bg-white/5 border border-white/10 space-y-4">
         <div class="flex items-center justify-between gap-3">
             <h4 id="news-form-title" class="font-bold text-xs text-[var(--cream)] uppercase tracking-wider">Form Tulis Berita Baru</h4>
             <button type="button" id="news-form-cancel" class="hidden text-[11px] text-white/50 hover:text-white font-semibold">
@@ -41,7 +41,9 @@
 
             <div>
                 <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Ringkasan (Excerpt)</label>
-                <textarea name="excerpt" rows="2" class="tsaqib-input w-full px-3 py-2 text-xs" placeholder="Kosongkan untuk auto dari isi berita"></textarea>
+                <textarea name="excerpt" rows="2" maxlength="160" class="tsaqib-input w-full px-3 py-2 text-xs" placeholder="Kosongkan untuk auto dari isi berita"></textarea>
+                <p id="excerpt-counter" class="text-[10px] text-white/40 mt-1 text-right">0/160</p>
+                @error('excerpt')<p class="text-[11px] text-red-400 mt-1">{{ $message }}</p>@enderror
             </div>
 
             <div>
@@ -57,7 +59,8 @@
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Tanggal Terbit (kosongkan = draf)</label>
-                    <input type="datetime-local" name="published_at" class="tsaqib-input w-full px-3 py-2 text-xs">
+                    <input type="datetime-local" name="published_at" value="{{ old('published_at', now()->format('Y-m-d\TH:i')) }}" class="tsaqib-input w-full px-3 py-2 text-xs">
+                    @error('published_at')<p class="text-[11px] text-red-400 mt-1">{{ $message }}</p>@enderror
                 </div>
             </div>
 
@@ -113,6 +116,13 @@
     var cancelBtn   = document.getElementById('news-form-cancel');
     var submitBtn   = document.getElementById('news-submit-btn');
     var thumbHint   = document.getElementById('news-thumb-hint');
+    var excerptEl   = form.querySelector('[name=excerpt]');
+    var excerptCnt  = document.getElementById('excerpt-counter');
+
+    function updateExcerptCounter() {
+        excerptCnt.textContent = excerptEl.value.length + '/160';
+    }
+    excerptEl.addEventListener('input', updateExcerptCounter);
     // Path relatif supaya action form hasil JS tidak pernah http:// absolut
     // (mixed content) di belakang proxy TLS — pola sama dengan _tab_books.
     var storeUrl    = "/admin-panel/news";
@@ -127,6 +137,7 @@
         submitBtn.textContent = 'Simpan & Terbitkan';
         cancelBtn.classList.add('hidden');
         if (thumbHint) thumbHint.classList.add('hidden');
+        updateExcerptCounter();
     }
 
     function enterEdit(payload) {
@@ -136,6 +147,7 @@
         form.querySelector('[name=title]').value = payload.title;
         form.querySelector('[name=slug]').value = payload.slug;
         form.querySelector('[name=excerpt]').value = payload.excerpt || '';
+        updateExcerptCounter();
         form.querySelector('[name=content]').value = payload.content || '';
         form.querySelector('[name=published_at]').value = payload.published_at || '';
         titleEl.textContent = 'Edit Berita';

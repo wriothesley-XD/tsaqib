@@ -325,16 +325,11 @@ class AdminController extends Controller
         $data = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255'],
-            'excerpt' => ['nullable', 'string', 'max:500'],
+            'excerpt' => ['nullable', 'string', 'max:160'],
             'content' => ['required', 'string'],
             'thumbnail' => ['nullable', 'image', 'max:4096'],
-            'published_at' => ['nullable', 'string'],
+            'published_at' => ['nullable', 'date'],
         ]);
-
-        // datetime-local mengirim "Y-m-d\TH:i" → MySQL butuh "Y-m-d H:i".
-        if (! empty($data['published_at'])) {
-            $data['published_at'] = str_replace('T', ' ', $data['published_at']);
-        }
 
         $data['slug'] = $this->uniqueNewsSlug(
             $data['slug'] ? Str::slug($data['slug']) : Str::slug($data['title']),
@@ -376,7 +371,16 @@ class AdminController extends Controller
         }
 
         $data['user_id'] = Auth::id();
-        $data['excerpt'] = $data['excerpt'] ?? Str::limit(strip_tags($data['content']), 160);
+        $excerptSource = $data['excerpt'] ?: strip_tags($data['content']);
+        $data['excerpt'] = Str::limit(strip_tags($excerptSource), 160, '');
+
+        if (! empty($data['published_at'])) {
+            try {
+                $data['published_at'] = \Carbon\Carbon::parse($data['published_at'])->format('Y-m-d H:i:s');
+            } catch (\Exception $e) {
+                return redirect()->back()->withInput()->withErrors(['published_at' => 'Format tanggal publikasi tidak valid.']);
+            }
+        }
 
         News::create($data);
 
@@ -400,8 +404,15 @@ class AdminController extends Controller
             $data['thumbnail'] = $request->file('thumbnail')->store('news', 'public');
         }
 
-        if (empty($data['excerpt'])) {
-            $data['excerpt'] = Str::limit(strip_tags($data['content']), 160);
+        $excerptSource = $data['excerpt'] ?: strip_tags($data['content']);
+        $data['excerpt'] = Str::limit(strip_tags($excerptSource), 160, '');
+
+        if (! empty($data['published_at'])) {
+            try {
+                $data['published_at'] = \Carbon\Carbon::parse($data['published_at'])->format('Y-m-d H:i:s');
+            } catch (\Exception $e) {
+                return redirect()->back()->withInput()->withErrors(['published_at' => 'Format tanggal publikasi tidak valid.']);
+            }
         }
 
         $news->update($data);

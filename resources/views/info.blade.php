@@ -42,6 +42,16 @@
     }
     .info-pager-btn:disabled { opacity: 0.35; cursor: not-allowed; }
     .cat-hidden { display: none !important; } /* filter kategori menimpa display pager */
+
+    /* Fallback cover card video: hijau tua + pattern geometris (titik emas +
+       garis diagonal) — tampil saat thumbnail kosong/gagal dimuat */
+    .doc-video-fallback{
+        background-color:#0D2818;
+        background-image:
+            radial-gradient(rgba(201,166,107,.16) 1px, transparent 1.5px),
+            repeating-linear-gradient(45deg, rgba(247,245,239,.045) 0 2px, transparent 2px 14px);
+        background-size:18px 18px, auto;
+    }
 </style>
 @endpush
 
@@ -197,37 +207,69 @@
 
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 js-pager-grid" data-per-page="8">
                     @foreach($documentations as $doc)
+                        {{-- Cover = foto pertama galeri (kolom cover_image TIDAK ada di
+                             tabel ini — pola sama dgn daftar admin _list_documentations). --}}
+                        @php($cover = $doc->photos->first()?->image_path)
                         <a href="{{ route('info.dokumentasi.show', $doc->slug) }}" data-cat="{{ $doc->category }}"
                            class="js-pager-item group tsaqib-card-interactive overflow-hidden flex flex-col">
-                            <div class="relative aspect-[16/11] bg-black/40 overflow-hidden">
-                                @if($doc->cover_image)
-                                    <img src="{{ asset('storage/' . $doc->cover_image) }}" alt="{{ $doc->title }}"
-                                         class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" onerror="this.remove()">
-                                @else
-                                    <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1C442B] to-[#0D2818]">
-                                        <i class="fa-solid fa-camera text-3xl text-white/20"></i>
-                                    </div>
-                                @endif
-                                <span class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></span>
+                            <div @class(['relative overflow-hidden bg-black/40', $doc->video_path ? 'aspect-video' : 'aspect-[16/11]'])>
                                 @if($doc->video_path)
-                                    {{-- Badge video: bedakan dari galeri foto biasa --}}
-                                    <span class="absolute inset-0 flex items-center justify-center">
-                                        <span class="w-10 h-10 rounded-full bg-[var(--gold)]/90 text-[#10140F] flex items-center justify-center shadow-lg transition-transform duration-200 group-hover:scale-110">
-                                            <i class="fa-solid fa-play text-xs ml-0.5"></i>
+                                    {{-- ===== CARD VIDEO =====
+                                         Fallback cover dirender SELALU di belakang img:
+                                         thumbnail kosong atau onerror (img di-remove) →
+                                         otomatis tersingkap. pattern via .doc-video-fallback --}}
+                                    <div class="doc-video-fallback absolute inset-0 flex flex-col items-center justify-center gap-2">
+                                        <span class="w-14 h-14 rounded-full bg-[var(--gold)] text-[#10140F] flex items-center justify-center text-lg shadow-[0_10px_30px_-8px_rgba(201,166,107,.8)]">
+                                            <i class="fa-solid fa-play translate-x-[2px]"></i>
                                         </span>
+                                        <span class="text-[9px] font-bold uppercase tracking-wider text-white/60">Dokumentasi Video Tsaqib</span>
+                                    </div>
+                                    @if($cover)
+                                        <img src="{{ asset('storage/' . $cover) }}" alt="{{ $doc->title }}"
+                                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" onerror="this.remove()">
+                                        <span class="absolute inset-0 bg-black/40"></span>
+                                        <span class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                            <span class="w-11 h-11 rounded-full bg-[var(--gold)]/90 text-[#10140F] flex items-center justify-center shadow-lg transition-transform duration-200 group-hover:scale-110">
+                                                <i class="fa-solid fa-play text-xs ml-0.5"></i>
+                                            </span>
+                                        </span>
+                                    @endif
+                                    {{-- Judul di cover (kiri) + badge durasi (kanan, diisi JS;
+                                         video Drive tidak punya metadata durasi → badge disembunyikan) --}}
+                                    <span class="absolute inset-x-2 bottom-2 flex items-end justify-between gap-2">
+                                        <span class="text-[11px] font-bold text-white leading-tight line-clamp-2 drop-shadow-[0_1px_2px_rgba(0,0,0,.8)]">{{ $doc->title }}</span>
+                                        @if(! $doc->isDriveVideo())
+                                            <span data-doc-duration data-video-src="{{ asset('storage/' . $doc->video_path) }}"
+                                                  class="hidden shrink-0 text-[9px] font-bold text-white bg-black/70 px-1.5 py-0.5 rounded tabular-nums">--:--</span>
+                                        @endif
                                     </span>
-                                @endif
-                                @if($doc->event_date)
-                                    <span class="absolute bottom-2 left-2 text-[9px] font-bold text-white/80 bg-black/60 px-2 py-0.5 rounded backdrop-blur-sm">
-                                        {{ $doc->event_date->format('d M Y') }}
-                                    </span>
+                                @else
+                                    {{-- ===== CARD GALERI FOTO ===== --}}
+                                    @if($cover)
+                                        <img src="{{ asset('storage/' . $cover) }}" alt="{{ $doc->title }}"
+                                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" onerror="this.remove()">
+                                    @else
+                                        <div class="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-gradient-to-br from-[#1C442B] to-[#0D2818]">
+                                            <i class="fa-solid fa-camera text-3xl text-white/20"></i>
+                                            <span class="text-[9px] font-bold uppercase tracking-wider text-white/30">Gambar tidak tersedia</span>
+                                        </div>
+                                    @endif
+                                    <span class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></span>
+                                    @if($doc->event_date)
+                                        <span class="absolute bottom-2 left-2 text-[9px] font-bold text-white/80 bg-black/60 px-2 py-0.5 rounded backdrop-blur-sm">
+                                            {{ $doc->event_date->format('d M Y') }}
+                                        </span>
+                                    @endif
                                 @endif
                             </div>
 
                             <div class="p-3.5 flex flex-col flex-1">
-                                <h3 class="font-display font-bold text-xs sm:text-sm text-[var(--cream)] leading-snug line-clamp-2 group-hover:text-[var(--gold)] transition-colors">
-                                    {{ $doc->title }}
-                                </h3>
+                                @if(! $doc->video_path)
+                                    {{-- Card video: judul sudah di cover — hindari duplikat --}}
+                                    <h3 class="font-display font-bold text-xs sm:text-sm text-[var(--cream)] leading-snug line-clamp-2 group-hover:text-[var(--gold)] transition-colors">
+                                        {{ $doc->title }}
+                                    </h3>
+                                @endif
                                 @if($doc->location)
                                     <p class="text-[10px] text-[var(--gold)] mt-1 truncate">
                                         <i class="fa-solid fa-location-dot text-[8px] mr-1"></i>{{ $doc->location }}
@@ -333,6 +375,23 @@
             nav.hidden = true; // pager hanya untuk tampilan "Semua"
         });
     }
+})();
+
+/* Badge durasi card video: baca metadata file lokal (preload="metadata"),
+   format mm:ss. Video Drive tidak punya metadata via iframe → badge tetap hidden. */
+(function () {
+    document.querySelectorAll('[data-doc-duration]').forEach(function (el) {
+        var probe = document.createElement('video');
+        probe.preload = 'metadata';
+        probe.addEventListener('loadedmetadata', function () {
+            var total = Math.round(probe.duration);
+            if (!isFinite(total) || total <= 0) return;
+            var m = Math.floor(total / 60), s = total % 60;
+            el.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+            el.classList.remove('hidden');
+        });
+        probe.src = el.dataset.videoSrc;
+    });
 })();
 </script>
 @endpush

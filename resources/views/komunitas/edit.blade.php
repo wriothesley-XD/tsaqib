@@ -93,6 +93,8 @@
                             <input type="file" name="media[]" multiple
                                    accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" class="sr-only">
                         </label>
+                        {{-- Feedback pilihan media: tanpa ini user mengira tombol tidak berfungsi --}}
+                        <div class="media-preview" data-preview></div>
                         <div class="media-count mt-2">Maks 6 foto (jpg/png/webp, ≤3 MB) atau 1 video (mp4/webm, ≤30 MB). Tidak boleh campur.</div>
                     </div>
                 </div>
@@ -118,6 +120,10 @@
            checkbox (input peer) dicentang -> badge jadi X merah + hint aktif. */
         .media-drop{ border:1px dashed rgba(247,245,239,.2); border-radius:.75rem; padding:.6rem; }
         .media-count{ font-size:10px; color:rgba(247,245,239,.5); }
+        /* Sama dengan form create (index.blade.php) */
+        .media-preview { display: grid; grid-template-columns: repeat(auto-fill, 76px); gap: 0.4rem; margin-top: 0.4rem; }
+        .thumb { position: relative; aspect-ratio: 1/1; border-radius: 0.5rem; overflow: hidden; background: rgba(247, 245, 239, 0.05); border: 1px solid rgba(247, 245, 239, 0.1); }
+        .thumb img, .thumb video { width: 100%; height: 100%; object-fit: cover; }
     </style>
     @endpush
 
@@ -129,6 +135,27 @@
                 tile.querySelector('.remove-badge')?.classList.toggle('!bg-red-500', cb.checked);
                 tile.querySelector('.remove-hint')?.classList.toggle('!bg-red-500/80', cb.checked);
                 tile.querySelector('img,video')?.classList.toggle('opacity-30', cb.checked);
+            });
+        });
+
+        /* Preview media baru dipilih — pola sama dgn form create (index.blade.php). */
+        document.querySelectorAll('input[name="media[]"]').forEach(input => {
+            input.addEventListener('change', () => {
+                const preview = input.closest('.media-drop')?.querySelector('[data-preview]');
+                if (!preview) return;
+                preview.innerHTML = '';
+                Array.from(input.files).forEach(f => {
+                    const div = document.createElement('div');
+                    div.className = 'thumb';
+                    if (f.type.startsWith('image/')) {
+                        const img = document.createElement('img');
+                        img.src = URL.createObjectURL(f);
+                        div.appendChild(img);
+                    } else {
+                        div.innerHTML = '<div class="w-full h-full flex items-center justify-center text-[var(--gold)]"><i class="fa-solid fa-film"></i></div>';
+                    }
+                    preview.appendChild(div);
+                });
             });
         });
     </script>

@@ -14,6 +14,7 @@ class ActivityDocumentation extends Model
         'slug',
         'description',
         'video_path',
+        'snippet_path',
         'event_date',
         'category',
     ];
@@ -66,6 +67,12 @@ class ActivityDocumentation extends Model
         $id = $this->driveFileId();
 
         return $id ? "https://drive.google.com/file/d/{$id}/view" : null;
+    }
+
+    /** URL cuplikan pendek (file lokal kecil) utk widget Beranda. Null jika tidak ada. */
+    public function snippetUrl(): ?string
+    {
+        return $this->snippet_path ? asset('storage/' . $this->snippet_path) : null;
     }
 
     /**

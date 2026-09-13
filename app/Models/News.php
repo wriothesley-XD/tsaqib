@@ -22,6 +22,7 @@ class News extends Model
         'excerpt',
         'content',
         'thumbnail',
+        'category',
         'published_at',
         'user_id',
     ];

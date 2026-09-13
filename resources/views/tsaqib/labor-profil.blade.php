@@ -241,7 +241,7 @@
                 Profil Laboratorium &amp; <span class="text-[var(--gold)]">Guru Pengampu</span>
             </h1>
             <p class="text-white/60 text-xs sm:text-sm leading-relaxed mt-2.5 max-w-2xl">
-                Sejarah, visi Laboratorium PAI, serta profil ustadz dan ustadzah pembina yang membimbing praktikum ibadah dan pembinaan karakter di SMAN 1 Bukittinggi.
+                Profil ustadz dan ustadzah pengampu Pendidikan Agama Islam yang membimbing praktikum ibadah dan pembinaan karakter di SMAN 1 Bukittinggi.
             </p>
         </div>
 
@@ -249,40 +249,6 @@
         <div class="reveal" style="--reveal-i:1;">
             @include('tsaqib._labor-subnav', ['active' => 'profil'])
         </div>
-
-        {{-- ===== Sejarah & Visi Rabbani ===== --}}
-        <section class="reveal" style="--reveal-i:2;">
-            <div class="tsaqib-card p-6 sm:p-8 relative overflow-hidden">
-                <div class="absolute -right-6 -bottom-6 w-48 h-48 rounded-full bg-[var(--gold)]/5 blur-2xl pointer-events-none"></div>
-                <p class="ed-eyebrow"><span class="text-[var(--gold)]/60">✦</span> Dari Ruang Laboratorium PAI</p>
-                <h2 class="font-display font-extrabold text-lg sm:text-2xl text-[var(--cream)] tracking-tight uppercase mt-3">
-                    Sejarah &amp; Visi Rabbani
-                </h2>
-                <p class="text-xs sm:text-sm text-white/70 leading-relaxed mt-3 max-w-2xl">
-                    Laboratorium PAI adalah pusat riset, praktikum ibadah, dan pembinaan karakter
-                    Pendidikan Agama Islam — bukan sekadar ruang fisik, melainkan wahana penguatan
-                    akhlak mulia dan pembiasaan nilai keislaman dalam kehidupan sehari-hari peserta didik.
-                </p>
-                <div class="grid sm:grid-cols-2 gap-x-10 gap-y-6 mt-8 max-w-3xl">
-                    <div class="vpoint">
-                        <h4 class="font-display font-extrabold uppercase text-[var(--gold)]">Visi Rabbani</h4>
-                        <p class="text-xs sm:text-sm mt-1.5 leading-relaxed">{{ $visiMisi['visi'] }}</p>
-                    </div>
-                    @foreach($visiMisi['misi'] as $misi)
-                        <div class="vpoint">
-                            <h4 class="font-display font-extrabold uppercase text-[var(--gold)]">Misi {{ $loop->iteration }}</h4>
-                            <p class="text-xs sm:text-sm mt-1.5 leading-relaxed">{{ $misi }}</p>
-                        </div>
-                    @endforeach
-                </div>
-                <div class="mt-8 pt-6 border-t border-white/10 flex items-center justify-between">
-                    <a href="{{ route('laboratorium.pai') }}" class="inline-flex items-center gap-2 text-xs font-bold text-[var(--gold)] hover:gap-3 transition-all">
-                        <span>Lihat ikhtisar lengkap Laboratorium</span>
-                        <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                    </a>
-                </div>
-            </div>
-        </section>
 
         {{-- ===== Grid profil guru ===== --}}
         <section class="space-y-6">
@@ -326,6 +292,9 @@
                                         <span class="block text-[9px] text-white/75 font-semibold mt-0.5">
                                             Kelas: {{ implode(', ', $guru->kelas_diampu) }}
                                         </span>
+                                    @endif
+                                    @if($guru->nip)
+                                        <span class="block text-[9px] text-white/60 mt-0.5">NIP. {{ $guru->nip }}</span>
                                     @endif
                                     <span class="about-me" title="{{ $guru->deskripsi }}">
                                         {{ $guru->deskripsi ?: 'Guru Pengampu Pendidikan Agama Islam SMAN 1 Bukittinggi.' }}

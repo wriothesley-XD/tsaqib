@@ -48,20 +48,21 @@ class PageController extends Controller
                 'pdf' => $b->pdf_path ? asset('storage/'.$b->pdf_path) : null,
             ]);
 
-        // Highlight "Laboratorium PAI Unggulan": video kunjungan/studi tiru
-        // terbaru + jumlah kunjungan untuk badge kredibilitas.
-        $kunjunganVideo = ActivityDocumentation::with('photos')
+        // Widget cuplikan Beranda: file video kecil LOKAL (snippet_path) — diambil
+        // random + di-crossfade JS. Video lengkap utk Laboratorium PAI tetap lewat
+        // video_path (link Google Drive, di-embed di sana) — sumber sengaja dipisah.
+        $kunjunganSnippets = ActivityDocumentation::with('photos')
             ->where('category', 'Kunjungan & Studi Tiru')
-            ->whereNotNull('video_path')
-            ->orderByDesc('event_date')
-            ->orderByDesc('created_at')
-            ->first();
+            ->whereNotNull('snippet_path')
+            ->inRandomOrder()
+            ->limit(4)
+            ->get();
         $kunjunganCount = ActivityDocumentation::where('category', 'Kunjungan & Studi Tiru')->count();
 
         return view('landing', compact(
             'daftarKomunitas', 'totalModul', 'totalAnggota', 'totalKomunitas',
             'beritaTerbaru', 'buletinTerbaru', 'katalogPerpus',
-            'kunjunganVideo', 'kunjunganCount'
+            'kunjunganSnippets', 'kunjunganCount'
         ));
     }
 

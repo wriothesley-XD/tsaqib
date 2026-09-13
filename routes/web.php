@@ -152,6 +152,8 @@ Route::middleware(['auth', 'community.selected'])->group(function () {
         Route::put('/news/{news}', [AdminController::class, 'updateNews'])->name('news.update');
         Route::delete('/news/{news}', [AdminController::class, 'destroyNews'])->name('news.destroy');
         Route::post('/documentations', [AdminController::class, 'storeDocumentation'])->name('documentations.store');
+        Route::get('/documentations/{documentation}/edit', [AdminController::class, 'editDocumentation'])->name('documentations.edit');
+        Route::put('/documentations/{documentation}', [AdminController::class, 'updateDocumentation'])->name('documentations.update');
         Route::delete('/documentations/{documentation}', [AdminController::class, 'destroyDocumentation'])->name('documentations.destroy');
         // Modul & Tugas (guru) + resolusi verifikasi siswa (blueprint RBAC).
         Route::post('/verifications/{verification}/resolve', [VerificationController::class, 'resolve'])->name('verifications.resolve');

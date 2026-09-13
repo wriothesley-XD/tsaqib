@@ -148,6 +148,25 @@
         .skyline-silhouette{ opacity:.45; } /* lebih samar di mobile */
     }
 
+    /* Tab underline bersama (sub-nav Laboratorium PAI & halaman Info):
+       aktif = teks emas + garis bawah 2px emas, tanpa background pill. */
+    .u-tab{
+        position:relative;
+        font-family:'Plus Jakarta Sans',sans-serif;
+        font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap;
+        color:rgba(245,241,232,.5);
+        padding:.6rem .1rem;
+        background:transparent;border:0;
+        transition:color .2s ease;
+    }
+    .u-tab::after{
+        content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;
+        border-radius:2px;background:transparent;transition:background .2s ease;
+    }
+    .u-tab:hover{ color:var(--cream); }
+    .u-tab.is-active{ color:var(--gold); }
+    .u-tab.is-active::after{ background:var(--gold); }
+
     @media (prefers-reduced-motion: reduce){
         *{ transition-duration:.01ms !important; animation-duration:.01ms !important; }
     }

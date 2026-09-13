@@ -400,6 +400,109 @@
     </header>
 
     {{-- =========================================================================
+       SECTION 1.5: HIGHLIGHT LABORATORIUM PAI (Cuplikan Video Kunjungan — Social Proof)
+       ========================================================================= --}}
+    <section id="labor-highlight" class="relative border-b border-white/10" style="background-color: var(--green-s1);">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto py-12 px-4 sm:px-6">
+            {{-- Anak Div 1 (Kiri): kotak teks Emas — overlap tipis ke area video di desktop --}}
+            <div class="relative z-10 bg-[var(--gold)] text-[#10140F] rounded-3xl p-6 sm:p-8 space-y-4 text-center md:text-left shadow-2xl md:-mr-[40px]">
+                <p class="text-[11px] font-bold uppercase tracking-wider text-[#10140F]/60">Laboratorium PAI Unggulan</p>
+                <h3 class="font-display font-extrabold text-2xl sm:text-3xl tracking-tight leading-tight">
+                    PUSAT INOVASI &amp; RUJUKAN STUDI TIRU
+                </h3>
+                <p class="text-[#10140F]/80 text-xs sm:text-sm leading-relaxed">
+                    Laboratorium PAI SMAN 1 Bukittinggi menjadi pusat inovasi dan rujukan studi tiru berbagai instansi.
+                </p>
+                <div class="flex items-center justify-center md:justify-start gap-2 flex-wrap">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#10140F]/10 border border-[#10140F]/20 text-[11px] font-bold">
+                        <i class="fa-solid fa-circle-check text-[10px]"></i> Terakreditasi
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#10140F]/10 border border-[#10140F]/20 text-[11px] font-bold">
+                        <i class="fa-solid fa-video text-[10px]"></i>
+                        {{-- TODO: fallback "4+" dummy — otomatis angka asli saat data kunjungan terisi --}}
+                        {{ $kunjunganCount > 0 ? $kunjunganCount.'+ Kunjungan Studi Tiru' : '4+ Kunjungan Studi Tiru' }}
+                    </span>
+                </div>
+                <div class="pt-1">
+                    <a href="{{ route('laboratorium.pai') }}#dokumentasi-kunjungan"
+                       class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#10140F] text-[var(--gold)] text-xs font-bold transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#233029] hover:shadow-lg">
+                        <span>Jelajahi Profil &amp; Dokumentasi Lab PAI</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </a>
+                </div>
+            </div>
+
+            {{-- Anak Div 2 (Kanan): video Hijau, 16:9 dibatasi max-h 400px --}}
+            <div class="group relative aspect-video max-h-[400px] rounded-3xl overflow-hidden border border-[rgba(201,166,107,0.4)] bg-gradient-to-br from-[#1C442B] to-[#0D2818] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.65)]">
+                {{-- Pattern islami (reuse .pat-islami) sebagai lantai placeholder — tertutup video saat data terisi --}}
+                <span class="pat-islami" aria-hidden="true"></span>
+
+                @foreach($kunjunganSnippets as $i => $doc)
+                    <video data-snippet muted loop playsinline preload="metadata"
+                           {{ $i === 0 ? 'autoplay' : '' }}
+                           class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 {{ $i === 0 ? 'opacity-100' : 'opacity-0' }}"
+                           @if($doc->photos->first())poster="{{ asset('storage/' . $doc->photos->first()->image_path) }}"@endif>
+                        <source src="{{ $doc->snippetUrl() }}" type="{{ str_ends_with($doc->snippet_path, '.webm') ? 'video/webm' : 'video/mp4' }}">
+                    </video>
+                @endforeach
+
+                <span class="absolute inset-0 bg-black/40 pointer-events-none"></span>
+
+                {{-- Play + caption: satu kolom tengah, caption rapi di bawah tombol --}}
+                <div class="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                    @if($kunjunganSnippets->isNotEmpty())
+                        <button type="button" data-labor-play
+                                class="relative w-16 h-16 rounded-full bg-[var(--gold)] text-[#10140F] flex items-center justify-center text-xl shadow-[0_10px_30px_-8px_rgba(201,166,107,0.8)] transition-transform duration-200 hover:scale-110 cursor-pointer"
+                                aria-label="Putar cuplikan video kunjungan">
+                            <span class="absolute inset-0 rounded-full bg-[var(--gold)] opacity-50 animate-ping" aria-hidden="true"></span>
+                            <i class="fa-solid fa-play relative translate-x-[2px]"></i>
+                        </button>
+                        <span class="flex items-center gap-1.5 text-[10px] font-bold text-white/85">
+                            <i class="fa-solid fa-circle-play text-[9px]"></i>
+                            <span class="truncate">Cuplikan — versi lengkap di Laboratorium PAI</span>
+                        </span>
+                    @else
+                        <span class="relative w-16 h-16 rounded-full bg-[var(--gold)]/90 text-[#10140F] flex items-center justify-center text-xl shadow-[0_10px_30px_-8px_rgba(201,166,107,0.8)]" aria-hidden="true">
+                            <i class="fa-solid fa-play translate-x-[2px]"></i>
+                        </span>
+                        <span class="text-[10px] font-bold text-white/60">Video kunjungan — segera hadir</span>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- Modal overlay: cuplikan diputar dgn suara + controls --}}
+    @if($kunjunganSnippets->isNotEmpty())
+        <div id="labor-video-modal" class="fixed inset-0 z-[70] hidden bg-black/85 backdrop-blur-sm items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Cuplikan video kunjungan">
+            <button type="button" data-labor-modal-close class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white text-lg cursor-pointer transition" aria-label="Tutup video">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="w-full max-w-3xl">
+                <video id="labor-modal-video" controls playsinline preload="metadata"
+                       class="w-full max-h-[70vh] aspect-video rounded-2xl border border-white/15 bg-black shadow-2xl"></video>
+                <a href="{{ route('laboratorium.pai') }}#dokumentasi-kunjungan" data-labor-modal-close
+                   class="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-[var(--gold)] hover:underline">
+                    Tonton versi lengkap di Laboratorium PAI <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </a>
+            </div>
+        </div>
+        <script>
+        (function () {
+            var modal = document.getElementById('labor-video-modal');
+            var video = document.getElementById('labor-modal-video');
+            var src   = document.querySelector('[data-snippet] source');
+            function open()  { modal.classList.remove('hidden'); modal.classList.add('flex'); if (src) { video.src = src.src; video.play().catch(function(){}); } }
+            function close() { video.pause(); video.removeAttribute('src'); video.load(); modal.classList.add('hidden'); modal.classList.remove('flex'); }
+            document.querySelector('[data-labor-play]').addEventListener('click', open);
+            modal.querySelectorAll('[data-labor-modal-close]').forEach(function (el) { el.addEventListener('click', close); });
+            modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
+            document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !modal.classList.contains('hidden')) close(); });
+        })();
+        </script>
+    @endif
+
+    {{-- =========================================================================
        SCENE 03: "JADI, TSAQIB ITU APA?" (The Clarity Anchor / 5-Second Rule)
        ========================================================================= --}}
     <section id="tentang-tsaqib" class="relative py-14 sm:py-20 border-b border-white/10" style="background-color: var(--green-s1);">
@@ -890,56 +993,6 @@
                 </div>
             </div>
 
-            {{-- 2.5 Highlight: Laboratorium PAI Unggulan (Social Proof) --}}
-            <div class="tsaqib-card p-6 sm:p-8 grid sm:grid-cols-[minmax(0,320px)_1fr] gap-6 items-center border-[var(--gold)]/30 bg-gradient-to-r from-[rgba(1,121,95,0.12)] to-transparent">
-                <a href="{{ $kunjunganVideo ? route('info.dokumentasi.show', $kunjunganVideo->slug) : route('laboratorium.pai') }}"
-                   class="group relative block aspect-video rounded-xl overflow-hidden border border-[rgba(201,166,107,0.4)] bg-gradient-to-br from-[#1C442B] to-[#0D2818] shadow-xl"
-                   aria-label="Tonton video kunjungan Laboratorium PAI">
-                    @if($kunjunganVideo?->photos->first())
-                        <img src="{{ asset('storage/' . $kunjunganVideo->photos->first()->image_path) }}" alt="{{ $kunjunganVideo->title }}"
-                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" onerror="this.remove()">
-                    @endif
-                    <span class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></span>
-                    <span class="absolute inset-0 flex items-center justify-center">
-                        <span class="w-14 h-14 rounded-full bg-[var(--gold)]/90 text-[#10140F] flex items-center justify-center shadow-2xl transition-transform duration-200 group-hover:scale-110">
-                            <i class="fa-solid fa-play text-base ml-0.5"></i>
-                        </span>
-                    </span>
-                    @if($kunjunganVideo)
-                        <span class="absolute bottom-2 left-2 right-2 text-[10px] font-bold text-white/85 truncate">{{ $kunjunganVideo->title }}</span>
-                    @else
-                        {{-- TODO: dummy — muncul otomatis begitu admin upload video kunjungan (kategori "Kunjungan & Studi Tiru") --}}
-                        <span class="absolute bottom-2 left-2 right-2 text-[10px] font-bold text-white/60">Video kunjungan — segera hadir</span>
-                    @endif
-                </a>
-
-                <div class="space-y-3 text-center sm:text-left">
-                    <p class="ed-eyebrow">Laboratorium PAI Unggulan</p>
-                    <h3 class="font-display font-extrabold text-xl sm:text-2xl text-[var(--cream)] tracking-tight leading-snug">
-                        PUSAT INOVASI &amp; RUJUKAN STUDI TIRU
-                    </h3>
-                    <p class="text-white/70 text-xs sm:text-sm leading-relaxed">
-                        Laboratorium PAI SMAN 1 Bukittinggi menjadi pusat inovasi dan rujukan studi tiru berbagai instansi. Terakreditasi serta aktif menerima kunjungan penilaian eksternal.
-                    </p>
-                    <div class="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#01795F]/20 border border-[#01795F]/40 text-[11px] font-bold text-[#3fd6b0]">
-                            <i class="fa-solid fa-circle-check text-[10px]"></i> Terakreditasi
-                        </span>
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[rgba(201,166,107,0.14)] border border-[rgba(201,166,107,0.35)] text-[11px] font-bold text-[var(--gold)]">
-                            <i class="fa-solid fa-video text-[10px]"></i>
-                            {{-- TODO: fallback "4+" dummy — otomatis angka asli saat data kunjungan terisi --}}
-                            {{ $kunjunganCount > 0 ? $kunjunganCount.'+ Kunjungan Studi Tiru' : '4+ Kunjungan Studi Tiru' }}
-                        </span>
-                    </div>
-                    <div class="pt-1">
-                        <a href="{{ route('laboratorium.pai') }}" class="btn-gold">
-                            <span>Jelajahi Profil &amp; Dokumentasi Lab PAI</span>
-                            <i class="fa-solid fa-arrow-right text-xs"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
             {{-- 3. Callout Google Classroom (Tugas Siswa) --}}
             <div class="tsaqib-card p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6 border-[var(--gold)]/30 bg-gradient-to-r from-[rgba(201,166,107,0.1)] to-transparent">
                 <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[var(--gold)]/15 border border-[var(--gold)]/40 flex items-center justify-center text-[var(--gold)] text-2xl shrink-0">
@@ -1157,7 +1210,6 @@
         </div>
     </section>
     @endif
-    </section>
 
     {{-- Global Site Footer --}}
     @include('partials.site-footer')
@@ -1172,6 +1224,32 @@
        CLIENT-SIDE SCRIPTS (Carousel, Counter, Swap Interactivity)
        ========================================================================= --}}
     <script>
+        // 0. Cuplikan kunjungan Beranda: posisi awal acak + crossfade antar video
+        (function () {
+            var vids = Array.prototype.slice.call(document.querySelectorAll('[data-snippet]'));
+            if (!vids.length) return;
+
+            vids.forEach(function (v) {
+                v.addEventListener('loadedmetadata', function () {
+                    if (v.duration > 4) v.currentTime = Math.random() * (v.duration - 3);
+                });
+            });
+
+            // Satu video saja / user hemat-gerak: cukup loop video pertama.
+            if (vids.length < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+            var cur = 0;
+            setInterval(function () {
+                var prev = vids[cur];
+                cur = (cur + 1) % vids.length;
+                var next = vids[cur];
+                next.play().catch(function () {});
+                next.classList.remove('opacity-0');
+                prev.classList.add('opacity-0');
+                setTimeout(function () { prev.pause(); }, 1100);
+            }, 6000);
+        })();
+
         // 1. Program Carousel Infinite Loop + Drag
         (function () {
             const viewport = document.querySelector('.carousel-viewport');

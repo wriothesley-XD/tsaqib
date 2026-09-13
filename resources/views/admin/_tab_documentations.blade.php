@@ -59,10 +59,19 @@
             </div>
 
             <div>
-                <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Link Google Drive (opsional — diprioritaskan di atas video upload, hemat storage hosting)</label>
+                <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Link Google Drive — VIDEO LENGKAP (opsional — diprioritaskan di atas video upload, hemat storage hosting. Tampil di halaman Laboratorium PAI)</label>
                 <input type="url" name="video_drive" placeholder="https://drive.google.com/file/d/FILE_ID/view?usp=sharing"
                        class="tsaqib-input w-full px-3 py-2 text-xs">
                 <p class="text-[10px] text-white/40 mt-1">Bagikan file Drive sebagai "Siapa saja yang memiliki link", lalu paste link-nya di sini.</p>
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Cuplikan Video Beranda (opsional — mp4/webm, MAKS 10MB, potong 5-10 dtk, resolusi 480-720p. Khusus widget cuplikan di Beranda — file kecil karena di-host di server ini, beda dari video lengkap Drive di atas)</label>
+                <input type="file" name="video_snippet" accept="video/mp4,video/webm"
+                       class="w-full text-xs text-white/50 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[11px] file:font-semibold file:bg-[#01795F]/20 file:text-[#3fd6b0]">
+                {{-- Preview player sebelum submit --}}
+                <video id="doc-snippet-preview" controls muted playsinline preload="metadata"
+                       class="hidden w-full max-w-xs aspect-video rounded-xl border border-white/10 mt-3 bg-black"></video>
             </div>
 
             <div>
@@ -89,6 +98,100 @@
             </div>
         </form>
     </div>
+
+    {{-- FORM EDIT DOKUMENTASI (?edit={id} — dibuka via tombol Edit di tabel) --}}
+    @if(! empty($editDoc))
+        <div id="edit-doc-form" class="mb-6 p-5 rounded-xl bg-[rgba(201,166,107,0.06)] border border-[rgba(201,166,107,0.3)] space-y-4">
+            <div class="flex items-center justify-between">
+                <h4 class="font-bold text-xs text-[var(--gold)] uppercase tracking-wider">Edit Dokumentasi: {{ $editDoc->title }}</h4>
+                <a href="{{ route('admin.index', ['tab' => 'documentations']) }}" class="text-[11px] font-bold text-white/50 hover:text-white">Batal</a>
+            </div>
+
+            <form action="{{ route('admin.documentations.update', $editDoc) }}" method="POST" enctype="multipart/form-data" class="space-y-3">
+                @csrf
+                @method('PUT')
+
+                <div class="grid grid-cols-1 sm:grid-cols-[2fr_1fr] gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Nama Kegiatan *</label>
+                        <input type="text" name="title" required value="{{ $editDoc->title }}" class="tsaqib-input w-full px-3 py-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Tanggal Kegiatan</label>
+                        <input type="date" name="event_date" value="{{ $editDoc->event_date?->format('Y-m-d') }}" class="tsaqib-input w-full px-3 py-2 text-xs">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-[1fr_2fr] gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Kategori</label>
+                        <input type="text" name="category" list="doc-categories" value="{{ $editDoc->category }}" class="tsaqib-input w-full px-3 py-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Deskripsi Singkat</label>
+                        <textarea name="description" rows="2" class="tsaqib-input w-full px-3 py-2 text-xs">{{ $editDoc->description }}</textarea>
+                    </div>
+                </div>
+
+                {{-- Foto existing: klik = tandai hapus (checkbox — pola form edit komunitas) --}}
+                @if($editDoc->photos->count())
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-white/60 mb-2">Foto Saat Ini <span class="normal-case font-medium text-white/40">(klik foto = tandai hapus)</span></label>
+                        <div class="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                            @foreach($editDoc->photos as $ph)
+                                <label class="relative block aspect-square rounded-xl overflow-hidden border border-white/10 bg-white/5 cursor-pointer">
+                                    <img src="{{ asset('storage/' . $ph->image_path) }}" alt="" class="w-full h-full object-cover transition-opacity">
+                                    <input type="checkbox" name="remove_photos[]" value="{{ $ph->id }}" class="absolute inset-0 opacity-0 cursor-pointer">
+                                    <span class="remove-badge absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 border border-white/20 text-white/70 flex items-center justify-center text-[9px] pointer-events-none transition"><i class="fa-solid fa-xmark"></i></span>
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Tambah Foto Baru (opsional — jpg/png/webp, max 5MB/foto)</label>
+                    <input type="file" name="photos[]" multiple accept=".jpg,.jpeg,.png,.webp"
+                           class="w-full text-xs text-white/50 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[11px] file:font-semibold file:bg-[#01795F]/20 file:text-[#3fd6b0]">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Link Google Drive — VIDEO LENGKAP (kosongkan untuk menghapus video)</label>
+                    <input type="url" name="video_drive" value="{{ $editDoc->isDriveVideo() ? $editDoc->video_path : '' }}"
+                           placeholder="https://drive.google.com/file/d/FILE_ID/view?usp=sharing"
+                           class="tsaqib-input w-full px-3 py-2 text-xs">
+                    @if($editDoc->video_path && ! $editDoc->isDriveVideo())
+                        <p class="text-[10px] text-[var(--gold)] mt-1">Saat ini video lokal terupload. Mengisi link Drive akan menggantinya; mengosongkan field akan MENGHAPUS video lokal.</p>
+                    @endif
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Ganti Cuplikan Video Beranda (opsional — mp4/webm, maks 10MB; kosong = tetap pakai yang lama)</label>
+                    <input type="file" name="video_snippet" accept="video/mp4,video/webm"
+                           class="w-full text-xs text-white/50 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[11px] file:font-semibold file:bg-[#01795F]/20 file:text-[#3fd6b0]">
+                    @if($editDoc->snippet_path)
+                        <p class="text-[10px] text-[#3fd6b0] mt-1">Cuplikan saat ini sudah ada — upload di sini untuk menggantinya.</p>
+                    @endif
+                </div>
+
+                <div class="flex items-center justify-end pt-2">
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-[var(--gold)] text-[#10140F] font-bold text-xs shadow-sm cursor-pointer">
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <script>
+            /* Toggle visual "tandai hapus" foto di form edit (pola form edit komunitas). */
+            document.querySelectorAll('#edit-doc-form input[name="remove_photos[]"]').forEach(function (cb) {
+                cb.addEventListener('change', function () {
+                    cb.closest('label').querySelector('img')?.classList.toggle('opacity-30', cb.checked);
+                    cb.closest('label').querySelector('.remove-badge')?.classList.toggle('!bg-red-500', cb.checked);
+                });
+            });
+        </script>
+    @endif
 
     <!-- TABEL DOKUMENTASI -->
     {{-- URL relatif — fetch paginasi bebas mixed-content di belakang proxy TLS. --}}
@@ -166,6 +269,23 @@
         vPreview.src = URL.createObjectURL(file);
         vPreview.classList.remove('hidden');
     });
+
+    // ===== Cuplikan Beranda: preview player =====
+    var sInput   = form.querySelector('input[name="video_snippet"]');
+    var sPreview = document.getElementById('doc-snippet-preview');
+    if (sInput && sPreview) {
+        sInput.addEventListener('change', function () {
+            if (sPreview.src) URL.revokeObjectURL(sPreview.src);
+            var file = sInput.files && sInput.files[0];
+            if (!file) {
+                sPreview.removeAttribute('src');
+                sPreview.classList.add('hidden');
+                return;
+            }
+            sPreview.src = URL.createObjectURL(file);
+            sPreview.classList.remove('hidden');
+        });
+    }
 
     // ===== Submit dengan progress bar saat ada video =====
     var box  = document.getElementById('doc-upload-progress');

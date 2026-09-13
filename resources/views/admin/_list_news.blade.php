@@ -8,6 +8,7 @@
             'slug'         => $item->slug,
             'excerpt'      => $item->excerpt,
             'content'      => $item->content,
+            'category'     => $item->category ?? 'berita',
             'published_at' => $item->published_at ? $item->published_at->format('Y-m-d\TH:i') : '',
         ];
     @endphp

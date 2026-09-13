@@ -28,10 +28,17 @@
 @if($doc->video_path)
     <span class="text-[var(--gold)]"> + Video</span>
 @endif
+@if($doc->snippet_path)
+    <span class="text-[#3fd6b0]"> + Cuplikan</span>
+@endif
+        </td>
         <td data-label="Aksi" class="p-3">
             <div class="flex items-center gap-2 flex-wrap">
                 <a href="{{ route('info.dokumentasi.show', $doc->slug) }}" target="_blank" class="text-xs text-[var(--gold)] hover:underline font-bold">
                     Lihat
+                </a>
+                <a href="{{ route('admin.documentations.edit', $doc) }}" class="text-xs text-[#3fd6b0] hover:underline font-bold">
+                    Edit
                 </a>
                 <form action="{{ route('admin.documentations.destroy', $doc) }}" method="POST"
                       onsubmit="return confirm('Hapus dokumentasi &quot;{{ $doc->title }}&quot; beserta semua fotonya?')">

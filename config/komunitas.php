@@ -51,5 +51,16 @@ return [
             'peran' => 'Commander, Support',
             'image' => 'images/icon/mushou.jpg',
         ],
+        [
+            // Bukan komunitas/role/divisi — ruang publik digital (open space):
+            // tampil di feed/sidebar/beranda, tapi TIDAK boleh masuk form
+            // pemilihan komunitas (picker profil, select-role) — saring via 'open_space'.
+            'slug' => 'alun-alun-tsaqib',
+            'nama' => 'Alun-Alun Tsaqib',
+            'deskripsi_singkat' => 'Dari semua arah, untuk semua — ruang terbuka, cahaya bersama.',
+            'peran' => 'Terbuka — tanpa role khusus',
+            'image' => 'images/icon/alun-alun-tsaqib.svg',
+            'open_space' => true,
+        ],
     ],
 ];

@@ -15,7 +15,7 @@
     </div>
 
     <!-- FORM TULIS/EDIT BERITA (HIDDEN BY DEFAULT) -->
-    <div id="add-news-form" class="{{ $errors->hasAny(['title', 'slug', 'excerpt', 'content', 'thumbnail', 'published_at']) ? '' : 'hidden' }} mb-6 p-5 rounded-xl bg-white/5 border border-white/10 space-y-4">
+    <div id="add-news-form" class="{{ $errors->hasAny(['title', 'slug', 'excerpt', 'content', 'thumbnail', 'category', 'published_at']) ? '' : 'hidden' }} mb-6 p-5 rounded-xl bg-white/5 border border-white/10 space-y-4">
         <div class="flex items-center justify-between gap-3">
             <h4 id="news-form-title" class="font-bold text-xs text-[var(--cream)] uppercase tracking-wider">Form Tulis Berita Baru</h4>
             <button type="button" id="news-form-cancel" class="hidden text-[11px] text-white/50 hover:text-white font-semibold">
@@ -51,11 +51,18 @@
                 <textarea name="content" rows="6" required class="tsaqib-input w-full px-3 py-2 text-xs"></textarea>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                     <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Upload Thumbnail (Opsional)</label>
                     <input type="file" name="thumbnail" accept="image/*" class="w-full text-xs text-white/50 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[11px] file:font-semibold file:bg-[#01795F]/20 file:text-[#3fd6b0]">
                     <p id="news-thumb-hint" class="hidden text-[10px] text-white/40 mt-1">Kosongkan = pertahankan thumbnail yang ada.</p>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Kategori</label>
+                    <select name="category" class="tsaqib-input w-full px-3 py-2 text-xs">
+                        <option value="berita">Berita</option>
+                        <option value="pengumuman">Pengumuman</option>
+                    </select>
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Tanggal Terbit (kosongkan = draf)</label>
@@ -149,6 +156,7 @@
         form.querySelector('[name=excerpt]').value = payload.excerpt || '';
         updateExcerptCounter();
         form.querySelector('[name=content]').value = payload.content || '';
+        form.querySelector('[name=category]').value = payload.category || 'berita';
         form.querySelector('[name=published_at]').value = payload.published_at || '';
         titleEl.textContent = 'Edit Berita';
         submitBtn.textContent = 'Perbarui Berita';

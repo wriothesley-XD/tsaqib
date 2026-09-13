@@ -19,6 +19,15 @@
     @media (min-width:1024px){ .doc-masonry{ columns:4; column-gap:1rem; } }
     .doc-masonry figure{ break-inside:avoid; margin-bottom:.75rem; }
 
+    /* Video pas muat: tinggi maks 70vh dgn rasio 16:9 utuh — lebar menyusut
+       otomatis (70vh × 16/9) dan container center. Di layar sempit, min(100%,…)
+       membuat video tetap selebar layar. */
+    .doc-video-fit{
+        width:100%;
+        max-width:min(100%, calc(70vh * 16 / 9));
+        margin-inline:auto;
+    }
+
     /* ===== Lightbox ===== */
     #lightbox{
         opacity:0; pointer-events:none;
@@ -80,7 +89,7 @@
              Google Drive → iframe preview (hemat storage); file lokal → <video>.
              controls + preload="metadata": tidak autoplay, suara hanya jika user play. --}}
         @if($doc->isDriveVideo())
-            <div class="relative w-full aspect-video rounded-xl overflow-hidden border border-white/10 bg-black shadow-[0_24px_60px_-34px_rgba(0,0,0,.75)] mb-8">
+            <div class="doc-video-fit relative aspect-video rounded-xl overflow-hidden border border-white/10 bg-black shadow-[0_24px_60px_-34px_rgba(0,0,0,.75)] mb-8">
                 <iframe src="{{ $doc->videoPreviewUrl() }}" title="Video {{ $doc->title }}"
                         class="absolute inset-0 w-full h-full" loading="lazy"
                         allow="autoplay; fullscreen" allowfullscreen></iframe>
@@ -91,7 +100,7 @@
             </a>
         @elseif($doc->video_path)
             <video src="{{ asset('storage/' . $doc->video_path) }}" controls playsinline preload="metadata"
-                   class="w-full aspect-video rounded-xl border border-white/10 bg-black shadow-[0_24px_60px_-34px_rgba(0,0,0,.75)] mb-8"></video>
+                   class="doc-video-fit aspect-video rounded-xl border border-white/10 bg-black shadow-[0_24px_60px_-34px_rgba(0,0,0,.75)] mb-8"></video>
         @endif
 
         {{-- ===== Galeri masonry ===== --}}

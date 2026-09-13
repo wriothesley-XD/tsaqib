@@ -28,18 +28,9 @@ class TsaqibController extends Controller
      */
     public function laborProfil()
     {
-        $visiMisi = [
-            'visi' => 'Visi FSI belum diisi — tunggu data resmi.',
-            'misi' => [
-                'Misi 1 — belum diisi',
-                'Misi 2 — belum diisi',
-                'Misi 3 — belum diisi',
-            ],
-        ];
-
         $gurus = GuruProfile::with('user')->latest()->get();
 
-        return view('tsaqib.labor-profil', compact('visiMisi', 'gurus'));
+        return view('tsaqib.labor-profil', compact('gurus'));
     }
 
     /**

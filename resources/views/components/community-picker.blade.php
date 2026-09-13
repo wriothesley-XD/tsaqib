@@ -19,7 +19,13 @@
 ])
 
 @php
-    $komunitas = \Illuminate\Support\Facades\Config::get('komunitas.daftar', []);
+    // Open space (mis. Alun-Alun Tsaqib) bukan pilihan komunitas — tidak pernah
+    // masuk form manapun. User lama yang terlanjur memilihnya: tidak ada tombol
+    // aktif, nilai lama dibiarkan di DB (tidak 422, tidak error).
+    $komunitas = array_values(array_filter(
+        \Illuminate\Support\Facades\Config::get('komunitas.daftar', []),
+        fn (array $k): bool => empty($k['open_space'])
+    ));
     $slugs = array_column($komunitas, 'slug');
     $initial = (is_string($selected) && in_array($selected, $slugs, true)) ? $selected : null;
 @endphp

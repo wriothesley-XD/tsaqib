@@ -1,45 +1,10 @@
 @extends('layouts.master')
 
 @php($pageTitle = 'Pusat Informasi - TSAQIB SMAN 1 Bukittinggi')
+@php($tabLabels = ['berita' => 'Warta Berita', 'buletin' => 'Buletin Cetak', 'dokumentasi' => 'Dokumentasi'])
 
 @push('styles')
 <style>
-    .info-tab {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.6rem 1.25rem;
-        border-radius: 9999px;
-        font-size: 0.8125rem;
-        font-weight: 700;
-        color: rgba(247, 245, 239, 0.65);
-        background: rgba(247, 245, 239, 0.05);
-        border: 1px solid rgba(247, 245, 239, 0.12);
-        transition: all 0.2s ease;
-        white-space: nowrap;
-    }
-    .info-tab:hover {
-        color: var(--cream);
-        background: rgba(247, 245, 239, 0.1);
-        border-color: rgba(201, 166, 107, 0.3);
-    }
-    .info-tab.is-active {
-        color: #ffffff;
-        background: var(--green);
-        border-color: var(--green);
-        box-shadow: 0 6px 20px -6px rgba(1, 121, 95, 0.7);
-    }
-    .info-tab .count {
-        font-size: 10px;
-        font-weight: 700;
-        padding: 1px 6px;
-        border-radius: 9999px;
-        background: rgba(247, 245, 239, 0.15);
-    }
-    .info-tab.is-active .count {
-        background: rgba(255, 255, 255, 0.25);
-    }
-
     .info-pager {
         display: flex;
         align-items: center;
@@ -84,43 +49,33 @@
 <main class="flex-1 w-full relative">
     <div class="pat-islami"></div>
 
-    {{-- Hero Header --}}
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-6 text-center relative z-10 space-y-3">
-        <span class="eyebrow-pill eyebrow-pill-green">
-            <i class="fa-solid fa-circle-info text-[10px]"></i> Pusat Informasi Terpadu
-        </span>
-        <h1 class="font-display font-extrabold text-2xl sm:text-4xl text-[var(--cream)] tracking-tight">
-            Info &amp; Warta <span class="text-[var(--gold)]">TSAQIB</span>
-        </h1>
-        <p class="text-white/60 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed">
-            Berita kegiatan, terbitan buletin berkala, dan dokumentasi visual Forum Studi Islam SMAN 1 Bukittinggi.
-        </p>
+    {{-- Header section — pola sama dgn <x-page-header> di halaman Laboratorium PAI --}}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-6 relative z-10">
+        <nav class="flex items-center justify-center gap-2 text-[11px] text-white/45 mb-4" aria-label="Breadcrumb">
+            <a href="{{ url('/') }}" class="hover:text-[var(--cream)] transition-colors">Beranda</a>
+            <i class="fa-solid fa-angle-right text-[8px]" aria-hidden="true"></i>
+            <a href="{{ route('info') }}" class="hover:text-[var(--cream)] transition-colors">Info</a>
+            <i class="fa-solid fa-angle-right text-[8px]" aria-hidden="true"></i>
+            <span class="font-semibold text-[var(--gold)]" data-breadcrumb-current>{{ $tabLabels[$initialTab] ?? 'Warta Berita' }}</span>
+        </nav>
+
+        <x-page-header
+            eyebrow="Kabar &amp; Dokumentasi"
+            eyebrow-icon="fa-solid fa-circle-info"
+            title="Warta &amp; Dokumentasi <span class='text-[var(--gold)]'>TSAQIB</span>"
+            subtitle="Berita kegiatan, terbitan buletin berkala, dan dokumentasi visual Forum Studi Islam SMAN 1 Bukittinggi." />
     </div>
 
-    {{-- Sticky Tab Bar --}}
-    <div class="sticky top-16 xl:top-20 z-30 bg-[#0D2818]/90 backdrop-blur-md border-y border-white/10 py-3">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-center gap-2 sm:gap-3 overflow-x-auto pb-0.5">
-                <button type="button" data-info-tab="berita"
-                        class="info-tab {{ $initialTab === 'berita' ? 'is-active' : '' }}">
-                    <i class="fa-solid fa-bullhorn text-[11px]"></i>
-                    <span>Warta Berita</span>
-                    @if($news->isNotEmpty())<span class="count">{{ $news->count() }}</span>@endif
+    {{-- Sub-navigasi tab — struktur sama dgn _labor-subnav Laboratorium PAI (nav + border-b + .u-tab) --}}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <nav class="flex items-center gap-4 sm:gap-6 border-b border-white/10 overflow-x-auto" aria-label="Navigasi Info">
+            @foreach($tabLabels as $key => $label)
+                <button type="button" data-info-tab="{{ $key }}"
+                        class="u-tab {{ $initialTab === $key ? 'is-active' : '' }}">
+                    <span>{{ $label }}</span>
                 </button>
-                <button type="button" data-info-tab="buletin"
-                        class="info-tab {{ $initialTab === 'buletin' ? 'is-active' : '' }}">
-                    <i class="fa-solid fa-book-open text-[11px]"></i>
-                    <span>Buletin Cetak</span>
-                    @if($buletin->isNotEmpty())<span class="count">{{ $buletin->count() }}</span>@endif
-                </button>
-                <button type="button" data-info-tab="dokumentasi"
-                        class="info-tab {{ $initialTab === 'dokumentasi' ? 'is-active' : '' }}">
-                    <i class="fa-solid fa-images text-[11px]"></i>
-                    <span>Dokumentasi</span>
-                    @if($documentations->isNotEmpty())<span class="count">{{ $documentations->count() }}</span>@endif
-                </button>
-            </div>
-        </div>
+            @endforeach
+        </nav>
     </div>
 
     {{-- Content Panels --}}
@@ -131,18 +86,25 @@
             @if($news->isNotEmpty())
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 js-pager-grid" data-per-page="6">
                     @foreach($news as $item)
+                        @php($cat = $item->category ?? 'berita')
                         <a href="{{ route('berita.show', $item->slug) }}" class="js-pager-item group tsaqib-card-interactive overflow-hidden flex flex-col">
                             <div class="relative aspect-[16/10] overflow-hidden bg-black/40">
                                 @if($item->thumbnail)
                                     <img src="{{ asset('storage/' . $item->thumbnail) }}" alt="{{ $item->title }}"
                                          class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" onerror="this.remove()">
                                 @else
-                                    <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1C442B] to-[#0D2818]">
-                                        <span class="font-display font-extrabold text-2xl tracking-wider text-white/15">TSAQIB</span>
+                                    {{-- Placeholder jelas: bg solid + ikon, bukan watermark transparan --}}
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#1C442B] to-[#0D2818] text-white/25">
+                                        <i class="fa-solid fa-newspaper text-4xl"></i>
+                                        <span class="text-[9px] font-bold uppercase tracking-wider">Warta TSAQIB</span>
                                     </div>
                                 @endif
                                 <span class="absolute inset-0 bg-gradient-to-t from-[#0D2818]/90 via-transparent to-transparent"></span>
-                                <span class="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-sm text-[9px] font-bold text-[var(--cream)] uppercase tracking-wider">
+                                {{-- Badge kategori (kiri, warna per kategori) + tanggal (kanan) --}}
+                                <span class="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full backdrop-blur-sm text-[9px] font-bold uppercase tracking-wider {{ $cat === 'pengumuman' ? 'bg-[rgba(201,166,107,.92)] text-[#10140F]' : 'bg-[#01795F]/90 text-white' }}">
+                                    <i class="fa-solid {{ $cat === 'pengumuman' ? 'fa-bullhorn' : 'fa-newspaper' }} text-[8px]"></i>{{ ucfirst($cat) }}
+                                </span>
+                                <span class="absolute top-3 right-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-sm text-[9px] font-bold text-[var(--cream)] uppercase tracking-wider">
                                     <i class="fa-regular fa-calendar text-[8px] text-[var(--gold)]"></i>{{ $item->published_at?->format('d M Y') }}
                                 </span>
                             </div>
@@ -224,11 +186,12 @@
         {{-- ===== Panel: Dokumentasi ===== --}}
         <div data-info-panel="dokumentasi" class="{{ $initialTab === 'dokumentasi' ? '' : 'hidden' }}">
             @if($documentations->isNotEmpty())
-                {{-- Filter kategori (client-side) --}}
-                <div class="flex items-center justify-center gap-2 flex-wrap mb-6" data-doc-filter role="group" aria-label="Filter kategori dokumentasi">
-                    <button type="button" data-cat="*" class="info-tab is-active"><i class="fa-solid fa-border-all text-[11px]"></i><span>Semua</span></button>
+                {{-- Filter kategori (client-side) — komponen .u-tab yang sama dgn sub-nav di atas --}}
+                <div class="flex items-center gap-3 flex-wrap mb-6" data-doc-filter role="group" aria-label="Filter kategori dokumentasi">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-white/40 shrink-0">Kategori</span>
+                    <button type="button" data-cat="*" class="u-tab is-active"><span>Semua</span></button>
                     @foreach($documentations->pluck('category')->filter()->unique() as $cat)
-                        <button type="button" data-cat="{{ $cat }}" class="info-tab"><i class="fa-solid fa-tag text-[11px]"></i><span>{{ $cat }}</span></button>
+                        <button type="button" data-cat="{{ $cat }}" class="u-tab"><span>{{ $cat }}</span></button>
                     @endforeach
                 </div>
 
@@ -301,7 +264,11 @@
     }
 
     tabs.forEach(t => {
-        t.addEventListener('click', () => switchTab(t.dataset.infoTab));
+        t.addEventListener('click', () => {
+            switchTab(t.dataset.infoTab);
+            var bc = document.querySelector('[data-breadcrumb-current]');
+            if (bc) bc.textContent = t.textContent.trim();
+        });
     });
 
     // Client-side paginator for grids

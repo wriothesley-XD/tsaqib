@@ -93,6 +93,11 @@ class AdminController extends Controller
         $laporan = Report::pending()->with(['reportable.user', 'reporter'])->latest()->paginate($perPage);
         $pendingReportCount = $laporan->total();
 
+        // Dokumentasi yang sedang diedit (?edit={id} dari tombol Edit tab Dokumentasi).
+        $editDoc = $request->filled('edit')
+            ? ActivityDocumentation::with('photos')->find($request->query('edit'))
+            : null;
+
         // Feed "Perlu Perhatian" di dashboard: 5 laporan terbaru dari halaman aktif.
         $perluPerhatian = $laporan->getCollection()->take(5);
 
@@ -106,7 +111,7 @@ class AdminController extends Controller
             'total_gurus' => $gurus->total(),
         ];
 
-        return view('admin.index', compact('users', 'books', 'posts', 'selectedCommunity', 'registrations', 'news', 'documentations', 'nisnWhitelist', 'moduls', 'gurus', 'laborSettings', 'isRecruitmentOpen', 'stats', 'laporan', 'pendingReportCount', 'perluPerhatian'));
+        return view('admin.index', compact('users', 'books', 'posts', 'selectedCommunity', 'registrations', 'news', 'documentations', 'nisnWhitelist', 'moduls', 'gurus', 'laborSettings', 'isRecruitmentOpen', 'stats', 'laporan', 'pendingReportCount', 'perluPerhatian', 'editDoc'));
     }
 
     /**
@@ -328,8 +333,11 @@ class AdminController extends Controller
             'excerpt' => ['nullable', 'string', 'max:160'],
             'content' => ['required', 'string'],
             'thumbnail' => ['nullable', 'image', 'max:4096'],
+            'category' => ['nullable', 'in:berita,pengumuman'],
             'published_at' => ['nullable', 'date'],
         ]);
+
+        $data['category'] = $data['category'] ?? 'berita';
 
         $data['slug'] = $this->uniqueNewsSlug(
             $data['slug'] ? Str::slug($data['slug']) : Str::slug($data['title']),
@@ -457,7 +465,10 @@ class AdminController extends Controller
             // Atau cukup paste link Google Drive (hemat storage hosting) —
             // diprioritaskan di atas file upload jika keduanya diisi.
             'video_drive' => 'nullable|string|max:255',
-            'photos'      => 'required_without_all:video,video_drive|array|min:1',
+            // Cuplikan pendek utk widget Beranda — file KECIL lokal (beda dari
+            // video lengkap yang idealnya lewat link Drive di atas).
+            'video_snippet' => 'nullable|file|mimes:mp4,webm|max:10240',
+            'photos'      => 'required_without_all:video,video_drive,video_snippet|array|min:1',
             'photos.*'    => 'file|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
@@ -478,6 +489,9 @@ class AdminController extends Controller
                 : ($request->hasFile('video')
                     ? $request->file('video')->store('documentations', 'public')
                     : null),
+            'snippet_path' => $request->hasFile('video_snippet')
+                ? $request->file('video_snippet')->store('documentations/snippets', 'public')
+                : null,
             'event_date'  => $data['event_date'] ?? null,
             'category'    => $data['category'] ?? null,
         ]);
@@ -489,6 +503,94 @@ class AdminController extends Controller
         }
 
         return redirect()->back()->with('success', 'Dokumentasi kegiatan berhasil ditambahkan!');
+    }
+
+    /**
+     * Edit dokumentasi — GET route hanya meneruskan ke shell admin dengan
+     * ?tab=documentations&edit={id}; form edit ter-isi dirender di
+     * _tab_documentations (satu shell, tidak ada halaman terpisah).
+     * Route: GET /admin-panel/documentations/{documentation}/edit
+     */
+    public function editDocumentation(ActivityDocumentation $documentation): RedirectResponse
+    {
+        $this->checkAdmin();
+
+        return redirect()->route('admin.index', ['tab' => 'documentations', 'edit' => $documentation->id]);
+    }
+
+    /**
+     * Perbarui dokumentasi kegiatan: data utama, ganti/buang link Drive,
+     * ganti cuplikan Beranda, hapus foto lama (checkbox), tambah foto baru.
+     * Route: PUT /admin-panel/documentations/{documentation}
+     */
+    public function updateDocumentation(Request $request, ActivityDocumentation $documentation): RedirectResponse
+    {
+        $this->checkAdmin();
+
+        $data = $request->validate([
+            'title'           => 'required|string|max:255',
+            'description'     => 'nullable|string|max:5000',
+            'event_date'      => 'nullable|date',
+            'category'        => 'nullable|string|max:50',
+            'video_drive'     => 'nullable|string|max:255',
+            // Cuplikan Beranda: file kecil lokal (beda dari video lengkap Drive).
+            'video_snippet'   => 'nullable|file|mimes:mp4,webm|max:10240',
+            'remove_photos'   => 'nullable|array',
+            'remove_photos.*' => 'integer',
+            'photos'          => 'nullable|array',
+            'photos.*'        => 'file|mimes:jpg,jpeg,png,webp|max:5120',
+        ]);
+
+        // Foto ditandai hapus (klik foto di form edit) — buang file + barisnya.
+        $photoIds = collect($request->input('remove_photos', []))->map(fn ($v) => (int) $v);
+        foreach ($documentation->photos()->whereIn('id', $photoIds)->get() as $photo) {
+            Storage::disk('public')->delete($photo->image_path);
+            $photo->delete();
+        }
+
+        foreach ($request->file('photos', []) as $photo) {
+            $documentation->photos()->create([
+                'image_path' => $photo->store('documentations', 'public'),
+            ]);
+        }
+
+        // Video lengkap: isi link Drive = ganti; kosong = buang.
+        // File lokal lama ikut dihapus (URL Drive tidak ada di disk → otomatis lewat).
+        $oldVideo = $documentation->video_path;
+        $newVideo = ! empty($data['video_drive']) ? trim($data['video_drive']) : null;
+        if ($newVideo !== $oldVideo && $oldVideo && Storage::disk('public')->exists($oldVideo)) {
+            Storage::disk('public')->delete($oldVideo);
+        }
+
+        // Cuplikan Beranda: upload baru = ganti file lama; kosong = tetap.
+        $snippetPath = $documentation->snippet_path;
+        if ($request->hasFile('video_snippet')) {
+            if ($snippetPath && Storage::disk('public')->exists($snippetPath)) {
+                Storage::disk('public')->delete($snippetPath);
+            }
+            $snippetPath = $request->file('video_snippet')->store('documentations/snippets', 'public');
+        }
+
+        // Slug unik dari judul (abaikan slug milik doc ini sendiri).
+        $base = Str::slug($data['title']);
+        $slug = $base;
+        $attempt = 1;
+        while (ActivityDocumentation::where('slug', $slug)->whereKeyNot($documentation->id)->exists()) {
+            $slug = $base.'-'.(++$attempt);
+        }
+
+        $documentation->update([
+            'title'        => $data['title'],
+            'slug'         => $slug,
+            'description'  => $data['description'] ?? null,
+            'video_path'   => $newVideo,
+            'snippet_path' => $snippetPath,
+            'event_date'   => $data['event_date'] ?? null,
+            'category'     => $data['category'] ?? null,
+        ]);
+
+        return redirect()->route('admin.index', ['tab' => 'documentations'])
+            ->with('success', 'Dokumentasi kegiatan berhasil diperbarui!');
     }
 
     /**
@@ -505,6 +607,10 @@ class AdminController extends Controller
 
         if ($documentation->video_path && Storage::disk('public')->exists($documentation->video_path)) {
             Storage::disk('public')->delete($documentation->video_path);
+        }
+
+        if ($documentation->snippet_path && Storage::disk('public')->exists($documentation->snippet_path)) {
+            Storage::disk('public')->delete($documentation->snippet_path);
         }
 
         $documentation->delete();

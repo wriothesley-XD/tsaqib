@@ -509,99 +509,55 @@
         <div class="section-glow" style="--glow-x: 50%; --glow-y: 20%;"></div>
         <div class="pat-islami opacity-15"></div>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="text-center max-w-3xl mx-auto space-y-4">
-                <span class="eyebrow-pill eyebrow-pill-gold">
-                    <i class="fa-solid fa-compass text-[10px]"></i>
-                    Orientasi Singkat &middot; 5 Detik Paham
-                </span>
-                <h2 class="font-display font-extrabold text-2xl sm:text-4xl lg:text-5xl text-[var(--cream)] tracking-tight">
-                    Jadi, TSAQIB itu apa?
-                </h2>
-                <p class="text-base sm:text-2xl font-display text-shimmer leading-relaxed">
-                    TSAQIB adalah <strong class="text-[var(--cream)] font-bold">ruang tumbuh siswa</strong> SMAN 1 Bukittinggi.
-                </p>
-                <p class="text-white/70 text-xs sm:text-sm leading-relaxed max-w-2xl mx-auto">
-                    Bukan sekadar website profil sekolah biasa. Ini adalah ruang digital terpadu di mana siswa dibina karakternya, diasah potensinya, dan dihubungkan dalam ukhuwah yang nyata.
-                </p>
-            </div>
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center py-16 h-auto">
 
-            {{-- Triad: BELAJAR -> BERKARYA -> BERKOMUNITAS --}}
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-                {{-- Pilar 1: BELAJAR --}}
-                <div class="tsaqib-card p-6 sm:p-7 flex flex-col justify-between group hover:border-[#01795F] transition relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-28 h-28 bg-[#01795F]/10 rounded-full blur-2xl pointer-events-none"></div>
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="w-12 h-12 rounded-2xl bg-[#01795F]/20 border border-[#01795F]/35 flex items-center justify-center text-[#3fd6b0] text-xl font-bold">
-                                <i class="fa-solid fa-flask"></i>
-                            </span>
-                            <span class="font-display font-black text-2xl sm:text-3xl text-white/10 group-hover:text-[#3fd6b0]/30 transition">01</span>
-                        </div>
-                        <span class="eyebrow-pill eyebrow-pill-green text-[10px] mb-2">Pilar Pertama</span>
-                        <h3 class="font-display font-extrabold text-xl sm:text-2xl text-[var(--cream)] tracking-tight mt-2">
-                            BELAJAR.
-                        </h3>
-                        <p class="text-xs sm:text-sm text-white/70 mt-2 leading-relaxed">
-                            Melalui <strong class="text-white">Laboratorium PAI</strong>, siswa mempraktikkan ibadah, mengakses modul kurikulum resmi kelas X-XII, dan menyelesaikan penugasan terstruktur.
+                {{-- KIRI: Logo melayang --}}
+                <div class="flex justify-center">
+                    <div class="relative text-center">
+                        <style>
+                            @keyframes tsaqibFloatIdle {
+                                0%, 100% { transform: translateY(0px); }
+                                50%      { transform: translateY(-12px); }
+                            }
+                            @media (prefers-reduced-motion: reduce) {
+                                .tsaqib-hero-logo { animation: none !important; }
+                            }
+                        </style>
+                        <div class="absolute -inset-10 bg-yellow-500/20 blur-3xl rounded-full pointer-events-none" aria-hidden="true"></div>
+                        <img src="{{ asset('images/icon/tsaqib-media.svg.png') }}" alt="Logo TSAQIB"
+                             class="tsaqib-hero-logo relative object-contain mx-auto mb-5 drop-shadow-[0_4px_18px_rgba(0,0,0,0.45)]"
+                             style="width: clamp(144px, 42vw, 320px); height: auto; animation: tsaqibFloatIdle 3.5s ease-in-out infinite;">
+                        <p class="relative font-display font-black text-7xl sm:text-8xl lg:text-9xl text-shimmer tracking-tight select-none">
+                            TSAQIB
                         </p>
-                    </div>
-                    <div class="pt-5 mt-4 border-t border-white/10 flex items-center justify-between">
-                        <a href="#labor" class="text-xs font-bold text-[#3fd6b0] hover:underline inline-flex items-center gap-1.5">
-                            Jelajahi Laboratorium <i class="fa-solid fa-arrow-down text-[10px]"></i>
-                        </a>
+                        <p class="relative mt-3 text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] text-[var(--cream)]/60">
+                            Forum Studi Islam &middot; SMAN 1 Bukittinggi
+                        </p>
                     </div>
                 </div>
 
-                {{-- Pilar 2: BERKARYA --}}
-                <div class="tsaqib-card p-6 sm:p-7 flex flex-col justify-between group hover:border-[var(--gold)] transition relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-28 h-28 bg-[var(--gold)]/10 rounded-full blur-2xl pointer-events-none"></div>
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="w-12 h-12 rounded-2xl bg-[var(--gold)]/20 border border-[var(--gold)]/35 flex items-center justify-center text-[var(--gold)] text-xl font-bold">
-                                <i class="fa-solid fa-book-open"></i>
-                            </span>
-                            <span class="font-display font-black text-2xl sm:text-3xl text-white/10 group-hover:text-[var(--gold)]/30 transition">02</span>
-                        </div>
-                        <span class="eyebrow-pill eyebrow-pill-gold text-[10px] mb-2">Pilar Kedua</span>
-                        <h3 class="font-display font-extrabold text-xl sm:text-2xl text-[var(--cream)] tracking-tight mt-2">
-                            BERKARYA.
-                        </h3>
-                        <p class="text-xs sm:text-sm text-white/70 mt-2 leading-relaxed">
-                            Melalui <strong class="text-white">Perpustakaan Digital</strong>, siswa membaca ratusan buku islami, buletin dakwah gratis, serta menerbitkan risalah dan karya tulis mandiri.
-                        </p>
-                    </div>
-                    <div class="pt-5 mt-4 border-t border-white/10 flex items-center justify-between">
-                        <a href="#perpus" class="text-xs font-bold text-[var(--gold)] hover:underline inline-flex items-center gap-1.5">
-                            Buka Perpustakaan <i class="fa-solid fa-arrow-down text-[10px]"></i>
-                        </a>
-                    </div>
+                {{-- KANAN: Teks & CTA --}}
+                <div class="text-left space-y-5">
+                    <span class="eyebrow-pill eyebrow-pill-gold">
+                        <i class="fa-solid fa-compass text-[10px]"></i>
+                        Orientasi Singkat &middot; 5 Detik Paham
+                    </span>
+                    <h2 class="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl text-[var(--cream)] tracking-tight">
+                        Jadi, TSAQIB itu apa?
+                    </h2>
+                    <p class="text-lg sm:text-2xl font-display leading-relaxed">
+                        TSAQIB adalah <strong class="text-[var(--gold)] font-bold">ruang tumbuh</strong> siswa SMAN 1 Bukittinggi.
+                    </p>
+                    <p class="text-white/70 text-sm sm:text-base leading-relaxed">
+                        Tiga pilar utamanya: <strong class="text-white">Belajar</strong> di Laboratorium PAI, <strong class="text-white">Berkarya</strong> di Perpustakaan Digital, dan <strong class="text-white">Berkomunitas</strong> di 13 Circle. Siswa dibina karakternya, diasah potensinya, dan dihubungkan dalam ukhuwah yang nyata.
+                    </p>
+                    <a href="{{ route('tentang') }}" class="inline-flex items-center gap-2 text-sm font-bold text-[var(--gold)] hover:gap-3 transition-all group cursor-pointer">
+                        Baca Selengkapnya tentang Tsaqib
+                        <i class="fa-solid fa-arrow-right text-xs transition-transform group-hover:translate-x-0.5"></i>
+                    </a>
                 </div>
 
-                {{-- Pilar 3: BERKOMUNITAS --}}
-                <div class="tsaqib-card p-6 sm:p-7 flex flex-col justify-between group hover:border-[#3fd6b0] transition relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-28 h-28 bg-[#3fd6b0]/10 rounded-full blur-2xl pointer-events-none"></div>
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="w-12 h-12 rounded-2xl bg-[#01795F]/20 border border-[#01795F]/35 flex items-center justify-center text-[#3fd6b0] text-xl font-bold">
-                                <i class="fa-solid fa-users"></i>
-                            </span>
-                            <span class="font-display font-black text-2xl sm:text-3xl text-white/10 group-hover:text-[#3fd6b0]/30 transition">03</span>
-                        </div>
-                        <span class="eyebrow-pill eyebrow-pill-green text-[10px] mb-2">Pilar Ketiga</span>
-                        <h3 class="font-display font-extrabold text-xl sm:text-2xl text-[var(--cream)] tracking-tight mt-2">
-                            BERKOMUNITAS.
-                        </h3>
-                        <p class="text-xs sm:text-sm text-white/70 mt-2 leading-relaxed">
-                            Melalui <strong class="text-white">13 Circle Komunitas</strong>, setiap siswa menyalurkan minat &amp; bakat positif—dari hafalan Al-Qur'an, sains OSN, olahraga, hingga kreasi digital.
-                        </p>
-                    </div>
-                    <div class="pt-5 mt-4 border-t border-white/10 flex items-center justify-between">
-                        <a href="#komunitas-preview" class="text-xs font-bold text-[#3fd6b0] hover:underline inline-flex items-center gap-1.5">
-                            Lihat 13 Circle <i class="fa-solid fa-arrow-down text-[10px]"></i>
-                        </a>
-                    </div>
-                </div>
             </div>
         </div>
     </section>

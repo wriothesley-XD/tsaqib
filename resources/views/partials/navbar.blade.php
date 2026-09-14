@@ -2,7 +2,7 @@
     $currentRoute = Route::currentRouteName() ?? '';
 
     $isKomunitasZone = str_contains($currentRoute, 'komunitas');
-    $isLainnya       = str_contains($currentRoute, 'open.recruitment');
+    $isLainnya       = str_contains($currentRoute, 'open.recruitment') || $currentRoute === 'tentang';
     $isLaborZone     = in_array($currentRoute, ['laboratorium.pai', 'labor', 'laboratorium.profil', 'laboratorium.modul', 'laboratorium.tugas']);
 
     // Menu utama
@@ -15,7 +15,8 @@
 
     // Item sekunder di dropdown "Lainnya"
     $navLainnya = [
-        ['label' => 'Open Recruitment', 'href' => route('open.recruitment'), 'icon' => 'fa-user-plus'],
+        ['label' => 'Tentang Tsaqib', 'href' => route('tentang'), 'icon' => 'fa-circle-info', 'active' => $currentRoute === 'tentang'],
+        ['label' => 'Open Recruitment', 'href' => route('open.recruitment'), 'icon' => 'fa-user-plus', 'active' => str_contains($currentRoute, 'open.recruitment')],
         [
             'label'  => 'Saran & Masukan',
             'href'   => 'https://docs.google.com/forms/d/e/1FAIpQLScLDeCvGI17R7Z-NkckFV-N9Sm1Jfl8-eOEl20ZFVfFDeebgQ/viewform',
@@ -145,7 +146,7 @@
                                     if (!empty($item['attrs']))  $itemAttrs .= ' '.$item['attrs'];
                                 @endphp
                                 <a href="{{ $item['href'] }}"{!! $itemAttrs !!}
-                                   class="lainnya-item flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-white/75 hover:text-[var(--gold)] hover:bg-white/5 transition-colors">
+                                   class="lainnya-item flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold {{ !empty($item['active']) ? 'text-[var(--gold)]' : 'text-white/75' }} hover:text-[var(--gold)] hover:bg-white/5 transition-colors">
                                     <i class="fa-solid {{ $item['icon'] ?? 'fa-arrow-right' }} text-[10px] text-[var(--gold)]/70 w-4"></i>
                                     {{ $item['label'] }}
                                 </a>
@@ -287,7 +288,7 @@
                     if (!empty($item['rel']))    $itemAttrs .= ' rel="'.$item['rel'].'"';
                     if (!empty($item['attrs']))  $itemAttrs .= ' '.$item['attrs'];
                 @endphp
-                <a href="{{ $item['href'] }}"{!! $itemAttrs !!} class="block py-2 px-2 text-xs text-white/75 hover:text-[var(--gold)] transition-colors rounded-lg">
+                <a href="{{ $item['href'] }}"{!! $itemAttrs !!} class="block py-2 px-2 text-xs {{ !empty($item['active']) ? 'text-[var(--gold)]' : 'text-white/75' }} hover:text-[var(--gold)] transition-colors rounded-lg">
                     <i class="fa-solid {{ $item['icon'] ?? 'fa-arrow-right' }} text-[10px] mr-2 text-[var(--gold)]/70"></i>{{ $item['label'] }}
                 </a>
             @endforeach

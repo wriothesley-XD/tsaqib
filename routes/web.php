@@ -37,6 +37,9 @@ Route::get('/berita', fn () => redirect()->route('info'));
 // Detail berita per slug (dicapai dari tab Berita di /info & section Kabar Terbaru).
 Route::get('/berita/{slug}', [NewsController::class, 'show'])->name('berita.show');
 
+// Halaman statis publik.
+Route::view('/tentang', 'tentang')->name('tentang');
+
 // Laboratorium PAI Publik + 3 sub-halaman (profil/modul/tugas).
 // Modul & Tugas: akses penuh hanya siswa terverifikasi/guru — belum
 // terverifikasi dirender dengan panel gate (bukan 403).

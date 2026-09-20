@@ -34,10 +34,10 @@
                                 .hero-logo-float, .hero-logo-glow { animation: none !important; }
                             }
                         </style>
-                        <div class="hero-logo-glow absolute inset-0 -m-8 sm:-m-12 bg-yellow-500/25 blur-3xl rounded-full pointer-events-none" style="animation: tsaqibPulseGlow 3s ease-in-out infinite;" aria-hidden="true"></div>
+                        <div class="hero-logo-glow absolute inset-0 -m-8 sm:-m-12 bg-[radial-gradient(circle,rgba(255,255,255,0.13)_0%,rgba(240,220,160,0.08)_45%,transparent_72%)] blur-3xl rounded-full pointer-events-none" style="animation: tsaqibPulseGlow 3s ease-in-out infinite;" aria-hidden="true"></div>
                         <img src="{{ asset('images/icon/tsaqib-media.svg.png') }}" alt="Logo TSAQIB"
-                             class="hero-logo-float relative w-48 sm:w-64 lg:w-80 h-auto object-contain drop-shadow-2xl select-none"
-                             style="animation: tsaqibFloatIdle 3.5s ease-in-out infinite;">
+                             class="hero-logo-float relative w-40 sm:w-48 h-auto object-contain drop-shadow-2xl select-none"
+                             style="image-rendering: -webkit-optimize-contrast; animation: tsaqibFloatIdle 3.5s ease-in-out infinite;">
                     </div>
 
                     {{-- KANAN: Teks rata kiri --}}

@@ -489,10 +489,11 @@
                                 .tsaqib-hero-logo { animation: none !important; }
                             }
                         </style>
-                        <div class="absolute -inset-10 bg-yellow-500/20 blur-3xl rounded-full pointer-events-none" aria-hidden="true"></div>
+                        {{-- Glow putih hangat samar: putih dominan + sentuhan kuning hangat, redup menyatu dgn background hijau tua --}}
+<div class="absolute -inset-10 bg-[radial-gradient(circle,rgba(255,255,255,0.13)_0%,rgba(240,220,160,0.08)_45%,transparent_72%)] blur-3xl rounded-full pointer-events-none" aria-hidden="true"></div>
                         <img src="{{ asset('images/icon/tsaqib-media.svg.png') }}" alt="Logo TSAQIB"
-                             class="tsaqib-hero-logo relative object-contain mx-auto mb-5 drop-shadow-[0_4px_18px_rgba(0,0,0,0.45)]"
-                             style="width: clamp(144px, 42vw, 320px); height: auto; animation: tsaqibFloatIdle 3.5s ease-in-out infinite;">
+                             class="tsaqib-hero-logo relative object-contain mx-auto mb-5 drop-shadow-[0_3px_10px_rgba(0,0,0,0.45)]"
+                             style="width: min(42vw, 192px); height: auto; image-rendering: -webkit-optimize-contrast; animation: tsaqibFloatIdle 3.5s ease-in-out infinite;">
                         {{-- Wordmark watermark: sengaja kecil & redup — fokus tetap di headline "Jadi, TSAQIB itu apa?" --}}
                         <p class="relative font-display font-black text-4xl sm:text-5xl lg:text-6xl text-[var(--cream)]/15 tracking-tight select-none" aria-hidden="true">
                             TSAQIB

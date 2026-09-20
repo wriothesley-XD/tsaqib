@@ -20,17 +20,17 @@
 
             {{-- Barisan Logo Instansi --}}
             <div class="flex flex-wrap items-center justify-center gap-4 sm:gap-6 bg-white/[0.04] border border-white/10 rounded-2xl px-5 py-3 sm:px-6 sm:py-3.5 shadow-sm">
-                <img src="{{ asset('assets/logo-instansi/kemenag.webp') }}" alt="Kementerian Agama" title="Kementerian Agama" class="h-8 w-8 sm:h-9 sm:w-9 object-contain opacity-85 hover:opacity-100 transition-opacity" loading="lazy" onerror="this.remove()">
-                <img src="{{ asset('assets/logo-instansi/pendidikan.webp') }}" alt="Tut Wuri Handayani" title="Tut Wuri Handayani" class="h-8 w-8 sm:h-9 sm:w-9 object-contain opacity-85 hover:opacity-100 transition-opacity" loading="lazy" onerror="this.remove()">
-                <img src="{{ asset('assets/logo-instansi/sumbar.webp') }}" alt="Pemerintah Provinsi Sumatera Barat" title="Pemerintah Provinsi Sumatera Barat" class="h-8 w-8 sm:h-9 sm:w-9 object-contain opacity-85 hover:opacity-100 transition-opacity" loading="lazy" onerror="this.remove()">
-                <img src="{{ asset('assets/logo-instansi/smansa.webp') }}" alt="SMAN 1 Bukittinggi" title="SMAN 1 Bukittinggi" class="h-8 w-8 sm:h-9 sm:w-9 object-contain opacity-85 hover:opacity-100 transition-opacity" loading="lazy" onerror="this.remove()">
-                <img src="{{ asset('assets/logo-instansi/fsi.webp') }}" alt="Forum Studi Islam" title="Forum Studi Islam" class="h-8 w-8 sm:h-9 sm:w-9 object-contain opacity-85 hover:opacity-100 transition-opacity" loading="lazy" onerror="this.remove()">
+                <img src="{{ asset('assets/logo-instansi/kemenag.webp') }}" alt="Kementerian Agama" title="Kementerian Agama" class="h-8 w-8 sm:h-9 sm:w-9 object-contain opacity-85 hover:opacity-100 transition-opacity" loading="lazy">
+                <img src="{{ asset('assets/logo-instansi/pendidikan.webp') }}" alt="Tut Wuri Handayani" title="Tut Wuri Handayani" class="h-8 w-8 sm:h-9 sm:w-9 object-contain opacity-85 hover:opacity-100 transition-opacity" loading="lazy">
+                <img src="{{ asset('assets/logo-instansi/sumbar.webp') }}" alt="Pemerintah Provinsi Sumatera Barat" title="Pemerintah Provinsi Sumatera Barat" class="h-8 w-8 sm:h-9 sm:w-9 object-contain opacity-85 hover:opacity-100 transition-opacity" loading="lazy">
+                <img src="{{ asset('assets/logo-instansi/smansa.webp') }}" alt="SMAN 1 Bukittinggi" title="SMAN 1 Bukittinggi" class="h-8 w-8 sm:h-9 sm:w-9 object-contain opacity-85 hover:opacity-100 transition-opacity" loading="lazy">
+                <img src="{{ asset('assets/logo-instansi/fsi.webp') }}" alt="Forum Studi Islam" title="Forum Studi Islam" class="h-8 w-8 sm:h-9 sm:w-9 object-contain opacity-85 hover:opacity-100 transition-opacity" loading="lazy">
 
                 {{-- Liivo badge --}}
                 <div title="Liivo"
                      class="flex items-center justify-center h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-black/80 border border-white/10"
                      aria-label="Liivo">
-                    <img src="{{ asset('assets/logo-instansi/Liivo.png') }}" alt="Liivo" title="Liivo" class="h-full w-full object-contain p-1 opacity-90" loading="lazy" onerror="this.remove()">
+                    <img src="{{ asset('assets/logo-instansi/Liivo.png') }}" alt="Liivo" title="Liivo" class="h-full w-full object-contain p-1 opacity-90" loading="lazy">
                 </div>
             </div>
         </div>

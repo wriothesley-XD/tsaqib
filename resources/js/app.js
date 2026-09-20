@@ -15,7 +15,33 @@ document.addEventListener('DOMContentLoaded', () => {
     initKeyboardShortcuts();
     initCardSpotlights();
     initInkRipple();
+    initImageFallback();
 });
+
+/* =========================================================================
+   11. IMAGE FALLBACK — gambar rusak diganti placeholder SVG (tanpa ikon broken)
+   Delegasi di document (capture: event "error" tidak bubbles) sehingga mencakup
+   semua <img>, termasuk yang dirender lewat JS setelah halaman dimuat.
+   ========================================================================= */
+function initImageFallback() {
+    // Placeholder: rounded hijau gelap + ikon foto emas (selaras tema brand).
+    const PLACEHOLDER = 'data:image/svg+xml,' + encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">' +
+        '<rect width="400" height="300" rx="16" fill="#0D2818"/>' +
+        '<rect x="1" y="1" width="398" height="298" rx="15" fill="none" stroke="rgba(201,166,107,.35)" stroke-width="2"/>' +
+        '<g fill="none" stroke="rgba(201,166,107,.7)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">' +
+        '<rect x="150" y="100" width="100" height="80" rx="8"/>' +
+        '<circle cx="178" cy="126" r="8" fill="rgba(201,166,107,.7)" stroke="none"/>' +
+        '<path d="M150 168 l26 -24 l20 18 l16 -14 l38 20"/></g></svg>'
+    );
+
+    document.addEventListener('error', (e) => {
+        const img = e.target;
+        if (!(img instanceof HTMLImageElement) || img.dataset.fallbackApplied) return;
+        img.dataset.fallbackApplied = '1';
+        img.src = PLACEHOLDER;
+    }, true);
+}
 
 /* =========================================================================
    1. SCROLL READING PROGRESS BAR

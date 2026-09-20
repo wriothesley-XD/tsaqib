@@ -30,7 +30,7 @@
     @php($komunitasKartu = $post->community_slug ? collect(config('komunitas.daftar'))->firstWhere('slug', $post->community_slug) : null)
     <div class="flex items-center gap-2 px-4 pt-3.5 sm:px-5">
         @if ($komunitasKartu)
-            <img src="{{ asset($komunitasKartu['image']) }}" alt="" loading="lazy" onerror="this.remove()"
+            <img src="{{ asset($komunitasKartu['image']) }}" alt="" loading="lazy"
                  class="w-7 h-7 rounded-full object-cover shrink-0 bg-white/5">
         @else
             <span class="w-7 h-7 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0">

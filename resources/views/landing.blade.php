@@ -198,7 +198,7 @@
         <div class="absolute inset-0 z-0 pointer-events-none select-none">
             <picture>
                 <source srcset="{{ asset('assets/landing/fsi.webp') }}" type="image/webp">
-                <img src="{{ asset('assets/landing/fsi.jpg') }}" alt="Gerbang FSI SMAN 1 Bukittinggi"
+                <img src="{{ asset('assets/landing/fsi.jpg') }}" alt="Gerbang FSI SMAN 1 Bukittinggi" data-eager
                      class="w-full h-full object-cover object-[center_35%] transform scale-105 filter brightness-[0.70] contrast-105">
             </picture>
             {{-- Deep Luxurious Emerald Gradients (Assures 100% WCAG AAA Text Contrast) --}}
@@ -232,7 +232,7 @@
 
                 <p class="text-white/80 text-sm sm:text-base leading-relaxed max-w-xl">
                     Platform digital resmi Forum Studi Islam (FSI) SMAN 1 Bukittinggi. Menghadirkan silabus riset
-                    <strong class="text-[var(--cream)]">Laboratorium PAI</strong>, ratusan koleksi <strong class="text-[var(--cream)]">Perpustakaan Digital</strong>, serta ruang ukhuwah <strong class="text-[var(--cream)]">13 circle komunitas</strong> mandiri karya siswa.
+                    <strong class="text-[var(--cream)]">Laboratorium PAI</strong>, ratusan koleksi <strong class="text-[var(--cream)]">Perpustakaan Digital</strong>, serta ruang ukhuwah <strong class="text-[var(--cream)]">7 circle komunitas</strong> mandiri karya siswa.
                 </p>
 
                 {{-- Call To Action Buttons --}}
@@ -272,7 +272,7 @@
                             <a href="{{ route('laboratorium.pai') }}" class="card-program group">
                                 <picture>
                                     <source srcset="{{ asset('assets/landing/card-labor.webp') }}" type="image/webp">
-                                    <img src="{{ asset('assets/landing/card-labor.jpg') }}" alt="Laboratorium PAI" class="card-photo" loading="lazy" onerror="this.remove()">
+                                    <img src="{{ asset('assets/landing/card-labor.jpg') }}" alt="Laboratorium PAI" class="card-photo" loading="lazy">
                                 </picture>
                                 <div class="card-program-content">
                                     <span class="w-7 h-7 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center text-[var(--gold)] text-xs mb-2">
@@ -290,7 +290,7 @@
                             <a href="{{ route('perpustakaan') }}" class="card-program group">
                                 <picture>
                                     <source srcset="{{ asset('assets/landing/card-perpus.webp') }}" type="image/webp">
-                                    <img src="{{ asset('assets/landing/card-perpus.jpg') }}" alt="Perpustakaan Digital" class="card-photo" loading="lazy" onerror="this.remove()">
+                                    <img src="{{ asset('assets/landing/card-perpus.jpg') }}" alt="Perpustakaan Digital" class="card-photo" loading="lazy">
                                 </picture>
                                 <div class="card-program-content">
                                     <span class="w-7 h-7 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center text-[var(--gold)] text-xs mb-2">
@@ -308,7 +308,7 @@
                             <a href="{{ route('komunitas', 'semua') }}" class="card-program group">
                                 <picture>
                                     <source srcset="{{ asset('assets/landing/card-komunitas.webp') }}" type="image/webp">
-                                    <img src="{{ asset('assets/landing/card-komunitas.jpg') }}" alt="Komunitas TSAQIB" class="card-photo" loading="lazy" onerror="this.remove()">
+                                    <img src="{{ asset('assets/landing/card-komunitas.jpg') }}" alt="Komunitas TSAQIB" class="card-photo" loading="lazy">
                                 </picture>
                                 <div class="card-program-content">
                                     <span class="w-7 h-7 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center text-[var(--gold)] text-xs mb-2">
@@ -326,7 +326,7 @@
                             <a href="https://www.figma.com/proto/1Azmk9c0fapjsTICrk7hU6/Tsaqib-Adv?node-id=5-4&t=O3fg7rE3EBm3cqZ7-0&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=1%3A2" target="_blank" rel="noopener noreferrer" class="card-program group">
                                 <picture>
                                     <source srcset="{{ asset('assets/landing/card-figma.webp') }}" type="image/webp">
-                                    <img src="{{ asset('assets/landing/card-figma.jpg') }}" alt="Prototype Figma" class="card-photo" loading="lazy" onerror="this.remove()">
+                                    <img src="{{ asset('assets/landing/card-figma.jpg') }}" alt="Prototype Figma" class="card-photo" loading="lazy">
                                 </picture>
                                 <div class="card-program-content">
                                     <span class="w-7 h-7 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center text-[var(--gold)] text-xs mb-2">
@@ -346,7 +346,7 @@
                             <a href="{{ route('laboratorium.pai') }}" class="card-program group" tabindex="-1">
                                 <picture>
                                     <source srcset="{{ asset('assets/landing/card-labor.webp') }}" type="image/webp">
-                                    <img src="{{ asset('assets/landing/card-labor.jpg') }}" alt="" class="card-photo" loading="lazy" onerror="this.remove()">
+                                    <img src="{{ asset('assets/landing/card-labor.jpg') }}" alt="" class="card-photo" loading="lazy">
                                 </picture>
                                 <div class="card-program-content">
                                     <span class="w-7 h-7 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center text-[var(--gold)] text-xs mb-2"><i class="fa-solid fa-flask"></i></span>
@@ -358,7 +358,7 @@
                             <a href="{{ route('perpustakaan') }}" class="card-program group" tabindex="-1">
                                 <picture>
                                     <source srcset="{{ asset('assets/landing/card-perpus.webp') }}" type="image/webp">
-                                    <img src="{{ asset('assets/landing/card-perpus.jpg') }}" alt="" class="card-photo" loading="lazy" onerror="this.remove()">
+                                    <img src="{{ asset('assets/landing/card-perpus.jpg') }}" alt="" class="card-photo" loading="lazy">
                                 </picture>
                                 <div class="card-program-content">
                                     <span class="w-7 h-7 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center text-[var(--gold)] text-xs mb-2"><i class="fa-solid fa-book-open"></i></span>
@@ -370,7 +370,7 @@
                             <a href="{{ route('komunitas', 'semua') }}" class="card-program group" tabindex="-1">
                                 <picture>
                                     <source srcset="{{ asset('assets/landing/card-komunitas.webp') }}" type="image/webp">
-                                    <img src="{{ asset('assets/landing/card-komunitas.jpg') }}" alt="" class="card-photo" loading="lazy" onerror="this.remove()">
+                                    <img src="{{ asset('assets/landing/card-komunitas.jpg') }}" alt="" class="card-photo" loading="lazy">
                                 </picture>
                                 <div class="card-program-content">
                                     <span class="w-7 h-7 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center text-[var(--gold)] text-xs mb-2"><i class="fa-solid fa-users"></i></span>
@@ -382,7 +382,7 @@
                             <a href="https://www.figma.com/proto/1Azmk9c0fapjsTICrk7hU6/Tsaqib-Adv?node-id=5-4&t=O3fg7rE3EBm3cqZ7-0&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=1%3A2" target="_blank" rel="noopener noreferrer" class="card-program group" tabindex="-1">
                                 <picture>
                                     <source srcset="{{ asset('assets/landing/card-figma.webp') }}" type="image/webp">
-                                    <img src="{{ asset('assets/landing/card-figma.jpg') }}" alt="" class="card-photo" loading="lazy" onerror="this.remove()">
+                                    <img src="{{ asset('assets/landing/card-figma.jpg') }}" alt="" class="card-photo" loading="lazy">
                                 </picture>
                                 <div class="card-program-content">
                                     <span class="w-7 h-7 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center text-[var(--gold)] text-xs mb-2"><i class="fa-brands fa-figma"></i></span>
@@ -438,8 +438,10 @@
                 <span class="pat-islami" aria-hidden="true"></span>
 
                 @foreach($kunjunganSnippets as $i => $doc)
-                    <video data-snippet muted loop playsinline preload="metadata"
-                           {{ $i === 0 ? 'autoplay' : '' }}
+                    {{-- Tanpa autoplay: hanya poster/thumbnail yang tampil, video baru
+                         benar-benar diunduh saat tombol play diklik (modal di bawah). --}}
+                    <video data-snippet muted loop playsinline preload="none"
+                           @if($doc->photos->first())poster="{{ asset('storage/' . $doc->photos->first()->image_path) }}"@endif
                            class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 {{ $i === 0 ? 'opacity-100' : 'opacity-0' }}"
                            @if($doc->photos->first())poster="{{ asset('storage/' . $doc->photos->first()->image_path) }}"@endif>
                         <source src="{{ $doc->snippetUrl() }}" type="{{ str_ends_with($doc->snippet_path, '.webm') ? 'video/webm' : 'video/mp4' }}">
@@ -550,7 +552,7 @@
                         TSAQIB adalah <strong class="text-[var(--gold)] font-bold">ruang tumbuh</strong> siswa SMAN 1 Bukittinggi.
                     </p>
                     <p class="text-white/70 text-sm sm:text-base leading-relaxed">
-                        Tiga pilar utamanya: <strong class="text-white">Belajar</strong> di Laboratorium PAI, <strong class="text-white">Berkarya</strong> di Perpustakaan Digital, dan <strong class="text-white">Berkomunitas</strong> di 13 Circle. Siswa dibina karakternya, diasah potensinya, dan dihubungkan dalam ukhuwah yang nyata.
+                        Tiga pilar utamanya: <strong class="text-white">Belajar</strong> di Laboratorium PAI, <strong class="text-white">Berkarya</strong> di Perpustakaan Digital, dan <strong class="text-white">Berkomunitas</strong> di 7 Circle. Siswa dibina karakternya, diasah potensinya, dan dihubungkan dalam ukhuwah yang nyata.
                     </p>
                     <a href="{{ route('tentang') }}" class="inline-flex items-center gap-2 text-sm font-bold text-[var(--gold)] hover:gap-3 transition-all group cursor-pointer">
                         Baca Selengkapnya tentang Tsaqib
@@ -636,7 +638,7 @@
                             MEREKA BERKOMUNITAS.
                         </h3>
                         <p class="text-[11px] text-white/70 mt-2 leading-snug">
-                            Saling menguatkan dalam 13 circle minat &amp; bakat yang penuh berkah.
+                            Saling menguatkan dalam 7 circle minat &amp; bakat yang penuh berkah.
                         </p>
                     </div>
                 </div>
@@ -705,7 +707,7 @@
                                 @if($item['image'])
                                     <img src="{{ asset('storage/' . $item['image']) }}" alt="{{ $item['title'] }}"
                                          class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                         loading="lazy" onerror="this.remove()">
+                                         loading="lazy">
                                 @else
                                     <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1C442B] to-[#0D2818]">
                                         <i class="fa-solid fa-newspaper text-5xl text-white/10"></i>
@@ -761,7 +763,7 @@
                             <a href="{{ $b['url'] }}" @if($b['target'] === '_blank') target="_blank" rel="noopener" @endif
                                class="group flex items-center gap-3.5 pb-3 border-b border-white/5 last:border-0 hover:bg-white/[0.03] p-1.5 rounded-lg transition-colors">
                                 @if($b['image'])
-                                    <img src="{{ asset('storage/' . $b['image']) }}" alt="" class="w-11 h-14 object-cover rounded border border-white/15 shrink-0" loading="lazy" onerror="this.remove()">
+                                    <img src="{{ asset('storage/' . $b['image']) }}" alt="" class="w-11 h-14 object-cover rounded border border-white/15 shrink-0" loading="lazy">
                                 @else
                                     <span class="w-11 h-14 rounded bg-white/5 border border-white/10 flex items-center justify-center text-[var(--gold)] text-sm shrink-0">
                                         <i class="fa-solid fa-file-pdf"></i>
@@ -860,15 +862,15 @@
                     <div class="ph aspect-[4/3] sm:aspect-[16/11] rounded-2xl shadow-2xl overflow-hidden border border-[var(--gold)]/30" data-lab-rotator>
                         <picture>
                             <source srcset="{{ asset('assets/images/laboratorium/foto-1.webp') }}" type="image/webp">
-                            <img src="{{ asset('assets/images/laboratorium/foto-1.jpg') }}" alt="Suasana Laboratorium PAI - 1" class="lab-photo-slide is-active" data-lab-slide loading="lazy" onerror="this.remove()">
+                            <img src="{{ asset('assets/images/laboratorium/foto-1.jpg') }}" alt="Suasana Laboratorium PAI - 1" class="lab-photo-slide is-active" data-lab-slide loading="lazy">
                         </picture>
                         <picture>
                             <source srcset="{{ asset('assets/images/laboratorium/foto-2.webp') }}" type="image/webp">
-                            <img src="{{ asset('assets/images/laboratorium/foto-2.jpg') }}" alt="Suasana Laboratorium PAI - 2" class="lab-photo-slide" data-lab-slide loading="lazy" onerror="this.remove()">
+                            <img src="{{ asset('assets/images/laboratorium/foto-2.jpg') }}" alt="Suasana Laboratorium PAI - 2" class="lab-photo-slide" data-lab-slide loading="lazy">
                         </picture>
                         <picture>
                             <source srcset="{{ asset('assets/images/laboratorium/foto-3.webp') }}" type="image/webp">
-                            <img src="{{ asset('assets/images/laboratorium/foto-3.jpg') }}" alt="Suasana Laboratorium PAI - 3" class="lab-photo-slide" data-lab-slide loading="lazy" onerror="this.remove()">
+                            <img src="{{ asset('assets/images/laboratorium/foto-3.jpg') }}" alt="Suasana Laboratorium PAI - 3" class="lab-photo-slide" data-lab-slide loading="lazy">
                         </picture>
 
                         {{-- Dots --}}
@@ -890,7 +892,7 @@
                             3 TINGKATAN, PULUHAN MODUL
                         </h3>
                     </div>
-                    <a href="{{ route('laboratorium.pai') }}#modul" class="text-xs font-bold text-[var(--gold)] hover:underline">
+                    <a href="{{ route('laboratorium.modul') }}" class="text-xs font-bold text-[var(--gold)] hover:underline">
                         Lihat Semua Modul <i class="fa-solid fa-arrow-right text-[10px]"></i>
                     </a>
                 </div>
@@ -938,8 +940,8 @@
                                         </p>
                                     </div>
                                     <div class="pt-2 flex items-center gap-3">
-                                        <a href="{{ route('laboratorium.pai') }}#modul" class="btn-gold py-2 px-4 text-xs">
-                                            Unduh Silabus PDF
+                                        <a href="{{ route('laboratorium.modul') }}" class="btn-gold py-2 px-4 text-xs">
+                                            Lihat Materi &amp; Silabus
                                         </a>
                                     </div>
                                 </div>
@@ -985,7 +987,7 @@
                             <div class="swap-slide h-full flex flex-col {{ $loop->first ? 'is-active' : '' }}" data-swap-slide data-index="{{ $loop->index }}">
                                 <div class="ph flex-1 overflow-hidden flex flex-col justify-end p-5 shadow-2xl">
                                     @if($b['image'])
-                                        <img src="{{ asset('storage/' . $b['image']) }}" alt="{{ $b['title'] }}" class="absolute inset-0 w-full h-full object-cover" loading="lazy" onerror="this.remove()">
+                                        <img src="{{ asset('storage/' . $b['image']) }}" alt="{{ $b['title'] }}" class="absolute inset-0 w-full h-full object-cover" loading="lazy">
                                     @else
                                         <div class="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#1C442B] to-[#0D2818]">
                                             <i class="fa-solid fa-book-bookmark text-5xl text-[var(--gold)]/30"></i>
@@ -1103,7 +1105,7 @@
                     <div class="community-card p-5 space-y-4">
                         <div class="flex items-center gap-3.5">
                             <div class="community-logo-container">
-                                <img src="{{ asset($k['image']) }}" alt="{{ $k['nama'] }}" loading="lazy" onerror="this.remove()">
+                                <img src="{{ asset($k['image']) }}" alt="{{ $k['nama'] }}" loading="lazy">
                             </div>
                             <div class="min-w-0 flex-1">
                                 <h3 class="font-display font-bold text-sm sm:text-base text-[var(--cream)] truncate">
@@ -1180,29 +1182,22 @@
        CLIENT-SIDE SCRIPTS (Carousel, Counter, Swap Interactivity)
        ========================================================================= --}}
     <script>
-        // 0. Cuplikan kunjungan Beranda: posisi awal acak + crossfade antar video
+        // 0. Cuplikan kunjungan Beranda: crossfade antar poster/thumbnail.
+        //    Video TIDAK diunduh di sini (preload="none") — download baru terjadi
+        //    saat tombol play diklik, lewat modal #labor-video-modal.
         (function () {
             var vids = Array.prototype.slice.call(document.querySelectorAll('[data-snippet]'));
             if (!vids.length) return;
 
-            vids.forEach(function (v) {
-                v.addEventListener('loadedmetadata', function () {
-                    if (v.duration > 4) v.currentTime = Math.random() * (v.duration - 3);
-                });
-            });
-
-            // Satu video saja / user hemat-gerak: cukup loop video pertama.
+            // Satu video saja / user hemat-gerak: cukup poster pertama.
             if (vids.length < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
             var cur = 0;
             setInterval(function () {
                 var prev = vids[cur];
                 cur = (cur + 1) % vids.length;
-                var next = vids[cur];
-                next.play().catch(function () {});
-                next.classList.remove('opacity-0');
+                vids[cur].classList.remove('opacity-0');
                 prev.classList.add('opacity-0');
-                setTimeout(function () { prev.pause(); }, 1100);
             }, 6000);
         })();
 
@@ -1429,8 +1424,7 @@
             });
         })();
     </script>
-    {{-- Modal onboarding "Panduan TSAQIB" — auto-sekali + buka ulang via navbar. --}}
-    @include('partials.intro-modal')
+    {{-- Modal onboarding kini ikut partials/navbar (sekali include utk semua halaman). --}}
 
 </body>
 </html>

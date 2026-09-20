@@ -101,7 +101,7 @@
                             <div class="relative aspect-[16/10] overflow-hidden bg-black/40">
                                 @if($item->thumbnail)
                                     <img src="{{ asset('storage/' . $item->thumbnail) }}" alt="{{ $item->title }}"
-                                         class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" onerror="this.remove()">
+                                         class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy">
                                 @else
                                     {{-- Placeholder jelas: bg solid + ikon, bukan watermark transparan --}}
                                     <div class="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#1C442B] to-[#0D2818] text-white/25">
@@ -154,7 +154,7 @@
                             <div class="relative aspect-[3/4] bg-[#143520] overflow-hidden">
                                 @if($book->cover_image)
                                     <img src="{{ asset('storage/' . $book->cover_image) }}" alt="{{ $book->title }}"
-                                         class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" onerror="this.remove()">
+                                         class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy">
                                 @else
                                     <div class="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#1C442B] to-[#0D2818] text-white/25">
                                         <i class="fa-solid fa-book-open text-4xl"></i>
@@ -226,7 +226,7 @@
                                     </div>
                                     @if($cover)
                                         <img src="{{ asset('storage/' . $cover) }}" alt="{{ $doc->title }}"
-                                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" onerror="this.remove()">
+                                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy">
                                         <span class="absolute inset-0 bg-black/40"></span>
                                         <span class="absolute inset-0 flex items-center justify-center pointer-events-none">
                                             <span class="w-11 h-11 rounded-full bg-[var(--gold)]/90 text-[#10140F] flex items-center justify-center shadow-lg transition-transform duration-200 group-hover:scale-110">
@@ -238,7 +238,7 @@
                                          video Drive tidak punya metadata durasi → badge disembunyikan) --}}
                                     <span class="absolute inset-x-2 bottom-2 flex items-end justify-between gap-2">
                                         <span class="text-[11px] font-bold text-white leading-tight line-clamp-2 drop-shadow-[0_1px_2px_rgba(0,0,0,.8)]">{{ $doc->title }}</span>
-                                        @if(! $doc->isDriveVideo())
+                                        @if($doc->isLocalVideo())
                                             <span data-doc-duration data-video-src="{{ asset('storage/' . $doc->video_path) }}"
                                                   class="hidden shrink-0 text-[9px] font-bold text-white bg-black/70 px-1.5 py-0.5 rounded tabular-nums">--:--</span>
                                         @endif
@@ -247,7 +247,7 @@
                                     {{-- ===== CARD GALERI FOTO ===== --}}
                                     @if($cover)
                                         <img src="{{ asset('storage/' . $cover) }}" alt="{{ $doc->title }}"
-                                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" onerror="this.remove()">
+                                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy">
                                     @else
                                         <div class="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-gradient-to-br from-[#1C442B] to-[#0D2818]">
                                             <i class="fa-solid fa-camera text-3xl text-white/20"></i>

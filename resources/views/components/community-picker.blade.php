@@ -37,7 +37,7 @@
                     class="cm-pick{{ $initial === $k['slug'] ? ' is-active' : '' }}"
                     data-value="{{ $k['slug'] }}"
                     aria-label="Pilih komunitas {{ $k['nama'] }}">
-                <img src="{{ asset($k['image']) }}" alt="" loading="lazy" draggable="false" onerror="this.remove()">
+                <img src="{{ asset($k['image']) }}" alt="" loading="lazy" draggable="false">
                 <span class="cm-name">{{ $k['nama'] }}</span>
             </button>
         @endforeach

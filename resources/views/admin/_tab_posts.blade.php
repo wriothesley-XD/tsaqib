@@ -6,7 +6,7 @@
                 <i class="fa-solid fa-newspaper text-[var(--gold)]"></i>
                 <span>Kelola Postingan Members ({{ $posts->total() }})</span>
             </h3>
-            <p class="text-xs text-white/50 mt-0.5">Pantau dan kelola seluruh konten diskusi pelajar di 13 circle komunitas.</p>
+            <p class="text-xs text-white/50 mt-0.5">Pantau dan kelola seluruh konten diskusi pelajar di 7 circle komunitas.</p>
         </div>
 
         {{-- Filter Per Komunitas --}}

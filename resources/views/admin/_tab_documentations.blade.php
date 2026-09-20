@@ -156,11 +156,11 @@
                 </div>
 
                 <div>
-                    <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Link Google Drive — VIDEO LENGKAP (kosongkan untuk menghapus video)</label>
-                    <input type="url" name="video_drive" value="{{ $editDoc->isDriveVideo() ? $editDoc->video_path : '' }}"
+                    <label class="block text-[10px] font-bold uppercase text-white/60 mb-1">Link Google Drive / YouTube — VIDEO LENGKAP (kosongkan untuk menghapus video)</label>
+                    <input type="url" name="video_drive" value="{{ ! $editDoc->isLocalVideo() ? $editDoc->video_path : '' }}"
                            placeholder="https://drive.google.com/file/d/FILE_ID/view?usp=sharing"
                            class="tsaqib-input w-full px-3 py-2 text-xs">
-                    @if($editDoc->video_path && ! $editDoc->isDriveVideo())
+                    @if($editDoc->isLocalVideo())
                         <p class="text-[10px] text-[var(--gold)] mt-1">Saat ini video lokal terupload. Mengisi link Drive akan menggantinya; mengosongkan field akan MENGHAPUS video lokal.</p>
                     @endif
                 </div>

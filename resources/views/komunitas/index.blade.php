@@ -225,7 +225,7 @@
                         @endif
                     </h1>
                     <p class="text-white/60 text-xs sm:text-sm mt-1">
-                        Kumpulan kegiatan, karya, karya tulis, dan pengumuman dari 13 circle FSI SMAN 1 Bukittinggi.
+                        Kumpulan kegiatan, karya, karya tulis, dan pengumuman dari 7 circle FSI SMAN 1 Bukittinggi.
                     </p>
                 </div>
                 @auth
@@ -259,7 +259,7 @@
                         <a href="{{ route('komunitas', $k['slug']) }}"
                            class="k-nav-link {{ $currentSlug === $k['slug'] ? 'active' : '' }}"
                            {{ $currentSlug === $k['slug'] ? 'aria-current="page"' : '' }}>
-                            <img src="{{ asset($k['image']) }}" alt="" loading="lazy" onerror="this.remove()"
+                            <img src="{{ asset($k['image']) }}" alt="" loading="lazy"
                                  class="w-8 h-8 rounded-lg object-cover shrink-0 bg-white/5 border border-white/10">
                             <span class="min-w-0 flex-1 truncate">{{ $k['nama'] }}</span>
                             <span class="k-count">{{ $k['total'] }}</span>
@@ -281,7 +281,7 @@
                     @foreach($komunitasSidebar as $k)
                         <a href="{{ route('komunitas', $k['slug']) }}"
                            class="k-chip shrink-0 whitespace-nowrap {{ $currentSlug === $k['slug'] ? 'active' : '' }}">
-                            <img src="{{ asset($k['image']) }}" alt="" loading="lazy" onerror="this.remove()"
+                            <img src="{{ asset($k['image']) }}" alt="" loading="lazy"
                                  class="w-4 h-4 rounded object-cover">
                             {{ $k['nama'] }} <span class="opacity-60 ml-0.5">{{ $k['total'] }}</span>
                         </a>

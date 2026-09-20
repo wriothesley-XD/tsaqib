@@ -107,7 +107,7 @@
                         </span>
                         <h3 class="font-display font-extrabold text-xl text-[var(--cream)] tracking-tight">BERKOMUNITAS.</h3>
                         <p class="text-xs sm:text-sm text-white/70 mt-2 leading-relaxed">
-                            Melalui <strong class="text-white">13 Circle Komunitas</strong>, setiap siswa menyalurkan minat &amp; bakat positif—dari hafalan Al-Qur'an, sains OSN, olahraga, hingga kreasi digital.
+                            Melalui <strong class="text-white">7 Circle Komunitas</strong>, setiap siswa menyalurkan minat &amp; bakat positif—dari hafalan Al-Qur'an, sains OSN, olahraga, hingga kreasi digital.
                         </p>
                     </div>
                 </div>

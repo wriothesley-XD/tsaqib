@@ -1,10 +1,11 @@
 @php
     $pageTitle = 'Laboratorium PAI - FSI SMAN 1 Bukittinggi';
-    // Prioritas: tautan eksternal (Heyzine/Google Drive/dst) > PDF yang diupload > file default.
+    // Prioritas: tautan eksternal (Heyzine/Google Drive/dst) > PDF yang diunggah.
+    // Tanpa keduanya → null (viewer jadi catatan "segera", bukan link file kosong).
     $monevIsExternalLink = !empty($monevUrlSetting);
     $monevUrl = $monevIsExternalLink
         ? $monevUrlSetting
-        : (!empty($monevPdf) ? asset('storage/' . $monevPdf) : asset('assets/documents/monev-internal-pemerintah-daerah.pdf'));
+        : (!empty($monevPdf) ? asset('storage/' . $monevPdf) : null);
     $profilBukuFileUrl = !empty($profilBukuPdf) ? asset('storage/' . $profilBukuPdf) : null;
     $pembinaImgSrc = !empty($strukturPembinaImg) ? asset('storage/' . $strukturPembinaImg) : asset('images/struktur.webp');
     $siswaImgSrc = !empty($strukturSiswaImg) ? asset('storage/' . $strukturSiswaImg) : asset('images/kepengurusan.webp');
@@ -200,13 +201,13 @@
                         <button type="button" data-video-card
                                 data-embed="{{ $doc->videoPreviewUrl() }}"
                                 data-watch="{{ $doc->videoWatchUrl() }}"
-                                data-local="{{ $doc->isDriveVideo() || ! $doc->video_path ? '' : asset('storage/' . $doc->video_path) }}"
+                                data-local="{{ $doc->isLocalVideo() ? asset('storage/' . $doc->video_path) : '' }}"
                                 data-title="{{ $doc->title }}"
                                 class="group text-left rounded-xl overflow-hidden border border-white/10 hover:border-[rgba(201,166,107,0.5)] bg-black/30 transition cursor-pointer">
                             <span class="relative block aspect-video overflow-hidden">
                                 @if($doc->photos->first())
                                     <img src="{{ asset('storage/' . $doc->photos->first()->image_path) }}" alt="{{ $doc->title }}"
-                                         class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" onerror="this.remove()">
+                                         class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy">
                                 @else
                                     <span class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1C442B] to-[#0D2818]">
                                         <span class="font-display font-extrabold text-2xl tracking-wider text-white/10">TSAQIB</span>
@@ -406,7 +407,7 @@
                                 <div class="flex items-center gap-2">
                                     <h3 class="text-lg font-display font-bold text-[var(--cream)]">Monev Internal Pemerintah Daerah</h3>
                                     <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#01795F]/15 text-[#3fd6b0] border border-[#01795F]/30">
-                                        {{ $monevIsExternalLink ? 'Tautan Eksternal' : 'Dokumen Resmi PDF' }}
+                                        {{ $monevUrl ? ($monevIsExternalLink ? 'Tautan Eksternal' : 'Dokumen Resmi PDF') : 'Segera Tersedia' }}
                                     </span>
                                 </div>
                                 <p class="text-white/55 text-xs mt-0.5">
@@ -415,6 +416,7 @@
                             </div>
                         </div>
 
+                        @if($monevUrl)
                         <div class="flex items-center gap-2 shrink-0 self-start sm:self-auto">
                             <a href="{{ $monevUrl }}" target="_blank" rel="noopener"
                                class="btn-outline text-xs px-4 py-2">
@@ -429,8 +431,10 @@
                                 </a>
                             @endunless
                         </div>
+                        @endif
                     </div>
 
+                    @if($monevUrl)
                     <!-- PDF/Link Viewer Container -->
                     <div class="rounded-xl overflow-hidden border border-white/15 bg-white shadow-2xl">
                         <iframe src="{{ $monevUrl }}{{ $monevIsExternalLink ? '' : '#toolbar=1&navpanes=0' }}"
@@ -438,14 +442,21 @@
                                 class="w-full h-[520px] sm:h-[600px] bg-[#525659]"
                                 loading="lazy"></iframe>
                     </div>
+                    @else
+                    <!-- Belum ada dokumen (eksternal/upload) — pesan jujur, bukan link file kosong -->
+                    <div class="rounded-xl border border-dashed border-white/15 bg-white/[0.03] p-10 text-center">
+                        <i class="fa-solid fa-file-pdf text-3xl text-white/15 block mb-2"></i>
+                        <p class="text-white/40 text-xs">Dokumen monev internal akan segera diunggah.</p>
+                    </div>
+                    @endif
 
                     <div class="flex items-center justify-between text-xs text-white/50 pt-1">
                         <span><i class="fa-solid fa-shield-halved text-[var(--gold)] mr-1.5"></i>Dokumen Terverifikasi FSI TSAQIB &amp; Sekolah</span>
-                        @unless($monevIsExternalLink)
+                        @if($monevUrl && ! $monevIsExternalLink)
                             <a href="{{ $monevUrl }}" download class="text-[var(--gold)] hover:underline">
                                 Simpan salinan (PDF)
                             </a>
-                        @endunless
+                        @endif
                     </div>
                 </div>
 
@@ -469,13 +480,13 @@
                 <div class="group relative rounded-xl overflow-hidden border border-white/10 bg-white p-3 shadow-lg">
                     <img src="{{ $pembinaImgSrc }}" alt="Struktur Pembina &amp; Laboratorium PAI" width="800" height="600"
                          class="w-full h-auto rounded-lg object-contain transition-transform duration-300 group-hover:scale-[1.01]"
-                         loading="lazy" onerror="this.remove()">
+                         loading="lazy">
                     <span class="block text-center text-xs font-semibold text-[#10140F]/70 mt-2">Bagan Struktur Pembina &amp; Laboratorium PAI</span>
                 </div>
                 <div class="group relative rounded-xl overflow-hidden border border-white/10 bg-white p-3 shadow-lg">
                     <img src="{{ $siswaImgSrc }}" alt="Kepengurusan Siswa TSAQIB FSI" width="800" height="600"
                          class="w-full h-auto rounded-lg object-contain transition-transform duration-300 group-hover:scale-[1.01]"
-                         loading="lazy" onerror="this.remove()">
+                         loading="lazy">
                     <span class="block text-center text-xs font-semibold text-[#10140F]/70 mt-2">Bagan Kepengurusan Siswa TSAQIB FSI</span>
                 </div>
             </div>
@@ -490,8 +501,8 @@
         </button>
         <div class="w-full max-w-3xl space-y-3">
             <div class="relative w-full aspect-video rounded-xl overflow-hidden border border-[rgba(201,166,107,0.4)] bg-black shadow-2xl">
-                {{-- Prioritas: embed Google Drive (video lengkap, bandwidth ditangang Drive).
-                     <video> native hanya utk video lokal lama yang sudah pernah diupload. --}}
+                {{-- Prioritas: embed Google Drive (video lengkap, bandwidth ditangani Drive).
+                     <video> native hanya utk video lokal lama yang sudah pernah diunggah. --}}
                 <iframe id="doc-video-frame" src="" title="Video dokumentasi"
                         class="absolute inset-0 w-full h-full" allow="autoplay; fullscreen" allowfullscreen></iframe>
                 <video id="doc-video-local" controls playsinline preload="metadata"

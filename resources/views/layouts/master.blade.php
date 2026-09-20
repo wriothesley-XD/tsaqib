@@ -43,8 +43,7 @@
 
     @include('partials.site-footer')
 
-    {{-- Modal onboarding "Panduan TSAQIB" — auto-sekali + buka ulang via navbar. --}}
-    @include('partials.intro-modal')
+    {{-- Modal onboarding kini ikut partials/navbar (sekali include utk semua halaman). --}}
 
     @stack('scripts')
 </body>

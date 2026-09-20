@@ -40,6 +40,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Tempelkan header keamanan (CSP, HSTS, dll) ke setiap response
         $middleware->append(SecurityHeaders::class);
+
+        // Lazy-loading + fallback gambar terpusat (termasuk <img> dari konten DB)
+        $middleware->append(\App\Http\Middleware\OptimizeImages::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

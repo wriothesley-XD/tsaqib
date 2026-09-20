@@ -168,7 +168,7 @@
                         <label class="block text-xs font-semibold text-white/75 mb-1">Atau Unggah Berkas PDF Monev Resmi (Maks 30MB)</label>
                         <input type="file" name="monev_internal_pdf" accept=".pdf"
                                class="tsaqib-input w-full px-3 py-1.5 text-xs text-white/70 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[var(--gold)]/20 file:text-[var(--gold)]">
-                        <p class="text-[11px] text-white/45 mt-1">Jika tautan di atas kosong dan PDF belum diupload, sistem akan menampilkan dokumen monev resmi default.</p>
+                        <p class="text-[11px] text-white/45 mt-1">Jika tautan dan PDF keduanya kosong, halaman publik menampilkan catatan "dokumen akan segera diunggah" — bukan link file kosong.</p>
                         @if(!empty($laborSettings['monev_internal_pdf']))
                             <div class="mt-2 flex items-center justify-between text-xs">
                                 <a href="{{ asset('storage/' . $laborSettings['monev_internal_pdf']) }}" target="_blank" class="text-[var(--gold)] hover:underline inline-flex items-center gap-1">

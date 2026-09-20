@@ -24,7 +24,7 @@
             </h1>
 
             <p class="text-white/60 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed mb-6">
-                Pusat kegiatan, ukhuwah, keilmuan Al-Qur'an, dan syiar kebaikan siswa SMAN 1 Bukittinggi. Silakan jelajahi 13 komunitas di bawah ini.
+                Pusat kegiatan, ukhuwah, keilmuan Al-Qur'an, dan syiar kebaikan siswa SMAN 1 Bukittinggi. Silakan jelajahi 8 komunitas di bawah ini.
             </p>
 
             <div class="flex justify-center space-x-3">
@@ -50,13 +50,13 @@
                 <div>
                     <h2 class="text-xl font-display font-bold text-[var(--cream)] flex items-center space-x-2">
                         <i class="fa-solid fa-compass text-[var(--gold)]"></i>
-                        <span>Peta Eksplorasi 13 Komunitas</span>
+                        <span>Peta Eksplorasi 8 Komunitas</span>
                     </h2>
                     <p class="text-white/50 text-xs mt-0.5">Klik salah satu ikon komunitas untuk menjelajahi aktivitasnya</p>
                 </div>
             </div>
 
-            <!-- Grid 13 Community Icons -->
+            <!-- Grid 8 Community Icons -->
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
                 @foreach($daftarKomunitas as $k)
                     <a href="{{ route('komunitas', $k['slug']) }}"

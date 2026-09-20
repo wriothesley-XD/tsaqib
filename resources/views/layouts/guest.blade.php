@@ -148,7 +148,7 @@
             </a>
 
             <a href="/" aria-label="Beranda TSAQIB">
-                <img src="{{ asset('images/icon/tsaqib-media.svg.png') }}" alt="TSAQIB" class="auth-logo" />
+                <img src="{{ asset('images/icon/tsaqib-media.svg.png') }}" alt="TSAQIB" class="auth-logo" data-eager />
             </a>
 
             <div class="auth-card w-full sm:max-w-md mt-6 px-6 py-8 sm:px-8">

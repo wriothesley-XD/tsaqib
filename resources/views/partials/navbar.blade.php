@@ -58,7 +58,7 @@
 
             {{-- ===== BRAND (kiri) ===== --}}
             <a href="{{ route('landing') }}" class="flex items-center gap-3 group shrink-0" title="Kembali ke Beranda">
-                <img src="{{ asset('images/icon/tsaqib-media.svg.png') }}" alt="TSAQIB Logo" class="h-9 sm:h-10 w-auto object-contain shrink-0 group-hover:scale-105 transition-transform duration-200">
+                <img src="{{ asset('images/icon/tsaqib-media.svg.png') }}" alt="TSAQIB Logo" data-eager class="h-9 sm:h-10 w-auto object-contain shrink-0 group-hover:scale-105 transition-transform duration-200">
                 <span class="leading-none">
                     <span class="font-display font-extrabold text-base sm:text-lg tracking-tight text-[var(--cream)] block">TSAQIB</span>
                     <span class="text-[9px] sm:text-[10px] text-[var(--gold)] font-bold tracking-[0.14em] uppercase block mt-0.5">FSI SMAN 1 Bukittinggi</span>
@@ -454,3 +454,7 @@
         setupDropdown('lainnya-toggle', 'lainnya-menu');
     });
 </script>
+
+{{-- Modal onboarding "Panduan TSAQIB" — ikut navbar supaya item "Panduan TSAQIB"
+     berfungsi di SEMUA halaman (dulu hanya landing/master yang memuat modalnya). --}}
+@include('partials.intro-modal')

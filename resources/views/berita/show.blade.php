@@ -81,7 +81,7 @@
                             <a href="{{ route('berita.show', $r->slug) }}" class="tsaqib-card p-3 flex gap-3 group">
                                 <div class="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-[#01795F]/20">
                                     @if($r->thumbnail)
-                                        <img src="{{ asset('storage/' . $r->thumbnail) }}" alt="{{ $r->title }}" class="w-full h-full object-cover" onerror="this.remove()">
+                                        <img src="{{ asset('storage/' . $r->thumbnail) }}" alt="{{ $r->title }}" class="w-full h-full object-cover">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center text-white/25"><i class="fa-solid fa-newspaper"></i></div>
                                     @endif
@@ -106,7 +106,7 @@
                         <a href="{{ route('berita.show', $r->slug) }}" class="tsaqib-card p-3 flex gap-3">
                             <div class="w-14 h-14 rounded-lg overflow-hidden shrink-0 bg-[#01795F]/20">
                                 @if($r->thumbnail)
-                                    <img src="{{ asset('storage/' . $r->thumbnail) }}" alt="{{ $r->title }}" class="w-full h-full object-cover" onerror="this.remove()">
+                                    <img src="{{ asset('storage/' . $r->thumbnail) }}" alt="{{ $r->title }}" class="w-full h-full object-cover">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center text-white/25"><i class="fa-solid fa-newspaper"></i></div>
                                 @endif

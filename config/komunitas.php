@@ -40,7 +40,7 @@ return [
         [
             'slug' => 'leora',
             'nama' => 'Leora (Game)',
-            'deskripsi_singkat' => 'Mabar santai sampai turnamen kecil-kecilan — main asik, tetap terjaga.',
+            'deskripsi_singkat' => 'Mabar santai sampai turnamen kecil-kecilan — main asyik, tetap terjaga.',
             'peran' => 'Commander, Subcomunity, Support',
             'image' => 'images/icon/leora.jpg',
         ],

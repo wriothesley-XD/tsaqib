@@ -41,6 +41,6 @@
     </tr>
 @empty
     <tr>
-        <td colspan="7" class="p-6 text-center text-white/40">Belum ada materi silabus atau modul yang diupload.</td>
+        <td colspan="7" class="p-6 text-center text-white/40">Belum ada materi silabus atau modul yang diunggah.</td>
     </tr>
 @endforelse

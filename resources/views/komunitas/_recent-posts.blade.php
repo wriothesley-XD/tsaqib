@@ -24,7 +24,7 @@
                data-rp-url="{{ route('komunitas.post.show', $rp->id) }}"
                class="rp-item">
                 @if ($rpKomunitas)
-                    <img src="{{ asset($rpKomunitas['image']) }}" alt="" loading="lazy" onerror="this.remove()" class="rp-avatar">
+                    <img src="{{ asset($rpKomunitas['image']) }}" alt="" loading="lazy" class="rp-avatar">
                 @else
                     <span class="rp-avatar rp-avatar-fallback"><i class="fa-solid fa-users"></i></span>
                 @endif

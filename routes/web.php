@@ -39,6 +39,7 @@ Route::get('/berita/{slug}', [NewsController::class, 'show'])->name('berita.show
 
 // Halaman statis publik.
 Route::view('/tentang', 'tentang')->name('tentang');
+Route::view('/panduan', 'panduan')->name('panduan');
 
 // Laboratorium PAI Publik + 3 sub-halaman (profil/modul/tugas).
 // Modul & Tugas: akses penuh hanya siswa terverifikasi/guru — belum

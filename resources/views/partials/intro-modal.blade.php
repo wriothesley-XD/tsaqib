@@ -3,9 +3,8 @@
     ===============================================
     Modal onboarding "Panduan TSAQIB" — carousel 4 slide.
 
-    • Muncul OTOMATIS SEKALI per browser (localStorage "sudah_lihat_intro").
-    • Bisa dibuka ulang kapan saja: elemen apa pun ber-atribut [data-open-intro]
-      (lihat item "Panduan TSAQIB" di dropdown Lainnya, partials/navbar).
+    • Muncul OTOMATIS SEKALI per browser (localStorage "sudah_lihat_intro");
+      panduan lengkap tersedia sebagai halaman /panduan (menu "Panduan TSAQIB").
     • Self-contained (markup + <style> + <script> satu file) supaya bisa
       di-include dari layouts/master ATAU landing.blade.php — keduanya
       menyediakan var tema --gold/--cream (theme-head / :root landing).
@@ -153,18 +152,8 @@
         if (e.key === 'Escape' && modal.classList.contains('is-open')) close();
     });
 
-    // Reopen via [data-open-intro] (navbar "Panduan TSAQIB"). preventDefault karena
-    // href-nya "#"; dropdown Lainnya ikut ditutup agar tak tertinggal terbuka.
-    document.addEventListener('click', function (e) {
-        var t = e.target.closest('[data-open-intro]');
-        if (!t) return;
-        e.preventDefault();
-        var lm = document.getElementById('lainnya-menu');
-        var lb = document.getElementById('lainnya-toggle');
-        if (lm) lm.classList.remove('is-open');
-        if (lb) lb.setAttribute('aria-expanded', 'false');
-        open();
-    });
+    // Reopen in-page kini lewat halaman /panduan (menu "Panduan TSAQIB");
+    // modal ini hanya tayang otomatis sekali per browser.
 
     // Auto-sekali untuk pengunjung baru. try/catch: localStorage bisa diblokir
     // (private mode) — gagalnya jangan sampai mematikan seluruh halaman.

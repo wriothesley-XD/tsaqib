@@ -2,7 +2,7 @@
     $currentRoute = Route::currentRouteName() ?? '';
 
     $isKomunitasZone = str_contains($currentRoute, 'komunitas');
-    $isLainnya       = str_contains($currentRoute, 'open.recruitment') || $currentRoute === 'tentang';
+    $isLainnya       = str_contains($currentRoute, 'open.recruitment') || $currentRoute === 'tentang' || $currentRoute === 'panduan';
     $isLaborZone     = in_array($currentRoute, ['laboratorium.pai', 'labor', 'laboratorium.profil', 'laboratorium.modul', 'laboratorium.tugas']);
 
     // Menu utama
@@ -13,9 +13,10 @@
         ['label' => 'Info', 'href' => route('info'), 'active' => $currentRoute === 'info' || $currentRoute === 'berita.show'],
     ];
 
-    // Item sekunder di dropdown "Lainnya"
+    // Item sekunder di dropdown "Lainnya" — urutan sama di desktop & mobile (SATU sumber data).
     $navLainnya = [
         ['label' => 'Tentang Tsaqib', 'href' => route('tentang'), 'icon' => 'fa-circle-info', 'active' => $currentRoute === 'tentang'],
+        ['label' => 'Panduan TSAQIB', 'href' => route('panduan'), 'icon' => 'fa-circle-question', 'active' => $currentRoute === 'panduan'],
         ['label' => 'Open Recruitment', 'href' => route('open.recruitment'), 'icon' => 'fa-user-plus', 'active' => str_contains($currentRoute, 'open.recruitment')],
         [
             'label'  => 'Saran & Masukan',
@@ -23,14 +24,6 @@
             'target' => '_blank',
             'rel'    => 'noopener noreferrer',
             'icon'   => 'fa-comment-dots',
-        ],
-        [
-            // Buka ulang modal onboarding (partials/intro-modal) — bukan navigasi,
-            // href "#" di-preventDefault oleh script modal via [data-open-intro].
-            'label' => 'Panduan TSAQIB',
-            'href'  => '#',
-            'icon'  => 'fa-circle-question',
-            'attrs' => 'data-open-intro',
         ],
     ];
 
@@ -455,6 +448,6 @@
     });
 </script>
 
-{{-- Modal onboarding "Panduan TSAQIB" — ikut navbar supaya item "Panduan TSAQIB"
-     berfungsi di SEMUA halaman (dulu hanya landing/master yang memuat modalnya). --}}
+{{-- Modal onboarding — ikut navbar supaya tayang otomatis (kunjungan pertama/?intro=1)
+     di SEMUA halaman. Item menu "Panduan TSAQIB" kini mengarah ke halaman /panduan. --}}
 @include('partials.intro-modal')

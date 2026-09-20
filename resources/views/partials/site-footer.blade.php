@@ -64,9 +64,8 @@
     </div>
 </footer>
 
-{{-- Global Interactive Modals, Toast Container & Daily Notification --}}
+{{-- Global Interactive Modals & Toast Container --}}
 @include('components.command-palette')
 @include('components.shortcuts-modal')
 @include('components.toast')
-@include('components.daily-notification')
 

@@ -438,71 +438,34 @@
                 <span class="pat-islami" aria-hidden="true"></span>
 
                 @foreach($kunjunganSnippets as $i => $doc)
-                    {{-- Tanpa autoplay: hanya poster/thumbnail yang tampil, video baru
-                         benar-benar diunduh saat tombol play diklik (modal di bawah). --}}
-                    <video data-snippet muted loop playsinline preload="none"
+                    {{-- Preview autoplay: cuplikan bergerak natural, tanpa tombol play.
+                         Diputar via JS (hanya yang terlihat di viewport); poster = fallback
+                         bila video gagal dimuat. --}}
+                    <video data-snippet muted loop playsinline preload="auto"
                            @if($doc->photos->first())poster="{{ asset('storage/' . $doc->photos->first()->image_path) }}"@endif
-                           class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 {{ $i === 0 ? 'opacity-100' : 'opacity-0' }}"
-                           @if($doc->photos->first())poster="{{ asset('storage/' . $doc->photos->first()->image_path) }}"@endif>
+                           class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 {{ $i === 0 ? 'opacity-100' : 'opacity-0' }}">
                         <source src="{{ $doc->snippetUrl() }}" type="{{ str_ends_with($doc->snippet_path, '.webm') ? 'video/webm' : 'video/mp4' }}">
                     </video>
                 @endforeach
 
-                <span class="absolute inset-0 bg-black/40 pointer-events-none"></span>
-
-                {{-- Play + caption: satu kolom tengah, caption rapi di bawah tombol --}}
-                <div class="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                    @if($kunjunganSnippets->isNotEmpty())
-                        <button type="button" data-labor-play
-                                class="relative w-16 h-16 rounded-full bg-[var(--gold)] text-[#10140F] flex items-center justify-center text-xl shadow-[0_10px_30px_-8px_rgba(201,166,107,0.8)] transition-transform duration-200 hover:scale-110 cursor-pointer"
-                                aria-label="Putar cuplikan video kunjungan">
-                            <span class="absolute inset-0 rounded-full bg-[var(--gold)] opacity-50 animate-ping" aria-hidden="true"></span>
-                            <i class="fa-solid fa-play relative translate-x-[2px]"></i>
-                        </button>
-                        <span class="flex items-center gap-1.5 text-[10px] font-bold text-white/85">
-                            <i class="fa-solid fa-circle-play text-[9px]"></i>
-                            <span class="truncate">Cuplikan — versi lengkap di Laboratorium PAI</span>
-                        </span>
-                    @else
-                        <span class="relative w-16 h-16 rounded-full bg-[var(--gold)]/90 text-[#10140F] flex items-center justify-center text-xl shadow-[0_10px_30px_-8px_rgba(201,166,107,0.8)]" aria-hidden="true">
-                            <i class="fa-solid fa-play translate-x-[2px]"></i>
-                        </span>
-                        <span class="text-[10px] font-bold text-white/60">Video kunjungan — segera hadir</span>
-                    @endif
-                </div>
+                @if($kunjunganSnippets->isNotEmpty())
+                    {{-- Caption kecil di bawah — tautan, bukan tombol, tidak menutupi video --}}
+                    <a href="{{ route('laboratorium.pai') }}#dokumentasi-kunjungan"
+                       class="absolute bottom-3 left-4 right-4 flex items-center gap-1.5 text-[10px] font-bold text-white/85 drop-shadow-[0_1px_2px_rgba(0,0,0,.8)] transition-colors hover:text-white">
+                        <i class="fa-solid fa-circle-play text-[9px]"></i>
+                        <span class="truncate">Cuplikan kunjungan — versi lengkap di Laboratorium PAI</span>
+                    </a>
+                @else
+                    {{-- Belum ada cuplikan video: thumbnail statis Laboratorium PAI --}}
+                    <picture>
+                        <source srcset="{{ asset('assets/landing/card-labor.webp') }}" type="image/webp">
+                        <img src="{{ asset('assets/landing/card-labor.jpg') }}" alt="Laboratorium PAI SMAN 1 Bukittinggi"
+                             class="absolute inset-0 w-full h-full object-cover" loading="lazy">
+                    </picture>
+                @endif
             </div>
         </div>
     </section>
-
-    {{-- Modal overlay: cuplikan diputar dgn suara + controls --}}
-    @if($kunjunganSnippets->isNotEmpty())
-        <div id="labor-video-modal" class="fixed inset-0 z-[70] hidden bg-black/85 backdrop-blur-sm items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Cuplikan video kunjungan">
-            <button type="button" data-labor-modal-close class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white text-lg cursor-pointer transition" aria-label="Tutup video">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <div class="w-full max-w-3xl">
-                <video id="labor-modal-video" controls playsinline preload="metadata"
-                       class="w-full max-h-[70vh] aspect-video rounded-2xl border border-white/15 bg-black shadow-2xl"></video>
-                <a href="{{ route('laboratorium.pai') }}#dokumentasi-kunjungan" data-labor-modal-close
-                   class="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-[var(--gold)] hover:underline">
-                    Tonton versi lengkap di Laboratorium PAI <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                </a>
-            </div>
-        </div>
-        <script>
-        (function () {
-            var modal = document.getElementById('labor-video-modal');
-            var video = document.getElementById('labor-modal-video');
-            var src   = document.querySelector('[data-snippet] source');
-            function open()  { modal.classList.remove('hidden'); modal.classList.add('flex'); if (src) { video.src = src.src; video.play().catch(function(){}); } }
-            function close() { video.pause(); video.removeAttribute('src'); video.load(); modal.classList.add('hidden'); modal.classList.remove('flex'); }
-            document.querySelector('[data-labor-play]').addEventListener('click', open);
-            modal.querySelectorAll('[data-labor-modal-close]').forEach(function (el) { el.addEventListener('click', close); });
-            modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
-            document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !modal.classList.contains('hidden')) close(); });
-        })();
-        </script>
-    @endif
 
     {{-- =========================================================================
        SCENE 03: "JADI, TSAQIB ITU APA?" (The Clarity Anchor / 5-Second Rule)
@@ -530,10 +493,11 @@
                         <img src="{{ asset('images/icon/tsaqib-media.svg.png') }}" alt="Logo TSAQIB"
                              class="tsaqib-hero-logo relative object-contain mx-auto mb-5 drop-shadow-[0_4px_18px_rgba(0,0,0,0.45)]"
                              style="width: clamp(144px, 42vw, 320px); height: auto; animation: tsaqibFloatIdle 3.5s ease-in-out infinite;">
-                        <p class="relative font-display font-black text-7xl sm:text-8xl lg:text-9xl text-shimmer tracking-tight select-none">
+                        {{-- Wordmark watermark: sengaja kecil & redup — fokus tetap di headline "Jadi, TSAQIB itu apa?" --}}
+                        <p class="relative font-display font-black text-4xl sm:text-5xl lg:text-6xl text-[var(--cream)]/15 tracking-tight select-none" aria-hidden="true">
                             TSAQIB
                         </p>
-                        <p class="relative mt-3 text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] text-[var(--cream)]/60">
+                        <p class="relative mt-4 text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] text-[var(--cream)]/70">
                             Forum Studi Islam &middot; SMAN 1 Bukittinggi
                         </p>
                     </div>
@@ -1172,33 +1136,37 @@
     {{-- Global Site Footer --}}
     @include('partials.site-footer')
 
-    {{-- Floating Back to Top Button --}}
-    <button id="to-top" type="button" aria-label="Kembali ke atas"
-            class="fixed bottom-6 right-6 z-[80] w-11 h-11 rounded-full flex items-center justify-center text-[var(--cream)] bg-[#0D2818]/90 border border-[var(--gold)]/50 shadow-2xl backdrop-blur-md hover:border-[var(--gold)] hover:scale-105 transition-all">
-        <i class="fa-solid fa-arrow-up text-xs"></i>
-    </button>
-
     {{-- =========================================================================
        CLIENT-SIDE SCRIPTS (Carousel, Counter, Swap Interactivity)
        ========================================================================= --}}
     <script>
-        // 0. Cuplikan kunjungan Beranda: crossfade antar poster/thumbnail.
-        //    Video TIDAK diunduh di sini (preload="none") — download baru terjadi
-        //    saat tombol play diklik, lewat modal #labor-video-modal.
+        // 0. Cuplikan kunjungan Beranda: preview autoplay + crossfade antar cuplikan.
+        //    Hanya cuplikan yang terlihat di viewport yang diputar & diunduh
+        //    (IntersectionObserver); prefers-reduced-motion → tampil poster saja.
         (function () {
             var vids = Array.prototype.slice.call(document.querySelectorAll('[data-snippet]'));
             if (!vids.length) return;
-
-            // Satu video saja / user hemat-gerak: cukup poster pertama.
-            if (vids.length < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
             var cur = 0;
-            setInterval(function () {
-                var prev = vids[cur];
-                cur = (cur + 1) % vids.length;
-                vids[cur].classList.remove('opacity-0');
-                prev.classList.add('opacity-0');
-            }, 6000);
+            function play()  { vids[cur].play().catch(function(){}); }
+            function pause() { vids[cur].pause(); }
+
+            if (vids.length > 1) {
+                setInterval(function () {
+                    pause();
+                    vids[cur].classList.add('opacity-0');
+                    cur = (cur + 1) % vids.length;
+                    vids[cur].classList.remove('opacity-0');
+                    play();
+                }, 6000);
+            }
+
+            new IntersectionObserver(function (entries) {
+                entries.forEach(function (en) {
+                    if (en.isIntersecting) { play(); } else { pause(); }
+                });
+            }, { threshold: 0.25 }).observe(vids[0]);
         })();
 
         // 1. Program Carousel Infinite Loop + Drag
@@ -1360,18 +1328,6 @@
             root.addEventListener('mouseenter', stop);
             root.addEventListener('mouseleave', start);
             start();
-        })();
-
-        // 6. Back to Top Button
-        (function () {
-            const btn = document.getElementById('to-top');
-            if (!btn) return;
-            window.addEventListener('scroll', () => {
-                btn.classList.toggle('is-show', window.scrollY > 400);
-            }, { passive: true });
-            btn.addEventListener('click', () => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
         })();
 
         // 7. Copy Hikmah Hadits
